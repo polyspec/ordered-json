@@ -23,3 +23,5 @@ python3 scripts/test.py --suite .cache/JSONTestSuite
 ```
 
 이 결과는 위 환경과 사례에 대한 검증 기록입니다. 선언된 최소 런타임 버전 전체에서 실행한 결과는 아닙니다.
+
+동일한 입력으로 실행한 기존 Python·Erlang 프로젝트 결과는 [ojson 비교 검증](ojson-comparison.md)에 별도로 기록했습니다.
