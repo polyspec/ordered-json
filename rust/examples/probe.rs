@@ -1,5 +1,5 @@
 // Adapter only. The shared Python verifier owns examples and expectations.
-use ordered_json::{parse_bytes, Kind, Member, Value};
+use ordered_json::{parse_bytes, stringify, Kind, OrderedMap, Value};
 use std::{
     fs,
     io::{self, BufRead},
@@ -20,7 +20,7 @@ fn tree(v: &Value) -> String {
             v.members()
                 .unwrap()
                 .iter()
-                .map(|m| format!("[{},{}]", text(&m.key), tree(&m.value)))
+                .map(|(key, value)| format!("[{},{}]", text(key), tree(value)))
                 .collect::<Vec<_>>()
                 .join(",")
         ),
@@ -41,17 +41,21 @@ fn tree(v: &Value) -> String {
 }
 fn rebuild(v: &Value) -> Value {
     match v.kind() {
-        Kind::Object => Value::object(
-            &v.members()
-                .unwrap()
-                .iter()
-                .map(|m| Member {
-                    key: m.key.clone(),
-                    value: rebuild(&m.value),
-                })
-                .collect::<Vec<_>>(),
-        )
-        .unwrap(),
+        Kind::Object => {
+            let mut members = OrderedMap::new();
+            for (key, _) in v.members().unwrap().iter() {
+                members.insert(key.clone(), Value::null()).unwrap();
+            }
+            for (key, _) in v.members().unwrap().iter().rev() {
+                members
+                    .insert(
+                        key.clone(),
+                        rebuild(v.get_units(key.string_units().unwrap()).unwrap()),
+                    )
+                    .unwrap();
+            }
+            Value::object(&members).unwrap()
+        }
         Kind::Array => {
             Value::array(&v.items().unwrap().iter().map(rebuild).collect::<Vec<_>>()).unwrap()
         }
@@ -64,8 +68,9 @@ fn main() {
         match parse_bytes(&bytes) {
             Err(_) => println!("{{\"ok\":false}}"),
             Ok(v) => println!(
-                "{{\"ok\":true,\"raw\":{},\"compact\":{},\"tree\":{},\"rebuilt\":{}}}",
+                "{{\"ok\":true,\"raw\":{},\"serialized\":{},\"compact\":{},\"tree\":{},\"rebuilt\":{}}}",
                 quote(v.raw()),
+                quote(&stringify(&v)),
                 quote(&v.compact()),
                 tree(&v),
                 quote(&rebuild(&v).compact())

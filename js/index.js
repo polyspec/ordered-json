@@ -1,4 +1,4 @@
-/** Strict, immutable JSON values. Object members are ordered pairs, never maps. */
+/** Strict, immutable JSON values. Objects use insertion-ordered associative maps. */
 export const MAX_DEPTH = 256;
 const internal = Symbol('ordered-json');
 const values = new WeakSet();
@@ -14,18 +14,19 @@ export class ParseError extends SyntaxError {
 }
 
 export class Value {
-  #source; #start; #end; #kind; #members; #items; #text;
-  constructor(token, source, start, end, kind, members = [], items = [], text) {
+  #source; #start; #end; #kind; #members; #keys; #items; #text;
+  constructor(token, source, start, end, kind, members = new Map(), items = [], text, keys = new Map()) {
     if (token !== internal) throw new TypeError('Use parse() or Value factories');
     this.#source = source; this.#start = start; this.#end = end;
-    this.#kind = kind; this.#members = Object.freeze(members);
+    this.#kind = kind; this.#members = members; this.#keys = keys;
     this.#items = Object.freeze(items); this.#text = text;
     values.add(this);
     Object.freeze(this);
   }
   get kind() { return this.#kind; }
   get raw() { return this.#source.slice(this.#start, this.#end); }
-  get members() { this.#expect('object'); return this.#members; }
+  get members() { this.#expect('object'); return new Map(this.#members); }
+  get keys() { this.#expect('object'); return Object.freeze(Array.from(this.#keys.values())); }
   get items() { this.#expect('array'); return this.#items; }
   #expect(kind) {
     if (this.#kind !== kind) throw new TypeError(`Expected ${kind}, got ${this.#kind}`);
@@ -37,12 +38,12 @@ export class Value {
   }
   numberLiteral() { this.#expect('number'); return this.raw.trim(); }
   booleanValue() { this.#expect('boolean'); return this.raw.trim() === 'true'; }
-  get(key) { return this.getAll(key)[0]; }
-  getAll(key) {
+  get(key) {
     if (typeof key !== 'string') throw new TypeError('Key must be a string');
-    return this.members.filter(m => m.key.stringValue() === key).map(m => m.value);
+    this.#expect('object');
+    return this.#members.get(key);
   }
-  toString() { return this.raw; }
+  toString() { return stringify(this); }
   // JSON.stringify must not silently serialize the AST as an ordinary object.
   toJSON() { throw new TypeError('Use stringify(value) from ordered-json'); }
   static string(text) {
@@ -62,13 +63,13 @@ export class Value {
   }
   static null() { return parse('null'); }
   static array(items) {
-    return parse('[' + Array.from(items, value => { checkValue(value); return value.raw; }).join(',') + ']');
+    return parse('[' + Array.from(items, stringify).join(',') + ']');
   }
   static object(entries) {
     return parse('{' + Array.from(entries, ([key, value]) => {
       if (typeof key === 'string') key = Value.string(key);
       checkValue(key); key.#expect('string'); checkValue(value);
-      return key.raw + ':' + value.raw;
+      return key.raw.trim() + ':' + stringify(value);
     }).join(',') + '}');
   }
 }
@@ -111,7 +112,7 @@ export function parse(source, {maxDepth = MAX_DEPTH} = {}) {
     const start = pos;
     const ch = source[pos];
     let kind, text;
-    const members = [], items = [];
+    const members = new Map(), keys = new Map(), items = [];
     if (ch === '{' || ch === '[') {
       if (depth >= maxDepth) fail('Maximum nesting depth exceeded');
       kind = ch === '{' ? 'object' : 'array';
@@ -122,11 +123,13 @@ export function parse(source, {maxDepth = MAX_DEPTH} = {}) {
           if (kind === 'object') {
             if (source[pos] !== '"') fail('Expected object key');
             const keyStart = pos, keyText = string();
-            const key = new Value(internal, source, keyStart, pos, 'string', [], [], keyText);
+            const key = new Value(internal, source, keyStart, pos, 'string', new Map(), [], keyText);
             ws();
             if (source[pos] !== ':') fail('Expected colon');
             pos++;
-            members.push(Object.freeze({key, value: value(depth + 1)}));
+            const child = value(depth + 1);
+            if (!keys.has(keyText)) keys.set(keyText, key);
+            members.set(keyText, child);
           } else items.push(value(depth + 1));
           ws();
           if (source[pos] === close) break;
@@ -163,7 +166,7 @@ export function parse(source, {maxDepth = MAX_DEPTH} = {}) {
       kind = literal === 'null' ? 'null' : 'boolean';
     }
     return new Value(internal, source, root ? 0 : start, root ? source.length : pos,
-      kind, members, items, text);
+      kind, members, items, text, keys);
   }
   const result = value(0, true);
   ws();
@@ -179,21 +182,10 @@ export function parseBytes(bytes, options) {
   return parse(source, options);
 }
 
-export function stringify(value, {compact = false} = {}) {
+export function stringify(value, options = {}) {
   checkValue(value);
-  if (!compact) return value.raw;
-  const out = [];
-  let quoted = false, escaped = false;
-  for (const ch of value.raw) {
-    if (quoted) {
-      out.push(ch);
-      if (escaped) escaped = false;
-      else if (ch === '\\') escaped = true;
-      else if (ch === '"') quoted = false;
-    } else if (!whitespace(ch)) {
-      out.push(ch);
-      if (ch === '"') quoted = true;
-    }
-  }
-  return out.join('');
+  if (value.kind === 'object') return '{' + value.keys.map(key =>
+    key.raw.trim() + ':' + stringify(value.get(key.stringValue()))).join(',') + '}';
+  if (value.kind === 'array') return '[' + value.items.map(item => stringify(item)).join(',') + ']';
+  return value.raw.trim();
 }

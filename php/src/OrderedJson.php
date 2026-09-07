@@ -13,15 +13,42 @@ final class ParseError extends \InvalidArgumentException
     }
 }
 
-final readonly class Member
+/** @internal UTF-8 keys, with lone UTF-16 surrogates represented losslessly as WTF-8. */
+function keyText(array $units): string
 {
-    public function __construct(public Value $key, public Value $value)
-    {
-        if ($key->kind() !== 'string') throw new \InvalidArgumentException('Object key must be string');
+    $out = '';
+    for ($i = 0, $n = count($units); $i < $n; $i++) {
+        $point = $units[$i];
+        if (!is_int($point) || $point < 0 || $point > 65535)
+            throw new \InvalidArgumentException('Expected UTF-16 code units');
+        if ($point >= 0xd800 && $point <= 0xdbff && $i + 1 < $n
+            && is_int($units[$i + 1]) && $units[$i + 1] >= 0xdc00 && $units[$i + 1] <= 0xdfff) {
+            $point = 0x10000 + (($point - 0xd800) << 10) + $units[++$i] - 0xdc00;
+        }
+        if ($point < 0x80) $out .= chr($point);
+        elseif ($point < 0x800) $out .= chr(0xc0 | ($point >> 6)) . chr(0x80 | ($point & 63));
+        elseif ($point < 0x10000) $out .= chr(0xe0 | ($point >> 12)) . chr(0x80 | (($point >> 6) & 63)) . chr(0x80 | ($point & 63));
+        else $out .= chr(0xf0 | ($point >> 18)) . chr(0x80 | (($point >> 12) & 63)) . chr(0x80 | (($point >> 6) & 63)) . chr(0x80 | ($point & 63));
     }
+    return $out;
 }
 
-/** Immutable JSON value. Object members are lists, never associative maps. */
+/** @internal Encode associative array keys, escaping any stored lone surrogates. */
+function quoteKey(string $key): string
+{
+    $out = '"';
+    foreach (preg_split('/(\xED[\xA0-\xBF][\x80-\xBF])/', $key, -1, PREG_SPLIT_DELIM_CAPTURE) as $i => $part) {
+        if ($i % 2) {
+            $unit = ((ord($part[0]) & 15) << 12) | ((ord($part[1]) & 63) << 6) | (ord($part[2]) & 63);
+            $out .= sprintf('\\u%04x', $unit);
+        } else {
+            $out .= substr(json_encode($part, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 1, -1);
+        }
+    }
+    return $out . '"';
+}
+
+/** Immutable JSON value. Objects use insertion-ordered PHP associative arrays. */
 final readonly class Value implements \JsonSerializable, \Stringable
 {
     private function __construct(
@@ -32,6 +59,7 @@ final readonly class Value implements \JsonSerializable, \Stringable
         private array $members = [],
         private array $items = [],
         private array $units = [],
+        private array $keys = [],
     ) {}
 
     public static function parse(string $source, int $maxDepth = MAX_DEPTH, bool $useNative = true): self
@@ -52,12 +80,14 @@ final readonly class Value implements \JsonSerializable, \Stringable
     private static function hydrate(string $source, array $node): self
     {
         $members = [];
-        foreach ($node['members'] ?? [] as $m)
-            $members[] = new Member(self::hydrate($source, $m['key']), self::hydrate($source, $m['value']));
+        foreach ($node['members'] ?? [] as $key => $value)
+            $members[$key] = self::hydrate($source, $value);
+        $keys = [];
+        foreach ($node['keys'] ?? [] as $key => $value) $keys[$key] = self::hydrate($source, $value);
         $items = [];
         foreach ($node['items'] ?? [] as $item) $items[] = self::hydrate($source, $item);
         return new self($source, $node['start'], $node['end'], $node['kind'],
-            $members, $items, $node['units'] ?? []);
+            $members, $items, $node['units'] ?? [], $keys);
     }
 
     public function kind(): string { return $this->kind; }
@@ -66,7 +96,7 @@ final readonly class Value implements \JsonSerializable, \Stringable
     {
         if ($this->kind !== $kind) throw new \LogicException("Expected $kind, got {$this->kind}");
     }
-    /** @return list<Member> */
+    /** @return array<string|int, Value> Key order is the first insertion order. */
     public function members(): array { $this->expect('object'); return $this->members; }
     /** @return list<Value> */
     public function items(): array { $this->expect('array'); return $this->items; }
@@ -80,19 +110,10 @@ final readonly class Value implements \JsonSerializable, \Stringable
     }
     public function numberLiteral(): string { $this->expect('number'); return trim($this->raw()); }
     public function booleanValue(): bool { $this->expect('boolean'); return trim($this->raw()) === 'true'; }
-    public function get(string $key): ?self { return $this->getAll($key)[0] ?? null; }
+    public function get(string $key): ?self { $this->expect('object'); return $this->members[$key] ?? null; }
     public function getUnits(array $units): ?self
     {
-        foreach ($this->members() as $m) if ($m->key->units === $units) return $m->value;
-        return null;
-    }
-    /** @return list<Value> */
-    public function getAll(string $key): array
-    {
-        $units = self::string($key)->units;
-        $out = [];
-        foreach ($this->members() as $m) if ($m->key->units === $units) $out[] = $m->value;
-        return $out;
+        return $this->get(keyText($units));
     }
     public static function string(string $text): self
     {
@@ -120,34 +141,31 @@ final readonly class Value implements \JsonSerializable, \Stringable
     public static function array(array $items): self
     {
         if (!array_is_list($items)) throw new \InvalidArgumentException('Expected a list of values');
-        return self::parse('[' . implode(',', array_map(fn(self $v) => $v->raw(), $items)) . ']');
+        return self::parse('[' . implode(',', array_map(fn(self $v) => $v->compact(), $items)) . ']');
     }
-    /** @param list<Member> $members */
+    /** @param array<string|int, Value> $members */
     public static function object(array $members): self
     {
-        if (!array_is_list($members)) throw new \InvalidArgumentException('Expected a list of members');
-        return self::parse('{' . implode(',', array_map(
-            fn(Member $m) => $m->key->raw() . ':' . $m->value->raw(), $members)) . '}');
+        $parts = [];
+        foreach ($members as $key => $value) {
+            if (!$value instanceof self) throw new \InvalidArgumentException('Expected ordered_json Value');
+            $parts[] = quoteKey((string)$key) . ':' . $value->compact();
+        }
+        return self::parse('{' . implode(',', $parts) . '}');
     }
     public function compact(): string
     {
         if (\extension_loaded('ordered_json')) return \ordered_json_compact($this->raw());
-        $out = ''; $quoted = false; $escaped = false; $raw = $this->raw();
-        for ($i = 0, $n = strlen($raw); $i < $n; $i++) {
-            $ch = $raw[$i];
-            if ($quoted) {
-                $out .= $ch;
-                if ($escaped) $escaped = false;
-                elseif ($ch === '\\') $escaped = true;
-                elseif ($ch === '"') $quoted = false;
-            } elseif (!str_contains(" \t\n\r", $ch)) {
-                $out .= $ch;
-                if ($ch === '"') $quoted = true;
-            }
+        if ($this->kind === 'object') {
+            $parts = [];
+            foreach ($this->members as $key => $value)
+                $parts[] = trim($this->keys[$key]->raw()) . ':' . $value->compact();
+            return '{' . implode(',', $parts) . '}';
         }
-        return $out;
+        if ($this->kind === 'array') return '[' . implode(',', array_map(fn(self $v) => $v->compact(), $this->items)) . ']';
+        return trim($this->raw());
     }
-    public function __toString(): string { return $this->raw(); }
+    public function __toString(): string { return $this->compact(); }
     public function jsonSerialize(): never
     {
         throw new \LogicException('Use OrderedJson\\stringify($value)');
@@ -165,7 +183,7 @@ function parseNative(string $source, int $maxDepth = MAX_DEPTH): Value
 }
 function stringify(Value $value, bool $compact = false): string
 {
-    return $compact ? $value->compact() : $value->raw();
+    return $value->compact();
 }
 
 /** @internal Descriptor parser shared in shape with the C extension. */
@@ -246,12 +264,15 @@ final class Parser
             if ($depth >= $this->maxDepth) $this->fail('Maximum nesting depth exceeded');
             $object = $ch === '{'; $close = $object ? '}' : ']';
             $node['kind'] = $object ? 'object' : 'array';
-            $children = []; $this->pos++; $this->ws();
+            $children = []; $keys = []; $this->pos++; $this->ws();
             if ($this->peek() !== $close) {
                 while (true) {
                     if ($object) {
                         $key = $this->stringNode(); $this->ws(); $this->expect(':', 'Expected colon');
-                        $children[] = ['key'=>$key, 'value'=>$this->value($depth + 1)];
+                        $name = keyText($key['units']);
+                        $child = $this->value($depth + 1);
+                        $keys[$name] ??= $key;
+                        $children[$name] = $child;
                     } else $children[] = $this->value($depth + 1);
                     $this->ws();
                     if ($this->peek() === $close) break;
@@ -259,6 +280,7 @@ final class Parser
                 }
             }
             $node[$object ? 'members' : 'items'] = $children; $this->pos++;
+            if ($object) $node['keys'] = $keys;
         } elseif ($ch === '"') return $this->stringNode();
         elseif ($ch === '-' || $this->digit()) {
             $node['kind'] = 'number';

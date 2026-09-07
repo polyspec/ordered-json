@@ -32,8 +32,9 @@ func tree(v *orderedjson.Value) string {
 			panic(err)
 		}
 		parts := []string{}
-		for _, m := range members {
-			parts = append(parts, "["+text(m.Key)+","+tree(m.Value)+"]")
+		for _, key := range members.Keys() {
+			units, _ := key.StringUnits()
+			parts = append(parts, "["+text(key)+","+tree(members.GetUnits(units))+"]")
 		}
 		return `["object",[` + strings.Join(parts, ",") + `]]`
 	case orderedjson.ArrayKind:
@@ -71,10 +72,21 @@ func rebuild(v *orderedjson.Value) *orderedjson.Value {
 		if err != nil {
 			panic(err)
 		}
-		for i, m := range members {
-			members[i].Value = rebuild(m.Value)
+		outMembers := &orderedjson.OrderedMap{}
+		keys := members.Keys()
+		for _, key := range keys {
+			if err := outMembers.Set(key, orderedjson.Null()); err != nil {
+				panic(err)
+			}
 		}
-		out, err := orderedjson.Object(members)
+		for i := len(keys) - 1; i >= 0; i-- {
+			key := keys[i]
+			units, _ := key.StringUnits()
+			if err := outMembers.Set(key, rebuild(v.GetUnits(units))); err != nil {
+				panic(err)
+			}
+		}
+		out, err := orderedjson.Object(outMembers)
 		if err != nil {
 			panic(err)
 		}
@@ -116,8 +128,12 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("{\"ok\":true,\"raw\":%s,\"compact\":%s,\"tree\":%s,\"rebuilt\":%s}\n",
-			quote(value.Raw()), quote(compact), tree(value), quote(rebuilt))
+		serialized, err := orderedjson.Stringify(value)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("{\"ok\":true,\"raw\":%s,\"serialized\":%s,\"compact\":%s,\"tree\":%s,\"rebuilt\":%s}\n",
+			quote(value.Raw()), quote(serialized), quote(compact), tree(value), quote(rebuilt))
 	}
 	if err := scanner.Err(); err != nil {
 		panic(err)

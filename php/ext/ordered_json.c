@@ -126,6 +126,38 @@ static bool oj_digits(oj_parser *p) {
     while (oj_digit(oj_peek(p))) p->pos++;
     return true;
 }
+/* Decoded key identity: UTF-8, with escaped lone surrogates retained as WTF-8. */
+static zend_string *oj_key_string(zval *key) {
+    zval *units = zend_hash_str_find(Z_ARRVAL_P(key), "units", sizeof("units") - 1);
+    size_t count = zend_hash_num_elements(Z_ARRVAL_P(units)), length = 0;
+    zend_string *out = zend_string_alloc(count * 3, 0);
+    for (size_t i = 0; i < count; i++) {
+        uint32_t cp = (uint32_t)Z_LVAL_P(zend_hash_index_find(Z_ARRVAL_P(units), i));
+        if (cp >= 0xd800 && cp <= 0xdbff && i + 1 < count) {
+            uint32_t low = (uint32_t)Z_LVAL_P(zend_hash_index_find(Z_ARRVAL_P(units), i + 1));
+            if (low >= 0xdc00 && low <= 0xdfff) {
+                cp = 0x10000 + ((cp - 0xd800) << 10) + low - 0xdc00;
+                i++;
+            }
+        }
+        if (cp < 0x80) ZSTR_VAL(out)[length++] = (char)cp;
+        else if (cp < 0x800) {
+            ZSTR_VAL(out)[length++] = (char)(0xc0 | (cp >> 6));
+            ZSTR_VAL(out)[length++] = (char)(0x80 | (cp & 63));
+        } else if (cp < 0x10000) {
+            ZSTR_VAL(out)[length++] = (char)(0xe0 | (cp >> 12));
+            ZSTR_VAL(out)[length++] = (char)(0x80 | ((cp >> 6) & 63));
+            ZSTR_VAL(out)[length++] = (char)(0x80 | (cp & 63));
+        } else {
+            ZSTR_VAL(out)[length++] = (char)(0xf0 | (cp >> 18));
+            ZSTR_VAL(out)[length++] = (char)(0x80 | ((cp >> 12) & 63));
+            ZSTR_VAL(out)[length++] = (char)(0x80 | ((cp >> 6) & 63));
+            ZSTR_VAL(out)[length++] = (char)(0x80 | (cp & 63));
+        }
+    }
+    ZSTR_VAL(out)[length] = '\0'; ZSTR_LEN(out) = length;
+    return out;
+}
 static bool oj_value(oj_parser *p, zend_long depth, zval *out) {
     ZVAL_UNDEF(out);
     oj_ws(p);
@@ -139,21 +171,23 @@ static bool oj_value(oj_parser *p, zend_long depth, zval *out) {
         bool object = ch == '{';
         int close = object ? '}' : ']';
         add_assoc_string(out, "kind", object ? "object" : "array");
-        zval children;
+        zval children, keys;
         array_init(&children);
+        if (object) array_init(&keys);
         p->pos++; oj_ws(p);
         if (oj_peek(p) != close) {
             while (true) {
                 if (object) {
-                    zval key, value, member;
+                    zval key, value;
                     if (!oj_string(p, &key)) goto children_fail;
                     oj_ws(p);
                     if (!oj_expect(p, ':', "Expected colon")) { zval_ptr_dtor(&key); goto children_fail; }
                     if (!oj_value(p, depth + 1, &value)) { zval_ptr_dtor(&key); goto children_fail; }
-                    array_init(&member);
-                    add_assoc_zval(&member, "key", &key);
-                    add_assoc_zval(&member, "value", &value);
-                    add_next_index_zval(&children, &member);
+                    zend_string *name = oj_key_string(&key);
+                    if (zend_symtable_exists(Z_ARRVAL(keys), name)) zval_ptr_dtor(&key);
+                    else zend_symtable_update(Z_ARRVAL(keys), name, &key);
+                    zend_symtable_update(Z_ARRVAL(children), name, &value);
+                    zend_string_release(name);
                 } else {
                     zval item;
                     if (!oj_value(p, depth + 1, &item)) goto children_fail;
@@ -167,9 +201,11 @@ static bool oj_value(oj_parser *p, zend_long depth, zval *out) {
         }
         p->pos++;
         add_assoc_zval(out, object ? "members" : "items", &children);
+        if (object) add_assoc_zval(out, "keys", &keys);
         goto done;
 children_fail:
         zval_ptr_dtor(&children);
+        if (object) zval_ptr_dtor(&keys);
         goto fail;
     } else if (ch == '-' || oj_digit(ch)) {
         add_assoc_string(out, "kind", "number");
@@ -253,6 +289,39 @@ PHP_FUNCTION(ordered_json_scan) {
     if (!oj_parse(source, max_depth, return_value)) RETURN_THROWS();
 }
 
+static void oj_render(zend_string *source, zval *node, char *out, size_t *length) {
+    zval *kind = zend_hash_str_find(Z_ARRVAL_P(node), "kind", sizeof("kind") - 1);
+    bool object = zend_string_equals_literal(Z_STR_P(kind), "object");
+    bool array = zend_string_equals_literal(Z_STR_P(kind), "array");
+    if (object || array) {
+        zval *children = zend_hash_str_find(Z_ARRVAL_P(node), object ? "members" : "items", object ? 7 : 5);
+        zval *keys = object ? zend_hash_str_find(Z_ARRVAL_P(node), "keys", sizeof("keys") - 1) : NULL;
+        zend_ulong index;
+        zend_string *name;
+        zval *child;
+        bool first = true;
+        out[(*length)++] = object ? '{' : '[';
+        ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(children), index, name, child) {
+            if (!first) out[(*length)++] = ',';
+            first = false;
+            if (object) {
+                zval *key = name ? zend_hash_find(Z_ARRVAL_P(keys), name) : zend_hash_index_find(Z_ARRVAL_P(keys), index);
+                oj_render(source, key, out, length);
+                out[(*length)++] = ':';
+            }
+            oj_render(source, child, out, length);
+        } ZEND_HASH_FOREACH_END();
+        out[(*length)++] = object ? '}' : ']';
+    } else {
+        size_t start = (size_t)Z_LVAL_P(zend_hash_str_find(Z_ARRVAL_P(node), "start", sizeof("start") - 1));
+        size_t end = (size_t)Z_LVAL_P(zend_hash_str_find(Z_ARRVAL_P(node), "end", sizeof("end") - 1));
+        while (start < end && oj_ws_char((unsigned char)ZSTR_VAL(source)[start])) start++;
+        while (end > start && oj_ws_char((unsigned char)ZSTR_VAL(source)[end - 1])) end--;
+        memcpy(out + *length, ZSTR_VAL(source) + start, end - start);
+        *length += end - start;
+    }
+}
+
 PHP_FUNCTION(ordered_json_compact) {
     zend_string *source;
     zend_long max_depth = ORDERED_JSON_MAX_DEPTH;
@@ -266,22 +335,10 @@ PHP_FUNCTION(ordered_json_compact) {
     }
     zval node;
     if (!oj_parse(source, max_depth, &node)) RETURN_THROWS();
-    zval_ptr_dtor(&node);
     zend_string *out = zend_string_alloc(ZSTR_LEN(source), 0);
     size_t length = 0;
-    bool quoted = false, escaped = false;
-    for (size_t i = 0; i < ZSTR_LEN(source); i++) {
-        unsigned char ch = (unsigned char)ZSTR_VAL(source)[i];
-        if (quoted) {
-            ZSTR_VAL(out)[length++] = ch;
-            if (escaped) escaped = false;
-            else if (ch == '\\') escaped = true;
-            else if (ch == '"') quoted = false;
-        } else if (!oj_ws_char(ch)) {
-            ZSTR_VAL(out)[length++] = ch;
-            if (ch == '"') quoted = true;
-        }
-    }
+    oj_render(source, &node, ZSTR_VAL(out), &length);
+    zval_ptr_dtor(&node);
     ZSTR_VAL(out)[length] = '\0'; ZSTR_LEN(out) = length;
     RETURN_STR(out);
 }
