@@ -1,0 +1,9 @@
+{
+  "name": "ordered-json/ordered-json",
+  "description": "JSON document order at every depth, with optional native parser",
+  "type": "library",
+  "require": {"php": ">=8.2", "ext-json": "*", "ext-pcre": "*"},
+  "suggest": {"ext-ordered_json": "Native C parser with the same ordered Value API"},
+  "autoload": {"files": ["src/OrderedJson.php"]},
+  "scripts": {"test": "python3 ../scripts/verify.py --only php"}
+}

@@ -1,0 +1,4 @@
+ARG_ENABLE("ordered-json", "ordered_json native JSON parser", "no");
+if (PHP_ORDERED_JSON != "no") {
+    EXTENSION("ordered_json", "ordered_json.c");
+}
