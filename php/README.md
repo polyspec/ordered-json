@@ -1,34 +1,31 @@
+<!-- doc-id: php -->
 # PHP
 
-PHP 8.2 이상. `src/OrderedJson.php`를 불러오거나 이 디렉터리를 Composer path 저장소로 사용합니다.
+[한국어](README.ko.md)
 
-`$source`는 [공식 예제](../examples/official.json)의 `input` JSON 문자열입니다.
+<a id="usage"></a>
+## Usage
 
-```php
+The pure PHP package and optional [native extension](ext/README.md) share the same `Value` API. See [installation](../docs/operations/installation.md) for requirements and loading. Here `$source` is the `input` string from an object case in [official.json](../examples/official.json); the file path is relative to this directory.
+
+~~~php
 require 'src/OrderedJson.php';
 
 $value = OrderedJson\parse($source);
-$members = $value->members(); // array<string|int, Value>, 키의 첫 등장 순서
+$members = $value->members();
 $output = OrderedJson\stringify($value);
-```
+$rebuilt = OrderedJson\stringify(OrderedJson\Value::object($members));
+~~~
 
-객체는 `Value::object([$key => $value, ...])`로 PHP 연관배열을 전달하고, JSON 배열은 `Value::array([$value, ...])`로 구성합니다. 같은 키는 마지막 값으로 덮어쓰며 처음 들어온 자리는 유지합니다. 숫자로 해석되는 PHP 배열 키도 JSON 출력에서는 문자열 키로 씁니다. 스칼라는 `Value::string`, `Value::number`, `Value::boolean`, `Value::null`로 생성합니다.
+`members()` returns an associative array of library values. Use `Value::object` for associative arrays and `Value::array` for JSON arrays. Use the library's `stringify`; `json_encode($value)` throws. The [API contract](../docs/spec/api.md#php) defines backend selection, including the separate rules for parsing and native serialization.
 
-`items()`는 배열 원소, `get()`은 객체 키의 마지막 값 조회입니다. `$members[$key]`로도 조회할 수 있습니다. `stringUnits()`는 손실 없는 UTF-16 단위를 반환합니다. `stringValue()`는 단독 surrogate가 있으면 오류를 반환합니다. 그런 키는 `getUnits()`로 조회할 수 있으며, 연관배열 안에서는 WTF-8 바이트로 보관합니다. 숫자는 `numberLiteral()`로 조회합니다.
+<a id="verification"></a>
+## Verification
 
-`OrderedJson\stringify($value)`는 연관배열을 공백 없는 JSON으로 출력합니다. 기존 `compact: true` 옵션도 같은 결과를 냅니다. `raw()`는 입력 원문 조회입니다. 깊이 제한은 `OrderedJson\parse($source, maxDepth: 256)`으로 설정합니다. 직렬화에는 패키지의 `stringify`를 사용합니다. `json_encode($value)`는 내부 노드의 잘못된 출력을 방지하기 위해 오류를 반환합니다.
+After building the extension, run from the repository root:
 
-## 순수 PHP와 네이티브 확장
-
-동일한 API를 사용합니다. [ordered_json 확장](ext/README.md)이 로드되어 있으면 C 파서를 사용하고, 없으면 순수 PHP 파서를 사용합니다.
-
-- `OrderedJson\parse($source, useNative: false)`: 순수 PHP 파서 지정
-- `OrderedJson\parseNative($source)`: C 파서 지정. 확장이 없으면 오류
-
-네이티브 버전은 파싱과 JSON 출력을 C에서 수행합니다. 순서 있는 `Value` API는 공통 PHP 코드입니다.
-
-저장소 루트에서 두 구현을 동일한 공식 예제로 검증합니다.
-
-```sh
+~~~sh
 python3 scripts/verify.py --only php --only php-native
-```
+~~~
+
+Both backends use the shared verifier and official expectations. The [repository check](../docs/operations/validation.md) builds the extension and tests all implementations.

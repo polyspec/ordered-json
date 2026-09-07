@@ -56,7 +56,7 @@ def compile_erlang(erl, source, out):
                              capture_output=True, text=True, timeout=45)
     if process.returncode:
         raise RuntimeError('Erlang compilation failed:\n' + process.stdout + process.stderr)
-    return process.stdout + process.stderr
+    return (process.stdout + process.stderr).replace(str(source) + '/', 'erlang-ojson/').replace(str(ROOT) + '/', '')
 
 
 def main():
@@ -65,7 +65,7 @@ def main():
     parser.add_argument('--erlang-source', type=Path, default=ROOT / '.cache/comparison/erlang-ojson')
     parser.add_argument('--erl', type=Path)
     parser.add_argument('--suite', type=Path)
-    parser.add_argument('--output', type=Path, default=ROOT / 'docs/ojson-comparison.json')
+    parser.add_argument('--output', type=Path, default=ROOT / 'docs/reports/ojson-comparison.json')
     args = parser.parse_args()
     args.python_package = args.python_package.resolve()
     args.erlang_source = args.erlang_source.resolve()

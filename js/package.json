@@ -9,7 +9,7 @@
       "import": "./index.js"
     }
   },
-  "files": ["index.js", "index.d.ts", "README.md"],
+  "files": ["index.js", "index.d.ts", "README.md", "README.ko.md"],
   "engines": {"node": ">=20"},
   "scripts": {"test": "python3 ../scripts/verify.py --only js"}
 }

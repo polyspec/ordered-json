@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "documents": [
+    {
+      "id": "json-contract",
+      "kind": "specification",
+      "en": "docs/spec/json-contract.md",
+      "ko": "docs/spec/json-contract.ko.md"
+    },
+    {
+      "id": "documentation-plan",
+      "kind": "procedure",
+      "en": "docs/documentation-plan.md",
+      "ko": "docs/documentation-plan.ko.md"
+    },
+    {
+      "id": "development",
+      "kind": "procedure",
+      "en": "AGENTS.md",
+      "ko": "AGENTS.ko.md"
+    },
+    {
+      "id": "proposals",
+      "kind": "procedure",
+      "en": "docs/plans/README.md",
+      "ko": "docs/plans/README.ko.md"
+    },
+    {
+      "id": "overview",
+      "kind": "overview",
+      "en": "README.md",
+      "ko": "README.ko.md"
+    },
+    {
+      "id": "api",
+      "kind": "specification",
+      "en": "docs/spec/api.md",
+      "ko": "docs/spec/api.ko.md"
+    },
+    {
+      "id": "installation",
+      "kind": "operations",
+      "en": "docs/operations/installation.md",
+      "ko": "docs/operations/installation.ko.md"
+    },
+    {
+      "id": "validation",
+      "kind": "operations",
+      "en": "docs/operations/validation.md",
+      "ko": "docs/operations/validation.ko.md"
+    },
+    {
+      "id": "distribution",
+      "kind": "operations",
+      "en": "docs/operations/distribution.md",
+      "ko": "docs/operations/distribution.ko.md"
+    },
+    {
+      "id": "features",
+      "kind": "state",
+      "en": "docs/features.md",
+      "ko": "docs/features.ko.md"
+    },
+    {
+      "id": "changelog",
+      "kind": "history",
+      "en": "CHANGELOG.md",
+      "ko": "CHANGELOG.ko.md"
+    },
+    {
+      "id": "official-examples",
+      "kind": "specification",
+      "en": "examples/README.md",
+      "ko": "examples/README.ko.md"
+    },
+    {
+      "id": "javascript",
+      "kind": "usage",
+      "en": "js/README.md",
+      "ko": "js/README.ko.md"
+    },
+    {
+      "id": "rust",
+      "kind": "usage",
+      "en": "rust/README.md",
+      "ko": "rust/README.ko.md"
+    },
+    {
+      "id": "go",
+      "kind": "usage",
+      "en": "go/README.md",
+      "ko": "go/README.ko.md"
+    },
+    {
+      "id": "php",
+      "kind": "usage",
+      "en": "php/README.md",
+      "ko": "php/README.ko.md"
+    },
+    {
+      "id": "php-extension",
+      "kind": "usage",
+      "en": "php/ext/README.md",
+      "ko": "php/ext/README.ko.md"
+    },
+    {
+      "id": "ojson-comparison",
+      "kind": "report",
+      "en": "docs/reports/ojson-comparison.md",
+      "ko": "docs/reports/ojson-comparison.ko.md"
+    }
+  ]
+}

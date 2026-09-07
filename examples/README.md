@@ -1,27 +1,27 @@
-# 공식 예제
+<!-- doc-id: official-examples -->
+# Official examples
 
-[official.json](official.json)이 모든 구현의 공통 계약입니다.
+[한국어](README.ko.md)
 
-| 필드 | 의미 |
-| --- | --- |
-| `id` | 예제 이름 |
-| `input` | 입력 JSON 문서 |
-| `tree` | 고정된 기대 트리. 연관배열의 순서를 비교하기 위한 보고 형식 |
-| `compact` | 연관배열을 직렬화한 기대 JSON 출력 |
+<a id="format"></a>
+## Shared expectations
 
-`tree`의 형식은 다음과 같습니다.
+[official.json](official.json) contains the common inputs and fixed expected results for all implementations. `id` names the case, `input` contains the JSON document, `tree` contains the expected reporting tree, and `compact` contains the expected associative JSON output. The verifier reads these expectations without regenerating them.
 
-```text
-["object", [[키, 자식 노드], ...]]
-["array", [자식 노드, ...]]
-["string", 문자열]
-["number", 숫자 토큰 문자열]
-["boolean", true 또는 false]
+~~~text
+["object", [[key, child], ...]]
+["array", [child, ...]]
+["string", text]
+["number", token]
+["boolean", flag]
 ["null"]
-```
+~~~
 
-객체의 보고 형식에 사용한 항목 목록은 순서를 검사하기 위한 것이며 라이브러리 내부 저장 구조가 아닙니다. 내부 객체는 키당 값 하나를 담는 연관배열입니다. 같은 키는 마지막 값으로 덮어쓰고 처음 들어온 자리는 유지합니다. 공통 검증기는 고정된 기대 결과를 읽기만 하며, 실행 중 다시 생성하지 않습니다.
+The object entry list is a reporting format for comparing order. Internal objects are associative maps with one value per key, retaining the first key position and the last value. The [JSON contract](../docs/spec/json-contract.md) defines the behavior.
 
-언어 어댑터는 입력 문서를 파싱하고 결과를 위 형식으로 보고하는 역할만 합니다. 판정은 모두 [scripts/verify.py](../scripts/verify.py)에서 수행합니다.
+<a id="verification"></a>
+## Adapters and reconstruction
 
-재구성 검사는 각 객체의 키를 같은 순서로 넣은 뒤, 역순으로 값을 덮어쓰고 다시 JSON으로 출력합니다. 따라서 생성 API에서도 덮어쓰기로 키 순서가 바뀌지 않는지 확인합니다. 재구성한 JSON은 공통 검증기가 독립적으로 파싱해 같은 기대 트리와 비교합니다. 키의 이스케이프 표기는 달라도 되지만 키 문자열·순서·값·숫자 토큰은 같아야 합니다.
+Each language adapter parses the same documents and reports results. [scripts/verify.py](../scripts/verify.py) performs every comparison. Additional inputs under `fixtures/` and the optional supplementary suite use an independent standard-library reference with object-pair and number-token callbacks.
+
+Reconstruction inserts each object's keys in source order with null values, updates their values in reverse order, and constructs JSON through the library's map and array APIs. The common verifier independently parses the generated JSON, rejects duplicate output keys, and compares the fixed expected tree. Key escaping may differ; decoded keys, order, values, and number tokens must match.
