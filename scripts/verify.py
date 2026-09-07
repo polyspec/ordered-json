@@ -155,13 +155,8 @@ def commands(selected):
     return result
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--only', action='append', choices=['js', 'rust', 'go', 'php', 'php-native'])
-    parser.add_argument('--suite', type=Path, help='Optional nst/JSONTestSuite checkout')
-    args = parser.parse_args()
-    selected = args.only or ['js', 'rust', 'go', 'php', 'php-native']
-    suite = args.suite.resolve() if args.suite else None
+def verify(selected, suite=None):
+    results = {}
     with tempfile.TemporaryDirectory(prefix='ordered-json-examples-') as folder:
         cases, official_count = prepare_cases(Path(folder), suite)
         requests = ''.join(str(path) + '\n' for _, path, _ in cases)
@@ -195,7 +190,21 @@ def main():
                                 f'actual   {ascii(actual.get(key))[:500]}')
             print(f'{language}: {official_count} official examples + '
                   f'{len(cases)-official_count} shared cases passed', flush=True)
+            results[language] = {'status': 'passed', 'cases': len(cases)}
+        counts = {'official': official_count,
+                  'fixtures': sum(name.startswith('fixtures/') for name, _, _ in cases),
+                  'supplementary': sum(name.startswith('JSONTestSuite/') for name, _, _ in cases)}
     print('All selected implementations match the same expected results.', flush=True)
+    return results, counts
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--only', action='append', choices=['js', 'rust', 'go', 'php', 'php-native'])
+    parser.add_argument('--suite', type=Path, help='Optional nst/JSONTestSuite checkout')
+    args = parser.parse_args()
+    verify(args.only or ['js', 'rust', 'go', 'php', 'php-native'],
+           args.suite.resolve() if args.suite else None)
 
 
 if __name__ == '__main__':

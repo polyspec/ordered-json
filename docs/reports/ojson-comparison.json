@@ -7,7 +7,7 @@
   "erlang_package": {
     "commit": "5cd1de1a4a7622523c83d9464772b0f0926e654d",
     "runtime": "Erlang/OTP 29 [erts-17.0.6] [source] [64-bit] [smp:2:2] [ds:2:2:10] [async-threads:1] [jit] [dtrace]",
-    "compile_warnings": ".cache/comparison/erlang-ojson/src/ojson_decoder.erl:89:5: Warning: erlang:get_stacktrace/0 is removed; use the new try/catch syntax for retrieving the stack backtrace\n%   89| \t\t\t?raise(Pos);\n%     | \t\t\t ^\n\n.cache/comparison/erlang-ojson/src/ojson_decoder.erl:91:5: Warning: erlang:get_stacktrace/0 is removed; use the new try/catch syntax for retrieving the stack backtrace\n%   91| \t\t\t?raise(Pos, Token)\n%     | \t\t\t ^\n\n"
+    "compile_warnings": "erlang-ojson/src/ojson_decoder.erl:89:5: Warning: erlang:get_stacktrace/0 is removed; use the new try/catch syntax for retrieving the stack backtrace\n%   89| \t\t\t?raise(Pos);\n%     | \t\t\t ^\n\nerlang-ojson/src/ojson_decoder.erl:91:5: Warning: erlang:get_stacktrace/0 is removed; use the new try/catch syntax for retrieving the stack backtrace\n%   91| \t\t\t?raise(Pos, Token)\n%     | \t\t\t ^\n\n"
   },
   "official_sha256": "008b05fe07142d9dcad9edd90fe6606926ccb279461664c19af5a3d0eedac830",
   "suite_commit": "1ef36fa01286573e846ac449e8683f8833c5b26a",
