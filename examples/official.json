@@ -1,0 +1,459 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "document-order",
+      "input": "{\"10\":\"first\",\"2\":\"second\"}",
+      "tree": [
+        "object",
+        [
+          [
+            "10",
+            [
+              "string",
+              "first"
+            ]
+          ],
+          [
+            "2",
+            [
+              "string",
+              "second"
+            ]
+          ]
+        ]
+      ],
+      "compact": "{\"10\":\"first\",\"2\":\"second\"}"
+    },
+    {
+      "id": "nested-objects",
+      "input": "{\"10\":{\"9\":1,\"1\":{\"z\":2,\"a\":3}},\"2\":4}",
+      "tree": [
+        "object",
+        [
+          [
+            "10",
+            [
+              "object",
+              [
+                [
+                  "9",
+                  [
+                    "number",
+                    "1"
+                  ]
+                ],
+                [
+                  "1",
+                  [
+                    "object",
+                    [
+                      [
+                        "z",
+                        [
+                          "number",
+                          "2"
+                        ]
+                      ],
+                      [
+                        "a",
+                        [
+                          "number",
+                          "3"
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "2",
+            [
+              "number",
+              "4"
+            ]
+          ]
+        ]
+      ],
+      "compact": "{\"10\":{\"9\":1,\"1\":{\"z\":2,\"a\":3}},\"2\":4}"
+    },
+    {
+      "id": "objects-in-arrays",
+      "input": "{\"rows\":[{\"10\":1,\"2\":2},[{\"b\":3,\"a\":4}]],\"tail\":0}",
+      "tree": [
+        "object",
+        [
+          [
+            "rows",
+            [
+              "array",
+              [
+                [
+                  "object",
+                  [
+                    [
+                      "10",
+                      [
+                        "number",
+                        "1"
+                      ]
+                    ],
+                    [
+                      "2",
+                      [
+                        "number",
+                        "2"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "array",
+                  [
+                    [
+                      "object",
+                      [
+                        [
+                          "b",
+                          [
+                            "number",
+                            "3"
+                          ]
+                        ],
+                        [
+                          "a",
+                          [
+                            "number",
+                            "4"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "tail",
+            [
+              "number",
+              "0"
+            ]
+          ]
+        ]
+      ],
+      "compact": "{\"rows\":[{\"10\":1,\"2\":2},[{\"b\":3,\"a\":4}]],\"tail\":0}"
+    },
+    {
+      "id": "duplicate-keys",
+      "input": "{\"b\":1,\"a\":2,\"b\":3}",
+      "tree": [
+        "object",
+        [
+          [
+            "b",
+            [
+              "number",
+              "1"
+            ]
+          ],
+          [
+            "a",
+            [
+              "number",
+              "2"
+            ]
+          ],
+          [
+            "b",
+            [
+              "number",
+              "3"
+            ]
+          ]
+        ]
+      ],
+      "compact": "{\"b\":1,\"a\":2,\"b\":3}"
+    },
+    {
+      "id": "escaped-key-equivalence",
+      "input": "{\"b\":1,\"\\u0062\":2,\"a\":3}",
+      "tree": [
+        "object",
+        [
+          [
+            "b",
+            [
+              "number",
+              "1"
+            ]
+          ],
+          [
+            "b",
+            [
+              "number",
+              "2"
+            ]
+          ],
+          [
+            "a",
+            [
+              "number",
+              "3"
+            ]
+          ]
+        ]
+      ],
+      "compact": "{\"b\":1,\"\\u0062\":2,\"a\":3}"
+    },
+    {
+      "id": "all-json-types",
+      "input": "{\"n\":null,\"b\":true,\"f\":false,\"s\":\"text\",\"a\":[3,2,1],\"o\":{},\"e\":[]}",
+      "tree": [
+        "object",
+        [
+          [
+            "n",
+            [
+              "null"
+            ]
+          ],
+          [
+            "b",
+            [
+              "boolean",
+              true
+            ]
+          ],
+          [
+            "f",
+            [
+              "boolean",
+              false
+            ]
+          ],
+          [
+            "s",
+            [
+              "string",
+              "text"
+            ]
+          ],
+          [
+            "a",
+            [
+              "array",
+              [
+                [
+                  "number",
+                  "3"
+                ],
+                [
+                  "number",
+                  "2"
+                ],
+                [
+                  "number",
+                  "1"
+                ]
+              ]
+            ]
+          ],
+          [
+            "o",
+            [
+              "object",
+              []
+            ]
+          ],
+          [
+            "e",
+            [
+              "array",
+              []
+            ]
+          ]
+        ]
+      ],
+      "compact": "{\"n\":null,\"b\":true,\"f\":false,\"s\":\"text\",\"a\":[3,2,1],\"o\":{},\"e\":[]}"
+    },
+    {
+      "id": "exact-number-tokens",
+      "input": "[9007199254740993,-0,1.2300E+04,1e9999]",
+      "tree": [
+        "array",
+        [
+          [
+            "number",
+            "9007199254740993"
+          ],
+          [
+            "number",
+            "-0"
+          ],
+          [
+            "number",
+            "1.2300E+04"
+          ],
+          [
+            "number",
+            "1e9999"
+          ]
+        ]
+      ],
+      "compact": "[9007199254740993,-0,1.2300E+04,1e9999]"
+    },
+    {
+      "id": "unicode-and-escapes",
+      "input": "{\"\ud55c\uae00\":\"\uc548\ub155 \ud83c\udf0d\",\"escaped\":\"\\uD834\\uDD1E\",\"line\":\"a\\nb\"}",
+      "tree": [
+        "object",
+        [
+          [
+            "\ud55c\uae00",
+            [
+              "string",
+              "\uc548\ub155 \ud83c\udf0d"
+            ]
+          ],
+          [
+            "escaped",
+            [
+              "string",
+              "\ud834\udd1e"
+            ]
+          ],
+          [
+            "line",
+            [
+              "string",
+              "a\nb"
+            ]
+          ]
+        ]
+      ],
+      "compact": "{\"\ud55c\uae00\":\"\uc548\ub155 \ud83c\udf0d\",\"escaped\":\"\\uD834\\uDD1E\",\"line\":\"a\\nb\"}"
+    },
+    {
+      "id": "escaped-surrogates",
+      "input": "{\"\\ud800\":\"\\udead\",\"pair\":\"\\ud83c\\udf0d\"}",
+      "tree": [
+        "object",
+        [
+          [
+            "\ud800",
+            [
+              "string",
+              "\udead"
+            ]
+          ],
+          [
+            "pair",
+            [
+              "string",
+              "\ud83c\udf0d"
+            ]
+          ]
+        ]
+      ],
+      "compact": "{\"\\ud800\":\"\\udead\",\"pair\":\"\\ud83c\\udf0d\"}"
+    },
+    {
+      "id": "whitespace",
+      "input": " \n{ \"10\" : 1, \"2\" : { \"b\" : 2, \"a\" : 3 } }\t",
+      "tree": [
+        "object",
+        [
+          [
+            "10",
+            [
+              "number",
+              "1"
+            ]
+          ],
+          [
+            "2",
+            [
+              "object",
+              [
+                [
+                  "b",
+                  [
+                    "number",
+                    "2"
+                  ]
+                ],
+                [
+                  "a",
+                  [
+                    "number",
+                    "3"
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "compact": "{\"10\":1,\"2\":{\"b\":2,\"a\":3}}"
+    },
+    {
+      "id": "special-property-names",
+      "input": "{\"__proto__\":{\"b\":1,\"a\":2},\"constructor\":3,\"prototype\":4}",
+      "tree": [
+        "object",
+        [
+          [
+            "__proto__",
+            [
+              "object",
+              [
+                [
+                  "b",
+                  [
+                    "number",
+                    "1"
+                  ]
+                ],
+                [
+                  "a",
+                  [
+                    "number",
+                    "2"
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "constructor",
+            [
+              "number",
+              "3"
+            ]
+          ],
+          [
+            "prototype",
+            [
+              "number",
+              "4"
+            ]
+          ]
+        ]
+      ],
+      "compact": "{\"__proto__\":{\"b\":1,\"a\":2},\"constructor\":3,\"prototype\":4}"
+    },
+    {
+      "id": "root-scalar",
+      "input": "true",
+      "tree": [
+        "boolean",
+        true
+      ],
+      "compact": "true"
+    }
+  ]
+}
