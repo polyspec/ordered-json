@@ -10,6 +10,7 @@ import sys
 from urllib.parse import unquote, urlsplit
 
 from verification_record import IMPLEMENTATIONS, sha256, source_manifest
+from registry import REGISTRY, repository_paths
 
 ROOT = Path(__file__).resolve().parents[1]
 KINDS = {'overview', 'specification', 'state', 'operations', 'history', 'procedure', 'usage', 'report'}
@@ -88,7 +89,8 @@ def local_target(root, source, target):
 def authored_markdown(root):
     paths = set()
     for folder, directories, files in os.walk(root):
-        directories[:] = [name for name in directories if name not in IGNORED]
+        directories[:] = [name for name in directories if name not in IGNORED
+                          and not (Path(folder) / name / '.git').exists()]
         for name in files:
             if name.endswith('.md'):
                 paths.add((Path(folder) / name).relative_to(root).as_posix())
@@ -145,12 +147,12 @@ def check_verification(root, record):
         raise ValueError('Verification counts do not match repository inputs')
     implementations = record['implementations']
     if set(implementations) != set(IMPLEMENTATIONS):
-        raise ValueError('Verification requires all five implementations')
+        raise ValueError('Verification requires all registered implementations')
     for name, result in implementations.items():
         if result.get('status') != 'passed' or result.get('cases') != counts['total'] or not result.get('runtime'):
             raise ValueError('Incomplete implementation result: ' + name)
-    native = implementations['php-native']['runtime']
-    if native.get('extension') != 'ordered_json' or not native.get('extension_version') or not native.get('php'):
+    native = implementations.get('php-extension', {}).get('runtime', {})
+    if 'php-extension' in implementations and (not native.get('extension_version') or not native.get('php')):
         raise ValueError('PHP runtime and extension versions must both be recorded')
     tests = record['documentation_tests']
     if tests.get('status') != 'passed' or type(tests.get('count')) is not int or tests['count'] <= 0:
@@ -193,7 +195,7 @@ def check_distribution(record, features):
             raise ValueError('Published feature has no observed artifact: ' + identifier)
 
 
-def check_repository(root):
+def check_repository(root, include_children=True):
     root = root.resolve()
     errors, registered, identifiers, documents = [], set(), set(), {}
 
@@ -203,10 +205,14 @@ def check_repository(root):
     def read_json(path):
         return json.loads((root / path).read_text(encoding='utf-8'))
 
+    role = 'common'
     try:
         manifest = read_json('docs/documentation-manifest.json')
         if manifest.get('schema_version') != 1 or not isinstance(manifest.get('documents'), list):
             raise ValueError('Expected documentation manifest schema version 1')
+        role = manifest.get('role', 'common')
+        if role not in ('common', 'package'):
+            raise ValueError('Unknown documentation repository role')
         for entry in manifest['documents']:
             identifier, en, ko, kind = (entry[key] for key in ('id', 'en', 'ko', 'kind'))
             if not re.fullmatch(r'[a-z][a-z0-9-]*', identifier) or identifier in identifiers:
@@ -254,19 +260,25 @@ def check_repository(root):
         error(name, 'Markdown document is not registered')
 
     features = {}
-    try:
-        features = feature_rows(documents['docs/features.md'])
-        if features != feature_rows(documents['docs/features.ko.md']):
-            raise ValueError('English and Korean feature states or references differ')
-        if any(row[1] != 'not-verified' for row in features.values()):
-            check_verification(root, read_json('docs/verification.json'))
-    except (ValueError, KeyError, TypeError, OSError) as issue:
-        error('docs/features.md', str(issue))
-
-    try:
-        check_distribution(read_json('docs/distribution.json'), features)
-    except (ValueError, KeyError, TypeError, OSError) as issue:
-        error('docs/distribution.json', str(issue))
+    if role == 'common':
+        try:
+            features = feature_rows(documents['docs/features.md'])
+            if features != feature_rows(documents['docs/features.ko.md']):
+                raise ValueError('English and Korean feature states or references differ')
+            if any(row[1] != 'not-verified' for row in features.values()):
+                check_verification(root, read_json('docs/verification.json'))
+        except (ValueError, KeyError, TypeError, OSError) as issue:
+            error('docs/features.md', str(issue))
+        try:
+            check_distribution(read_json('docs/distribution.json'), features)
+        except (ValueError, KeyError, TypeError, OSError) as issue:
+            error('docs/distribution.json', str(issue))
+        if include_children:
+            for name, path in repository_paths(root).items():
+                manifest = path / 'docs/documentation-manifest.json'
+                if manifest.is_file():
+                    child_errors, count, _ = check_repository(path, include_children=False)
+                    errors.extend(name + '/' + issue for issue in child_errors)
 
     for path in (root / 'docs').rglob('*.json'):
         try:

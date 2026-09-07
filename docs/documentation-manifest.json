@@ -100,14 +100,20 @@
     {
       "id": "php-extension",
       "kind": "usage",
-      "en": "php/ext/README.md",
-      "ko": "php/ext/README.ko.md"
+      "en": "php-extension/README.md",
+      "ko": "php-extension/README.ko.md"
     },
     {
       "id": "ojson-comparison",
       "kind": "report",
       "en": "docs/reports/ojson-comparison.md",
       "ko": "docs/reports/ojson-comparison.ko.md"
+    },
+    {
+      "id": "repositories",
+      "kind": "specification",
+      "en": "docs/spec/repositories.md",
+      "ko": "docs/spec/repositories.ko.md"
     }
   ]
 }

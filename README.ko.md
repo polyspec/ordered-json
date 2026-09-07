@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: 634b68b2048d81e07885ebbe926743449affdc700eaac65d7944544df83d34fa -->
+<!-- source-sha256: 4a2e372ea9a43b03ceafdf2467eb555afa327648f19a15f1a27c9a21b217b884 -->
 # ordered-json
 
 [English](README.md)
@@ -29,7 +29,7 @@ JS
 | Rust | [Rust](rust/README.ko.md) |
 | Go | [Go](go/README.ko.md) |
 | PHP | [PHP](php/README.ko.md) |
-| PHP 네이티브 확장 | [네이티브 확장](php/ext/README.ko.md) |
+| PHP 네이티브 확장 | [네이티브 확장](php-extension/README.ko.md) |
 
 <a id="verification"></a>
 ## 검증

@@ -4,9 +4,11 @@ import argparse
 import json
 from pathlib import Path
 import re
-import shutil
 import subprocess
 import tempfile
+
+from registry import (IMPLEMENTATIONS, adapter_commands, parse_overrides, prepare,
+                      repository_paths)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -131,36 +133,17 @@ def prepare_cases(directory, suite):
     return cases, len(official['cases'])
 
 
-def commands(selected):
-    result = {}
-    if 'js' in selected:
-        result['js'] = ['node', str(ROOT / 'js/test/probe.mjs')]
-    if 'rust' in selected:
-        cargo = shutil.which('cargo') or str(Path.home() / '.cargo/bin/cargo')
-        subprocess.run([cargo, 'build', '--quiet', '--manifest-path', str(ROOT / 'rust/Cargo.toml'),
-                        '--example', 'probe'], check=True)
-        result['rust'] = [str(ROOT / 'rust/target/debug/examples/probe')]
-    if 'go' in selected:
-        binary = ROOT / '.cache/probes/go-probe'
-        binary.parent.mkdir(parents=True, exist_ok=True)
-        subprocess.run(['go', 'build', '-o', str(binary), './internal/probe'], cwd=ROOT / 'go', check=True)
-        result['go'] = [str(binary)]
-    if 'php' in selected:
-        result['php'] = ['php', '-n', str(ROOT / 'php/tests/probe.php')]
-    if 'php-native' in selected:
-        extension = ROOT / 'php/ext/modules/ordered_json.so'
-        if not extension.is_file():
-            raise ValueError('Build the PHP extension first: python3 scripts/test.py --build-extension')
-        result['php-native'] = ['php', '-n', '-d', f'extension={extension}', str(ROOT / 'php/tests/probe.php'), '--native']
-    return result
-
-
-def verify(selected, suite=None):
+def verify(selected, suite=None, paths=None, cache=None, build_warnings=None):
+    paths = paths or repository_paths(ROOT)
+    cache = cache or ROOT / '.cache/probes'
+    warnings = prepare(selected, paths, cache)
+    if build_warnings is not None:
+        build_warnings.extend(warnings)
     results = {}
     with tempfile.TemporaryDirectory(prefix='ordered-json-examples-') as folder:
         cases, official_count = prepare_cases(Path(folder), suite)
         requests = ''.join(str(path) + '\n' for _, path, _ in cases)
-        for language, command in commands(selected).items():
+        for language, command in adapter_commands(selected, paths, cache).items():
             process = subprocess.run(command, input=requests, encoding='utf-8',
                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
             if process.returncode:
@@ -200,11 +183,12 @@ def verify(selected, suite=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--only', action='append', choices=['js', 'rust', 'go', 'php', 'php-native'])
+    parser.add_argument('--only', action='append', choices=IMPLEMENTATIONS)
     parser.add_argument('--suite', type=Path, help='Optional nst/JSONTestSuite checkout')
+    parser.add_argument('--repository', action='append', metavar='NAME=PATH', help='Use another directory for a package')
     args = parser.parse_args()
-    verify(args.only or ['js', 'rust', 'go', 'php', 'php-native'],
-           args.suite.resolve() if args.suite else None)
+    verify(args.only or IMPLEMENTATIONS, args.suite.resolve() if args.suite else None,
+           repository_paths(ROOT, parse_overrides(args.repository)))
 
 
 if __name__ == '__main__':

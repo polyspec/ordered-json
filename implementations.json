@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "repositories": {
+    "javascript": {"path": "js", "url": "https://github.com/polyspec/ordered-json.git"},
+    "rust": {"path": "rust", "url": "https://github.com/polyspec/ordered-json.git"},
+    "go": {"path": "go", "url": "https://github.com/polyspec/ordered-json.git"},
+    "php": {"path": "php", "url": "https://github.com/polyspec/ordered-json.git"},
+    "php-extension": {"path": "php-extension", "url": "https://github.com/polyspec/ordered-json.git"}
+  },
+  "implementations": {
+    "js": {
+      "repository": "javascript",
+      "command": ["node", "{javascript}/test/probe.mjs"],
+      "runtime": {"node": ["node", "--version"]}
+    },
+    "rust": {
+      "repository": "rust",
+      "prepare": [{"cwd": "{rust}", "command": ["{cargo}", "build", "--quiet", "--example", "probe"]}],
+      "command": ["{rust}/target/debug/examples/probe"],
+      "runtime": {"rustc": ["{rustc}", "--version"]}
+    },
+    "go": {
+      "repository": "go",
+      "prepare": [{"cwd": "{go}", "command": ["go", "build", "-o", "{cache}/go-probe", "./internal/probe"]}],
+      "command": ["{cache}/go-probe"],
+      "runtime": {"go": ["go", "version"]}
+    },
+    "php": {
+      "repository": "php",
+      "command": ["php", "-n", "{php}/tests/probe.php"],
+      "runtime": {"php": ["php", "-n", "-r", "echo PHP_VERSION;"]}
+    },
+    "php-extension": {
+      "repository": "php-extension",
+      "dependencies": ["php"],
+      "prepare": [
+        {"cwd": "{php-extension}/src", "if_exists": "{php-extension}/src/Makefile", "command": ["make", "distclean"]},
+        {"cwd": "{php-extension}/src", "command": ["phpize", "--clean"]},
+        {"cwd": "{php-extension}/src", "command": ["phpize"]},
+        {"cwd": "{php-extension}/src", "command": ["./configure", "--enable-ordered-json"]},
+        {"cwd": "{php-extension}/src", "command": ["make", "-j2"]}
+      ],
+      "command": ["php", "-n", "-d", "extension={php-extension}/src/modules/ordered_json.so", "{php}/tests/probe.php", "--native"],
+      "runtime": {
+        "php": ["php", "-n", "-r", "echo PHP_VERSION;"],
+        "extension_version": ["php", "-n", "-d", "extension={php-extension}/src/modules/ordered_json.so", "-r", "if (phpversion('ordered_json') !== ORDERED_JSON_VERSION) exit(1); echo ORDERED_JSON_VERSION;"]
+      },
+      "artifacts": ["{php-extension}/src/modules/ordered_json.so"]
+    }
+  }
+}

@@ -45,7 +45,7 @@ class DocumentationChecks(unittest.TestCase):
         self.json('docs/distribution.json', self.distribution)
         self.results = {name: {'status': 'passed', 'cases': 2} for name in IMPLEMENTATIONS}
         self.versions = {name: {'version': 'synthetic fixture'} for name in IMPLEMENTATIONS}
-        self.versions['php-native'] = {'php': 'synthetic fixture', 'extension': 'ordered_json',
+        self.versions['php-extension'] = {'php': 'synthetic fixture', 'extension': 'ordered_json',
                                        'extension_version': 'synthetic fixture'}
         self.record = create_record(self.root, source_manifest(self.root), self.results,
                                    {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions)
@@ -154,12 +154,12 @@ class DocumentationChecks(unittest.TestCase):
         self.assert_failure('Verification is stale')
 
     def test_missing_implementation_result_fails(self):
-        del self.record['implementations']['php-native']
+        del self.record['implementations']['php-extension']
         self.json('docs/verification.json', self.record)
-        self.assert_failure('requires all five implementations')
+        self.assert_failure('requires all registered implementations')
 
     def test_php_extension_and_runtime_versions_are_separate(self):
-        del self.record['implementations']['php-native']['runtime']['extension_version']
+        del self.record['implementations']['php-extension']['runtime']['extension_version']
         self.json('docs/verification.json', self.record)
         self.assert_failure('PHP runtime and extension versions')
 
@@ -189,7 +189,7 @@ class DocumentationChecks(unittest.TestCase):
     def test_partial_results_cannot_create_record(self):
         results = copy.deepcopy(self.results)
         del results['go']
-        with self.assertRaisesRegex(ValueError, 'all five implementations'):
+        with self.assertRaisesRegex(ValueError, 'all registered implementations'):
             create_record(self.root, source_manifest(self.root), results,
                           {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions)
 
@@ -216,8 +216,8 @@ class DocumentationChecks(unittest.TestCase):
     def test_native_build_rejects_copy_error_with_zero_exit_status(self):
         from subprocess import CompletedProcess
         result = CompletedProcess(['phpize'], 0, stdout='cp: generated-file: Permission denied\n')
-        with patch('test.subprocess.run', return_value=result), redirect_stdout(io.StringIO()):
-            with self.assertRaisesRegex(RuntimeError, 'Native build reported an error'):
+        with patch('registry.subprocess.run', return_value=result), redirect_stdout(io.StringIO()):
+            with self.assertRaisesRegex(RuntimeError, 'Build reported an error'):
                 build_extension()
 
 

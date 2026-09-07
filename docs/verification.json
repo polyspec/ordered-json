@@ -1,19 +1,21 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-07T11:42:40+00:00",
+  "checked_at": "2026-09-07T13:11:29+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "e36d69708b469adea6e9df9f4b4920df32834086aa490d32763c58d174d76eb4",
+    "sha256": "0ce9d30b3412687e188301c07763b5b2c44f90242543746589d663932ae7c12e",
     "files": {
       "Makefile": "d6d8b4312c45dae0a3da2da17eb57c14977976778af9984ccda41aedd7c42123",
-      "docs/spec/api.ko.md": "2e32fb7f559b09dcfdf8e9dfc514e6a02c4834f3e6e8816a1198ac06023461f2",
-      "docs/spec/api.md": "6c595c962932d839697ccaf20f866cb8613540fa895360864706f541c96f81ed",
+      "docs/spec/api.ko.md": "a898db01f297804296cd7dd462485ca7e498bf945ccbd50078a95faf8136a5aa",
+      "docs/spec/api.md": "06c906c1cc749aed0c0c76e42c847481cfe0509034cebb3527ea16d73f9c0a00",
       "docs/spec/json-contract.ko.md": "c9b26ae9f6dd4954426fedf6717b0aac307e0671c8758e3ce3db8f311ead9067",
       "docs/spec/json-contract.md": "27525c1be0241f6e90d606b4a441e2def782bb5d5984bcd3794da6852fd0f15b",
+      "docs/spec/repositories.ko.md": "983e83bb635225eb4c3a489cae34d702af3427fd6a8c21bb871b5ee5285aaf7c",
+      "docs/spec/repositories.md": "0db37d277a2840942c0e80d5a6b842a374271981de718a3a0acf58408c9de09a",
       "examples/README.ko.md": "702a4a27ed68590c1a89ccfb7f90568ae187aadd986843f8d02fe614c226b21d",
       "examples/README.md": "5adddda24704fe97a3a005bce6ab4dd2ab91aa89f7c25fa54746ca0d698d1089",
       "examples/official.json": "008b05fe07142d9dcad9edd90fe6606926ccb279461664c19af5a3d0eedac830",
@@ -115,20 +117,22 @@
       "fixtures/valid/unicode.json": "a8236324f77bf7650c7f660e8238daa84baef1ba11265183374348bc5a4cecf6",
       "fixtures/valid/whitespace.json": "fde2ba473d5de7feaaba3339457ccd182f0f2156532e504fe47df1ed605e232e",
       "fixtures/valid/zero.json": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
-      "go/go.mod": "ae02d374d221feb28bc3dcf36a5128371a9a2c69d89b4f6a0ab7ee394e5f1dc9",
-      "go/internal/probe/main.go": "a035b4ab17c0bfacd3628d4ed0191f64ea2747beaeb11c9cc3bf4fe5ca58ecf7",
+      "go/go.mod": "df40995792ec5f0fb858223c065493b06435556c65337bdd63206589bba8b41f",
+      "go/internal/probe/main.go": "78fc4b9be4ab84d9cc1da45ca84364fdd430610349747e874273019b9d6edd2d",
       "go/orderedjson.go": "27f4ecebd1ea5cdc5fc56725fa90acc057cac8632c7fef0ecc650612b7ece529",
+      "implementations.json": "60472aa090cc5ad1cdb6516fc2fde710ee12db8706aa8ea031d7ab2715f7835c",
       "js/index.d.ts": "9a699c64a708171c6b43d1dd27d9636a67f51582b959564caa15587fc82f612e",
       "js/index.js": "93ddc3f11831e6eb779fcb732e802e15eb6637a978a28037a8861ec39ebef1b1",
       "js/package.json": "7a1ec5248a842da6a623657728777fa68aa58f9d9b83f3c26415bcea8846ffb2",
       "js/test/probe.mjs": "c1b87d90afc70c2cef94df27163043ad986c69a01e7ae9c4e6f38d33a3f7e355",
       "php/composer.json": "9e28a4664aa75ff0048b9e181d7e8d5c94a576f39e8a75fc5d7675317d4d55cd",
-      "php/ext/config.m4": "8fd1b60d558549b653541a60b4615507c543617924851b41ae5a7516646eeed9",
-      "php/ext/config.w32": "52f65b0c0ab32af3bac72f4c1265fac1fd475c52cdd74ae49a54b3fc337e7cf9",
-      "php/ext/ordered_json.c": "fa7979ab4c8701866a21084e473fe9befd832c2df6c23bf7c9e1e81d73c45454",
-      "php/ext/ordered_json.stub.php": "5a39353528294cb7a062c567ad5108f092101d886b70990c55c292a676687342",
       "php/src/OrderedJson.php": "00258117ab21c0e7b9b973cb07236ee4e11353d7b402de5a7c63e0357b89866b",
       "php/tests/probe.php": "c93a114abcf1817d457d8ba098052b49658263d4a2e4eceb08cdbc55d2bf4ee1",
+      "php-extension/composer.json": "1571c88e25b8302aff403e634abc6ebad100dac1df248ec2b0c0d81ceb37684c",
+      "php-extension/src/config.m4": "13e0ddc6c0e391d7ff11c48f3bdd2a07ea2943684fb01949473d645949054c00",
+      "php-extension/src/config.w32": "52f65b0c0ab32af3bac72f4c1265fac1fd475c52cdd74ae49a54b3fc337e7cf9",
+      "php-extension/src/ordered_json.c": "fa7979ab4c8701866a21084e473fe9befd832c2df6c23bf7c9e1e81d73c45454",
+      "php-extension/src/ordered_json.stub.php": "5a39353528294cb7a062c567ad5108f092101d886b70990c55c292a676687342",
       "rust/Cargo.lock": "dd9beee9a75c8331d090c13e730cf3fc188a3e0560878833a85baae689f15bde",
       "rust/Cargo.toml": "a63cf801f64d9c66dc53bab946312ba53ac337cb825de0225c53f53958ad7eac",
       "rust/examples/probe.rs": "c6270d919c06f7c1666cb2e126cda45ceefea07e0126f9d29fc33f90f6ed8152",
@@ -136,11 +140,13 @@
       "scripts/compare_ojson.py": "bd45cccfc0b64c45a262cde1c2e7509cd23a554040beee4cb598c957786fdef8",
       "scripts/comparison/ojson_comparison.erl": "d267254b5de99b8f3d815639a18dbc97d953be86dc1c28dabce6cbf9218cba9c",
       "scripts/comparison/python_ojson_probe.py": "7939ea89a8c481b4e466969977149d72a1689991cf1d84661ddcc64cbadcf202",
-      "scripts/docs_check.py": "fed51f0194ddd2baf22482dc2859d771680912718b8331f6f98e7a5ab32615f2",
-      "scripts/test.py": "c0e63bf0e542b2f47815d169ab136160f3476da3650a7f72a9b16890b6bc5760",
-      "scripts/tests/test_docs_check.py": "37c3f94219b7af0342100c65bbf258b6ef8cc778a715f1b79a915002916d8cde",
-      "scripts/verification_record.py": "418f467b5a037127bf7bb1a9838055b9aa9e727cd2d178e5fc7b9dde73c8a68e",
-      "scripts/verify.py": "ce13151a0db4f523fed93a7eaccb7efe86a27d2a0c100583a176077d49f309c4"
+      "scripts/docs_check.py": "6574f1885bd5c8cf1a961ae44bd613ba5b1f56d3a914bfe876c61dc855e8501f",
+      "scripts/registry.py": "b25e2d469388d27c1aa2ae68d27434041931a87183b024a735b70ce5f4e13457",
+      "scripts/test.py": "857a2df125e4be1e17d56774d5010ad0cdb23d7a50b08503a4ca048dcb07f631",
+      "scripts/tests/test_docs_check.py": "f71fdbc2e88bedc992990e71942bebffd33e82d21dc55472db2b2a68c4d46a93",
+      "scripts/tests/test_repositories.py": "45e44c2c3237f3619d0aeae4c8f4f8b3e621f19a12f87ae65607e659cf43c4bd",
+      "scripts/verification_record.py": "ee26315e49128ee205cd68ea3dce3511ad5d83b098e1da9259b38f1f0b7225eb",
+      "scripts/verify.py": "b76641592f3023212e8c4e9214a8c4f50be06ea111ab649c68caf0202a599e36"
     }
   },
   "cases": {
@@ -175,24 +181,21 @@
       "status": "passed",
       "cases": 433,
       "runtime": {
-        "php": "8.5.10",
-        "extension_loaded": false
+        "php": "8.5.10"
       }
     },
-    "php-native": {
+    "php-extension": {
       "status": "passed",
       "cases": 433,
       "runtime": {
         "php": "8.5.10",
-        "extension": "ordered_json",
-        "extension_version": "0.1.0",
-        "module_sha256": "b932337ec511a68a6518beee7148bd628caef4b50992427ff571ac6eef3825a6"
+        "extension_version": "0.1.0"
       }
     }
   },
   "documentation_tests": {
     "status": "passed",
-    "count": 32
+    "count": 41
   },
   "supplementary": {
     "project": "nst/JSONTestSuite",
@@ -200,8 +203,14 @@
     "cases": 318,
     "inputs_sha256": "dafa7facfed6700b0a2f16207fb1d3b557f9e45d3abd84f2dfb666538d10c332"
   },
-  "native_build_warnings": [
-    "checking for -single_module linker flag... ld: warning: -single_module is obsolete",
-    "ld: warning: -undefined suppress is deprecated"
+  "build_warnings": [
+    {
+      "implementation": "php-extension",
+      "message": "checking for -single_module linker flag... ld: warning: -single_module is obsolete"
+    },
+    {
+      "implementation": "php-extension",
+      "message": "ld: warning: -undefined suppress is deprecated"
+    }
   ]
 }
