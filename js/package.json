@@ -1,7 +1,7 @@
 {
   "name": "ordered-json",
   "version": "0.1.0",
-  "description": "Strict JSON with document order, duplicate keys and exact number preservation",
+  "description": "Strict JSON with insertion-ordered associative objects and exact number preservation",
   "type": "module",
   "exports": {
     ".": {

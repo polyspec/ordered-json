@@ -1,5 +1,5 @@
 //! Ordered, immutable JSON values. See [`parse`] and [`Value`].
-use std::{fmt, sync::Arc};
+use std::{collections::HashMap, fmt, sync::Arc};
 
 pub const MAX_DEPTH: usize = 256;
 
@@ -30,10 +30,40 @@ pub enum Kind {
     Null,
 }
 
-#[derive(Debug, Clone)]
-pub struct Member {
-    pub key: Value,
-    pub value: Value,
+/// An associative map that keeps each key's first insertion position.
+#[derive(Debug, Clone, Default)]
+pub struct OrderedMap {
+    keys: Vec<Value>,
+    values: HashMap<Vec<u16>, Value>,
+}
+impl OrderedMap {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn insert(&mut self, key: Value, value: Value) -> Result<Option<Value>> {
+        if key.kind != Kind::String {
+            return Err(error("object key must be a string"));
+        }
+        if !self.values.contains_key(&key.units) {
+            self.keys.push(key.clone());
+        }
+        Ok(self.values.insert(key.units, value))
+    }
+    pub fn get(&self, key: &str) -> Option<&Value> {
+        self.get_units(&key.encode_utf16().collect::<Vec<_>>())
+    }
+    pub fn get_units(&self, key: &[u16]) -> Option<&Value> {
+        self.values.get(key)
+    }
+    pub fn iter(&self) -> impl DoubleEndedIterator<Item = (&Value, &Value)> {
+        self.keys.iter().map(|key| (key, &self.values[&key.units]))
+    }
+    pub fn len(&self) -> usize {
+        self.values.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.values.is_empty()
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -42,7 +72,7 @@ pub struct Value {
     start: usize,
     end: usize,
     kind: Kind,
-    members: Vec<Member>,
+    members: OrderedMap,
     items: Vec<Value>,
     units: Vec<u16>,
 }
@@ -54,7 +84,7 @@ impl Value {
     pub fn raw(&self) -> &str {
         &self.source[self.start..self.end]
     }
-    pub fn members(&self) -> Option<&[Member]> {
+    pub fn members(&self) -> Option<&OrderedMap> {
         (self.kind == Kind::Object).then_some(&self.members)
     }
     pub fn items(&self) -> Option<&[Value]> {
@@ -77,22 +107,10 @@ impl Value {
         (self.kind == Kind::Boolean).then(|| self.raw().trim() == "true")
     }
     pub fn get(&self, key: &str) -> Option<&Value> {
-        let units: Vec<u16> = key.encode_utf16().collect();
-        self.get_units(&units)
+        self.members.get(key)
     }
     pub fn get_units(&self, key: &[u16]) -> Option<&Value> {
-        self.members
-            .iter()
-            .find(|m| m.key.units == key)
-            .map(|m| &m.value)
-    }
-    pub fn get_all(&self, key: &str) -> Vec<&Value> {
-        let units: Vec<u16> = key.encode_utf16().collect();
-        self.members
-            .iter()
-            .filter(|m| m.key.units == units)
-            .map(|m| &m.value)
-            .collect()
+        self.members.get_units(key)
     }
     pub fn string(text: &str) -> Self {
         Self::from_units(&text.encode_utf16().collect::<Vec<_>>())
@@ -127,51 +145,62 @@ impl Value {
     pub fn array(items: &[Value]) -> Result<Self> {
         parse(&format!(
             "[{}]",
-            items.iter().map(Self::raw).collect::<Vec<_>>().join(",")
+            items
+                .iter()
+                .map(Self::compact)
+                .collect::<Vec<_>>()
+                .join(",")
         ))
     }
-    pub fn object(members: &[Member]) -> Result<Self> {
+    pub fn object(members: &OrderedMap) -> Result<Self> {
         let mut parts = Vec::with_capacity(members.len());
-        for m in members {
-            if m.key.kind != Kind::String {
-                return Err(error("object key must be a string"));
-            }
-            parts.push(format!("{}:{}", m.key.raw(), m.value.raw()));
+        for (key, value) in members.iter() {
+            parts.push(format!("{}:{}", key.raw().trim(), value.compact()));
         }
         parse(&format!("{{{}}}", parts.join(",")))
     }
-    /// Remove only insignificant JSON whitespace, retaining every scalar token.
+    /// Serialize the associative maps in insertion order, retaining scalar tokens.
     pub fn compact(&self) -> String {
         let mut out = String::with_capacity(self.raw().len());
-        let (mut quoted, mut escaped) = (false, false);
-        for ch in self.raw().chars() {
-            if quoted {
-                out.push(ch);
-                if escaped {
-                    escaped = false;
-                } else if ch == '\\' {
-                    escaped = true;
-                } else if ch == '"' {
-                    quoted = false;
-                }
-            } else if !matches!(ch, ' ' | '\t' | '\n' | '\r') {
-                out.push(ch);
-                if ch == '"' {
-                    quoted = true;
-                }
-            }
-        }
+        self.write_json(&mut out);
         out
+    }
+    fn write_json(&self, out: &mut String) {
+        match self.kind {
+            Kind::Object => {
+                out.push('{');
+                for (i, (key, value)) in self.members.iter().enumerate() {
+                    if i > 0 {
+                        out.push(',');
+                    }
+                    out.push_str(key.raw().trim());
+                    out.push(':');
+                    value.write_json(out);
+                }
+                out.push('}');
+            }
+            Kind::Array => {
+                out.push('[');
+                for (i, item) in self.items.iter().enumerate() {
+                    if i > 0 {
+                        out.push(',');
+                    }
+                    item.write_json(out);
+                }
+                out.push(']');
+            }
+            _ => out.push_str(self.raw().trim()),
+        }
     }
 }
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(self.raw())
+        f.write_str(&self.compact())
     }
 }
 
-pub fn stringify(value: &Value) -> &str {
-    value.raw()
+pub fn stringify(value: &Value) -> String {
+    value.compact()
 }
 pub fn parse(source: &str) -> Result<Value> {
     parse_with_max_depth(source, MAX_DEPTH)
@@ -290,7 +319,7 @@ impl Parser {
         self.ws();
         let start = self.pos;
         let kind;
-        let (mut members, mut items, mut units) = (Vec::new(), Vec::new(), Vec::new());
+        let (mut members, mut items, mut units) = (OrderedMap::new(), Vec::new(), Vec::new());
         match self.peek() {
             Some(open @ (b'{' | b'[')) => {
                 if depth >= self.max_depth {
@@ -315,15 +344,12 @@ impl Parser {
                                 end: self.pos,
                                 kind: Kind::String,
                                 units: key_units,
-                                members: Vec::new(),
+                                members: OrderedMap::new(),
                                 items: Vec::new(),
                             };
                             self.ws();
                             self.expect(b':', "expected colon")?;
-                            members.push(Member {
-                                key,
-                                value: self.value(depth + 1)?,
-                            });
+                            members.insert(key, self.value(depth + 1)?)?;
                         } else {
                             items.push(self.value(depth + 1)?);
                         }

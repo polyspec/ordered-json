@@ -2,7 +2,6 @@
 """One set of examples, one set of expectations, five thin language adapters."""
 import argparse
 import json
-import os
 from pathlib import Path
 import re
 import shutil
@@ -24,7 +23,9 @@ def normalized(value, depth=0):
     if isinstance(value, (ObjectPairs, list)) and depth >= 256:
         raise ValueError('maximum nesting depth exceeded')
     if isinstance(value, ObjectPairs):
-        return ['object', [[key, normalized(child, depth + 1)] for key, child in value]]
+        # Validate every occurrence, including a subtree later overwritten.
+        members = dict((key, normalized(child, depth + 1)) for key, child in value)
+        return ['object', [[key, child] for key, child in members.items()]]
     if isinstance(value, list):
         return ['array', [normalized(child, depth + 1) for child in value]]
     if isinstance(value, NumberToken):
@@ -40,15 +41,63 @@ def reject_constant(value):
     raise ValueError(f'{value} is not JSON')
 
 
-def reference(source):
+def compact_reference(text):
+    """Render validated text with a dict: first key position, last value.
+
+    The standard decoder reads scalar boundaries. Original scalar/key tokens
+    remain available without using any of the five implementations.
+    """
+    decoder = json.JSONDecoder(parse_int=NumberToken, parse_float=NumberToken)
+    whitespace = re.compile(r'[ \t\r\n]*')
+
+    def value(pos):
+        pos = whitespace.match(text, pos).end()
+        start = pos
+        if text[pos] not in '{[':
+            _, end = decoder.raw_decode(text, pos)
+            return text[start:end], end
+        object_value = text[pos] == '{'
+        close = '}' if object_value else ']'
+        pos = whitespace.match(text, pos + 1).end()
+        members, items = {}, []
+        while text[pos] != close:
+            if object_value:
+                key_start = pos
+                name, pos = decoder.raw_decode(text, pos)
+                key_token = text[key_start:pos]
+                pos = whitespace.match(text, pos).end() + 1  # colon
+                child, pos = value(pos)
+                if name in members:
+                    key_token = members[name][0]
+                members[name] = (key_token, child)
+            else:
+                child, pos = value(pos)
+                items.append(child)
+            pos = whitespace.match(text, pos).end()
+            if text[pos] == close:
+                break
+            pos = whitespace.match(text, pos + 1).end()  # comma
+        if object_value:
+            return '{' + ','.join(key + ':' + child for key, child in members.values()) + '}', pos + 1
+        return '[' + ','.join(items) + ']', pos + 1
+
+    return value(0)[0]
+
+
+def unique_object(pairs):
+    if len(dict(pairs)) != len(pairs):
+        raise ValueError('duplicate key in generated JSON')
+    return ObjectPairs(pairs)
+
+
+def reference(source, require_unique=False):
     """Independent reference for supplementary fixtures; never rewrite goldens."""
     text = source.decode('utf-8', errors='strict')
-    parsed = json.loads(text, object_pairs_hook=ObjectPairs, parse_int=NumberToken,
+    parsed = json.loads(text, object_pairs_hook=unique_object if require_unique else ObjectPairs, parse_int=NumberToken,
                         parse_float=NumberToken, parse_constant=reject_constant)
     tree = normalized(parsed)
-    compact = re.sub(r'("(?:[^"\\]|\\.)*")|[ \t\r\n]+',
-                     lambda m: m.group(1) or '', text)
-    return {'ok': True, 'raw': text, 'compact': compact, 'tree': tree, 'rebuilt': compact}
+    compact = compact_reference(text)
+    return {'ok': True, 'raw': text, 'serialized': compact, 'compact': compact, 'tree': tree, 'rebuilt': tree}
 
 
 def prepare_cases(directory, suite):
@@ -57,8 +106,8 @@ def prepare_cases(directory, suite):
     for example in official['cases']:
         path = directory / (example['id'] + '.json')
         path.write_bytes(example['input'].encode('utf-8'))
-        expected = {'ok': True, 'raw': example['input'], 'compact': example['compact'],
-                    'tree': example['tree'], 'rebuilt': example['compact']}
+        expected = {'ok': True, 'raw': example['input'], 'serialized': example['compact'],
+                    'compact': example['compact'], 'tree': example['tree'], 'rebuilt': example['tree']}
         cases.append(('official/' + example['id'], path, expected))
     for category in ['valid', 'invalid']:
         for path in sorted((ROOT / 'fixtures' / category).glob('*.json')):
@@ -131,6 +180,13 @@ def main():
                 raise AssertionError(f'{language}: expected {len(cases)} responses, got {len(lines)}')
             for (name, _, expected), line in zip(cases, lines):
                 actual = json.loads(line)
+                if actual.get('ok'):
+                    # Constructors may quote keys differently; independently
+                    # validate their JSON, decoded keys, order and exact numbers.
+                    try:
+                        actual['rebuilt'] = reference(actual['rebuilt'].encode('utf-8'), require_unique=True)['tree']
+                    except (KeyError, ValueError, UnicodeError, RecursionError) as error:
+                        raise AssertionError(f'{language} {name}: invalid reconstructed JSON') from error
                 if actual != expected:
                     for key in set(actual) | set(expected):
                         if actual.get(key) != expected.get(key):

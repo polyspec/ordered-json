@@ -9,19 +9,19 @@
     "runtime": "Erlang/OTP 29 [erts-17.0.6] [source] [64-bit] [smp:2:2] [ds:2:2:10] [async-threads:1] [jit] [dtrace]",
     "compile_warnings": ".cache/comparison/erlang-ojson/src/ojson_decoder.erl:89:5: Warning: erlang:get_stacktrace/0 is removed; use the new try/catch syntax for retrieving the stack backtrace\n%   89| \t\t\t?raise(Pos);\n%     | \t\t\t ^\n\n.cache/comparison/erlang-ojson/src/ojson_decoder.erl:91:5: Warning: erlang:get_stacktrace/0 is removed; use the new try/catch syntax for retrieving the stack backtrace\n%   91| \t\t\t?raise(Pos, Token)\n%     | \t\t\t ^\n\n"
   },
-  "official_sha256": "1c6cb22d197e960b0876f35d82e81e7bac58f9af0a2b6e8d36232aa637fd70c2",
+  "official_sha256": "008b05fe07142d9dcad9edd90fe6606926ccb279461664c19af5a3d0eedac830",
   "suite_commit": "1ef36fa01286573e846ac449e8683f8833c5b26a",
   "case_source": "examples/official.json + fixtures/ + optional JSONTestSuite",
   "projects": {
     "pypi-ojson": {
       "summary": {
-        "cases": 428,
-        "official_cases": 12,
-        "official_structure_order_matches": 10,
-        "official_decoded_tree_matches": 9,
-        "official_encoded_tree_matches": 9,
-        "official_strict_outputs": 11,
-        "acceptance_matches": 412
+        "cases": 433,
+        "official_cases": 17,
+        "official_structure_order_matches": 17,
+        "official_decoded_tree_matches": 16,
+        "official_encoded_tree_matches": 16,
+        "official_strict_outputs": 16,
+        "acceptance_matches": 417
       },
       "cases": [
         {
@@ -201,11 +201,11 @@
           "case": "official/duplicate-keys",
           "acceptance_matches": true,
           "accepted": true,
-          "structure_order_matches": false,
-          "decoded_tree_matches": false,
+          "structure_order_matches": true,
+          "decoded_tree_matches": true,
           "strict_output": true,
-          "encoded_tree_matches": false,
-          "token_text_matches": false,
+          "encoded_tree_matches": true,
+          "token_text_matches": true,
           "observed": {
             "ok": true,
             "tree": [
@@ -234,11 +234,11 @@
           "case": "official/escaped-key-equivalence",
           "acceptance_matches": true,
           "accepted": true,
-          "structure_order_matches": false,
-          "decoded_tree_matches": false,
+          "structure_order_matches": true,
+          "decoded_tree_matches": true,
           "strict_output": true,
-          "encoded_tree_matches": false,
-          "token_text_matches": false,
+          "encoded_tree_matches": true,
+          "token_text_matches": true,
           "observed": {
             "ok": true,
             "tree": [
@@ -573,6 +573,264 @@
           }
         },
         {
+          "case": "official/nested-duplicate-keys",
+          "acceptance_matches": true,
+          "accepted": true,
+          "structure_order_matches": true,
+          "decoded_tree_matches": true,
+          "strict_output": true,
+          "encoded_tree_matches": true,
+          "token_text_matches": true,
+          "observed": {
+            "ok": true,
+            "tree": [
+              "object",
+              [
+                [
+                  "10",
+                  [
+                    "object",
+                    [
+                      [
+                        "b",
+                        [
+                          "number",
+                          "3"
+                        ]
+                      ],
+                      [
+                        "a",
+                        [
+                          "number",
+                          "2"
+                        ]
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "2",
+                  [
+                    "array",
+                    [
+                      [
+                        "object",
+                        [
+                          [
+                            "z",
+                            [
+                              "object",
+                              [
+                                [
+                                  "x",
+                                  [
+                                    "number",
+                                    "4"
+                                  ]
+                                ],
+                                [
+                                  "y",
+                                  [
+                                    "number",
+                                    "2"
+                                  ]
+                                ]
+                              ]
+                            ]
+                          ],
+                          [
+                            "a",
+                            [
+                              "number",
+                              "1"
+                            ]
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            "output": "{\"10\": {\"b\": 3, \"a\": 2}, \"2\": [{\"z\": {\"x\": 4, \"y\": 2}, \"a\": 1}]}"
+          }
+        },
+        {
+          "case": "official/numeric-key-overwrite",
+          "acceptance_matches": true,
+          "accepted": true,
+          "structure_order_matches": true,
+          "decoded_tree_matches": true,
+          "strict_output": true,
+          "encoded_tree_matches": true,
+          "token_text_matches": true,
+          "observed": {
+            "ok": true,
+            "tree": [
+              "object",
+              [
+                [
+                  "10",
+                  [
+                    "number",
+                    "3"
+                  ]
+                ],
+                [
+                  "2",
+                  [
+                    "number",
+                    "2"
+                  ]
+                ],
+                [
+                  "01",
+                  [
+                    "number",
+                    "4"
+                  ]
+                ],
+                [
+                  "0",
+                  [
+                    "number",
+                    "5"
+                  ]
+                ],
+                [
+                  "-0",
+                  [
+                    "number",
+                    "6"
+                  ]
+                ]
+              ]
+            ],
+            "output": "{\"10\": 3, \"2\": 2, \"01\": 4, \"0\": 5, \"-0\": 6}"
+          }
+        },
+        {
+          "case": "official/empty-and-null-key-overwrite",
+          "acceptance_matches": true,
+          "accepted": true,
+          "structure_order_matches": true,
+          "decoded_tree_matches": true,
+          "strict_output": true,
+          "encoded_tree_matches": true,
+          "token_text_matches": true,
+          "observed": {
+            "ok": true,
+            "tree": [
+              "object",
+              [
+                [
+                  "",
+                  [
+                    "number",
+                    "2"
+                  ]
+                ],
+                [
+                  "\u0000",
+                  [
+                    "number",
+                    "3"
+                  ]
+                ]
+              ]
+            ],
+            "output": "{\"\": 2, \"\\u0000\": 3}"
+          }
+        },
+        {
+          "case": "official/unicode-key-overwrite",
+          "acceptance_matches": true,
+          "accepted": true,
+          "structure_order_matches": true,
+          "decoded_tree_matches": true,
+          "strict_output": true,
+          "encoded_tree_matches": true,
+          "token_text_matches": false,
+          "observed": {
+            "ok": true,
+            "tree": [
+              "object",
+              [
+                [
+                  "\ud800",
+                  [
+                    "number",
+                    "2"
+                  ]
+                ],
+                [
+                  "x",
+                  [
+                    "number",
+                    "1"
+                  ]
+                ],
+                [
+                  "\ud83c\udf0d",
+                  [
+                    "number",
+                    "4"
+                  ]
+                ]
+              ]
+            ],
+            "output": "{\"\\ud800\": 2, \"x\": 1, \"\\ud83c\\udf0d\": 4}"
+          }
+        },
+        {
+          "case": "official/replace-object-value",
+          "acceptance_matches": true,
+          "accepted": true,
+          "structure_order_matches": true,
+          "decoded_tree_matches": true,
+          "strict_output": true,
+          "encoded_tree_matches": true,
+          "token_text_matches": true,
+          "observed": {
+            "ok": true,
+            "tree": [
+              "object",
+              [
+                [
+                  "b",
+                  [
+                    "object",
+                    [
+                      [
+                        "z",
+                        [
+                          "number",
+                          "3"
+                        ]
+                      ],
+                      [
+                        "y",
+                        [
+                          "number",
+                          "4"
+                        ]
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "a",
+                  [
+                    "number",
+                    "2"
+                  ]
+                ]
+              ]
+            ],
+            "output": "{\"b\": {\"z\": 3, \"y\": 4}, \"a\": 2}"
+          }
+        },
+        {
           "case": "fixtures/valid/bom-in-string.json",
           "acceptance_matches": true,
           "accepted": true,
@@ -616,11 +874,11 @@
           "case": "fixtures/valid/duplicates.json",
           "acceptance_matches": true,
           "accepted": true,
-          "structure_order_matches": false,
-          "decoded_tree_matches": false,
+          "structure_order_matches": true,
+          "decoded_tree_matches": true,
           "strict_output": true,
-          "encoded_tree_matches": false,
-          "token_text_matches": false
+          "encoded_tree_matches": true,
+          "token_text_matches": true
         },
         {
           "case": "fixtures/valid/empty-array.json",
@@ -656,11 +914,11 @@
           "case": "fixtures/valid/escaped-keys.json",
           "acceptance_matches": true,
           "accepted": true,
-          "structure_order_matches": false,
-          "decoded_tree_matches": false,
+          "structure_order_matches": true,
+          "decoded_tree_matches": true,
           "strict_output": true,
-          "encoded_tree_matches": false,
-          "token_text_matches": false
+          "encoded_tree_matches": true,
+          "token_text_matches": true
         },
         {
           "case": "fixtures/valid/escaped-solidus.json",
@@ -856,11 +1114,11 @@
           "case": "fixtures/valid/surrogate-key.json",
           "acceptance_matches": true,
           "accepted": true,
-          "structure_order_matches": false,
-          "decoded_tree_matches": false,
+          "structure_order_matches": true,
+          "decoded_tree_matches": true,
           "strict_output": true,
-          "encoded_tree_matches": false,
-          "token_text_matches": false
+          "encoded_tree_matches": true,
+          "token_text_matches": true
         },
         {
           "case": "fixtures/valid/surrogate-pair.json",
@@ -2792,21 +3050,21 @@
           "case": "JSONTestSuite/y_object_duplicated_key.json",
           "acceptance_matches": true,
           "accepted": true,
-          "structure_order_matches": false,
-          "decoded_tree_matches": false,
+          "structure_order_matches": true,
+          "decoded_tree_matches": true,
           "strict_output": true,
-          "encoded_tree_matches": false,
-          "token_text_matches": false
+          "encoded_tree_matches": true,
+          "token_text_matches": true
         },
         {
           "case": "JSONTestSuite/y_object_duplicated_key_and_value.json",
           "acceptance_matches": true,
           "accepted": true,
-          "structure_order_matches": false,
-          "decoded_tree_matches": false,
+          "structure_order_matches": true,
+          "decoded_tree_matches": true,
           "strict_output": true,
-          "encoded_tree_matches": false,
-          "token_text_matches": false
+          "encoded_tree_matches": true,
+          "token_text_matches": true
         },
         {
           "case": "JSONTestSuite/y_object_empty.json",
@@ -3422,13 +3680,13 @@
     },
     "erlang-ojson": {
       "summary": {
-        "cases": 428,
-        "official_cases": 12,
-        "official_structure_order_matches": 2,
+        "cases": 433,
+        "official_cases": 17,
+        "official_structure_order_matches": 3,
         "official_decoded_tree_matches": 2,
         "official_encoded_tree_matches": 2,
-        "official_strict_outputs": 10,
-        "acceptance_matches": 398
+        "official_strict_outputs": 14,
+        "acceptance_matches": 402
       },
       "cases": [
         {
@@ -3940,6 +4198,216 @@
           }
         },
         {
+          "case": "official/nested-duplicate-keys",
+          "acceptance_matches": true,
+          "accepted": true,
+          "structure_order_matches": false,
+          "decoded_tree_matches": false,
+          "strict_output": true,
+          "encoded_tree_matches": false,
+          "token_text_matches": false,
+          "observed": {
+            "ok": true,
+            "output": "{\"10\":{\"a\":2,\"b\":1},\"2\":[{\"a\":1,\"z\":0}]}",
+            "tree": [
+              "object",
+              [
+                [
+                  "10",
+                  [
+                    "object",
+                    [
+                      [
+                        "a",
+                        [
+                          "number",
+                          "2"
+                        ]
+                      ],
+                      [
+                        "b",
+                        [
+                          "number",
+                          "1"
+                        ]
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "2",
+                  [
+                    "array",
+                    [
+                      [
+                        "object",
+                        [
+                          [
+                            "a",
+                            [
+                              "number",
+                              "1"
+                            ]
+                          ],
+                          [
+                            "z",
+                            [
+                              "number",
+                              "0"
+                            ]
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "case": "official/numeric-key-overwrite",
+          "acceptance_matches": true,
+          "accepted": true,
+          "structure_order_matches": false,
+          "decoded_tree_matches": false,
+          "strict_output": true,
+          "encoded_tree_matches": false,
+          "token_text_matches": false,
+          "observed": {
+            "ok": true,
+            "output": "{\"-0\":6,\"0\":5,\"01\":4,\"10\":1,\"2\":2}",
+            "tree": [
+              "object",
+              [
+                [
+                  "-0",
+                  [
+                    "number",
+                    "6"
+                  ]
+                ],
+                [
+                  "0",
+                  [
+                    "number",
+                    "5"
+                  ]
+                ],
+                [
+                  "01",
+                  [
+                    "number",
+                    "4"
+                  ]
+                ],
+                [
+                  "10",
+                  [
+                    "number",
+                    "1"
+                  ]
+                ],
+                [
+                  "2",
+                  [
+                    "number",
+                    "2"
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "case": "official/empty-and-null-key-overwrite",
+          "acceptance_matches": true,
+          "accepted": true,
+          "structure_order_matches": true,
+          "decoded_tree_matches": false,
+          "strict_output": true,
+          "encoded_tree_matches": false,
+          "token_text_matches": false,
+          "observed": {
+            "ok": true,
+            "output": "{\"\":0,\"\\u0000\":1}",
+            "tree": [
+              "object",
+              [
+                [
+                  "",
+                  [
+                    "number",
+                    "0"
+                  ]
+                ],
+                [
+                  "\u0000",
+                  [
+                    "number",
+                    "1"
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "case": "official/unicode-key-overwrite",
+          "acceptance_matches": false,
+          "accepted": false,
+          "structure_order_matches": false,
+          "decoded_tree_matches": false,
+          "strict_output": false,
+          "encoded_tree_matches": false,
+          "token_text_matches": false,
+          "observed": {
+            "decode_error": "error",
+            "ok": false
+          }
+        },
+        {
+          "case": "official/replace-object-value",
+          "acceptance_matches": true,
+          "accepted": true,
+          "structure_order_matches": false,
+          "decoded_tree_matches": false,
+          "strict_output": true,
+          "encoded_tree_matches": false,
+          "token_text_matches": false,
+          "observed": {
+            "ok": true,
+            "output": "{\"a\":2,\"b\":{\"old\":1}}",
+            "tree": [
+              "object",
+              [
+                [
+                  "a",
+                  [
+                    "number",
+                    "2"
+                  ]
+                ],
+                [
+                  "b",
+                  [
+                    "object",
+                    [
+                      [
+                        "old",
+                        [
+                          "number",
+                          "1"
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        {
           "case": "fixtures/valid/bom-in-string.json",
           "acceptance_matches": true,
           "accepted": true,
@@ -3983,7 +4451,7 @@
           "case": "fixtures/valid/duplicates.json",
           "acceptance_matches": true,
           "accepted": true,
-          "structure_order_matches": false,
+          "structure_order_matches": true,
           "decoded_tree_matches": false,
           "strict_output": true,
           "encoded_tree_matches": false,
@@ -4023,7 +4491,7 @@
           "case": "fixtures/valid/escaped-keys.json",
           "acceptance_matches": true,
           "accepted": true,
-          "structure_order_matches": false,
+          "structure_order_matches": true,
           "decoded_tree_matches": false,
           "strict_output": true,
           "encoded_tree_matches": false,
@@ -6171,7 +6639,7 @@
           "case": "JSONTestSuite/y_object_duplicated_key.json",
           "acceptance_matches": true,
           "accepted": true,
-          "structure_order_matches": false,
+          "structure_order_matches": true,
           "decoded_tree_matches": false,
           "strict_output": true,
           "encoded_tree_matches": false,
@@ -6181,11 +6649,11 @@
           "case": "JSONTestSuite/y_object_duplicated_key_and_value.json",
           "acceptance_matches": true,
           "accepted": true,
-          "structure_order_matches": false,
-          "decoded_tree_matches": false,
+          "structure_order_matches": true,
+          "decoded_tree_matches": true,
           "strict_output": true,
-          "encoded_tree_matches": false,
-          "token_text_matches": false
+          "encoded_tree_matches": true,
+          "token_text_matches": true
         },
         {
           "case": "JSONTestSuite/y_object_empty.json",

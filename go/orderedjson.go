@@ -29,15 +29,81 @@ type ParseError struct {
 
 func (e *ParseError) Error() string { return fmt.Sprintf("%s at byte %d", e.Message, e.Offset) }
 
-type Member struct{ Key, Value *Value }
+// OrderedMap associates each key with one value and retains its insertion position.
+// Its zero value is an empty map. Keys returns JSON string values in that order.
+type OrderedMap struct {
+	state *orderedMapState
+}
+
+type orderedMapState struct {
+	keys   []*Value
+	values map[string]*Value
+}
+
+// unitsKey is a lossless identity for decoded JSON keys, including lone surrogates.
+func unitsKey(units []uint16) string {
+	key := make([]byte, len(units)*2)
+	for i, unit := range units {
+		key[2*i], key[2*i+1] = byte(unit>>8), byte(unit)
+	}
+	return string(key)
+}
+func (m *OrderedMap) Set(key, value *Value) error {
+	if key.Kind() != StringKind {
+		return fmt.Errorf("object key must be string")
+	}
+	if !value.valid() {
+		return fmt.Errorf("expected orderedjson Value")
+	}
+	if m.state == nil {
+		m.state = &orderedMapState{values: make(map[string]*Value)}
+	}
+	name := unitsKey(key.units)
+	if _, exists := m.state.values[name]; !exists {
+		m.state.keys = append(m.state.keys, key)
+	}
+	m.state.values[name] = value
+	return nil
+}
+func (m *OrderedMap) GetUnits(key []uint16) *Value {
+	if m.state == nil {
+		return nil
+	}
+	return m.state.values[unitsKey(key)]
+}
+func (m *OrderedMap) Get(key string) *Value {
+	if !utf8.ValidString(key) {
+		return nil
+	}
+	return m.GetUnits(utf16.Encode([]rune(key)))
+}
+func (m *OrderedMap) orderedKeys() []*Value {
+	if m.state == nil {
+		return nil
+	}
+	return m.state.keys
+}
+func (m *OrderedMap) Keys() []*Value { return append([]*Value{}, m.orderedKeys()...) }
+func (m *OrderedMap) Len() int       { return len(m.orderedKeys()) }
+func (m *OrderedMap) clone() *OrderedMap {
+	out := &OrderedMap{}
+	if m.state == nil {
+		return out
+	}
+	out.state = &orderedMapState{keys: m.Keys(), values: make(map[string]*Value, m.Len())}
+	for key, value := range m.state.values {
+		out.state.values[key] = value
+	}
+	return out
+}
 
 // Value is immutable. Construct values with Parse or the factory functions.
-// The zero value is invalid. Members and Items return copies of their slices.
+// The zero value is invalid. Members and Items return independent map/slice copies.
 type Value struct {
 	source     string
 	start, end int
 	kind       Kind
-	members    []Member
+	members    OrderedMap
 	items      []*Value
 	units      []uint16
 }
@@ -55,12 +121,12 @@ func (v *Value) Raw() string {
 	}
 	return v.source[v.start:v.end]
 }
-func (v *Value) String() string { return v.Raw() }
-func (v *Value) Members() ([]Member, error) {
+func (v *Value) String() string { out, _ := v.Compact(); return out }
+func (v *Value) Members() (*OrderedMap, error) {
 	if v.Kind() != ObjectKind {
 		return nil, fmt.Errorf("expected object")
 	}
-	return append([]Member{}, v.members...), nil
+	return v.members.clone(), nil
 }
 func (v *Value) Items() ([]*Value, error) {
 	if v.Kind() != ArrayKind {
@@ -103,46 +169,17 @@ func (v *Value) BooleanValue() (bool, error) {
 	}
 	return strings.TrimSpace(v.Raw()) == "true", nil
 }
-func equalUnits(a, b []uint16) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
-}
 func (v *Value) GetUnits(key []uint16) *Value {
 	if v.Kind() != ObjectKind {
 		return nil
 	}
-	for _, m := range v.members {
-		if equalUnits(m.Key.units, key) {
-			return m.Value
-		}
-	}
-	return nil
+	return v.members.GetUnits(key)
 }
 func (v *Value) Get(key string) *Value {
 	if !utf8.ValidString(key) {
 		return nil
 	}
 	return v.GetUnits(utf16.Encode([]rune(key)))
-}
-func (v *Value) GetAll(key string) []*Value {
-	result := []*Value{}
-	if v.Kind() != ObjectKind || !utf8.ValidString(key) {
-		return result
-	}
-	units := utf16.Encode([]rune(key))
-	for _, m := range v.members {
-		if equalUnits(m.Key.units, units) {
-			result = append(result, m.Value)
-		}
-	}
-	return result
 }
 func String(text string) (*Value, error) {
 	if !utf8.ValidString(text) {
@@ -189,20 +226,18 @@ func Array(items []*Value) (*Value, error) {
 		if !v.valid() {
 			return nil, fmt.Errorf("expected orderedjson Value")
 		}
-		parts[i] = v.Raw()
+		parts[i], _ = v.Compact()
 	}
 	return Parse("[" + strings.Join(parts, ",") + "]")
 }
-func Object(members []Member) (*Value, error) {
-	parts := make([]string, len(members))
-	for i, m := range members {
-		if m.Key.Kind() != StringKind {
-			return nil, fmt.Errorf("object key must be string")
-		}
-		if !m.Value.valid() {
-			return nil, fmt.Errorf("expected orderedjson Value")
-		}
-		parts[i] = m.Key.Raw() + ":" + m.Value.Raw()
+func Object(members *OrderedMap) (*Value, error) {
+	if members == nil {
+		return nil, fmt.Errorf("expected ordered map")
+	}
+	parts := make([]string, members.Len())
+	for i, key := range members.orderedKeys() {
+		child, _ := members.GetUnits(key.units).Compact()
+		parts[i] = strings.TrimSpace(key.Raw()) + ":" + child
 	}
 	return Parse("{" + strings.Join(parts, ",") + "}")
 }
@@ -210,7 +245,7 @@ func Stringify(value *Value) (string, error) {
 	if !value.valid() {
 		return "", fmt.Errorf("expected orderedjson Value")
 	}
-	return value.Raw(), nil
+	return value.Compact()
 }
 
 // MarshalJSON preserves members and literals; encoding/json may compact/escape the result.
@@ -223,25 +258,34 @@ func (v *Value) Compact() (string, error) {
 		return "", fmt.Errorf("expected orderedjson Value")
 	}
 	var out strings.Builder
-	quoted, escaped := false, false
-	for _, ch := range v.Raw() {
-		if quoted {
-			out.WriteRune(ch)
-			if escaped {
-				escaped = false
-			} else if ch == '\\' {
-				escaped = true
-			} else if ch == '"' {
-				quoted = false
-			}
-		} else if ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r' {
-			out.WriteRune(ch)
-			if ch == '"' {
-				quoted = true
-			}
-		}
-	}
+	v.writeJSON(&out)
 	return out.String(), nil
+}
+func (v *Value) writeJSON(out *strings.Builder) {
+	switch v.kind {
+	case ObjectKind:
+		out.WriteByte('{')
+		for i, key := range v.members.orderedKeys() {
+			if i > 0 {
+				out.WriteByte(',')
+			}
+			out.WriteString(strings.TrimSpace(key.Raw()))
+			out.WriteByte(':')
+			v.members.GetUnits(key.units).writeJSON(out)
+		}
+		out.WriteByte('}')
+	case ArrayKind:
+		out.WriteByte('[')
+		for i, item := range v.items {
+			if i > 0 {
+				out.WriteByte(',')
+			}
+			item.writeJSON(out)
+		}
+		out.WriteByte(']')
+	default:
+		out.WriteString(strings.TrimSpace(v.Raw()))
+	}
 }
 
 func Parse(source string) (*Value, error)      { return ParseWithMaxDepth(source, MaxDepth) }
@@ -406,7 +450,9 @@ func (p *parser) value(depth int) (*Value, error) {
 					if err != nil {
 						return nil, err
 					}
-					v.members = append(v.members, Member{Key: key, Value: child})
+					if err := v.members.Set(key, child); err != nil {
+						return nil, err
+					}
 				} else {
 					child, err := p.value(depth + 1)
 					if err != nil {
