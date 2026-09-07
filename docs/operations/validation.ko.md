@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 96bfb86d96ac227733e9d846cab73f315ac993adb03e76fd9abcf749939bae19 -->
+<!-- source-sha256: dd0704d1106c0301fce50c6bdf8a302322510ac9f2b5713059a59bf82b928109 -->
 # 검증
 
 [English](validation.md)
@@ -39,7 +39,7 @@ make check JSON_TEST_SUITE=.cache/JSONTestSuite
 python3 scripts/verify.py --only js
 python3 scripts/verify.py --only rust
 python3 scripts/verify.py --only go
-python3 scripts/verify.py --only php --only php-native
+python3 scripts/verify.py --only php --only php-extension
 ~~~
 
 마지막 명령을 실행하기 전에 네이티브 확장을 빌드해야 합니다. PHP 어댑터는 의도한 확장 파서가 로드됐는지 확인합니다.

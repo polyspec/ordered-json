@@ -28,7 +28,7 @@ JS
 | Rust | [Rust](rust/README.md) |
 | Go | [Go](go/README.md) |
 | PHP | [PHP](php/README.md) |
-| PHP native extension | [Native extension](php/ext/README.md) |
+| PHP native extension | [Native extension](php-extension/README.md) |
 
 <a id="verification"></a>
 ## Verification

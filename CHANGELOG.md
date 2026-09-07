@@ -6,6 +6,9 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Added a registry of implementation build, adapter, and runtime commands.
+- Separated PHP extension sources into `php-extension/src` and added PIE package metadata with a default-enabled standalone build.
+
 - Renamed language packages, namespaces, imports, native symbols, and build outputs to the ordered-json identifiers in the [API contract](docs/spec/api.md).
 - Added English canonical documents and paired Korean translations for specifications, APIs, feature state, operations, examples, and development procedure.
 - Added `make check` and `make docs-check`. Checks validate document registration, links, translation revisions, section/code parity, feature state, and current verification evidence. Verification records now include the actual source hashes, runtime versions, and common test results.

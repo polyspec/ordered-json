@@ -5,18 +5,19 @@ import json
 import os
 from pathlib import Path
 import platform
-import shutil
 import subprocess
 import tempfile
 
-IMPLEMENTATIONS = ('js', 'rust', 'go', 'php', 'php-native')
+from registry import IMPLEMENTATIONS, REGISTRY, repository_paths, runtime_versions
+
 SOURCE_PATTERNS = (
     'Makefile', 'js/*.js', 'js/*.ts', 'js/test/**/*.mjs', 'js/package.json',
     'rust/src/**/*.rs', 'rust/examples/**/*.rs', 'rust/Cargo.toml', 'rust/Cargo.lock',
     'go/**/*.go', 'go/go.mod', 'go/go.sum', 'php/src/**/*.php', 'php/tests/**/*.php',
-    'php/composer.json', 'php/ext/*.c', 'php/ext/*.h', 'php/ext/*.stub.php',
-    'php/ext/config.m4', 'php/ext/config.w32', 'scripts/**/*.py', 'scripts/**/*.erl',
+    'php/composer.json', 'php-extension/src/*.c', 'php-extension/src/*.h', 'php-extension/src/*.stub.php',
+    'php-extension/src/config.m4', 'php-extension/src/config.w32', 'scripts/**/*.py', 'scripts/**/*.erl',
     'examples/official.json', 'examples/README*.md', 'fixtures/**/*.json', 'docs/spec/*.md',
+    'implementations.json', 'php-extension/composer.json',
 )
 
 
@@ -37,22 +38,7 @@ def output(command, cwd=None):
 
 
 def runtimes(root):
-    rustc = shutil.which('rustc') or str(Path.home() / '.cargo/bin/rustc')
-    extension = root / 'php/ext/modules/ordered_json.so'
-    native = json.loads(output(['php', '-n', '-d', f'extension={extension}', '-r',
-        'echo json_encode(["php" => PHP_VERSION, "extension" => phpversion("ordered_json"), '
-        '"constant" => ORDERED_JSON_VERSION]);']))
-    if not native['extension'] or native['extension'] != native['constant']:
-        raise ValueError('PHP extension version is missing or inconsistent')
-    return {
-        'js': {'node': output(['node', '--version'])},
-        'rust': {'rustc': output([rustc, '--version'])},
-        'go': {'go': output(['go', 'version'])},
-        'php': {'php': output(['php', '-n', '-r', 'echo PHP_VERSION;']), 'extension_loaded': False},
-        'php-native': {'php': native['php'], 'extension': 'ordered_json',
-                       'extension_version': native['extension'],
-                       'module_sha256': sha256(extension.read_bytes())},
-    }
+    return runtime_versions(IMPLEMENTATIONS, repository_paths(root), root / '.cache/probes')
 
 
 def create_record(root, before, results, counts, documentation_tests, runtime_versions,
@@ -60,7 +46,7 @@ def create_record(root, before, results, counts, documentation_tests, runtime_ve
     if source_manifest(root) != before:
         raise ValueError('Sources changed during verification; no current record was written')
     if set(results) != set(IMPLEMENTATIONS):
-        raise ValueError('A current record requires all five implementations')
+        raise ValueError('A current record requires all registered implementations')
     total = sum(counts.values())
     if counts.get('official', 0) <= 0 or counts.get('fixtures', 0) <= 0:
         raise ValueError('Official examples and repository fixtures are required')
@@ -76,7 +62,7 @@ def create_record(root, before, results, counts, documentation_tests, runtime_ve
         'implementations': {name: {**results[name], 'runtime': runtime_versions[name]}
                             for name in IMPLEMENTATIONS},
         'documentation_tests': {'status': 'passed', 'count': documentation_tests},
-        'supplementary': supplementary, 'native_build_warnings': list(build_warnings),
+        'supplementary': supplementary, 'build_warnings': list(build_warnings),
     }
 
 

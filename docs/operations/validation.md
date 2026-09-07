@@ -38,7 +38,7 @@ These commands run a selected implementation against the same expectations. They
 python3 scripts/verify.py --only js
 python3 scripts/verify.py --only rust
 python3 scripts/verify.py --only go
-python3 scripts/verify.py --only php --only php-native
+python3 scripts/verify.py --only php --only php-extension
 ~~~
 
 The native extension must already be built for the last command. The PHP adapter verifies whether the intended extension backend is loaded.

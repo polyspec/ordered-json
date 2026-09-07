@@ -6,7 +6,7 @@
 <a id="usage"></a>
 ## Usage
 
-The pure PHP package and optional [native extension](ext/README.md) share the same `Value` API. See [installation](../docs/operations/installation.md) for requirements and loading. Here `$source` is the `input` string from an object case in [official.json](../examples/official.json); the file path is relative to this directory.
+The pure PHP package and optional [native extension](../php-extension/README.md) share the same `Value` API. See [installation](../docs/operations/installation.md) for requirements and loading. Here `$source` is the `input` string from an object case in [official.json](../examples/official.json); the file path is relative to this directory.
 
 ~~~php
 require 'src/OrderedJson.php';
@@ -25,7 +25,7 @@ $rebuilt = OrderedJson\stringify(OrderedJson\Value::object($members));
 After building the extension, run from the repository root:
 
 ~~~sh
-python3 scripts/verify.py --only php --only php-native
+python3 scripts/verify.py --only php --only php-extension
 ~~~
 
 Both backends use the shared verifier and official expectations. The [repository check](../docs/operations/validation.md) builds the extension and tests all implementations.

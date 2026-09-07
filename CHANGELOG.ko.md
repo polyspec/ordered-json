@@ -1,11 +1,14 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: ff2474eaf41dc0da6122e0483f69d2b83abe6f1c0eee0327c93e799b5bfa104d -->
+<!-- source-sha256: 2f5df39beebf791afe2695eb0ac335f209ae8b417dfb83f3be9704e0b8ef3397 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
+
+- 구현 빌드·어댑터·런타임 명령 등록 정보를 추가했습니다.
+- PHP 확장 소스를 `php-extension/src`로 분리하고 단독 빌드를 기본 활성화하는 PIE 패키지 메타데이터를 추가했습니다.
 
 - 언어별 패키지, 네임스페이스, 가져오기, 네이티브 심볼, 빌드 출력을 [API 계약](docs/spec/api.ko.md)의 ordered-json 식별자로 변경했습니다.
 - 명세, API, 기능 상태, 운영, 예제, 개발 절차에 영어 정본과 한국어 번역을 추가했습니다.
