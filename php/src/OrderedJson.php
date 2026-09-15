@@ -381,9 +381,12 @@ final class Value implements \JsonSerializable, \Stringable
         if (self::$native ??= \extension_loaded('ordered_json'))
             return \ordered_json_compact_node($this->source, $this->tape, $this->index);
         $meta = $this->tape[$this->index];
-        $kind = $meta & Tape::KIND;
-        if ($meta & Tape::COMPACT || $kind > Tape::ARRAY) return $this->token();
-        if ($kind === Tape::OBJECT) {
+        return $meta & Tape::COMPACT || ($meta & Tape::KIND) > Tape::ARRAY ? $this->token() : $this->render();
+    }
+    /** Serializes a container in PHP; kept out of compact() so the extension path has a small call frame. */
+    private function render(): string
+    {
+        if (($this->tape[$this->index] & Tape::KIND) === Tape::OBJECT) {
             [$members, $keys] = $this->cache ??= $this->hydrateMembers();
             $parts = [];
             foreach ($members as $key => $value)
