@@ -1,10 +1,17 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "benchmark": {
+    "warmup": 1000,
+    "iterations": 1000,
+    "samples": 9,
+    "median_tolerance": 0.10,
+    "p95_tolerance": 0.30
+  },
   "fixtures": [
-    {"file": "empty-array.json", "input_bytes": 3, "objects": 0, "arrays": 1, "strings": 0, "numbers": 0, "booleans": 0, "nulls": 0, "nodes": 1, "max_depth": 0},
-    {"file": "empty-object.json", "input_bytes": 3, "objects": 1, "arrays": 0, "strings": 0, "numbers": 0, "booleans": 0, "nulls": 0, "nodes": 1, "max_depth": 0},
-    {"file": "large-array.json", "input_bytes": 182, "objects": 0, "arrays": 1, "strings": 0, "numbers": 90, "booleans": 0, "nulls": 0, "nodes": 91, "max_depth": 1},
-    {"file": "mixed-unicode.json", "input_bytes": 130, "objects": 1, "arrays": 1, "strings": 5, "numbers": 4, "booleans": 0, "nulls": 0, "nodes": 11, "max_depth": 2},
-    {"file": "nested-order.json", "input_bytes": 66, "objects": 5, "arrays": 3, "strings": 6, "numbers": 5, "booleans": 0, "nulls": 0, "nodes": 19, "max_depth": 4}
+    {"file": "empty-array.json", "input_bytes": 3, "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570", "objects": 0, "arrays": 1, "strings": 0, "numbers": 0, "booleans": 0, "nulls": 0, "nodes": 1, "max_depth": 0},
+    {"file": "empty-object.json", "input_bytes": 3, "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356", "objects": 1, "arrays": 0, "strings": 0, "numbers": 0, "booleans": 0, "nulls": 0, "nodes": 1, "max_depth": 0},
+    {"file": "large-array.json", "input_bytes": 182, "sha256": "e57f10beb9a91d19f2c3b564afb3f627c775431b59cfebac5fe618c5389f862a", "objects": 0, "arrays": 1, "strings": 0, "numbers": 90, "booleans": 0, "nulls": 0, "nodes": 91, "max_depth": 1},
+    {"file": "mixed-unicode.json", "input_bytes": 130, "sha256": "cb6f171b0a53de7aac3fd15cf81db7bd789ee90910d9d083e6ab593c3e4ae8f1", "objects": 1, "arrays": 1, "strings": 5, "numbers": 4, "booleans": 0, "nulls": 0, "nodes": 11, "max_depth": 2},
+    {"file": "nested-order.json", "input_bytes": 66, "sha256": "ee4d0c53ac06ed42d611f115ec3935f672711c506547268fb1381e8d71d335a5", "objects": 5, "arrays": 3, "strings": 6, "numbers": 5, "booleans": 0, "nulls": 0, "nodes": 19, "max_depth": 4}
   ]
 }

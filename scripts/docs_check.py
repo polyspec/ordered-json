@@ -115,7 +115,7 @@ def feature_rows(text):
             raise ValueError('Duplicate feature ID: ' + identifier)
         if not feature or implementation not in ('implemented', 'partial', 'planned'):
             raise ValueError('Invalid implementation state: ' + identifier)
-        if verification not in ('shared-suite', 'docs-tests', 'not-verified'):
+        if verification not in ('shared-suite', 'docs-tests', 'benchmark', 'not-verified'):
             raise ValueError('Invalid verification state: ' + identifier)
         if distribution not in ('source-only', 'not-distributed', 'published'):
             raise ValueError('Invalid distribution state: ' + identifier)
