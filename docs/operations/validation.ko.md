@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: cacdf5a331dacbebb042e64fc61a3b0597175f1b99c04647d74c61d0bbffcfc2 -->
+<!-- source-sha256: 8a8696279b36a8c23367b2890b63473caa093d7a418dc97596f038cbad50e423 -->
 # 검증
 
 [English](validation.md)
@@ -64,7 +64,7 @@ make pie-check PIE=/path/to/pie.phar JSON_TEST_SUITE=.cache/JSONTestSuite
 
 [PIE 검사기](../../scripts/check_pie.py)는 `.cache/` 아래에 PIE 설정을 격리하고, 현재 확장 체크아웃을 경로 저장소로 등록하고, 패키지 인식을 확인하고, PIE로 빌드합니다. 같은 공통 어댑터와 기대값으로 해당 산출물을 직접 검사합니다. 중간에 일반 네이티브 빌드를 실행하지 않습니다.
 
-준비된 경우 `pie-verification.json`은 PIE 버전과 PHAR 해시, 확장 산출물 해시, 명령, 소스 해시, PHP·확장 버전, 사례 결과를 기록합니다. 빌드 오류, 빌드 도구 누락, 어댑터 경고, 검사 중 변경은 검증 실패로 처리합니다. 컴파일 경고는 기록에 유지합니다. 이 검사는 모듈을 설치하거나 패키지를 게시하지 않습니다. 기록된 입력이 변경되면 다시 실행합니다.
+준비된 경우 `pie-verification.json`은 PIE 버전과 PHAR 해시, 확장 산출물 해시, 명령, 소스 해시, PHP·확장 버전, 사례 결과를 기록합니다. 빌드 오류, 빌드 도구 누락, 어댑터 경고, 검사 중 변경은 검증 실패로 처리합니다. 컴파일 경고는 기록에 유지합니다. 이 검사는 모듈을 설치하거나 패키지를 게시하지 않습니다. 기록된 입력이 변경되면 `make check`보다 먼저 다시 실행합니다. `make check`의 문서 검사는 오래된 PIE 기록을 거부합니다.
 
 <a id="documentation-checks"></a>
 ## 문서 검사

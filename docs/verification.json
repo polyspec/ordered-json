@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-15T12:29:57+00:00",
+  "checked_at": "2026-09-15T12:34:19+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "1d2be80a4765fda6e74346ede36f42641b0b4dd2cb19487e970649caedd13403",
+    "sha256": "1e635bfd89ac8f3e6d32eae280ea6fc272cde5af288908a4f9e5c673648b1928",
     "files": {
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
-      "AGENTS.ko.md": "a8b0309d3832249dd7605b6404a644701e5456a67924f2b7f5ab69f13ad31196",
-      "AGENTS.md": "f61e8588ac0a6af7ec4b66534866aa67f6bf50a0cb07de5841b04b9928e5de54",
-      "CHANGELOG.ko.md": "69880c3adf0545dc351296990c0304dc8081e4da94baee9603bc436b7d01e2d6",
-      "CHANGELOG.md": "e579700626a2934332afe6227a708e6920aea6220c72311419637b5f6d7ff6ee",
+      "AGENTS.ko.md": "72246495efbec08ab1c4b4086db12babd37d3c98dfa3c2b33645137c8da86cc8",
+      "AGENTS.md": "6c41691419dacdc2114d1087a3193cb6e04f25b552a147723cc2db5541535982",
+      "CHANGELOG.ko.md": "a5092dda1b39a29cb77aefc176ce2c202f4f5b68d907a7ae82dac5e8da9cf1f9",
+      "CHANGELOG.md": "41d03a8536bc0573ff400a00bbddfaafc1743efc13141b2e76e443b8195c40c0",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
       "README.md": "8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75",
@@ -39,8 +39,8 @@
       "docs/operations/distribution.md": "c4f493d8b93e47f14bb7c17639a83b9b5f4f656c253df2fef77ee4c65dc9d2ef",
       "docs/operations/installation.ko.md": "e7a89afe9c690610202106b9bd748464b257e8111d8cba9744a327f8ab5293df",
       "docs/operations/installation.md": "059f5ac85003cb447fbb237ccb2c1b5bc1d00fb96cd7aed7819dbe443c400b4e",
-      "docs/operations/validation.ko.md": "c75292e23c83ec387d9bf71cc782fa20bba77b3bea40ceda48090101f83eba22",
-      "docs/operations/validation.md": "cacdf5a331dacbebb042e64fc61a3b0597175f1b99c04647d74c61d0bbffcfc2",
+      "docs/operations/validation.ko.md": "282561f4e33e26bd68c0a66e5efd5a24a4a2e7421dc4db7b180c823580b929b6",
+      "docs/operations/validation.md": "8a8696279b36a8c23367b2890b63473caa093d7a418dc97596f038cbad50e423",
       "docs/plans/README.ko.md": "b12490bd99031c50587613e425077a2f6b673834202e8b84bff62750974efd19",
       "docs/plans/README.md": "2d012cdb4ebc1b599fbb75c77d41618f7eaf575d27da127050c30d59d6693f3a",
       "docs/reports/ojson-comparison.json": "4f6bc37d9fba4be253b8b11c3a813eec52d53d139ee202ca9693d8a17ecb5ba2",
