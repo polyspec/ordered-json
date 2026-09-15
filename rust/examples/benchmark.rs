@@ -60,12 +60,12 @@ fn main() {
             count,
         );
         println!(
-            "{file}\tordered-json\t{parse_ns}\t{stringify_ns}\t{roundtrip_ns}\t{}",
-            digest(&output)
+            "{file}\tordered-json\t{parse_ns}\t{stringify_ns}\t{roundtrip_ns}\t{}\t{}\t{}",
+            digest(&output), source.len(), output.len()
         );
         println!(
-            "{file}\tnative-json\t{native_parse_ns}\t{native_stringify_ns}\t{native_roundtrip_ns}\t{}",
-            digest(&native_output)
+            "{file}\tnative-json\t{native_parse_ns}\t{native_stringify_ns}\t{native_roundtrip_ns}\t{}\t{}\t{}",
+            digest(&native_output), source.len(), native_output.len()
         );
     }
 }
