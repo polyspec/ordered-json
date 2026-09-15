@@ -30,7 +30,7 @@ For full supplementary coverage:
 make check JSON_TEST_SUITE=.cache/JSONTestSuite
 ~~~
 
-Run `make docs-check` for documentation-only review. If verification source hashes changed, run `make check` to generate a current record. If the PIE record is stale, also run `make pie-check PIE=/path/to/pie.phar` with the applicable supplementary suite. Do not edit verification results or source hashes to make checks pass.
+Run `make docs-check` for documentation-only review. When sources change and a PIE record exists, run `make pie-check PIE=/path/to/pie.phar` with the applicable supplementary suite first, then run `make check` to generate a current record; the documentation check in `make check` rejects a stale PIE record. Do not edit verification results or source hashes to make checks pass.
 
 The [implementation registry](implementations.json) declares package paths, build, adapter, and runtime commands. Add new languages there and in a package directory without changing the shared JSON comparison algorithm. A contract change updates the verifier and affected packages in one repository revision. See the [repository contract](docs/spec/repositories.md).
 
