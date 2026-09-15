@@ -1,23 +1,48 @@
-<!-- doc-id: php-extension -->
-<!-- source-sha256: b2642ae13da13b662863115c155956dbb6256d1ad393fae59b7abae8daf56182 -->
-# PHP 확장
+<!-- doc-id: overview -->
+<!-- source-sha256: 02503f8935c712a5c227c9106181942726e09e3c206300431d07a411f374aae7 -->
+# ordered-json for PHP extension
 
 [English](README.md)
 
+객체를 연관배열로 처리하고 모든 깊이에서 문서 키 순서를 유지하는 엄격한 JSON 구현입니다. 중복 키는 최초 위치와 마지막 값을 유지합니다. 공식 입력과 기대 결과는 모노레포의 examples에서 관리합니다.
+
 <a id="usage"></a>
-## 빌드와 사용
+## 사용
 
-C 확장은 엄격한 파싱과 연관배열 JSON 직렬화를 구현합니다. [공통 PHP 패키지](../php/README.ko.md)가 공개 API를 제공합니다. 확장의 `ordered_json` 버전과 PHP 런타임 버전은 별도이며 [verification.json](../docs/verification.json)에 둘 다 기록합니다.
+PHP >= 8.2와 일치하는 개발 헤더를 요구하며 PIE 패키지는 `ordered-json/ordered-json-extension`, 확장은 `ordered_json`입니다.
 
-[네이티브 설치](../docs/operations/installation.ko.md#native-php)에 따라 대상 PHP 런타임용 `modules/ordered_json.so`를 빌드합니다. [API 계약](../docs/spec/api.ko.md#php)에 `ordered_json_scan`, `ordered_json_compact`, 서술자 필드, 파서 선택을 정의합니다. Windows 설정이 포함되어 있지만 Windows 빌드는 검증되지 않았습니다.
+소스 빌드는 `src/modules/ordered_json.so`를 생성합니다. PHP의 `-d extension=/absolute/path/to/ordered_json.so`로 로드합니다. [PHP 라이브러리](https://github.com/polyspec/ordered-json/tree/main/php)는 공통 Value API를 제공합니다.
+
+~~~sh
+cd src
+phpize
+./configure
+make -j2
+~~~
+
+
+macOS의 configure는 지정된 `MACOSX_DEPLOYMENT_TARGET`을 유지합니다. 값이 없으면 대상 플래그를 포함한 현재 컴파일러 설정에서 구합니다. 최신 macOS 대상의 번들에는 동적 심볼 조회를 사용합니다. Libtool의 `LT_MULTI_MODULE` 옵션으로 불필요한 동적 라이브러리 단일 모듈 플래그 검사를 제외합니다.
+
+PIE 메타데이터는 `php-ext` 유형, `ordered_json` 확장 이름, `src` 빌드 경로를 정의합니다. 패키지 이름은 PHP 라이브러리와 구분합니다. 로컬 PIE 빌드는 이 체크아웃을 등록하고 개발 패키지를 빌드합니다.
+
+~~~sh
+pie repository:add path .
+pie build 'ordered-json/ordered-json-extension:*@dev'
+~~~
+
+PIE 설정은 `PIE_WORKING_DIRECTORY` 환경 변수로 격리할 수 있습니다. 빌드는 확장을 설치하거나 활성화하지 않습니다. Windows 바이너리와 ZTS 빌드는 검증되지 않았습니다. 공통 검사는 PHP 버전과 확장 버전을 별도로 기록합니다. PHP 라이브러리는 이 모노레포의 형제 `php/` 패키지이며 네이티브 빌드나 PIE 패키지와는 별도입니다.
+
+동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
 
 <a id="verification"></a>
 ## 검증
 
-빌드 후 저장소 루트에서 실행합니다.
+Python >= 3.9, Git, make, 해당 구현의 런타임·빌드 도구를 설치하고 이 체크아웃에서 실행합니다.
 
 ~~~sh
-python3 scripts/verify.py --only php-extension
+make check
 ~~~
 
-어댑터는 확장을 요구하며 공통 공식 기대 결과를 사용합니다. [저장소 검사](../docs/operations/validation.ko.md)는 확장을 빌드하고 두 PHP 백엔드를 다른 구현과 비교합니다.
+루트 검증기를 호출하여 이 패키지를 검사합니다. 루트 통합 검사는 같은 소스 리비전의 모든 패키지를 검사하고 현재 결과를 `docs/verification.json`에 기록합니다.
+
+추가 사례는 `make check JSON_TEST_SUITE=/path/to/JSONTestSuite`로 검사합니다. [개발 절차](AGENTS.ko.md)와 [변경 기록](CHANGELOG.ko.md)에 필수 검사와 변경 사항이 있습니다.

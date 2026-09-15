@@ -1,26 +1,24 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: dd0704d1106c0301fce50c6bdf8a302322510ac9f2b5713059a59bf82b928109 -->
+<!-- source-sha256: ca4521bcfe59bcf7da1fc03fd4205cc92195f06389472131ef60df3f77d46e98 -->
 # 검증
 
 [English](validation.md)
 
 <a id="repository-check"></a>
-## 저장소 검사
+## 통합 검사
 
-[필수 도구](installation.ko.md#requirements)를 설치한 후 저장소 루트에서 실행합니다.
+[필수 도구](installation.ko.md#requirements)를 설치하고 저장소 루트에서 실행합니다.
 
 ~~~sh
 make check
 ~~~
 
-이 명령은 PHP 확장을 빌드하고 문서 검사기 테스트 및 JavaScript, Rust, Go, 순수 PHP, 네이티브 PHP의 동일 JSON 사례를 실행합니다. 검증 성공 후에만 [verification.json](../verification.json)을 작성하고 문서 검사를 실행합니다.
+검증기와 문서 검사기 테스트를 실행하고, 선택한 패키지를 빌드하고, 등록된 모든 구현에 공통 JSON 사례를 적용하고, [verification.json](../verification.json)을 생성한 뒤 공통·패키지 문서를 검사합니다. 통합 기록에는 추적된 모든 패키지 파일의 소스 해시가 포함됩니다.
 
-`verification.json`은 실제 런타임 버전, 사례 수, 구현별 결과, 문서 테스트 수, 소스 해시, 추가 입력 개정본을 기록합니다. 게시가 아닌 검증 기록입니다. 검사한 소스 파일이 바뀌면 현재 검증 근거로 사용할 수 없습니다. 검증기는 실행 중 소스가 변경되거나 일부 구현만 선택되면 기록 작성을 거부합니다.
+기록에는 소스 해시, 패키지 파일 기록, 실제 런타임 버전, 사례 수, 결과, 검사기 테스트 수, 빌드 경고, 추가 입력 개정본이 포함됩니다. PHP 버전과 확장 버전은 별도 필드입니다. 입력이 변경되면 현재 검증 근거로 유효하지 않습니다. 실행 중 변경과 불완전한 구현 결과는 거부합니다. 이 기록은 게시 근거가 아닙니다.
 
 <a id="supplementary"></a>
 ## 추가 입력
-
-선택적인 추가 체크아웃은 재현을 위해 개정본을 고정합니다.
 
 ~~~sh
 git clone https://github.com/nst/JSONTestSuite.git .cache/JSONTestSuite
@@ -28,12 +26,12 @@ git -C .cache/JSONTestSuite checkout 1ef36fa01286573e846ac449e8683f8833c5b26a
 make check JSON_TEST_SUITE=.cache/JSONTestSuite
 ~~~
 
-기록에는 추가 입력의 사용 여부를 표시합니다. `i_` 사례는 라이브러리의 UTF-8 및 깊이 정책을 적용합니다. 필요한 공식 기대값은 공통 소스에 있으며 언어 어댑터에는 별도 예제나 기대 결과가 없습니다.
+추가 입력 사용 여부를 기록합니다. `i_` 사례에는 공통 UTF-8·깊이 정책을 적용합니다. 공식 입력과 기대값은 저장소 루트에만 있으며 어댑터에 독립 기대값을 추가하지 않습니다.
 
 <a id="individual"></a>
 ## 개별 구현
 
-다음 명령은 선택한 구현을 같은 기대값으로 검사합니다. 저장소 검사를 대체하거나 전체 검증 기록을 갱신하지 않습니다.
+공통 체크아웃에서 선택한 검사는 정의된 어댑터를 빌드하고 실행합니다. 통합 기록은 갱신하지 않습니다.
 
 ~~~sh
 python3 scripts/verify.py --only js
@@ -42,7 +40,30 @@ python3 scripts/verify.py --only go
 python3 scripts/verify.py --only php --only php-extension
 ~~~
 
-마지막 명령을 실행하기 전에 네이티브 확장을 빌드해야 합니다. PHP 어댑터는 의도한 확장 파서가 로드됐는지 확인합니다.
+독립 체크아웃은 다음과 같이 검사합니다.
+
+~~~sh
+git clone https://github.com/polyspec/ordered-json.git
+cd php-extension
+make check
+~~~
+
+각 패키지는 독립 빌드 대상으로 유지하지만 공유 검사 명령은 루트 registry와 검증기가 정의합니다. 네이티브 확장은 `php-extension/`에서 빌드하며 같은 체크아웃의 형제 PHP 패키지와 함께 검사합니다.
+
+추가 입력은 `make check JSON_TEST_SUITE=/path/to/JSONTestSuite`로 검사합니다.
+
+<a id="pie"></a>
+## PIE 산출물 검사
+
+[공식 릴리스](https://github.com/php/pie/releases)에서 PIE PHAR를 내려받고 `gh attestation verify --owner php /path/to/pie.phar`로 출처를 확인합니다. 공통 루트에서 실행합니다.
+
+~~~sh
+make pie-check PIE=/path/to/pie.phar JSON_TEST_SUITE=.cache/JSONTestSuite
+~~~
+
+[PIE 검사기](../../scripts/check_pie.py)는 `.cache/` 아래에 PIE 설정을 격리하고, 현재 확장 체크아웃을 경로 저장소로 등록하고, 패키지 인식을 확인하고, PIE로 빌드합니다. 같은 공통 어댑터와 기대값으로 해당 산출물을 직접 검사합니다. 중간에 일반 네이티브 빌드를 실행하지 않습니다.
+
+준비된 경우 `pie-verification.json`은 PIE 버전과 PHAR 해시, 확장 산출물 해시, 명령, 소스 해시, PHP·확장 버전, 사례 결과를 기록합니다. 빌드 오류, 빌드 도구 누락, 어댑터 경고, 검사 중 변경은 검증 실패로 처리합니다. 컴파일 경고는 기록에 유지합니다. 이 검사는 모듈을 설치하거나 패키지를 게시하지 않습니다. 기록된 입력이 변경되면 다시 실행합니다.
 
 <a id="documentation-checks"></a>
 ## 문서 검사
@@ -51,13 +72,13 @@ python3 scripts/verify.py --only php --only php-extension
 make docs-check
 ~~~
 
-[검사기](../../scripts/docs_check.py)는 [목록](../documentation-manifest.json), 로컬 링크와 앵커, 번역 쌍과 개정본 해시, 섹션과 코드 블록의 일치, 기능 항목, 검증 근거 링크, 검증 결과의 최신 여부를 검사합니다. [테스트](../../scripts/tests/test_docs_check.py)는 유효한 문서와 의도적으로 만든 실패 사례를 검사합니다.
+[검사기](../../scripts/docs_check.py)는 각 문서 목록, 링크, 번역 쌍과 개정 해시, 절과 코드 블록 일치, 기능 상태, 현재 통합·PIE 근거를 검사합니다. 공통 목록에는 공통 문서만 등록합니다. 각 패키지 디렉터리는 자체 목록으로 검사합니다.
 
-영어와 한국어 문장을 코드 및 테스트와 비교합니다. 그다음 한국어의 `source-sha256`을 영어 파일 전체의 SHA-256으로 갱신합니다. 검토 전에 마커를 갱신하지 않습니다. 외부 링크는 이 명령에서 문법만 검사하며 접속하지 않습니다.
+한국어 `source-sha256`을 갱신하기 전에 코드·테스트와 영어·한국어 내용을 비교합니다. 해시 일치는 번역 정확성을 증명하지 않습니다. 외부 링크는 문법만 검사하며 접속하지 않습니다. 호스팅 CI는 설정되지 않았으며 PR 제출이나 소스 게시 전에 필수 후보 검사를 실행해야 합니다.
 
 <a id="limits"></a>
 ## 한계
 
-테스트는 파서의 입력 허용 여부와 [인수 계약](../spec/json-contract.ko.md#acceptance)의 동작을 비교합니다. API 인자 전체, 기본값과 다른 모든 깊이 설정, 모든 최소 런타임 버전, 모든 플랫폼 빌드를 검증하지 않습니다. 라이브러리 직렬화 테스트는 모든 호스트 인코더의 동작을 검증하지 않습니다.
+사례 모음은 파서 허용 여부와 [인수 계약](../spec/json-contract.ko.md#acceptance)을 검사합니다. 모든 API 인수, 기본값이 아닌 모든 깊이 설정, 선언된 모든 최소 런타임, 모든 플랫폼, 모든 호스트 인코더 연동을 검증하지는 않습니다. Windows와 ZTS 네이티브 빌드는 검증되지 않았습니다.
 
-컴파일 경고와 검사 실패를 직접 보고합니다. 누락된 결과를 이전 실행으로 대체하지 않습니다. 후속 문서 검사가 실패해도 JSON 검증 성공 기록은 존재할 수 있습니다. 변경을 완료하기 전에 전체 `make check` 명령도 성공해야 합니다.
+실패한 검사와 컴파일 경고를 직접 기록합니다. 입력이 변경되면 이전 결과를 사용하지 않습니다. JSON 기록 생성 후 문서 검사가 실패할 수 있으므로 완료 전에 전체 검사가 성공해야 합니다.

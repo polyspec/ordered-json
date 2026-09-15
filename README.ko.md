@@ -1,17 +1,22 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: 4a2e372ea9a43b03ceafdf2467eb555afa327648f19a15f1a27c9a21b217b884 -->
+<!-- source-sha256: 9db3d37a63ae84c239f2094ea68733f063e539d0c2405dfa68c1f155081eb59a -->
 # ordered-json
 
 [English](README.md)
 
-JavaScript, Rust, Go, PHP용 JSON 라이브러리입니다. 객체는 모든 깊이에서 키의 최초 등장 순서를 유지하는 연관배열을 사용합니다. 중복 키는 해당 순서를 변경하지 않고 값을 교체합니다.
+JavaScript, Rust, Go, PHP용 JSON 라이브러리입니다. 객체는 모든 깊이에서 문서 키 순서를 유지하는 연관배열을 사용합니다. 중복 키는 최초 위치와 마지막 값을 유지합니다.
 
-저장소는 순수 PHP와 네이티브 PHP 확장을 포함합니다. [설치 문서](docs/operations/installation.ko.md)에 정확한 식별자와 런타임 요구사항을 작성합니다.
+이 저장소는 공통 명세, 공식 예제, 기대 결과, 검증기와 다섯 구현체를 모두 관리하는 단일 소스 저장소입니다. 언어별 디렉터리는 이 저장소 안에서 독립 패키지와 빌드 대상으로 동작하며, 언어별 API를 섞지 않고 하나의 리비전을 공유합니다.
 
 <a id="start"></a>
 ## 시작
 
-저장소 루트에서 공식 입력으로 JavaScript 구현을 실행합니다.
+~~~sh
+git clone https://github.com/polyspec/ordered-json.git
+cd ordered-json
+~~~
+
+저장소 루트에서 공식 입력으로 JavaScript를 실행합니다.
 
 ~~~sh
 node --input-type=module <<'JS'
@@ -23,31 +28,32 @@ console.log(stringify(parse(example.input)));
 JS
 ~~~
 
-| 구현 | 사용법 |
-| --- | --- |
-| JavaScript 및 TypeScript 선언 | [JavaScript](js/README.ko.md) |
-| Rust | [Rust](rust/README.ko.md) |
-| Go | [Go](go/README.ko.md) |
-| PHP | [PHP](php/README.ko.md) |
-| PHP 네이티브 확장 | [네이티브 확장](php-extension/README.ko.md) |
+| 패키지 | 내용 | 경로 |
+| --- | --- | --- |
+| JavaScript | JavaScript 및 TypeScript 선언 | `js/` |
+| Rust | Rust crate | `rust/` |
+| Go | Go 패키지 | `go/` |
+| PHP | 순수 PHP 및 Value API | `php/` |
+| PHP 확장 | PIE 메타데이터를 제공하는 네이티브 PHP 확장 | `php-extension/` |
 
 <a id="verification"></a>
 ## 검증
 
-다섯 구현은 같은 [공식 예제](examples/README.ko.md)와 공통 검증기를 사용합니다.
+모든 구현이 같은 [공식 예제](examples/README.ko.md)와 공통 기대값을 사용합니다. 각 패키지는 현재 체크아웃에서 독립적으로 빌드·검사되며, 루트의 `make check`는 모든 패키지를 검사합니다.
 
 ~~~sh
 make check
 ~~~
 
-필수 도구와 추가 테스트 절차는 [검증 운영 문서](docs/operations/validation.ko.md)에 작성합니다. 테스트 통과와 패키지 게시는 별도 상태입니다.
+통합 기록은 공통 계약과 모든 패키지가 포함된 하나의 리비전에 적용됩니다. 도구와 식별자는 [설치](docs/operations/installation.ko.md), 추가 사례·PIE 검사는 [검증](docs/operations/validation.ko.md)을 참조합니다. 테스트와 패키지 게시는 별도로 기록합니다.
 
 <a id="documents"></a>
 ## 문서
 
 - [JSON 계약](docs/spec/json-contract.ko.md)
 - [API 계약](docs/spec/api.ko.md)
-- [기능 및 구현 상태](docs/features.ko.md)
+- [저장소 계약](docs/spec/repositories.ko.md)
+- [기능 상태](docs/features.ko.md)
 - [배포 상태](docs/operations/distribution.ko.md)
 - [변경 기록](CHANGELOG.ko.md)
 - [문서 관리](docs/documentation-plan.ko.md)

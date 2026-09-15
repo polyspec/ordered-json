@@ -19,9 +19,11 @@
 | F-CONSTRUCT | Construction from ordered maps and arrays of Value objects | implemented | shared-suite | [result](verification.json) | source-only | [construction](spec/json-contract.md#construction) |
 | F-PHP-NATIVE | PHP extension parser and serializer with the shared PHP API | implemented | shared-suite | [result](verification.json) | source-only | [PHP](spec/api.md#php) |
 | F-DOCS | Bilingual documents, link/status checks, verification freshness | implemented | docs-tests | [result](verification.json) | source-only | [procedure](documentation-plan.md#checks) |
-| F-REPOS | Single repository with independently buildable implementation packages and shared conformance | partial | not-verified | — | not-distributed | [repositories](spec/repositories.md) |
+| F-REPOS | Single repository with independently buildable implementation packages and shared conformance | implemented | shared-suite | [result](verification.json) | source-only | [repositories](spec/repositories.md) |
 
 <a id="limits"></a>
 ## Verification and distribution limits
 
-Passing shared cases establishes their recorded acceptance criteria. It does not establish exhaustive input coverage, all declared minimum runtimes, all platforms, or every host encoder integration. See [verification limits](operations/validation.md#limits). Source metadata contains development version strings; this table does not identify a registry release. The package registry and shared checks are in progress.
+The previous native macOS and PIE records are not current evidence. A new PIE record will be created only after a local PHAR is available and `make pie-check` passes.
+
+Passing shared cases establishes their recorded acceptance criteria. It does not establish exhaustive input coverage, all declared minimum runtimes, all platforms, or every host encoder integration. See [verification limits](operations/validation.md#limits). Source metadata contains development version strings; this table does not identify a registry release.

@@ -1,4 +1,4 @@
-"""Check repository selection and registry commands."""
+"""Check repository selection, registry commands, and package record content."""
 import copy
 import json
 from pathlib import Path
@@ -10,6 +10,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from registry import (REGISTRY, adapter_commands, load_registry, parse_overrides, prepare,
                       repository_paths, runtime_versions)
+from verification_record import package_revisions
 
 
 class RepositoryChecks(unittest.TestCase):
@@ -53,3 +54,16 @@ class RepositoryChecks(unittest.TestCase):
             (root / 'implementations.json').write_text(json.dumps(registry))
             with self.assertRaisesRegex(ValueError, 'relative child directories'):
                 load_registry(root)
+
+    def test_monorepo_package_records_use_source_content(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for entry in REGISTRY['repositories'].values():
+                path = root / entry['path']
+                path.mkdir()
+                (path / 'source').write_text('first')
+            before = package_revisions(root)
+            self.assertEqual(set(before), set(REGISTRY['repositories']))
+            candidate = root / REGISTRY['repositories']['javascript']['path']
+            (candidate / 'source').write_text('second')
+            self.assertNotEqual(before['javascript'], package_revisions(root)['javascript'])

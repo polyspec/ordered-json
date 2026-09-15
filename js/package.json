@@ -9,7 +9,20 @@
       "import": "./index.js"
     }
   },
-  "files": ["index.js", "index.d.ts", "README.md", "README.ko.md"],
-  "engines": {"node": ">=20"},
-  "scripts": {"test": "python3 ../scripts/verify.py --only js"}
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "README.md",
+    "README.ko.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "python3 scripts/check.py"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/polyspec/ordered-json.git"
+  }
 }

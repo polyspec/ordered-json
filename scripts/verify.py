@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One set of examples, one set of expectations, five thin language adapters."""
+"""Shared examples and expectations for all registered language adapters."""
 import argparse
 import json
 from pathlib import Path
@@ -139,11 +139,18 @@ def verify(selected, suite=None, paths=None, cache=None, build_warnings=None):
     warnings = prepare(selected, paths, cache)
     if build_warnings is not None:
         build_warnings.extend(warnings)
+    return verify_adapters(adapter_commands(selected, paths, cache), suite)
+
+
+def verify_adapters(commands, suite=None):
+    """Compare prepared adapters, including externally built modules, with shared cases."""
+    if not commands:
+        raise ValueError('At least one adapter is required')
     results = {}
     with tempfile.TemporaryDirectory(prefix='ordered-json-examples-') as folder:
         cases, official_count = prepare_cases(Path(folder), suite)
         requests = ''.join(str(path) + '\n' for _, path, _ in cases)
-        for language, command in adapter_commands(selected, paths, cache).items():
+        for language, command in commands.items():
             process = subprocess.run(command, input=requests, encoding='utf-8',
                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
             if process.returncode:

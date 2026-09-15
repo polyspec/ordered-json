@@ -1,32 +1,36 @@
-<!-- doc-id: rust -->
-<!-- source-sha256: 03ca1e5491307f033948c444b82f3bb1ff5a0dcd4b6d539cac72691ece6fb79c -->
-# Rust
+<!-- doc-id: overview -->
+<!-- source-sha256: e5e732dfc316afaf2712c46dfcbf36156e9bf6d8af241e76c3d5b74941719162 -->
+# ordered-json for Rust
 
 [English](README.md)
+
+객체를 연관배열로 처리하고 모든 깊이에서 문서 키 순서를 유지하는 엄격한 JSON 구현입니다. 중복 키는 최초 위치와 마지막 값을 유지합니다. 공식 입력과 기대 결과는 모노레포의 examples에서 관리합니다.
 
 <a id="usage"></a>
 ## 사용
 
-이 크레이트는 의존성이 없습니다. 요구사항과 로컬 Cargo 의존성 설정은 [설치](../docs/operations/installation.ko.md)를 확인합니다. 아래 코드는 오류를 반환할 수 있는 함수의 일부이며 `source`는 [official.json](../examples/official.json)의 객체 사례에 있는 `input` 문자열입니다.
+Rust >= 1.70이며 Cargo 패키지는 `ordered-json`, 가져오기는 `ordered_json`입니다.
+
+사용 코드의 `source` 또는 `$source`는 [공통 공식 예제](https://github.com/polyspec/ordered-json/blob/main/examples/official.json)의 객체 사례에서 가져옵니다. 오류를 반환할 수 있는 함수 안에서 사용합니다.
 
 ~~~rust
-use ordered_json::{parse, stringify, Value};
-
+use ordered_json::{parse, stringify};
 let value = parse(source)?;
-let members = value.members().expect("object");
 let output = stringify(&value);
-let rebuilt = stringify(&Value::object(members)?);
 ~~~
 
-`members`는 불변 `OrderedMap` 참조입니다. `OrderedMap`을 생성하고 문자열 `Value` 키와 자식 값을 삽입한 뒤 `Value::object`를 호출합니다. 값 슬라이스에는 `Value::array`를 사용합니다. 스칼라 생성, 바이트 파싱, 코드 단위, 오류 동작은 [API 계약](../docs/spec/api.ko.md)을 확인합니다.
+
+동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
 
 <a id="verification"></a>
 ## 검증
 
-저장소 루트에서 실행합니다.
+Python >= 3.9, Git, make, 해당 구현의 런타임·빌드 도구를 설치하고 이 체크아웃에서 실행합니다.
 
 ~~~sh
-python3 scripts/verify.py --only rust
+make check
 ~~~
 
-공통 검증기와 공식 기대 결과를 사용합니다. [저장소 검사](../docs/operations/validation.ko.md)는 모든 구현을 검사합니다.
+루트 검증기를 호출하여 이 패키지를 검사합니다. 루트 통합 검사는 같은 소스 리비전의 모든 패키지를 검사하고 현재 결과를 `docs/verification.json`에 기록합니다.
+
+추가 사례는 `make check JSON_TEST_SUITE=/path/to/JSONTestSuite`로 검사합니다. [개발 절차](AGENTS.ko.md)와 [변경 기록](CHANGELOG.ko.md)에 필수 검사와 변경 사항이 있습니다.
