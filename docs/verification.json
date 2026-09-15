@@ -1,39 +1,40 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-15T10:26:21+00:00",
+  "checked_at": "2026-09-15T12:16:43+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "33fb6924fabf87c6d2861a6f7b59a7821d0bc5f26ce0f27d5c58cdb78ee6820e",
+    "sha256": "672d4efd109caffeaec486e0c3678dae4fbea5dde4c1d9b71f5afad2d2a52d8f",
     "files": {
+      "benchmarks/results.json": "d10acc4355e63a52a7fb1d6b1be9f9d8cbbded8dc9e73a650e8c33a94671b323",
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "689d4664673fbe8c17efff3966f7fc7938abec95cb48f1304ecd6cabdf7231dc",
       "AGENTS.md": "acff0c9afb73feec36e9d64ba58e9feddeaa2c7fb466264e3fee2da3c2c5fee3",
-      "CHANGELOG.ko.md": "e025b6a507414c3911bab9155f6fb3e63c2d3dcac6bbacf514cb711f77331dca",
-      "CHANGELOG.md": "6ee6208afd8a5e79bba7e6bf2e3ea074e38702b124f6ec156fcbb9c03d2868c9",
+      "CHANGELOG.ko.md": "068d735f61d3ffe98c159f3407193e309bba4a6eef99a73aaf9026e9a3a749f0",
+      "CHANGELOG.md": "c75de6e8cb27dac4b5c12a9dca54b8cd8ad8ae5282e82d1b79d604c54ba1acec",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
       "README.md": "8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75",
-      "benchmarks/README.ko.md": "d5c920ca30bdb6a03cceb25aea446eb9031dc30bb868c137f03a5b747fe13084",
-      "benchmarks/README.md": "dcd2233b948486f41c0197ee975983d7a102441a6fa3739f62638a384316b6aa",
+      "benchmarks/README.ko.md": "9ec526e95f93210d0dbb68f9f4e64d8ac49c2cb20a1b7040a043351b11ad4f3d",
+      "benchmarks/README.md": "1c95ccb0d712b74ba593f58e32cd62b2cfddc40bf7b55298a7a13348950363d4",
       "benchmarks/fixtures/empty-array.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
       "benchmarks/fixtures/empty-object.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
       "benchmarks/fixtures/large-array.json": "e57f10beb9a91d19f2c3b564afb3f627c775431b59cfebac5fe618c5389f862a",
       "benchmarks/fixtures/mixed-unicode.json": "cb6f171b0a53de7aac3fd15cf81db7bd789ee90910d9d083e6ab593c3e4ae8f1",
       "benchmarks/fixtures/nested-order.json": "ee4d0c53ac06ed42d611f115ec3935f672711c506547268fb1381e8d71d335a5",
-      "benchmarks/js.mjs": "de6b6a999943a22ee7db51b8c1587ab4aa395fae6e92d67c75a1855800922f2f",
-      "benchmarks/php.php": "d640a8bac681b1711af148de25e5487bff7fda7d9d96efe16b5e29896b1c0ac9",
-      "benchmarks/run.py": "2406bef2c84948dd326fd94246579c4def7efc9f72326e0c457910cc0811519d",
-      "benchmarks/workload.json": "c5ca283f6e86fb58fd58a9b7a2518b06fa05b4f5cd9c655c1c117abaa3d5ce60",
+      "benchmarks/js.mjs": "c4d244abc5bcff07d50f4f89d6756353d4aeaea3f988481523c450a37ffe5976",
+      "benchmarks/php.php": "3ca5fab8a0e9cf45129435320fe804bde38705071c26f434ed3232347fd8e0c7",
+      "benchmarks/run.py": "2f12b6267a5e5977f6d94bb55502e116cb1ccbb5b1f84177715b2623563ee32f",
+      "benchmarks/workload.json": "555599212bdaf5d7fe33d76416e962c59cb8f67834ed22d43e2a3f092e5f6cc2",
       "docs/distribution.json": "1ccded31251e48286d97c8df62bb87d70cf6eadba4f88cc99a146447fcb2eb8a",
       "docs/documentation-manifest.json": "4c119554db5cdc4aaf40fb17539c69934c49de532f175904dcc9c961af4e10c9",
       "docs/documentation-plan.ko.md": "1c08ee45f5272fe572a578f1afc77ae3554e57f6b267bf851ff25914f9aa2c95",
       "docs/documentation-plan.md": "ad7d491fa175e75d37a94f8465b4a9a7123668ab65ddb39db09dd46d21c6d1d0",
-      "docs/features.ko.md": "ff7cbb75dfe87447be3c9d2e8d4a1e6917fa61339d701c8a7691e9ae633f9f2f",
-      "docs/features.md": "fb36e616b10b9cf457abbdc54dddeaf0b754c4b41266d2f66ad09324edb6b302",
+      "docs/features.ko.md": "84bced244b982511e4e37e18a90e151b1ff29a059b2fe08a8a65f57bf03b385f",
+      "docs/features.md": "ff4570526c6a8a0ae3b60f422e1d7018f2f8242a65fcb62b5c4f7f47b133434a",
       "docs/operations/distribution.ko.md": "1c16f7a1ce39535bea9d5affe542dc8fe8afc77a293f329ec1d196950c9ad595",
       "docs/operations/distribution.md": "659a7fdf3df1b4ddd7fea5368da9d9d1cc07d9eed15e812fc1b7729deac2af56",
       "docs/operations/installation.ko.md": "705a5c4905101ec34550075047c5e89fd3e712034e8e597779e7f053a053fb92",
@@ -45,8 +46,8 @@
       "docs/reports/ojson-comparison.json": "4f6bc37d9fba4be253b8b11c3a813eec52d53d139ee202ca9693d8a17ecb5ba2",
       "docs/reports/ojson-comparison.ko.md": "4a8fdd346be00b60b020b79ea9cbd38fa6f73b7c9b468465361664e884b8cc7a",
       "docs/reports/ojson-comparison.md": "f51637e54cbf5e4fb650608261647ff4c7c508cb6e867c8d72f9a44db0a95373",
-      "docs/spec/api.ko.md": "3c23c5af6fb1266c5f5198cd5bc17cc801e5cbe87f47f8435c1dc39c6a53f6d3",
-      "docs/spec/api.md": "840a684b39ffbb76e38be079c00323f455f499f134fe94bc73e3130f0fc2859e",
+      "docs/spec/api.ko.md": "106d833865a4c7a8b059535b5b46b70985bebd105faa0c8fd996d90a8464a197",
+      "docs/spec/api.md": "18fe09943999d56e672b9195743c55a2bb6785177097b07d324dec1ebc089ed4",
       "docs/spec/json-contract.ko.md": "f6cad701fed404d7a8eb091eb86013ea04b0f01b10574a109c219da3dab30d63",
       "docs/spec/json-contract.md": "0f6e76611fff775c3a8c1aee128bfd345deba9d1dca442c2c05a2f2a986bfe27",
       "docs/spec/repositories.ko.md": "ec6b5e5686719dafa0404ddc36a00e74ea3539dfef742b61bbbd565d20ad9078",
@@ -155,35 +156,36 @@
       "go/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "go/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
       "go/AGENTS.md": "a8e43aea261abd8edd34b1495814884e55fcf6c17f24ad412ac708e9d55765b0",
-      "go/CHANGELOG.ko.md": "bd5429ec533f633366b4c1b709862c15c0ef45fc5767e5028bb3a5ecd7fc8cf9",
-      "go/CHANGELOG.md": "b247edc58b82d949f363357d9ab47422bb1d0f337566bfb9b989e9390346fc2f",
+      "go/CHANGELOG.ko.md": "41b14cab0521e4dadb1f2ae6c3432e2309592564cf1d76acbcf38c758d2b418d",
+      "go/CHANGELOG.md": "1bd1f321150c9a0140786f36102edb8023e2e0699f55a8537c3ff9d38e84e064",
       "go/Makefile": "562d18666e2ba1722a7e4d985d9393eff37abf2d454b3a928438158f551dcb99",
       "go/README.ko.md": "1021065cb281a7c306d03f5590b8047c4a7a227cd5bfefd43f8ba40e1bb17bf3",
       "go/README.md": "b6d24c0d70545747c5ac3a8430f938fc68fcc97799df78b7fc6c722bef69175e",
       "go/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
       "go/go.mod": "e06c222c5b837816e28456ce5a7f46a5896be5c46a89a7d2a01c85aa888018f2",
-      "go/internal/benchmark/main.go": "fcb3786c8ff2a0d68c4a6ab711031065ef0c90b2f23d4904d3224952b7707820",
+      "go/internal/benchmark/main.go": "4e1c75773fcfd5f170ab3af85ae4d79c21cac6b4d48a2093cf27f1ae0eb7a1f8",
       "go/internal/probe/main.go": "cbdf69a4210d9b98f7b41e267ac519a3f6fee4a8c3dba43b9932bbda5fc689be",
-      "go/orderedjson.go": "84d717a06da479c2e509e56859d8b0db7047db21c338a8a63b3e0aa401c26550",
+      "go/orderedjson.go": "d9b6a7e1ea8eb04cd679cece125008dc6e80dd90d6b6fb3ef93da22b1529c2f0",
+      "go/orderedjson_test.go": "4f2aae854c05ceb7c434cd94026db3a35d8bec73821a4d585029c193e9191f28",
       "implementations.json": "60472aa090cc5ad1cdb6516fc2fde710ee12db8706aa8ea031d7ab2715f7835c",
       "js/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "js/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
       "js/AGENTS.md": "a8e43aea261abd8edd34b1495814884e55fcf6c17f24ad412ac708e9d55765b0",
-      "js/CHANGELOG.ko.md": "037141c78df8d2dae806314b440003cd3922bcfadcaead363b849ab2fbc6b8d5",
-      "js/CHANGELOG.md": "1473813c804f9648831053b5bdff38231e2417e80849137ac73dd745b2423e80",
+      "js/CHANGELOG.ko.md": "2e87eb853352ff6c4fc687c97ef920e568c525571623b8384f7bdd6dbf6e75fe",
+      "js/CHANGELOG.md": "8b0ad79d77798175329cb217fcfa58383b4af3bb5f5cbb3c4a7066659d541bab",
       "js/Makefile": "283f8460279d1378641fc986fd5663d04ce366b73681fc77259f6267c27bfef6",
       "js/README.ko.md": "2157b301dc6cfb7e9b7670fad423f9f6447d5fc9c9ce7161fe88b2b9bca35674",
       "js/README.md": "5271983a46de7fa75cfa6fa85a426383df94e4290b0929cf7fb142f8b3e397c5",
       "js/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
       "js/index.d.ts": "9a699c64a708171c6b43d1dd27d9636a67f51582b959564caa15587fc82f612e",
-      "js/index.js": "ca1fd26b74ac790bfb8c151e129717a300f9a42b4d79381657a2075456d83b19",
+      "js/index.js": "7050547d5b31e4c5fb3af56ca41106e53b16324116bb34990beea993544c57ab",
       "js/package.json": "866585f358b8714add2b21de1e3f462b284d27702dc9d8082d38a7da8c953317",
       "js/test/probe.mjs": "046b3c805060ab2000f215d7c99d7101284110ceab6a637cf4a0bbd11356f8cb",
       "php-extension/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "php-extension/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
       "php-extension/AGENTS.md": "a8e43aea261abd8edd34b1495814884e55fcf6c17f24ad412ac708e9d55765b0",
-      "php-extension/CHANGELOG.ko.md": "e5107d060bfbe3ccfec7c2523853654dc4dd37e46e20163b61e9fa9383945d3f",
-      "php-extension/CHANGELOG.md": "31c1ce6911c407850710a462c286a2c4452eae3b999dc005aab1983c48fd5568",
+      "php-extension/CHANGELOG.ko.md": "591df2dc9620287041819dc17ff8547330e6adc4942cdb2d67585beda5742342",
+      "php-extension/CHANGELOG.md": "d44f98376b559a7772bf0152a57bec7b8fd867e395452d2304901c9c730d7879",
       "php-extension/Makefile": "06d845ea5afb41f4532244be8c8e41bd86206cf9e9286f2144222c4335d80537",
       "php-extension/README.ko.md": "f6a8b6c10aa5f226e83e486f47c170e26d5d7d34b65373540d44abf63896048d",
       "php-extension/README.md": "9bf343fe78ed79371309fa3e7b41e5375ef20276cee53bbabb3ac82d3e73d748",
@@ -192,39 +194,39 @@
       "php-extension/src/.gitignore": "a24cea86ccd06d6df27abe4079219b2c4f7b39a83718f7704b36d4e83121b71b",
       "php-extension/src/config.m4": "1039ac44901bf34856402852b5996ec509ae2883ba83960b455005d8248ba5ed",
       "php-extension/src/config.w32": "52f65b0c0ab32af3bac72f4c1265fac1fd475c52cdd74ae49a54b3fc337e7cf9",
-      "php-extension/src/ordered_json.c": "adcb0a372d53b12c8b6d123b94ae52206de06b2ede9ce74fb225e9912316c3f9",
-      "php-extension/src/ordered_json.stub.php": "fbd0eaa670f8701396738e3ccd3cf7e6520648f692b1c1585831de5b451856f8",
+      "php-extension/src/ordered_json.c": "62b1b0e20388629a222c40edd6508412818605883bdd042782741d92f16e1077",
+      "php-extension/src/ordered_json.stub.php": "ab05e519065694482dfcbacd78cef12ee0e4aff9f5e8e86fd4c9bf651af913b7",
       "php/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "php/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
       "php/AGENTS.md": "a8e43aea261abd8edd34b1495814884e55fcf6c17f24ad412ac708e9d55765b0",
-      "php/CHANGELOG.ko.md": "a1c4082900dff466c0fab17ad3b9c86e670a3f6b9c951444e5d53b64b2bd02c2",
-      "php/CHANGELOG.md": "846465f0a28974b6046b4a682ca212f580719bbefd25795e1fa7f5b327f2f6d0",
+      "php/CHANGELOG.ko.md": "94dab3ab3e6976b9c7aa338dc09b098e38aa393176cdb3fa0e9272f39b32d206",
+      "php/CHANGELOG.md": "6dfdb6f06932e28a3d30464a9fffebba681d28302c10c12d89502f1b979f958e",
       "php/Makefile": "772a643f13be6c3cc91c2f2d961dd526d5307db5c130abac43fc407f1d21a30c",
       "php/README.ko.md": "fff0883617cc6a2d8e2cf23bfd4311f7cf34c2cb0617b7e79432546a67919e7a",
       "php/README.md": "0ccd4a92edd1bad4f2eb10c265e92ae1eb1e8b1bcc5dd53422df3f0887e326d8",
       "php/composer.json": "25853cd81a924cb7966c61b7ddfd412bbfde9dac10bc7d978379a2591e663370",
       "php/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
-      "php/src/OrderedJson.php": "590f7ff0bb1382958370db5803e547cf3f2f2a84d64ea162fe482b6b05fa1d8d",
+      "php/src/OrderedJson.php": "98a7f2255b5109587b22b8dbd8cf6ebf6c15eea164235ffaeb5df05cc36ebaad",
       "php/tests/probe.php": "ca18015b946b6142f4a3080e5f4c415af080cff14454a26b1c2cb4e1df1a9228",
       "rust/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "rust/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
       "rust/AGENTS.md": "a8e43aea261abd8edd34b1495814884e55fcf6c17f24ad412ac708e9d55765b0",
-      "rust/CHANGELOG.ko.md": "1ff80bfba2b67316bc9adaab51c9be07d8aa12e1f266a3a6d302a0fe025a112a",
-      "rust/CHANGELOG.md": "cb49a100e400c0217f4ecefbd3785fb9192c53d33fd9eecb5f83440e0cf5b907",
+      "rust/CHANGELOG.ko.md": "315cf5d09189698844b16ae2809117f5ab68121bd654913d249fca96b620440b",
+      "rust/CHANGELOG.md": "60422d671450708826bef4c9347e3158960d35d109bcef8ebb1a03b0f7fab965",
       "rust/Cargo.lock": "31d0fcae18d7184b3bd75ef91d38b3fac0d7ce8624d7e67fa83ef98b2f257b86",
       "rust/Cargo.toml": "f679f5669fd0665a5c28fc2c37a962456ae6c9bcd6fddc8964bc73899dbb3db5",
       "rust/Makefile": "834f720591ef8747ce5e53d25b83005bf802472404adba7f5e64dfdc8510ad88",
       "rust/README.ko.md": "d5ac5e9857c793fb5dc17932207f12f80ea4ccb460653865a282d8a03eaeff7b",
       "rust/README.md": "e3c04eba3326d309a6e793f57ac7979c1429fdb9e135e85d022adb573029c8e3",
       "rust/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
-      "rust/examples/benchmark.rs": "f59a72c680635758f31f541eccd71a1f140f24dfc6747371190a1e087498be37",
+      "rust/examples/benchmark.rs": "8211cf4b20c73e48b1774d7128ce67deb79c4a3f0656f4a808f1b7efbe1dd578",
       "rust/examples/probe.rs": "e655d00000196925a77bfc4a2ead76072cce04973eba487f7086349265bee310",
-      "rust/src/lib.rs": "8bcac1bde9c1148224de73703945d53e757f176f2d3228c040b9cbdce0d6e7d0",
+      "rust/src/lib.rs": "c535cf4b40b4c525c2867893dd11dbd0b63cbbb76599e1d73984452f602c5678",
       "scripts/check_pie.py": "3a89741d4582e7f3a49367978f89a0a5dd417a887aa8d561db67c8d710990639",
       "scripts/compare_ojson.py": "bd45cccfc0b64c45a262cde1c2e7509cd23a554040beee4cb598c957786fdef8",
       "scripts/comparison/ojson_comparison.erl": "d267254b5de99b8f3d815639a18dbc97d953be86dc1c28dabce6cbf9218cba9c",
       "scripts/comparison/python_ojson_probe.py": "7939ea89a8c481b4e466969977149d72a1689991cf1d84661ddcc64cbadcf202",
-      "scripts/docs_check.py": "a6b113857a49152ae9780fce2929d7162a3634fdcc8a758a0f79164a88488b51",
+      "scripts/docs_check.py": "f0e43332b134944807c021a7776ae276e3099239876e05a38ba3714a70fde8f3",
       "scripts/registry.py": "41fc953178fd42720f4cd5a23465d2f186c8a471375321d7d181573d5a6955d7",
       "scripts/test.py": "857a2df125e4be1e17d56774d5010ad0cdb23d7a50b08503a4ca048dcb07f631",
       "scripts/tests/test_docs_check.py": "f71fdbc2e88bedc992990e71942bebffd33e82d21dc55472db2b2a68c4d46a93",
@@ -236,41 +238,41 @@
   "cases": {
     "official": 17,
     "fixtures": 98,
-    "supplementary": 0,
-    "total": 115
+    "supplementary": 318,
+    "total": 433
   },
   "implementations": {
     "js": {
       "status": "passed",
-      "cases": 115,
+      "cases": 433,
       "runtime": {
         "node": "v26.8.1"
       }
     },
     "rust": {
       "status": "passed",
-      "cases": 115,
+      "cases": 433,
       "runtime": {
         "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)"
       }
     },
     "go": {
       "status": "passed",
-      "cases": 115,
+      "cases": 433,
       "runtime": {
         "go": "go version go1.27.0 darwin/arm64"
       }
     },
     "php": {
       "status": "passed",
-      "cases": 115,
+      "cases": 433,
       "runtime": {
         "php": "8.5.10"
       }
     },
     "php-extension": {
       "status": "passed",
-      "cases": 115,
+      "cases": 433,
       "runtime": {
         "php": "8.5.10",
         "extension_version": "0.0.1"
@@ -281,32 +283,37 @@
     "status": "passed",
     "count": 41
   },
-  "supplementary": null,
+  "supplementary": {
+    "project": "nst/JSONTestSuite",
+    "revision": "1ef36fa01286573e846ac449e8683f8833c5b26a",
+    "cases": 318,
+    "inputs_sha256": "dafa7facfed6700b0a2f16207fb1d3b557f9e45d3abd84f2dfb666538d10c332"
+  },
   "build_warnings": [],
   "packages": {
     "javascript": {
       "path": "js",
-      "sha256": "04cf1a29fd30e450e72dcb2e738646dc0851973390177d045abfcc4335e9de4f",
+      "sha256": "b81f40e90f73d6cba093f0a27724a2b82d836f95667ee86775b1a4d53b3615ff",
       "files": 13
     },
     "rust": {
       "path": "rust",
-      "sha256": "57e21970bdca907bbd7714a5995d43a0e2a6ba643aea294916adff1eb45e6dda",
+      "sha256": "265ff1be9f15260a290cda9d957eb202646494ce53ae42529d3ae088ed2a8e4f",
       "files": 14
     },
     "go": {
       "path": "go",
-      "sha256": "d2d904620df46e9904df9f82deb80fcb16372ea5c1e104cb7e443377336459c9",
-      "files": 13
+      "sha256": "01b3ed1d0902c114fc52b605ee28fd7cf706d0735f6360256f42267ba76cb277",
+      "files": 14
     },
     "php": {
       "path": "php",
-      "sha256": "5994ba5702de73cc1f7acda9555bf2b0d3b6ad583f0afba0345ef8d9a6d5ccb4",
+      "sha256": "b5e1fb8a831fc69b7a63e68d6bfb41123311df6dfb2f681a3a6c1ebd2c154e27",
       "files": 12
     },
     "php-extension": {
       "path": "php-extension",
-      "sha256": "86a3bcac606fe274f11b239d43580bfdd05feb109d92a1083fc8d9c3edc5a113",
+      "sha256": "44ec80406e2dc2e4e24b1187d733772f18ce946a9efb79c295d9cd633ea14c7e",
       "files": 15
     }
   }
