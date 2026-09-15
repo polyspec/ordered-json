@@ -341,6 +341,35 @@ func ParseWithMaxDepth(source string, maxDepth int) (*Value, error) {
 	return v, nil
 }
 
+// ParseMany parses a whitespace-separated sequence of JSON values. It is
+// intended for JSON Lines and tools such as `go list -json`; each value keeps
+// the same node-kind and ordering guarantees as Parse.
+func ParseMany(source string) ([]*Value, error) {
+	return ParseManyWithMaxDepth(source, MaxDepth)
+}
+
+func ParseManyWithMaxDepth(source string, maxDepth int) ([]*Value, error) {
+	if maxDepth < 0 || maxDepth > MaxDepth {
+		return nil, fmt.Errorf("maxDepth must be between 0 and 256")
+	}
+	if !utf8.ValidString(source) {
+		return nil, &ParseError{0, "invalid UTF-8"}
+	}
+	p := parser{source: source, maxDepth: maxDepth}
+	values := make([]*Value, 0)
+	for {
+		p.ws()
+		if p.pos == len(source) {
+			return values, nil
+		}
+		value, err := p.value(0)
+		if err != nil {
+			return nil, err
+		}
+		values = append(values, value)
+	}
+}
+
 type parser struct {
 	source        string
 	pos, maxDepth int
