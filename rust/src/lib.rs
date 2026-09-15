@@ -1,5 +1,10 @@
 //! Ordered, immutable JSON values. See [`parse`] and [`Value`].
-use std::{collections::HashMap, fmt, sync::Arc};
+use std::{
+    collections::{hash_map::RandomState, HashMap},
+    fmt,
+    hash::{BuildHasher, BuildHasherDefault, Hasher},
+    sync::{Arc, OnceLock},
+};
 
 pub const MAX_DEPTH: usize = 256;
 
@@ -30,97 +35,277 @@ pub enum Kind {
     Null,
 }
 
+/// Objects with more members than this keep a hash index; smaller ones scan linearly.
+const LINEAR_MEMBERS: usize = 8;
+/// The value serializes to exactly its source token: it contains no
+/// insignificant whitespace and no duplicate object keys.
+const COMPACT: u8 = 1;
+/// A parse result; its raw text includes surrounding whitespace.
+const ROOT: u8 = 2;
+/// A string token that contains escape sequences.
+const ESCAPED: u8 = 4;
+
+/// Passes through the precomputed key hashes stored in [`Index`].
+#[derive(Default)]
+struct IdentityHasher(u64);
+impl Hasher for IdentityHasher {
+    fn finish(&self) -> u64 {
+        self.0
+    }
+    fn write(&mut self, bytes: &[u8]) {
+        for &byte in bytes {
+            self.0 = self.0.rotate_left(8) ^ u64::from(byte);
+        }
+    }
+    fn write_u64(&mut self, hash: u64) {
+        self.0 = hash;
+    }
+}
+
+/// Key positions by the hash of each key's UTF-16 units, encoded as WTF-8.
+#[derive(Debug, Clone, Default)]
+struct Index {
+    state: RandomState,
+    slots: HashMap<u64, usize, BuildHasherDefault<IdentityHasher>>,
+}
+
+fn hash_bytes(state: &RandomState, bytes: &[u8]) -> u64 {
+    let mut hasher = state.build_hasher();
+    hasher.write(bytes);
+    hasher.finish()
+}
+/// Hashes units as WTF-8, which matches the UTF-8 bytes of an unescaped key.
+fn hash_units(state: &RandomState, units: &[u16]) -> u64 {
+    let mut hasher = state.build_hasher();
+    let mut buffer = [0; 4];
+    for unit in char::decode_utf16(units.iter().copied()) {
+        match unit {
+            Ok(ch) => hasher.write(ch.encode_utf8(&mut buffer).as_bytes()),
+            Err(lone) => {
+                let u = lone.unpaired_surrogate();
+                hasher.write(&[0xe0 | (u >> 12) as u8, 0x80 | ((u >> 6) & 0x3f) as u8, 0x80 | (u & 0x3f) as u8]);
+            }
+        }
+    }
+    hasher.finish()
+}
+
 /// An associative map that keeps each key's first insertion position.
 #[derive(Debug, Clone, Default)]
 pub struct OrderedMap {
-    keys: Vec<Value>,
-    ordered_values: Vec<Value>,
-    indices: HashMap<Vec<u16>, usize>,
+    entries: Vec<(Value, Value)>,
+    index: Option<Box<Index>>,
 }
 impl OrderedMap {
     pub fn new() -> Self {
         Self::default()
     }
     pub fn insert(&mut self, key: Value, value: Value) -> Result<Option<Value>> {
-        if key.kind != Kind::String {
+        if key.kind() != Kind::String {
             return Err(error("object key must be a string"));
         }
-        if let Some(&index) = self.indices.get(&key.units) {
-            return Ok(Some(std::mem::replace(
-                &mut self.ordered_values[index],
-                value,
-            )));
+        Ok(self.set(key, value))
+    }
+    /// Inserts under a string key; a repeated key keeps its first token and position.
+    fn set(&mut self, key: Value, value: Value) -> Option<Value> {
+        if let Some(position) = self.find(|state| key.key_hash(state), |existing| existing.same_key(&key)) {
+            return Some(std::mem::replace(&mut self.entries[position].1, value));
         }
-        let index = self.keys.len();
-        self.indices.insert(key.units.clone(), index);
-        self.keys.push(key.clone());
-        self.ordered_values.push(value);
-        Ok(None)
+        let position = self.entries.len();
+        if let Some(index) = &mut self.index {
+            let hash = key.key_hash(&index.state);
+            index.slots.entry(hash).or_insert(position);
+        }
+        self.entries.push((key, value));
+        if self.index.is_none() && self.entries.len() > LINEAR_MEMBERS {
+            let mut index = Box::<Index>::default();
+            for (position, (key, _)) in self.entries.iter().enumerate() {
+                let hash = key.key_hash(&index.state);
+                index.slots.entry(hash).or_insert(position);
+            }
+            self.index = Some(index);
+        }
+        None
+    }
+    fn find(&self, hash: impl FnOnce(&RandomState) -> u64, matches: impl Fn(&Value) -> bool) -> Option<usize> {
+        if let Some(index) = &self.index {
+            match index.slots.get(&hash(&index.state)) {
+                None => return None,
+                Some(&position) if matches(&self.entries[position].0) => return Some(position),
+                Some(_) => {} // A hash collision; the key may still be present.
+            }
+        }
+        self.entries.iter().position(|(key, _)| matches(key))
     }
     pub fn get(&self, key: &str) -> Option<&Value> {
-        self.get_units(&key.encode_utf16().collect::<Vec<_>>())
+        self.find(|state| hash_bytes(state, key.as_bytes()), |existing| existing.key_is_str(key))
+            .map(|position| &self.entries[position].1)
     }
     pub fn get_units(&self, key: &[u16]) -> Option<&Value> {
-        self.indices
-            .get(key)
-            .and_then(|&index| self.ordered_values.get(index))
+        self.find(|state| hash_units(state, key), |existing| existing.key_is_units(key))
+            .map(|position| &self.entries[position].1)
     }
     pub fn iter(&self) -> impl DoubleEndedIterator<Item = (&Value, &Value)> {
-        self.keys.iter().zip(self.ordered_values.iter())
+        self.entries.iter().map(|(key, value)| (key, value))
     }
     pub fn len(&self) -> usize {
-        self.ordered_values.len()
+        self.entries.len()
     }
     pub fn is_empty(&self) -> bool {
-        self.ordered_values.is_empty()
+        self.entries.is_empty()
     }
+}
+
+#[derive(Debug, Clone)]
+enum Node {
+    Object(OrderedMap),
+    Array(Vec<Value>),
+    /// UTF-16 units, decoded from the source token on first use.
+    String(OnceLock<Box<[u16]>>),
+    Number,
+    Boolean,
+    Null,
 }
 
 #[derive(Debug, Clone)]
 pub struct Value {
     source: Arc<str>,
+    /// The value token; a root's raw text also includes surrounding whitespace.
     start: usize,
     end: usize,
-    kind: Kind,
-    members: OrderedMap,
-    items: Vec<Value>,
-    units: Vec<u16>,
+    flags: u8,
+    node: Node,
+}
+
+/// Decodes the contents of a validated string token.
+fn decode_units(content: &str) -> Box<[u16]> {
+    let bytes = content.as_bytes();
+    let mut units = Vec::with_capacity(content.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        match bytes[i] {
+            b'\\' => {
+                let escape = bytes[i + 1];
+                i += 2;
+                units.push(match escape {
+                    b'u' => {
+                        i += 4;
+                        u16::from_str_radix(&content[i - 4..i], 16).unwrap()
+                    }
+                    b'b' => 8,
+                    b'f' => 12,
+                    b'n' => 10,
+                    b'r' => 13,
+                    b't' => 9,
+                    other => u16::from(other),
+                });
+            }
+            byte if byte < 0x80 => {
+                units.push(u16::from(byte));
+                i += 1;
+            }
+            _ => {
+                let ch = content[i..].chars().next().unwrap();
+                units.extend_from_slice(ch.encode_utf16(&mut [0; 2]));
+                i += ch.len_utf8();
+            }
+        }
+    }
+    units.into_boxed_slice()
 }
 
 impl Value {
     pub fn kind(&self) -> Kind {
-        self.kind
+        match self.node {
+            Node::Object(_) => Kind::Object,
+            Node::Array(_) => Kind::Array,
+            Node::String(_) => Kind::String,
+            Node::Number => Kind::Number,
+            Node::Boolean => Kind::Boolean,
+            Node::Null => Kind::Null,
+        }
     }
     pub fn raw(&self) -> &str {
+        if self.flags & ROOT != 0 {
+            &self.source
+        } else {
+            self.token()
+        }
+    }
+    fn token(&self) -> &str {
         &self.source[self.start..self.end]
     }
+    fn content(&self) -> &str {
+        &self.source[self.start + 1..self.end - 1]
+    }
     pub fn members(&self) -> Option<&OrderedMap> {
-        (self.kind == Kind::Object).then_some(&self.members)
+        match &self.node {
+            Node::Object(members) => Some(members),
+            _ => None,
+        }
     }
     pub fn items(&self) -> Option<&[Value]> {
-        (self.kind == Kind::Array).then_some(&self.items)
+        match &self.node {
+            Node::Array(items) => Some(items),
+            _ => None,
+        }
     }
     /// UTF-16 code units also represent escaped, unpaired surrogates losslessly.
     pub fn string_units(&self) -> Option<&[u16]> {
-        (self.kind == Kind::String).then_some(&self.units)
+        match &self.node {
+            Node::String(units) => Some(units.get_or_init(|| decode_units(self.content()))),
+            _ => None,
+        }
     }
     pub fn string_value(&self) -> Result<String> {
-        let units = self
-            .string_units()
-            .ok_or_else(|| error("expected string"))?;
-        String::from_utf16(units).map_err(|_| error("unpaired surrogate; use string_units"))
+        if !matches!(self.node, Node::String(_)) {
+            return Err(error("expected string"));
+        }
+        if self.flags & ESCAPED == 0 {
+            return Ok(self.content().to_owned());
+        }
+        String::from_utf16(self.string_units().unwrap()).map_err(|_| error("unpaired surrogate; use string_units"))
     }
     pub fn number_literal(&self) -> Option<&str> {
-        (self.kind == Kind::Number).then(|| self.raw().trim())
+        matches!(self.node, Node::Number).then(|| self.raw().trim())
     }
     pub fn boolean_value(&self) -> Option<bool> {
-        (self.kind == Kind::Boolean).then(|| self.raw().trim() == "true")
+        matches!(self.node, Node::Boolean).then(|| self.raw().trim() == "true")
     }
     pub fn get(&self, key: &str) -> Option<&Value> {
-        self.members.get(key)
+        self.members().and_then(|members| members.get(key))
     }
     pub fn get_units(&self, key: &[u16]) -> Option<&Value> {
-        self.members.get_units(key)
+        self.members().and_then(|members| members.get_units(key))
+    }
+    fn key_hash(&self, state: &RandomState) -> u64 {
+        if self.flags & ESCAPED == 0 {
+            hash_bytes(state, self.content().as_bytes())
+        } else {
+            hash_units(state, self.string_units().unwrap())
+        }
+    }
+    // Unescaped string contents are UTF-8, so equal contents mean equal units.
+    fn same_key(&self, other: &Value) -> bool {
+        if (self.flags | other.flags) & ESCAPED == 0 {
+            self.content() == other.content()
+        } else {
+            self.string_units() == other.string_units()
+        }
+    }
+    fn key_is_str(&self, key: &str) -> bool {
+        if self.flags & ESCAPED == 0 {
+            self.content() == key
+        } else {
+            self.string_units().unwrap().iter().copied().eq(key.encode_utf16())
+        }
+    }
+    fn key_is_units(&self, key: &[u16]) -> bool {
+        if self.flags & ESCAPED == 0 {
+            self.content().encode_utf16().eq(key.iter().copied())
+        } else {
+            self.string_units() == Some(key)
+        }
     }
     pub fn string(text: &str) -> Self {
         Self::from_units(&text.encode_utf16().collect::<Vec<_>>())
@@ -147,7 +332,7 @@ impl Value {
     }
     pub fn number(literal: &str) -> Result<Self> {
         let value = parse(literal)?;
-        if value.kind != Kind::Number || literal.trim() != literal {
+        if value.kind() != Kind::Number || literal.trim() != literal {
             return Err(error("expected a number literal without whitespace"));
         }
         Ok(value)
@@ -177,27 +362,34 @@ impl Value {
     }
     /// Serialize the associative maps in insertion order, retaining scalar tokens.
     pub fn compact(&self) -> String {
-        let mut out = String::with_capacity(self.raw().len());
+        if self.flags & COMPACT != 0 {
+            return self.token().to_owned();
+        }
+        let mut out = String::with_capacity(self.end - self.start);
         self.write_json(&mut out);
         out
     }
     fn write_json(&self, out: &mut String) {
-        match self.kind {
-            Kind::Object => {
+        if self.flags & COMPACT != 0 {
+            out.push_str(self.token());
+            return;
+        }
+        match &self.node {
+            Node::Object(members) => {
                 out.push('{');
-                for (i, (key, value)) in self.members.iter().enumerate() {
+                for (i, (key, value)) in members.entries.iter().enumerate() {
                     if i > 0 {
                         out.push(',');
                     }
-                    out.push_str(key.raw().trim());
+                    out.push_str(key.token());
                     out.push(':');
                     value.write_json(out);
                 }
                 out.push('}');
             }
-            Kind::Array => {
+            Node::Array(items) => {
                 out.push('[');
-                for (i, item) in self.items.iter().enumerate() {
+                for (i, item) in items.iter().enumerate() {
                     if i > 0 {
                         out.push(',');
                     }
@@ -205,7 +397,7 @@ impl Value {
                 }
                 out.push(']');
             }
-            _ => out.push_str(self.raw().trim()),
+            _ => out.push_str(self.token()),
         }
     }
 }
@@ -233,28 +425,36 @@ pub fn parse_with_max_depth(source: &str, max_depth: usize) -> Result<Value> {
         return Err(error("max_depth exceeds 256"));
     }
     let mut p = Parser {
+        bytes: source.as_bytes(),
         source: Arc::from(source),
         pos: 0,
         max_depth,
+        whitespace: 0,
+        duplicates: 0,
+        items: Vec::new(),
     };
     let mut value = p.value(0)?;
     p.ws();
     if p.pos != source.len() {
         return Err(p.error("unexpected trailing input"));
     }
-    value.start = 0;
-    value.end = source.len();
+    value.flags |= ROOT;
     Ok(value)
 }
 
-struct Parser {
+struct Parser<'a> {
+    bytes: &'a [u8],
     source: Arc<str>,
     pos: usize,
     max_depth: usize,
+    whitespace: usize,
+    duplicates: usize,
+    /// Pending items of the open arrays.
+    items: Vec<Value>,
 }
-impl Parser {
+impl Parser<'_> {
     fn peek(&self) -> Option<u8> {
-        self.source.as_bytes().get(self.pos).copied()
+        self.bytes.get(self.pos).copied()
     }
     fn error(&self, message: &'static str) -> Error {
         Error {
@@ -263,9 +463,11 @@ impl Parser {
         }
     }
     fn ws(&mut self) {
+        let start = self.pos;
         while matches!(self.peek(), Some(b' ' | b'\n' | b'\r' | b'\t')) {
             self.pos += 1;
         }
+        self.whitespace += self.pos - start;
     }
     fn expect(&mut self, byte: u8, message: &'static str) -> Result<()> {
         if self.peek() != Some(byte) {
@@ -274,50 +476,43 @@ impl Parser {
         self.pos += 1;
         Ok(())
     }
-    fn string(&mut self) -> Result<Vec<u16>> {
+    fn new_value(&self, start: usize, flags: u8, node: Node) -> Value {
+        Value {
+            source: self.source.clone(),
+            start,
+            end: self.pos,
+            flags,
+            node,
+        }
+    }
+    /// Validates a string token and returns its value flags.
+    fn string(&mut self) -> Result<u8> {
         self.expect(b'"', "expected string")?;
-        let mut units = Vec::new();
+        let mut flags = COMPACT;
         while let Some(byte) = self.peek() {
             match byte {
                 b'"' => {
                     self.pos += 1;
-                    return Ok(units);
+                    return Ok(flags);
                 }
                 0..=31 => return Err(self.error("unescaped control character")),
                 b'\\' => {
+                    flags |= ESCAPED;
                     self.pos += 1;
                     let escape = self.peek().ok_or_else(|| self.error("unfinished escape"))?;
                     self.pos += 1;
                     if escape == b'u' {
-                        let mut unit = 0;
                         for _ in 0..4 {
-                            let d = self
-                                .peek()
-                                .and_then(|b| (b as char).to_digit(16))
-                                .ok_or_else(|| self.error("invalid Unicode escape"))?;
-                            unit = (unit << 4) | d as u16;
+                            if !self.peek().is_some_and(|b| b.is_ascii_hexdigit()) {
+                                return Err(self.error("invalid Unicode escape"));
+                            }
                             self.pos += 1;
                         }
-                        units.push(unit);
-                    } else {
-                        units.push(match escape {
-                            b'"' => 34,
-                            b'\\' => 92,
-                            b'/' => 47,
-                            b'b' => 8,
-                            b'f' => 12,
-                            b'n' => 10,
-                            b'r' => 13,
-                            b't' => 9,
-                            _ => return Err(self.error("invalid escape")),
-                        });
+                    } else if !matches!(escape, b'"' | b'\\' | b'/' | b'b' | b'f' | b'n' | b'r' | b't') {
+                        return Err(self.error("invalid escape"));
                     }
                 }
-                _ => {
-                    let ch = self.source[self.pos..].chars().next().unwrap();
-                    self.pos += ch.len_utf8();
-                    units.extend_from_slice(ch.encode_utf16(&mut [0; 2]));
-                }
+                _ => self.pos += 1,
             }
         }
         Err(self.error("unterminated string"))
@@ -334,40 +529,33 @@ impl Parser {
     fn value(&mut self, depth: usize) -> Result<Value> {
         self.ws();
         let start = self.pos;
-        let kind;
-        let (mut members, mut items, mut units) = (OrderedMap::new(), Vec::new(), Vec::new());
         match self.peek() {
             Some(open @ (b'{' | b'[')) => {
                 if depth >= self.max_depth {
                     return Err(self.error("maximum nesting depth exceeded"));
                 }
-                kind = if open == b'{' {
-                    Kind::Object
-                } else {
-                    Kind::Array
-                };
-                let close = if open == b'{' { b'}' } else { b']' };
+                let object = open == b'{';
+                let close = if object { b'}' } else { b']' };
+                let (whitespace, duplicates) = (self.whitespace, self.duplicates);
+                let mut members = OrderedMap::new();
+                let base = self.items.len();
                 self.pos += 1;
                 self.ws();
                 if self.peek() != Some(close) {
                     loop {
-                        if kind == Kind::Object {
+                        if object {
                             let key_start = self.pos;
-                            let key_units = self.string()?;
-                            let key = Value {
-                                source: self.source.clone(),
-                                start: key_start,
-                                end: self.pos,
-                                kind: Kind::String,
-                                units: key_units,
-                                members: OrderedMap::new(),
-                                items: Vec::new(),
-                            };
+                            let flags = self.string()?;
+                            let key = self.new_value(key_start, flags, Node::String(OnceLock::new()));
                             self.ws();
                             self.expect(b':', "expected colon")?;
-                            members.insert(key, self.value(depth + 1)?)?;
+                            let child = self.value(depth + 1)?;
+                            if members.set(key, child).is_some() {
+                                self.duplicates += 1;
+                            }
                         } else {
-                            items.push(self.value(depth + 1)?);
+                            let child = self.value(depth + 1)?;
+                            self.items.push(child);
                         }
                         self.ws();
                         if self.peek() == Some(close) {
@@ -378,13 +566,19 @@ impl Parser {
                     }
                 }
                 self.pos += 1;
+                let unchanged = (self.whitespace, self.duplicates) == (whitespace, duplicates);
+                let node = if object {
+                    Node::Object(members)
+                } else {
+                    Node::Array(self.items.drain(base..).collect())
+                };
+                Ok(self.new_value(start, if unchanged { COMPACT } else { 0 }, node))
             }
             Some(b'"') => {
-                kind = Kind::String;
-                units = self.string()?;
+                let flags = self.string()?;
+                Ok(self.new_value(start, flags, Node::String(OnceLock::new())))
             }
             Some(b'-' | b'0'..=b'9') => {
-                kind = Kind::Number;
                 if self.peek() == Some(b'-') {
                     self.pos += 1;
                 }
@@ -404,29 +598,22 @@ impl Parser {
                     }
                     self.digits()?;
                 }
+                Ok(self.new_value(start, COMPACT, Node::Number))
             }
             _ => {
-                let tail = &self.source[self.pos..];
-                let literal = ["true", "false", "null"]
-                    .into_iter()
-                    .find(|s| tail.starts_with(s))
-                    .ok_or_else(|| self.error("expected JSON value"))?;
-                kind = if literal == "null" {
-                    Kind::Null
+                let tail = &self.bytes[self.pos..];
+                let (length, node) = if tail.starts_with(b"true") {
+                    (4, Node::Boolean)
+                } else if tail.starts_with(b"false") {
+                    (5, Node::Boolean)
+                } else if tail.starts_with(b"null") {
+                    (4, Node::Null)
                 } else {
-                    Kind::Boolean
+                    return Err(self.error("expected JSON value"));
                 };
-                self.pos += literal.len();
+                self.pos += length;
+                Ok(self.new_value(start, COMPACT, node))
             }
         }
-        Ok(Value {
-            source: self.source.clone(),
-            start,
-            end: self.pos,
-            kind,
-            members,
-            items,
-            units,
-        })
     }
 }

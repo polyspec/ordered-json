@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Changed the internal descriptor to the integer tape shared with the extension. The parser scans whitespace, digits, and string runs with byte-span functions, string units are decoded on access, and values without insignificant whitespace or duplicate keys serialize by copying their source token. Results, errors, and offsets are unchanged.
 - Established an independent PHP repository with the existing implementation history.
 - Added standalone checks using the shared verifier at an explicit commit and the current candidate source.
 - Added English and Korean usage, development, and change records.
