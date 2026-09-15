@@ -1,19 +1,21 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-15T18:23:21+00:00",
+  "checked_at": "2026-09-15T20:46:33+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "0f7225522e9add35ffe2a7c2425045a0dcb91efa7120de44a1288d73fbf70bc8",
+    "sha256": "273e81a0a3590edef90fb8183a90771505e4318f23b3e703c9937f535320c673",
     "files": {
+      "go/marshal.go": "c1d572532c835ccc018aa8b6ebd252f451130a79775e6633f2baf6390b70ee05",
+      "go/marshal_test.go": "72a85f3ef9f3788c38b0736cbcfe86c777124b6a156e39cb1ddcbae808e9b254",
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "1a0ba9b6e81dea9c162c2cbcbf5d192fbedee0ed1acc4d438a4212f16961cb35",
       "AGENTS.md": "22c1f2efca3bc5ef1f4f218719c9b5d50b7e7c02b83a2c6f9812866d84ec9af7",
-      "CHANGELOG.ko.md": "2332b40a71a3f6117411e81bbc0d8ab34d0832ce38b1b3286ffdb329ffb04cc5",
-      "CHANGELOG.md": "515a235ef8fd848e530681f97a5d66f902112b2dea54010f0bc678078887e85c",
+      "CHANGELOG.ko.md": "7d3b62032d0e98e042b9aed3fb9dda9f7050942698ebc6c7542d37d71f0488f0",
+      "CHANGELOG.md": "2a5e8e93ff45b5aa62ebed513f2bad98b0b31be30c68a476877d2bac2c0a60ac",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
       "README.md": "8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75",
@@ -46,8 +48,8 @@
       "docs/reports/ojson-comparison.json": "4f6bc37d9fba4be253b8b11c3a813eec52d53d139ee202ca9693d8a17ecb5ba2",
       "docs/reports/ojson-comparison.ko.md": "4a8fdd346be00b60b020b79ea9cbd38fa6f73b7c9b468465361664e884b8cc7a",
       "docs/reports/ojson-comparison.md": "f51637e54cbf5e4fb650608261647ff4c7c508cb6e867c8d72f9a44db0a95373",
-      "docs/spec/api.ko.md": "5f7edf967534129f755a0b6a6319eab05bd3e0d81942276b033f0697df27b3f5",
-      "docs/spec/api.md": "21592b9b5747d851ce91520375165bb4961d8a2bb9180572a6b1b4b316debd6d",
+      "docs/spec/api.ko.md": "d398e5c93f2ad7d05293caa7826788b72fc4a5fa776eff088182e58eaf7a9e41",
+      "docs/spec/api.md": "80696139b61c850e41e8dbfbfb2a4223030524b3110ecf7a08f028b89d2395c0",
       "docs/spec/json-contract.ko.md": "f6cad701fed404d7a8eb091eb86013ea04b0f01b10574a109c219da3dab30d63",
       "docs/spec/json-contract.md": "0f6e76611fff775c3a8c1aee128bfd345deba9d1dca442c2c05a2f2a986bfe27",
       "docs/spec/repositories.ko.md": "ec6b5e5686719dafa0404ddc36a00e74ea3539dfef742b61bbbd565d20ad9078",
@@ -239,41 +241,41 @@
   "cases": {
     "official": 17,
     "fixtures": 98,
-    "supplementary": 318,
-    "total": 433
+    "supplementary": 0,
+    "total": 115
   },
   "implementations": {
     "js": {
       "status": "passed",
-      "cases": 433,
+      "cases": 115,
       "runtime": {
         "node": "v26.8.1"
       }
     },
     "rust": {
       "status": "passed",
-      "cases": 433,
+      "cases": 115,
       "runtime": {
         "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)"
       }
     },
     "go": {
       "status": "passed",
-      "cases": 433,
+      "cases": 115,
       "runtime": {
         "go": "go version go1.27.0 darwin/arm64"
       }
     },
     "php": {
       "status": "passed",
-      "cases": 433,
+      "cases": 115,
       "runtime": {
         "php": "8.5.10"
       }
     },
     "php-extension": {
       "status": "passed",
-      "cases": 433,
+      "cases": 115,
       "runtime": {
         "php": "8.5.10",
         "extension_version": "0.0.1"
@@ -284,13 +286,17 @@
     "status": "passed",
     "count": 41
   },
-  "supplementary": {
-    "project": "nst/JSONTestSuite",
-    "revision": "1ef36fa01286573e846ac449e8683f8833c5b26a",
-    "cases": 318,
-    "inputs_sha256": "dafa7facfed6700b0a2f16207fb1d3b557f9e45d3abd84f2dfb666538d10c332"
-  },
-  "build_warnings": [],
+  "supplementary": null,
+  "build_warnings": [
+    {
+      "implementation": "php-extension",
+      "message": "shtool:echo:Warning: unable to determine terminal sequence for bold mode"
+    },
+    {
+      "implementation": "php-extension",
+      "message": "shtool:echo:Warning: unable to determine terminal sequence for bold mode"
+    }
+  ],
   "packages": {
     "javascript": {
       "path": "js",
@@ -304,8 +310,8 @@
     },
     "go": {
       "path": "go",
-      "sha256": "6156b7171fadf9c9604502d802d7e76390918935903d58b4d86da2773a9c88e0",
-      "files": 13
+      "sha256": "ec95db68cf64674b1375a888dfd24b5651695589f90a9549eccfbd76e3ea6f7f",
+      "files": 15
     },
     "php": {
       "path": "php",

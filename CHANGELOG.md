@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Added the Go `Marshal` binding for typed struct, map, slice, scalar, time and byte values. It validates custom marshaler output through ordered-json and produces compact JSON without using the host JSON encoder.
 - Kept PHP container serialization out of `compact()`, whose larger call frame had made extension stringify about 1ns slower after the accessor changes. Extension stringify now takes 0.92-0.95 of the time before those changes.
 - The PHP extension creates child `Value` objects in C with `ordered_json_hydrate()` instead of a PHP loop. Parse followed by full traversal took 0.65-0.99 of the previous time with the extension; parse, stringify, and round trip stayed within 0.99-1.02, with identical results.
 - Rust root arrays take the parser's pending item stack instead of copying every item, releasing spare capacity above one quarter of the length. Parsing root arrays of 90 and 110,000 numbers took 0.84-0.85 of the previous time, with identical results.
