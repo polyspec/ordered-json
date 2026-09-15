@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: ea8278eff2d7a79eb2d95611a459d1c43c6b24e367989eb835d52bf43f48cdfe -->
+<!-- source-sha256: ae1756b7d2a832288578b15468edd79efd3bf937a3b6933ed1ee440650cb05bb -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- 확장이 로드되어 있으면 자식 값을 `ordered_json_hydrate()`로 만듭니다.
 - 조회 함수에서 디스크립터 테이프를 직접 읽고, 자식 값을 생성자 승격 없이 만들며, escape 문자열을 중간 UTF-16 단위 배열 없이 UTF-8로 해석하여 값 조회 비용을 줄였습니다.
 - `useNative` 파싱 옵션, `parseNative()`, 사용하지 않는 `stringify()` compact 인자를 제거했습니다. `parse()`는 확장이 로드돼 있으면 확장을 사용합니다.
 - PCRE backtrack 또는 recursion 한계가 매우 낮으면 올바른 입력을 거부하던 UTF-8 검증을 수정하고, 오프셋을 지역 변수로 전달하여 파서 부담을 줄였습니다.
