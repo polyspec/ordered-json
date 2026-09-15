@@ -1,7 +1,8 @@
 {
   "schema_version": 1,
+  "scope": "pie-build",
   "status": "passed",
-  "checked_at": "2026-09-15T12:16:43+00:00",
+  "checked_at": "2026-09-15T12:17:01+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
@@ -237,61 +238,6 @@
       "scripts/verify.py": "a12be41ddfcd339ef60cca1934d824c94ad805ddb582049c9ef52f9701cfe9ba"
     }
   },
-  "cases": {
-    "official": 17,
-    "fixtures": 98,
-    "supplementary": 318,
-    "total": 433
-  },
-  "implementations": {
-    "js": {
-      "status": "passed",
-      "cases": 433,
-      "runtime": {
-        "node": "v26.8.1"
-      }
-    },
-    "rust": {
-      "status": "passed",
-      "cases": 433,
-      "runtime": {
-        "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)"
-      }
-    },
-    "go": {
-      "status": "passed",
-      "cases": 433,
-      "runtime": {
-        "go": "go version go1.27.0 darwin/arm64"
-      }
-    },
-    "php": {
-      "status": "passed",
-      "cases": 433,
-      "runtime": {
-        "php": "8.5.10"
-      }
-    },
-    "php-extension": {
-      "status": "passed",
-      "cases": 433,
-      "runtime": {
-        "php": "8.5.10",
-        "extension_version": "0.0.1"
-      }
-    }
-  },
-  "documentation_tests": {
-    "status": "passed",
-    "count": 41
-  },
-  "supplementary": {
-    "project": "nst/JSONTestSuite",
-    "revision": "1ef36fa01286573e846ac449e8683f8833c5b26a",
-    "cases": 318,
-    "inputs_sha256": "dafa7facfed6700b0a2f16207fb1d3b557f9e45d3abd84f2dfb666538d10c332"
-  },
-  "build_warnings": [],
   "packages": {
     "javascript": {
       "path": "js",
@@ -318,5 +264,70 @@
       "sha256": "06905561e0aef62e51ca5c4d0dae68e9d05cb59e725d54720ef18163405afb94",
       "files": 15
     }
+  },
+  "pie": {
+    "version": "\ud83e\udd67 PHP Installer for Extensions (PIE) 1.4.10",
+    "phar_sha256": "b88792235c8e80be568436d4cb043b49fd1869c89b64e83d23e2882ae19d70a8"
+  },
+  "package": "ordered-json/ordered-json-extension:*@dev",
+  "commands": [
+    {
+      "arguments": [
+        "--version"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "repository:add",
+        "path",
+        "."
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "info",
+        "ordered-json/ordered-json-extension:*@dev"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "build",
+        "ordered-json/ordered-json-extension:*@dev",
+        "-j",
+        "2",
+        "-vv"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "build_warnings": [],
+  "artifact": {
+    "path": "php-extension/src/modules/ordered_json.so",
+    "sha256": "9fc9e6cc169c84e2a949d14a4be8f70e82ba4b7544ac1abe966eb3e1cd8f11f0"
+  },
+  "cases": {
+    "official": 17,
+    "fixtures": 98,
+    "supplementary": 318,
+    "total": 433
+  },
+  "implementations": {
+    "php-extension": {
+      "status": "passed",
+      "cases": 433,
+      "runtime": {
+        "php": "8.5.10",
+        "extension_version": "0.0.1"
+      }
+    }
+  },
+  "supplementary": {
+    "project": "nst/JSONTestSuite",
+    "revision": "1ef36fa01286573e846ac449e8683f8833c5b26a",
+    "cases": 318,
+    "inputs_sha256": "dafa7facfed6700b0a2f16207fb1d3b557f9e45d3abd84f2dfb666538d10c332"
   }
 }
