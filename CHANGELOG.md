@@ -7,6 +7,8 @@
 ## Unreleased — 2026-09-07
 
 - Reduced per-value parser and serializer work in every implementation without changing results, errors, or offsets. JavaScript checks values with a private-field brand instead of a `WeakSet` registry, slices unescaped strings from the source, and creates object key tokens on access. Go allocates values in chunks and decodes string units on access. Rust stores kind-specific payloads instead of an empty hash map, item vector, and unit vector per value. The PHP library and extension use an integer descriptor tape, and the extension validates UTF-8 while scanning strings instead of in a separate pass. Values without insignificant whitespace or duplicate keys serialize by copying their source token. Differential tests compared parse results, errors, offsets, accessors, factories, and serialization with the previous implementations. The PHP descriptor format is described in the [API contract](docs/spec/api.md#php).
+- Fixed benchmark execution to use Rust release builds, fixed workload input digests, repeated samples, median/p95 statistics, environment fingerprints, and committed results.
+- Preserved the committed benchmark baseline when a comparable run exceeds its tolerance and recorded failed measurements separately for review.
 - Corrected the native macOS deployment target and bundle configuration to remove the obsolete `-single_module` and `-undefined suppress` linker warnings.
 - Published five independent implementation repositories with their existing source histories and replaced common implementation directories with pinned submodules.
 - Added standalone candidate checks using a pinned common verifier and explicit test dependency commits.

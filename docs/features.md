@@ -6,7 +6,7 @@
 <a id="state"></a>
 ## Current implementation
 
-`implemented` means the listed behavior exists. `shared-suite` refers to the common JSON tests; `docs-tests` refers to the documentation checker tests. The [verification record](verification.json) contains the actual versions, case counts, date, and source hashes. `source-only` identifies the confirmed distribution; registry publication is not verified. Publication observations are maintained separately in [distribution.json](distribution.json).
+`implemented` means the listed behavior exists. `shared-suite` refers to the common JSON tests; `docs-tests` refers to the documentation checker tests; `benchmark` refers to the repository benchmark protocol and committed result. The [verification record](verification.json) contains the actual versions, case counts, date, and source hashes. `source-only` identifies the confirmed distribution; registry publication is not verified. Publication observations are maintained separately in [distribution.json](distribution.json).
 
 | ID | Feature | Implementation | Verification | Evidence | Distribution | Specification |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -21,6 +21,7 @@
 | F-PHP-NATIVE | PHP extension parser and serializer with the shared PHP API | implemented | shared-suite | [result](verification.json) | source-only | [PHP](spec/api.md#php) |
 | F-DOCS | Bilingual documents, link/status checks, verification freshness | implemented | docs-tests | [result](verification.json) | source-only | [procedure](documentation-plan.md#checks) |
 | F-REPOS | Single repository with independently buildable implementation packages and shared conformance | implemented | shared-suite | [result](verification.json) | source-only | [repositories](spec/repositories.md) |
+| F-BENCHMARK | Repository-contained reproducible benchmark protocol and committed results | implemented | benchmark | [result](verification.json) | source-only | [benchmarks](../benchmarks/README.md) |
 
 <a id="limits"></a>
 ## Verification and distribution limits
