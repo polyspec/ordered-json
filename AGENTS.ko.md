@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: acff0c9afb73feec36e9d64ba58e9feddeaa2c7fb466264e3fee2da3c2c5fee3 -->
+<!-- source-sha256: 22c1f2efca3bc5ef1f4f218719c9b5d50b7e7c02b83a2c6f9812866d84ec9af7 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -31,7 +31,7 @@ git diff --check
 make check JSON_TEST_SUITE=.cache/JSONTestSuite
 ~~~
 
-문서만 검토할 때는 `make docs-check`를 실행합니다. 검증 소스 해시가 변경됐으면 `make check`를 실행하여 현재 기록을 생성합니다. PIE 기록이 오래됐으면 해당 추가 사례와 함께 `make pie-check PIE=/path/to/pie.phar`도 실행합니다. 검사를 통과시키기 위해 검증 결과나 소스 해시를 직접 수정하지 않습니다.
+문서만 검토할 때는 `make docs-check`를 실행합니다. 소스가 변경됐고 PIE 기록이 있으면 해당 추가 사례와 함께 `make pie-check PIE=/path/to/pie.phar`를 먼저 실행한 뒤 `make check`를 실행하여 현재 기록을 생성합니다. `make check`의 문서 검사는 오래된 PIE 기록을 거부합니다. 검사를 통과시키기 위해 검증 결과나 소스 해시를 직접 수정하지 않습니다.
 
 [구현 등록 정보](implementations.json)는 패키지 경로·빌드·어댑터·런타임 명령을 정의합니다. 공통 JSON 비교 알고리즘을 변경하지 않고 해당 등록 정보와 패키지 디렉터리로 새 언어를 추가합니다. 계약 변경은 같은 저장소 리비전에서 검증기와 관련 패키지를 갱신합니다. [저장소 계약](docs/spec/repositories.ko.md)을 참조합니다.
 
