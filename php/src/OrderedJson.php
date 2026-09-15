@@ -174,11 +174,11 @@ final class Value implements \JsonSerializable, \Stringable
         private int $index,
     ) {}
 
-    public static function parse(string $source, int $maxDepth = MAX_DEPTH, bool $useNative = true): self
+    public static function parse(string $source, int $maxDepth = MAX_DEPTH): self
     {
         if ($maxDepth < 0 || $maxDepth > MAX_DEPTH)
             throw new \InvalidArgumentException('maxDepth must be between 0 and 256');
-        if ($useNative && (self::$native ??= \extension_loaded('ordered_json'))) {
+        if (self::$native ??= \extension_loaded('ordered_json')) {
             try { $tape = \ordered_json_scan($source, $maxDepth); }
             catch (\OrderedJsonNativeParseError $e) {
                 throw new ParseError($e->getMessage(), $e->offset);
@@ -314,16 +314,11 @@ final class Value implements \JsonSerializable, \Stringable
     }
 }
 
-function parse(string $source, int $maxDepth = MAX_DEPTH, bool $useNative = true): Value
+function parse(string $source, int $maxDepth = MAX_DEPTH): Value
 {
-    return Value::parse($source, $maxDepth, $useNative);
+    return Value::parse($source, $maxDepth);
 }
-function parseNative(string $source, int $maxDepth = MAX_DEPTH): Value
-{
-    if (!\extension_loaded('ordered_json')) throw new \RuntimeException('The ordered_json extension is not loaded');
-    return Value::parse($source, $maxDepth, true);
-}
-function stringify(Value $value, bool $compact = false): string
+function stringify(Value $value): string
 {
     return $value->compact();
 }

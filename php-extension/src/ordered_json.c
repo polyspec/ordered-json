@@ -495,10 +495,6 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ordered_json_scan, 0, 1, IS_ARRA
     ZEND_ARG_TYPE_INFO(0, source, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, maxDepth, IS_LONG, 0, "256")
 ZEND_END_ARG_INFO()
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ordered_json_compact, 0, 1, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, source, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, maxDepth, IS_LONG, 0, "256")
-ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ordered_json_compact_node, 0, 2, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, source, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, node, IS_ARRAY, 0)
@@ -529,25 +525,6 @@ PHP_FUNCTION(ordered_json_scan) {
     efree(p.tape);
 }
 
-PHP_FUNCTION(ordered_json_compact) {
-    zend_string *source;
-    zend_long max_depth = ORDERED_JSON_MAX_DEPTH;
-    ZEND_PARSE_PARAMETERS_START(1, 2)
-        Z_PARAM_STR(source)
-        Z_PARAM_OPTIONAL
-        Z_PARAM_LONG(max_depth)
-    ZEND_PARSE_PARAMETERS_END();
-    if (max_depth < 0 || max_depth > ORDERED_JSON_MAX_DEPTH) {
-        zend_argument_value_error(2, "must be between 0 and 256"); RETURN_THROWS();
-    }
-    oj_parser p;
-    if (!oj_parse(source, max_depth, &p)) RETURN_THROWS();
-    oj_tape t = {p.tape, NULL, p.count};
-    zend_string *out = oj_compact(source, &t, 0);
-    efree(p.tape);
-    RETURN_STR(out);
-}
-
 PHP_FUNCTION(ordered_json_compact_node) {
     zend_string *source;
     HashTable *node;
@@ -569,7 +546,6 @@ PHP_FUNCTION(ordered_json_compact_node) {
 
 static const zend_function_entry ordered_json_functions[] = {
     PHP_FE(ordered_json_scan, arginfo_ordered_json_scan)
-    PHP_FE(ordered_json_compact, arginfo_ordered_json_compact)
     PHP_FE(ordered_json_compact_node, arginfo_ordered_json_compact_node)
     PHP_FE_END
 };

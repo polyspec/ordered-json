@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Removed the unused `stringify()` options argument.
 - Reduced parser and serializer overhead: values use a private-field brand check instead of a `WeakSet` registry, unescaped strings are sliced from the source, object key tokens are created on access, and values without insignificant whitespace or duplicate keys serialize as their source token. Results, errors, and offsets are unchanged.
 - Established an independent JavaScript repository with the existing implementation history.
 - Added standalone checks using the shared verifier at an explicit commit and the current candidate source.
