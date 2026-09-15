@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-15T09:50:24+00:00",
+  "checked_at": "2026-09-15T09:57:04+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "ece3723f562f7348b68de0504506234dfe1227da020b4cefc94e6b2118a9703e",
+    "sha256": "0696a3ba71657f8fd3a72b062b0e6feade818f522e455e3eb594c4a82dd31588",
     "files": {
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "a8b0309d3832249dd7605b6404a644701e5456a67924f2b7f5ab69f13ad31196",
@@ -17,15 +17,15 @@
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "23939bfc76849af3ab82fc3e6decdc00f6aee752adf48c04837a1a103b6549ac",
       "README.md": "3e58b47a5a2372e81072b0f5f08bf549fea6d73b11b79fa65bb558e748216927",
-      "benchmarks/README.ko.md": "d7d650e99f27d8b648bc803b18dfa062b1de128a010b1f72fc485ca39e3d079f",
-      "benchmarks/README.md": "5e46e3b373ade0ad8c09a13eeb4e8411f2b2131d53e829455cafec6c01c23c18",
+      "benchmarks/README.ko.md": "157c826cc8a8cb3758b725b24b2b218dff098fa710684434d27dfbc40d658a7c",
+      "benchmarks/README.md": "ba4db66ea2109d8d7eb37f99253d10b64a34e039a0b89c5a175104f57fda694b",
       "benchmarks/fixtures/empty-array.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
       "benchmarks/fixtures/empty-object.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
       "benchmarks/fixtures/large-array.json": "e57f10beb9a91d19f2c3b564afb3f627c775431b59cfebac5fe618c5389f862a",
       "benchmarks/fixtures/mixed-unicode.json": "cb6f171b0a53de7aac3fd15cf81db7bd789ee90910d9d083e6ab593c3e4ae8f1",
       "benchmarks/fixtures/nested-order.json": "ee4d0c53ac06ed42d611f115ec3935f672711c506547268fb1381e8d71d335a5",
-      "benchmarks/js.mjs": "9b02496072c282e7f6d6bb8633725ccea724fa1820628e70548bb534e40ef4c0",
-      "benchmarks/php.php": "59ab335a3876d3949b8c4b07b9ef8e9952a068ef9b1e51a574980748735dc4f5",
+      "benchmarks/js.mjs": "498f5d3666733e84f54a8ca59c4e5f8b42a3a29af75c506382c246e7a6df67d2",
+      "benchmarks/php.php": "043d51f10fc9db637911997599bbda90dfd17aafc431401d3a90b1d3865301d3",
       "benchmarks/run.py": "9aa2c0c082c0c8a0ad0577c42ea9ee68aa25ea81f648d8d29e6e2518f5406209",
       "docs/distribution.json": "1ccded31251e48286d97c8df62bb87d70cf6eadba4f88cc99a146447fcb2eb8a",
       "docs/documentation-manifest.json": "4c119554db5cdc4aaf40fb17539c69934c49de532f175904dcc9c961af4e10c9",
@@ -161,7 +161,7 @@
       "go/README.md": "b6d24c0d70545747c5ac3a8430f938fc68fcc97799df78b7fc6c722bef69175e",
       "go/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
       "go/go.mod": "e06c222c5b837816e28456ce5a7f46a5896be5c46a89a7d2a01c85aa888018f2",
-      "go/internal/benchmark/main.go": "82823497e72d47e7600dbf33af4409614814bb083424977ed4e09ed39fe9a9ba",
+      "go/internal/benchmark/main.go": "c82fc164f03c4d51734c5b74c5b1de4d0b239bca9bc5a1102e2c719d4d99e7e0",
       "go/internal/probe/main.go": "cbdf69a4210d9b98f7b41e267ac519a3f6fee4a8c3dba43b9932bbda5fc689be",
       "go/orderedjson.go": "3e6236b32278061f013feba6067bf3185ccc0d792a6b64dadcb847b1ff56fffe",
       "implementations.json": "60472aa090cc5ad1cdb6516fc2fde710ee12db8706aa8ea031d7ab2715f7835c",
@@ -216,7 +216,7 @@
       "rust/README.ko.md": "d5ac5e9857c793fb5dc17932207f12f80ea4ccb460653865a282d8a03eaeff7b",
       "rust/README.md": "e3c04eba3326d309a6e793f57ac7979c1429fdb9e135e85d022adb573029c8e3",
       "rust/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
-      "rust/examples/benchmark.rs": "a96eb1b91c1d2585f3e878c29dc3e5d89a42c20b0a0061bcc7238719fc8ee46f",
+      "rust/examples/benchmark.rs": "e2e074f39d794fa11f257a52141faffad5a5913639746505b5543bbf6e5e62b4",
       "rust/examples/probe.rs": "e655d00000196925a77bfc4a2ead76072cce04973eba487f7086349265bee310",
       "rust/src/lib.rs": "c20629a5f4c17b8d3204f059aab52cd1bd17136793cf784241b2b8b592bff91a",
       "scripts/bootstrap.py": "ab6c627ec718fcafc44a5e63de00a37fd6b78093b4a223eb039423e74872a5a6",
@@ -292,12 +292,12 @@
     },
     "rust": {
       "path": "rust",
-      "sha256": "45383636605af5387e1102aee296940874d4c848a3125ef2d8986510c59e2bba",
+      "sha256": "ca19f33179a4bff69b79be322d4a0feae9cbebd973f719397402e5b68b105233",
       "files": 14
     },
     "go": {
       "path": "go",
-      "sha256": "aaa852a100f3aefd197e4853c5cee6d41139fd461c07556902008c62268e64b6",
+      "sha256": "9995d3c069be789a7afac15f19a84d37a898c1d8be63bba79e2a40455f2e6051",
       "files": 13
     },
     "php": {
