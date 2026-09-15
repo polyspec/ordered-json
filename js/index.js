@@ -319,7 +319,7 @@ export function parseBytes(bytes, options) {
   return parse(source, options);
 }
 
-export function stringify(value, options = noOptions) {
+export function stringify(value) {
   checkValue(value);
   return value[writeInternal]('');
 }

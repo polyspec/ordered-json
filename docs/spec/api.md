@@ -14,7 +14,7 @@ Parsed `Value` objects are immutable. Factories construct strings, number tokens
 
 | Operation | JavaScript | Rust | Go | PHP |
 | --- | --- | --- | --- | --- |
-| Text parsing | `parse(source, options)` | `parse(source)` | `Parse(source)` | `parse(source, maxDepth, useNative)` |
+| Text parsing | `parse(source, options)` | `parse(source)` | `Parse(source)` | `parse(source, maxDepth)` |
 | UTF-8 bytes | `parseBytes(bytes, options)` | `parse_bytes(bytes)` | `ParseBytes(bytes)` / `ParseBytesBorrowed(bytes)` | `parse(source)` |
 | Depth limit | `options.maxDepth` | `parse_with_max_depth(source, limit)` | `ParseWithMaxDepth(source, limit)` | `maxDepth` |
 | Default output | `stringify(value)` | `stringify(&value)` | `Stringify(value)` | `stringify($value)` |
@@ -64,10 +64,8 @@ JavaScript can construct a string from existing UTF-16 text. Rust and Go expose 
 <a id="php"></a>
 ## PHP backends
 
-`OrderedJson\parse` uses the native parser when the `ordered_json` extension is loaded. `useNative: false` selects pure PHP parsing. `OrderedJson\parseNative` requires the extension and fails when it is absent. The common `Value` API keeps the root parser descriptor and lazily hydrates child values only when tree access requires them.
+`OrderedJson\parse` uses the native parser and serializer when the `ordered_json` extension is loaded and the pure PHP implementation otherwise. The common `Value` API keeps the root parser descriptor and lazily hydrates child values only when tree access requires them.
 
-If the extension is loaded, `compact()` uses native serialization even for a value parsed with `useNative: false`. To run the pure PHP implementation for both operations, use PHP without that extension.
-
-The extension provides `ordered_json_scan(source, maxDepth)`, `ordered_json_compact(source, maxDepth)`, and `ordered_json_compact_node(source, descriptor, index)`. A descriptor is a list of three integers per value in document order: `meta`, `start`, and `end`. `start` and `end` are the byte span of the value token, and the first entry is the root value, whose raw text is the complete source. `meta` stores the kind in bits 0–2 (1 object, 2 array, 3 string, 4 number, 5 boolean, 6 null), flags in bits 3–5, and a link index from bit 8. The compact flag (8) marks a value without insignificant whitespace or duplicate keys; its compact output is its token. The escaped flag (16) marks a string token with escape sequences, and UTF-16 units are decoded on access. A container links to the entry after its last descendant. An object member is a key entry followed by its value; the key links to the value that the member retains. A repeated key has the skip flag (32), and the first key with that name links to the last value. Native parse failures use `OrderedJsonNativeParseError`; the common API converts them to `OrderedJson\ParseError`. `ordered_json_compact_node` rejects a descriptor that does not match the source with `ValueError`.
+The extension provides `ordered_json_scan(source, maxDepth)` and `ordered_json_compact_node(source, descriptor, index)`. A descriptor is a list of three integers per value in document order: `meta`, `start`, and `end`. `start` and `end` are the byte span of the value token, and the first entry is the root value, whose raw text is the complete source. `meta` stores the kind in bits 0–2 (1 object, 2 array, 3 string, 4 number, 5 boolean, 6 null), flags in bits 3–5, and a link index from bit 8. The compact flag (8) marks a value without insignificant whitespace or duplicate keys; its compact output is its token. The escaped flag (16) marks a string token with escape sequences, and UTF-16 units are decoded on access. A container links to the entry after its last descendant. An object member is a key entry followed by its value; the key links to the value that the member retains. A repeated key has the skip flag (32), and the first key with that name links to the last value. Native parse failures use `OrderedJsonNativeParseError`; the common API converts them to `OrderedJson\ParseError`. `ordered_json_compact_node` rejects a descriptor that does not match the source with `ValueError`.
 
 Native builds must match the PHP version, platform, and thread-safety configuration. See [native installation](../operations/installation.md#native-php).

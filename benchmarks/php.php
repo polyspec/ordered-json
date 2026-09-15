@@ -32,7 +32,7 @@ foreach ($files as $file) {
     if ($source === false) throw new RuntimeException("Cannot read $file");
     $parseFn = $mode === 'native-json'
         ? static fn() => json_decode($source, false, 512, JSON_THROW_ON_ERROR)
-        : static fn() => Value::parse($source, 256, $mode === 'extension');
+        : static fn() => Value::parse($source, 256);
     $stringifyFn = $mode === 'native-json'
         ? static fn($value) => json_encode($value, JSON_THROW_ON_ERROR)
         : static fn($value) => $value->compact();

@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: 89281821bbc0f43005d9b1169497d81414ec62f661bd70213b2c3a7659ab5c42 -->
+<!-- source-sha256: a7b86cc29c90fc49fe14067f5d79e87d03db849a66f3ebb5b18f12cc45250391 -->
 # ordered-json for PHP
 
 [English](README.md)
@@ -20,7 +20,7 @@ $output = OrderedJson\stringify($value);
 ~~~
 
 
-[네이티브 확장](https://github.com/polyspec/ordered-json/tree/main/php-extension)은 별도의 선택적 패키지입니다. 순수 PHP에는 확장 체크아웃이 필요하지 않습니다. `parse(..., useNative: false)`는 순수 파서를 선택하며 확장이 로드되어 있으면 `compact()`는 네이티브 직렬화를 사용합니다. 순수 구현 테스트는 `php -n`을 사용합니다.
+[네이티브 확장](https://github.com/polyspec/ordered-json/tree/main/php-extension)은 별도의 선택적 패키지입니다. 순수 PHP에는 확장 체크아웃이 필요하지 않습니다. `parse()`는 확장이 로드되어 있으면 확장을, 그렇지 않으면 순수 PHP 구현을 사용합니다. 순수 구현 테스트는 `php -n`을 사용합니다.
 
 동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
 
