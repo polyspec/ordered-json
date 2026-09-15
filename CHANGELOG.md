@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Kept PHP container serialization out of `compact()`, whose larger call frame had made extension stringify about 1ns slower after the accessor changes. Extension stringify now takes 0.92-0.95 of the time before those changes.
 - The PHP extension creates child `Value` objects in C with `ordered_json_hydrate()` instead of a PHP loop. Parse followed by full traversal took 0.65-0.99 of the previous time with the extension; parse, stringify, and round trip stayed within 0.99-1.02, with identical results.
 - Rust root arrays take the parser's pending item stack instead of copying every item, releasing spare capacity above one quarter of the length. Parsing root arrays of 90 and 110,000 numbers took 0.84-0.85 of the previous time, with identical results.
 - Reduced PHP value access cost: accessors read the descriptor tape directly instead of chaining helper calls, child values are created without a promoted constructor, and escaped strings decode to UTF-8 without an intermediate UTF-16 unit array. Parse followed by full traversal took 0.43-0.89 of the previous time with the extension and 0.60-0.97 in pure PHP, with identical results.
