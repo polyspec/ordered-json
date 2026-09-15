@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 09382b8addd043c8d0086052a17d5b79821ca9129c7e008869ce6c9e53ebb895 -->
+<!-- source-sha256: afd52a5269b6a8effeebaa2bf4180e11f14478d86f5f2ee665a8e86e06b6001d -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- PHP 컨테이너 직렬화를 `compact()`에서 private 메서드로 옮겨, 확장으로 직렬화할 때 호출 프레임이 작아졌습니다. 확장 직렬화 시간은 현재 조회 함수 변경 전의 0.92~0.95였습니다.
 - 확장이 로드되어 있으면 자식 값을 `ordered_json_hydrate()`로 만듭니다.
 - 조회 함수에서 디스크립터 테이프를 직접 읽고, 자식 값을 생성자 승격 없이 만들며, escape 문자열을 중간 UTF-16 단위 배열 없이 UTF-8로 해석하여 값 조회 비용을 줄였습니다.
 - `useNative` 파싱 옵션, `parseNative()`, 사용하지 않는 `stringify()` compact 인자를 제거했습니다. `parse()`는 확장이 로드돼 있으면 확장을 사용합니다.
