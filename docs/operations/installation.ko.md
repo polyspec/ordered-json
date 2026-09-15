@@ -1,5 +1,5 @@
 <!-- doc-id: installation -->
-<!-- source-sha256: d68c91ed273a28ff87ed89e1d57d4f122c7c41016fbd375314a045114c2b686e -->
+<!-- source-sha256: 652a379d1256006988f41343184105949020b21c0a63d13f0fb554ac7910de87 -->
 # 설치와 실행
 
 [English](installation.md)
@@ -11,7 +11,7 @@
 | --- | --- | --- | --- |
 | JavaScript | Node.js >= 20, ESM | `ordered-json`, 0.1.0 | [package.json](https://github.com/polyspec/ordered-json/blob/main/js/package.json) |
 | Rust | Rust >= 1.70, edition 2021 | `ordered-json`, 0.1.0 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/rust/Cargo.toml) |
-| Go | Go >= 1.22 | `github.com/ordered-json/ordered-json/go` 모듈, `orderedjson` 패키지 | [go.mod](https://github.com/polyspec/ordered-json/blob/main/go/go.mod) |
+| Go | Go >= 1.22 | `github.com/polyspec/ordered-json/go` 모듈, `orderedjson` 패키지 | [go.mod](https://github.com/polyspec/ordered-json/blob/main/go/go.mod) |
 | PHP | PHP >= 8.2, JSON 및 PCRE 확장 | `ordered-json/ordered-json`, `OrderedJson` 네임스페이스 | [composer.json](https://github.com/polyspec/ordered-json/blob/main/php/composer.json) |
 | 네이티브 PHP | 일치하는 PHP 개발 헤더, C 컴파일러, phpize, make | `ordered_json` 확장, 0.1.0 | [확장 소스](https://github.com/polyspec/ordered-json/blob/main/php-extension/src/ordered_json.c) |
 | 저장소 검사 | Python >= 3.9, Git, make, 위 런타임 전체 | `make check` | [검증](validation.ko.md) |
@@ -30,7 +30,7 @@ cd ordered-json
 
 - JavaScript: `js/index.js`에서 가져옵니다. TypeScript 선언은 `js/index.d.ts`에 있습니다.
 - Rust: `path`가 `rust/`를 지정하는 로컬 Cargo 의존성을 설정합니다.
-- Go: `github.com/ordered-json/ordered-json/go` 모듈의 로컬 `replace`가 `go/`를 지정하도록 설정합니다.
+- Go: `github.com/polyspec/ordered-json/go` 모듈의 로컬 `replace`가 `go/`를 지정하도록 설정합니다.
 - PHP: `php/src/OrderedJson.php`를 require하거나 `php/`를 Composer path 저장소로 사용합니다.
 
 <a id="native-php"></a>

@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: f8510fe66704cfa9333abfcc2fc292f9182ae0c8f34ad7729e3e2133822297eb -->
+<!-- source-sha256: 10782cf0dc4ef25c0c7ca3402f813010c9419f4ba738329f74253f46b922f823 -->
 # ordered-json for Go
 
 [English](README.md)
@@ -9,9 +9,9 @@
 <a id="usage"></a>
 ## 사용
 
-Go >= 1.22이며 모듈은 `github.com/ordered-json/ordered-json/go`, 패키지는 `orderedjson`입니다.
+Go >= 1.22이며 모듈은 `github.com/polyspec/ordered-json/go`, 패키지는 `orderedjson`입니다.
 
-사용 코드의 `source` 또는 `$source`는 [공통 공식 예제](https://github.com/polyspec/ordered-json/blob/main/examples/official.json)의 객체 사례에서 가져옵니다. `github.com/ordered-json/ordered-json/go`를 가져오고 오류를 반환할 수 있는 함수 안에서 사용합니다.
+사용 코드의 `source` 또는 `$source`는 [공통 공식 예제](https://github.com/polyspec/ordered-json/blob/main/examples/official.json)의 객체 사례에서 가져옵니다. `github.com/polyspec/ordered-json/go`를 가져오고 오류를 반환할 수 있는 함수 안에서 사용합니다.
 
 ~~~go
 value, err := orderedjson.Parse(source)

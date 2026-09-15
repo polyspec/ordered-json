@@ -2,7 +2,6 @@
 package orderedjson
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"unicode/utf16"
@@ -185,17 +184,34 @@ func String(text string) (*Value, error) {
 	if !utf8.ValidString(text) {
 		return nil, fmt.Errorf("invalid UTF-8")
 	}
-	raw, err := json.Marshal(text)
-	if err != nil {
-		return nil, err
-	}
-	return Parse(string(raw))
+	return StringFromUnits(utf16.Encode([]rune(text))), nil
 }
 func StringFromUnits(units []uint16) *Value {
 	var out strings.Builder
 	out.WriteByte('"')
 	for _, u := range units {
-		fmt.Fprintf(&out, "\\u%04x", u)
+		switch u {
+		case '"':
+			out.WriteString(`\"`)
+		case '\\':
+			out.WriteString(`\\`)
+		case '\b':
+			out.WriteString(`\b`)
+		case '\f':
+			out.WriteString(`\f`)
+		case '\n':
+			out.WriteString(`\n`)
+		case '\r':
+			out.WriteString(`\r`)
+		case '\t':
+			out.WriteString(`\t`)
+		default:
+			if u >= 0x20 && u <= 0x7e {
+				out.WriteByte(byte(u))
+			} else {
+				fmt.Fprintf(&out, "\\u%04x", u)
+			}
+		}
 	}
 	out.WriteByte('"')
 	v, _ := Parse(out.String())
@@ -248,7 +264,7 @@ func Stringify(value *Value) (string, error) {
 	return value.Compact()
 }
 
-// MarshalJSON preserves members and literals; encoding/json may compact/escape the result.
+// MarshalJSON integrates with encoding/json while preserving ordered-json values.
 func (v *Value) MarshalJSON() ([]byte, error) {
 	raw, err := Stringify(v)
 	return []byte(raw), err

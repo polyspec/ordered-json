@@ -8,9 +8,11 @@
 
 - Corrected the native macOS deployment target and bundle configuration to remove the obsolete `-single_module` and `-undefined suppress` linker warnings.
 - Added PIE artifact verification using the same shared JSON cases and separate PHP and extension version records.
+- Updated the Go module to `github.com/polyspec/ordered-json/go`.
 - Added `make distclean` before repeated native setup because moved dependency files retained the previous build path.
 - Added a registry of implementation build, adapter, and runtime commands.
 - Separated PHP extension sources into `php-extension/src` and added PIE package metadata with a default-enabled standalone build.
+- Removed host JSON parser and serializer dependencies from core value construction and string handling, and added shared repeated round-trip verification across all implementations.
 
 - Renamed language packages, namespaces, imports, native symbols, and build outputs to the ordered-json identifiers in the [API contract](docs/spec/api.md).
 - Added English canonical documents and paired Korean translations for specifications, APIs, feature state, operations, examples, and development procedure.

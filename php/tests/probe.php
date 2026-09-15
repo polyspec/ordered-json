@@ -45,6 +45,10 @@ while (($line = fgets(STDIN)) !== false) {
     if ($source === false) throw new RuntimeException('Cannot read document');
     try { $value = parse($source); }
     catch (ParseError $e) { echo '{"ok":false}', "\n"; continue; }
-    echo '{"ok":true,"raw":',quote($value->raw()),',"serialized":',quote(OrderedJson\stringify($value)),',"compact":',quote($value->compact()),
-        ',"tree":',tree($value),',"rebuilt":',quote(rebuild($value)->compact()),"}\n";
+    $serialized = OrderedJson\stringify($value);
+    $roundtrip = parse($serialized);
+    $factory = Value::string("quote \" slash \\ line\n 한 🌍")->compact();
+    echo '{"ok":true,"raw":',quote($value->raw()),',"serialized":',quote($serialized),',"compact":',quote($value->compact()),
+        ',"tree":',tree($value),',"roundtrip":',quote(OrderedJson\stringify($roundtrip)),',"roundtrip_tree":',tree($roundtrip),
+        ',"rebuilt":',quote(rebuild($value)->compact()),',"factory":',quote($factory),"}\n";
 }

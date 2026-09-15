@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 5f7447559f637ed14436447c74a341cf2f31c1221293e20bf6b9ebcede422ceb -->
+<!-- source-sha256: f03d27ede97cc90e143be53ad27f9f01510fcea9a273cf01fc46e323109c985a -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -9,9 +9,11 @@
 
 - 네이티브 macOS 배포 대상과 번들 설정을 수정하여 오래된 `-single_module` 및 `-undefined suppress` 링커 경고를 해결했습니다.
 - 같은 공통 JSON 사례로 PIE 산출물을 검사하고 PHP 버전과 확장 버전을 별도로 기록하도록 추가했습니다.
+- Go 모듈을 `github.com/polyspec/ordered-json/go`로 변경했습니다.
 - 이동한 의존성 파일에 이전 빌드 경로가 남아 반복 네이티브 설정 전에 `make distclean`을 추가했습니다.
 - 구현 빌드·어댑터·런타임 명령 등록 정보를 추가했습니다.
 - PHP 확장 소스를 `php-extension/src`로 분리하고 단독 빌드를 기본 활성화하는 PIE 패키지 메타데이터를 추가했습니다.
+- 핵심 값 생성과 문자열 처리에서 host JSON parser와 serializer 의존성을 제거하고 모든 구현에 공통 반복 round-trip 검증을 추가했습니다.
 
 - 언어별 패키지, 네임스페이스, 가져오기, 네이티브 심볼, 빌드 출력을 [API 계약](docs/spec/api.ko.md)의 ordered-json 식별자로 변경했습니다.
 - 명세, API, 기능 상태, 운영, 예제, 개발 절차에 영어 정본과 한국어 번역을 추가했습니다.

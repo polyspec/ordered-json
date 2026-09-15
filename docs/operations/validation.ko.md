@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: ca4521bcfe59bcf7da1fc03fd4205cc92195f06389472131ef60df3f77d46e98 -->
+<!-- source-sha256: 056729b24e2885b58fe7027e68e37cbd6d7fe466a5cae20f43c69f754fa9a5cc -->
 # 검증
 
 [English](validation.md)
@@ -44,7 +44,7 @@ python3 scripts/verify.py --only php --only php-extension
 
 ~~~sh
 git clone https://github.com/polyspec/ordered-json.git
-cd php-extension
+cd ordered-json
 make check
 ~~~
 

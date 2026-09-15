@@ -45,6 +45,8 @@ PHP stores ordinary object keys as UTF-8 array keys. Escaped unpaired surrogates
 
 The default serializer and compact serializer traverse the associative maps and arrays and return JSON without insignificant whitespace. They emit each object key once, in its first occurrence position, with its last value. Parsed scalar tokens and the first token spelling of each retained key are preserved.
 
+Serialization is idempotent for every accepted value: parsing the serialized output and serializing it again produces the same output, type tree, key order, and scalar token values. Empty objects remain objects and empty arrays remain arrays through parsing, construction, serialization, and repeated round trips. Core implementations use their own JSON parser and serializer for these operations; host JSON APIs are not part of the implementation contract.
+
 `raw` returns the original source span for inspection. The root span includes surrounding whitespace. It can contain overwritten keys and is not the serialized representation of the map.
 
 The JavaScript `compact` option and PHP `compact` argument are accepted for compatibility; both values select the same compact output. JavaScript `JSON.stringify(Value)` and PHP `json_encode(Value)` fail and direct the caller to the library serializer. Go implements `MarshalJSON`; the standard encoder may change HTML escapes or whitespace.

@@ -16,6 +16,7 @@
 | F-NUMBER | Exact number tokens | implemented | shared-suite | [result](verification.json) | source-only | [numbers](spec/json-contract.md#numbers) |
 | F-STRING | Decoded strings and escaped surrogate code units | implemented | shared-suite | [result](verification.json) | source-only | [strings](spec/json-contract.md#strings) |
 | F-OUTPUT | Associative serialization and source inspection | implemented | shared-suite | [result](verification.json) | source-only | [serialization](spec/json-contract.md#serialization) |
+| F-IDEMPOTENT | Repeated parse and serialization preserve the same type tree and output | implemented | shared-suite | [result](verification.json) | source-only | [serialization](spec/json-contract.md#serialization) |
 | F-CONSTRUCT | Construction from ordered maps and arrays of Value objects | implemented | shared-suite | [result](verification.json) | source-only | [construction](spec/json-contract.md#construction) |
 | F-PHP-NATIVE | PHP extension parser and serializer with the shared PHP API | implemented | shared-suite | [result](verification.json) | source-only | [PHP](spec/api.md#php) |
 | F-DOCS | Bilingual documents, link/status checks, verification freshness | implemented | docs-tests | [result](verification.json) | source-only | [procedure](documentation-plan.md#checks) |

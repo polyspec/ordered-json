@@ -13,17 +13,22 @@ final class ParseError extends \InvalidArgumentException
     }
 }
 
-/** @internal UTF-8 keys, with lone UTF-16 surrogates represented losslessly as WTF-8. */
-function keyText(array $units): string
+/** @internal Convert UTF-16 units to UTF-8, optionally retaining lone surrogates as WTF-8. */
+function unitsToUtf8(array $units, bool $allowUnpaired = true): string
 {
     $out = '';
     for ($i = 0, $n = count($units); $i < $n; $i++) {
         $point = $units[$i];
         if (!is_int($point) || $point < 0 || $point > 65535)
             throw new \InvalidArgumentException('Expected UTF-16 code units');
-        if ($point >= 0xd800 && $point <= 0xdbff && $i + 1 < $n
-            && is_int($units[$i + 1]) && $units[$i + 1] >= 0xdc00 && $units[$i + 1] <= 0xdfff) {
-            $point = 0x10000 + (($point - 0xd800) << 10) + $units[++$i] - 0xdc00;
+        if ($point >= 0xd800 && $point <= 0xdbff) {
+            if ($i + 1 < $n && is_int($units[$i + 1]) && $units[$i + 1] >= 0xdc00 && $units[$i + 1] <= 0xdfff) {
+                $point = 0x10000 + (($point - 0xd800) << 10) + $units[++$i] - 0xdc00;
+            } elseif (!$allowUnpaired) {
+                throw new UnexpectedValueException('Unpaired surrogate; use stringUnits()');
+            }
+        } elseif ($point >= 0xdc00 && $point <= 0xdfff && !$allowUnpaired) {
+            throw new UnexpectedValueException('Unpaired surrogate; use stringUnits()');
         }
         if ($point < 0x80) $out .= chr($point);
         elseif ($point < 0x800) $out .= chr(0xc0 | ($point >> 6)) . chr(0x80 | ($point & 63));
@@ -33,19 +38,67 @@ function keyText(array $units): string
     return $out;
 }
 
-/** @internal Encode associative array keys, escaping any stored lone surrogates. */
-function quoteKey(string $key): string
+/** @internal Object-key identity uses WTF-8 for lone UTF-16 surrogates. */
+function keyText(array $units): string
+{
+    return unitsToUtf8($units, true);
+}
+
+/** @internal Decode UTF-8 or WTF-8 into UTF-16 units. */
+function utf8Units(string $text, bool $allowWtf8 = false): array
+{
+    $units = [];
+    for ($i = 0, $n = strlen($text); $i < $n;) {
+        $first = ord($text[$i++]);
+        if ($first < 0x80) $point = $first;
+        elseif ($first >= 0xc2 && $first <= 0xdf) {
+            if ($i >= $n) throw new \InvalidArgumentException('Invalid UTF-8');
+            $next = ord($text[$i++]);
+            if (($next & 0xc0) !== 0x80) throw new \InvalidArgumentException('Invalid UTF-8');
+            $point = (($first & 0x1f) << 6) | ($next & 63);
+        } elseif ($first >= 0xe0 && $first <= 0xef) {
+            if ($i + 1 >= $n) throw new \InvalidArgumentException('Invalid UTF-8');
+            $b1 = ord($text[$i++]); $b2 = ord($text[$i++]);
+            if (($b1 & 0xc0) !== 0x80 || ($b2 & 0xc0) !== 0x80)
+                throw new \InvalidArgumentException('Invalid UTF-8');
+            $point = (($first & 15) << 12) | (($b1 & 63) << 6) | ($b2 & 63);
+            if ($point < 0x800 || ($point >= 0xd800 && $point <= 0xdfff && !$allowWtf8))
+                throw new \InvalidArgumentException('Invalid UTF-8');
+        } elseif ($first >= 0xf0 && $first <= 0xf4) {
+            if ($i + 2 >= $n) throw new \InvalidArgumentException('Invalid UTF-8');
+            $b1 = ord($text[$i++]); $b2 = ord($text[$i++]); $b3 = ord($text[$i++]);
+            if (($b1 & 0xc0) !== 0x80 || ($b2 & 0xc0) !== 0x80 || ($b3 & 0xc0) !== 0x80)
+                throw new \InvalidArgumentException('Invalid UTF-8');
+            $point = (($first & 7) << 18) | (($b1 & 63) << 12) | (($b2 & 63) << 6) | ($b3 & 63);
+            if ($point < 0x10000 || $point > 0x10ffff)
+                throw new \InvalidArgumentException('Invalid UTF-8');
+        } else throw new \InvalidArgumentException('Invalid UTF-8');
+        if ($point <= 0xffff) $units[] = $point;
+        else { $point -= 0x10000; $units[] = 0xd800 | ($point >> 10); $units[] = 0xdc00 | ($point & 1023); }
+    }
+    return $units;
+}
+
+/** @internal Encode UTF-16 units with the shared constructor spelling. */
+function quoteUnits(array $units): string
 {
     $out = '"';
-    foreach (preg_split('/(\xED[\xA0-\xBF][\x80-\xBF])/', $key, -1, PREG_SPLIT_DELIM_CAPTURE) as $i => $part) {
-        if ($i % 2) {
-            $unit = ((ord($part[0]) & 15) << 12) | ((ord($part[1]) & 63) << 6) | (ord($part[2]) & 63);
-            $out .= sprintf('\\u%04x', $unit);
-        } else {
-            $out .= substr(json_encode($part, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 1, -1);
-        }
+    foreach ($units as $unit) {
+        if (!is_int($unit) || $unit < 0 || $unit > 65535)
+            throw new \InvalidArgumentException('Expected UTF-16 code units');
+        $out .= match ($unit) {
+            34 => '\"', 92 => '\\\\', 8 => '\b', 12 => '\f', 10 => '\n',
+            13 => '\r', 9 => '\t',
+            default => ($unit >= 0x20 && $unit <= 0x7e) ? chr($unit) : sprintf('\u%04x', $unit),
+        };
     }
     return $out . '"';
+}
+
+/** @internal Encode associative array keys, including stored WTF-8 surrogate keys. */
+function quoteKey(string $key): string
+{
+    return quoteUnits(utf8Units($key, true));
 }
 
 /** Immutable JSON value. Objects use insertion-ordered PHP associative arrays. */
@@ -105,8 +158,7 @@ final readonly class Value implements \JsonSerializable, \Stringable
     public function stringValue(): string
     {
         $this->expect('string');
-        try { return json_decode($this->raw(), false, 512, JSON_THROW_ON_ERROR); }
-        catch (\JsonException $e) { throw new \UnexpectedValueException('Unpaired surrogate; use stringUnits()', 0, $e); }
+        return unitsToUtf8($this->units, false);
     }
     public function numberLiteral(): string { $this->expect('number'); return trim($this->raw()); }
     public function booleanValue(): bool { $this->expect('boolean'); return trim($this->raw()) === 'true'; }
@@ -117,7 +169,7 @@ final readonly class Value implements \JsonSerializable, \Stringable
     }
     public static function string(string $text): self
     {
-        return self::parse(json_encode($text, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        return self::parse(quoteUnits(utf8Units($text)));
     }
     public static function fromUnits(array $units): self
     {
