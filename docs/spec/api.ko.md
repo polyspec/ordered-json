@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: e1825a45d7cf76c9d4e2cae402b134e88de29f586f470fcefa985042a63bf192 -->
+<!-- source-sha256: 18fe09943999d56e672b9195743c55a2bb6785177097b07d324dec1ebc089ed4 -->
 # API 계약
 
 [English](api.md)
@@ -39,7 +39,7 @@ JavaScript는 복사된 `Map<string, Value>`를 반환하며 TypeScript에는 `R
 
 Rust는 불변 `OrderedMap` 참조를 반환합니다. `OrderedMap::insert(key, value)`는 문자열 `Value` 키를 받고 교체된 값이 있으면 반환합니다. `iter()`는 등록 순서대로 키와 값의 참조를 반환합니다.
 
-Go는 독립적인 `OrderedMap` 복사본을 반환합니다. `Set(key, value)`는 문자열 `Value` 키를 받으며 `Keys()`는 등록 순서대로 키 값을 반환합니다. `Get`과 `GetUnits`는 값 포인터 또는 nil을 반환합니다. `ParseBytes`는 입력을 복사합니다. `ParseBytesBorrowed`는 명시적인 zero-copy API이며 반환된 값이 살아 있는 동안 호출자는 바이트 슬라이스를 변경하면 안 됩니다.
+Go는 독립적인 `OrderedMap` 복사본을 반환합니다. `Set(key, value)`는 문자열 `Value` 키를 받으며 `Keys()`는 등록 순서대로 키 값을 반환합니다. `Get`과 `GetUnits`는 값 포인터 또는 nil을 반환합니다. `ParseBytes`는 입력을 복사합니다. `ParseBytesBorrowed`는 명시적인 zero-copy API이며 반환된 값이 살아 있는 동안 호출자는 바이트 슬라이스를 변경하면 안 됩니다. `ParseMany(source)`와 `ParseManyWithMaxDepth(source, limit)`는 JSON Lines처럼 공백으로 구분된 JSON 값 시퀀스를 파싱하여 문서마다 루트 값 하나를 반환하며, 잘못된 값이 하나라도 있으면 전체 입력을 거부합니다.
 
 PHP는 `Value` 객체의 연관배열을 반환합니다. 객체 생성자는 해당 연관배열을 받습니다. 키가 없으면 PHP는 null, JavaScript는 undefined, Rust는 `None`, Go는 nil을 반환합니다.
 
