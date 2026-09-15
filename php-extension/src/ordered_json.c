@@ -1,33 +1,10 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-#include "php.h"
+#include "ordered_json_internal.h"
 #include "Zend/zend_exceptions.h"
 #include "ext/standard/info.h"
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
 
 #define ORDERED_JSON_VERSION "0.0.1"
 #define ORDERED_JSON_MAX_DEPTH 256
 
-/* A descriptor is a tape of three integers per value in document order:
- * meta, start and end. meta = kind | flags | link << OJ_LINK_SHIFT. A container
- * links past its subtree; an object key links to the value of its member. */
-#define OJ_OBJECT 1
-#define OJ_ARRAY 2
-#define OJ_STRING 3
-#define OJ_NUMBER 4
-#define OJ_BOOLEAN 5
-#define OJ_NULL 6
-#define OJ_KIND_MASK 7
-/* The value serializes to exactly its source token. */
-#define OJ_COMPACT 8
-/* The string token contains escape sequences. */
-#define OJ_ESCAPED 16
-/* A repeated object key; the first key of that name links to the final value. */
-#define OJ_SKIP 32
-#define OJ_LINK_SHIFT 8
 /* Objects with more members than this detect repeated keys with a hash table. */
 #define OJ_LINEAR_MEMBERS 8
 
@@ -110,12 +87,6 @@ static bool oj_utf8(const unsigned char *s, size_t n, size_t *pos, uint32_t *poi
     *point = cp; *pos += width;
     return true;
 }
-static int oj_hex(int ch) {
-    if (ch >= '0' && ch <= '9') return ch - '0';
-    if (ch >= 'a' && ch <= 'f') return ch - 'a' + 10;
-    if (ch >= 'A' && ch <= 'F') return ch - 'A' + 10;
-    return -1;
-}
 /* Validate a string token, including its UTF-8; flags receive OJ_COMPACT and OJ_ESCAPED as applicable. */
 static bool oj_string(oj_parser *p, zend_long *flags) {
     if (!oj_expect(p, '"', "Expected string")) return false;
@@ -155,72 +126,6 @@ static bool oj_digits(oj_parser *p) {
     if (!oj_digit(oj_peek(p))) return oj_fail(p, "Expected digit");
     while (oj_digit(oj_peek(p))) p->pos++;
     return true;
-}
-
-static size_t oj_put_point(unsigned char *out, size_t n, uint32_t cp) {
-    if (cp < 0x80) out[n++] = (unsigned char)cp;
-    else if (cp < 0x800) {
-        out[n++] = (unsigned char)(0xc0 | (cp >> 6));
-        out[n++] = (unsigned char)(0x80 | (cp & 63));
-    } else if (cp < 0x10000) {
-        out[n++] = (unsigned char)(0xe0 | (cp >> 12));
-        out[n++] = (unsigned char)(0x80 | ((cp >> 6) & 63));
-        out[n++] = (unsigned char)(0x80 | (cp & 63));
-    } else {
-        out[n++] = (unsigned char)(0xf0 | (cp >> 18));
-        out[n++] = (unsigned char)(0x80 | ((cp >> 12) & 63));
-        out[n++] = (unsigned char)(0x80 | ((cp >> 6) & 63));
-        out[n++] = (unsigned char)(0x80 | (cp & 63));
-    }
-    return n;
-}
-/* Decoded key identity of validated string contents: UTF-8, with lone surrogates as WTF-8.
- * The result is never longer than the contents. */
-static size_t oj_decode_name(const unsigned char *s, size_t i, size_t end, unsigned char *out) {
-    size_t n = 0;
-    uint32_t pending = 0;
-    while (i < end) {
-        uint32_t unit;
-        if (s[i] == '\\') {
-            unsigned char escape = s[i + 1];
-            if (escape == 'u') {
-                unit = 0;
-                for (int k = 2; k < 6; k++) unit = (unit << 4) | (uint32_t)oj_hex(s[i + k]);
-                i += 6;
-            } else {
-                switch (escape) {
-                    case 'b': unit = 8; break;
-                    case 'f': unit = 12; break;
-                    case 'n': unit = 10; break;
-                    case 'r': unit = 13; break;
-                    case 't': unit = 9; break;
-                    default: unit = escape;
-                }
-                i += 2;
-            }
-        } else if (s[i] < 0x80) {
-            unit = s[i++];
-        } else {
-            size_t width = s[i] < 0xe0 ? 2 : (s[i] < 0xf0 ? 3 : 4);
-            if (pending) { n = oj_put_point(out, n, pending); pending = 0; }
-            memcpy(out + n, s + i, width);
-            n += width; i += width;
-            continue;
-        }
-        if (pending) {
-            if (unit >= 0xdc00 && unit <= 0xdfff) {
-                n = oj_put_point(out, n, 0x10000 + ((pending - 0xd800) << 10) + (unit - 0xdc00));
-                pending = 0;
-                continue;
-            }
-            n = oj_put_point(out, n, pending);
-            pending = 0;
-        }
-        if (unit >= 0xd800 && unit <= 0xdbff) pending = unit;
-        else n = oj_put_point(out, n, unit);
-    }
-    if (pending) n = oj_put_point(out, n, pending);
-    return n;
 }
 
 static void oj_members_free(oj_members *m) {
@@ -404,13 +309,6 @@ fail:;
     return false;
 }
 
-/* A read-only view of a tape held either in C memory or in a PHP array. */
-typedef struct {
-    const zend_long *slots;
-    HashTable *array;
-    size_t count;
-} oj_tape;
-
 typedef struct {
     const char *source;
     size_t source_length;
@@ -418,17 +316,6 @@ typedef struct {
     size_t length, capacity;
 } oj_writer;
 
-static bool oj_slot(const oj_tape *t, size_t index, zend_long *value) {
-    if (index >= t->count) return false;
-    if (t->slots) {
-        *value = t->slots[index];
-        return true;
-    }
-    zval *slot = zend_hash_index_find(t->array, index);
-    if (!slot || Z_TYPE_P(slot) != IS_LONG) return false;
-    *value = Z_LVAL_P(slot);
-    return true;
-}
 static bool oj_write_token(oj_writer *w, zend_long start, zend_long end) {
     if (start < 0 || end <= start || (zend_ulong)end > w->source_length || (size_t)(end - start) > w->capacity - w->length) return false;
     memcpy(w->out + w->length, w->source + start, (size_t)(end - start));
@@ -495,6 +382,11 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ordered_json_scan, 0, 1, IS_ARRA
     ZEND_ARG_TYPE_INFO(0, source, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, maxDepth, IS_LONG, 0, "256")
 ZEND_END_ARG_INFO()
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ordered_json_hydrate, 0, 3, IS_ARRAY, 0)
+    ZEND_ARG_TYPE_INFO(0, source, IS_STRING, 0)
+    ZEND_ARG_TYPE_INFO(0, node, IS_ARRAY, 0)
+    ZEND_ARG_TYPE_INFO(0, index, IS_LONG, 0)
+ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ordered_json_compact_node, 0, 2, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, source, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, node, IS_ARRAY, 0)
@@ -546,6 +438,7 @@ PHP_FUNCTION(ordered_json_compact_node) {
 
 static const zend_function_entry ordered_json_functions[] = {
     PHP_FE(ordered_json_scan, arginfo_ordered_json_scan)
+    PHP_FE(ordered_json_hydrate, arginfo_ordered_json_hydrate)
     PHP_FE(ordered_json_compact_node, arginfo_ordered_json_compact_node)
     PHP_FE_END
 };
@@ -566,8 +459,9 @@ PHP_MINFO_FUNCTION(ordered_json) {
 zend_module_entry ordered_json_module_entry = {
     STANDARD_MODULE_HEADER,
     "ordered_json", ordered_json_functions,
-    PHP_MINIT(ordered_json), NULL, NULL, NULL, PHP_MINFO(ordered_json),
-    ORDERED_JSON_VERSION, STANDARD_MODULE_PROPERTIES
+    PHP_MINIT(ordered_json), NULL, NULL, PHP_RSHUTDOWN(ordered_json), PHP_MINFO(ordered_json),
+    ORDERED_JSON_VERSION, PHP_MODULE_GLOBALS(ordered_json), PHP_GINIT(ordered_json), NULL, NULL,
+    STANDARD_MODULE_PROPERTIES_EX
 };
 #ifdef COMPILE_DL_ORDERED_JSON
 #ifdef ZTS
