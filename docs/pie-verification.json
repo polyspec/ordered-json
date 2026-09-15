@@ -2,19 +2,19 @@
   "schema_version": 1,
   "scope": "pie-build",
   "status": "passed",
-  "checked_at": "2026-09-15T15:51:54+00:00",
+  "checked_at": "2026-09-15T17:26:07+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "3d95d6cbcc8ce8ee4797a554d0406ecdf7f5eb96acbd36e992fa7b232498aca6",
+    "sha256": "aac4808bd2d1365b42277adc2ccd1db67fe1fb7ad2d03b5d796f4f248705db02",
     "files": {
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "72246495efbec08ab1c4b4086db12babd37d3c98dfa3c2b33645137c8da86cc8",
       "AGENTS.md": "6c41691419dacdc2114d1087a3193cb6e04f25b552a147723cc2db5541535982",
-      "CHANGELOG.ko.md": "aebcddd9fdc2a2381509c997c81aba561564e5556b88575cde0f2be4f21e8ab4",
-      "CHANGELOG.md": "9c3ad078f96025499bd860dc2c47547e91ee288bfcf4a0b8b326f99226015648",
+      "CHANGELOG.ko.md": "1ed6e7bdf9e7a44e63d60dd4535163e05aac9fe632166247afce7d37e17dcdea",
+      "CHANGELOG.md": "c445f117676b621d1702cfcdef0d3a4fb95c9a622760a730a8b5c231bbcf46db",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
       "README.md": "8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75",
@@ -47,8 +47,8 @@
       "docs/reports/ojson-comparison.json": "4f6bc37d9fba4be253b8b11c3a813eec52d53d139ee202ca9693d8a17ecb5ba2",
       "docs/reports/ojson-comparison.ko.md": "4a8fdd346be00b60b020b79ea9cbd38fa6f73b7c9b468465361664e884b8cc7a",
       "docs/reports/ojson-comparison.md": "f51637e54cbf5e4fb650608261647ff4c7c508cb6e867c8d72f9a44db0a95373",
-      "docs/spec/api.ko.md": "c2b68ea0057de1848511e2b0424ff7d7856f877b00290fa215bcb09efc4c3032",
-      "docs/spec/api.md": "37268268e74298454fe4063251d056f89b088c96dcd3402c9f3c8d11a9f2faed",
+      "docs/spec/api.ko.md": "5f7edf967534129f755a0b6a6319eab05bd3e0d81942276b033f0697df27b3f5",
+      "docs/spec/api.md": "21592b9b5747d851ce91520375165bb4961d8a2bb9180572a6b1b4b316debd6d",
       "docs/spec/json-contract.ko.md": "f6cad701fed404d7a8eb091eb86013ea04b0f01b10574a109c219da3dab30d63",
       "docs/spec/json-contract.md": "0f6e76611fff775c3a8c1aee128bfd345deba9d1dca442c2c05a2f2a986bfe27",
       "docs/spec/repositories.ko.md": "ec6b5e5686719dafa0404ddc36a00e74ea3539dfef742b61bbbd565d20ad9078",
@@ -184,29 +184,31 @@
       "php-extension/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "php-extension/AGENTS.ko.md": "8d649fcf0107c94fd0c5fbcefd719f5b34456f4fe98c7fa642dd793795fcc4e4",
       "php-extension/AGENTS.md": "07e4557cb5ec412b34e6a8bcc3e9dd5fd0ddb12bc1a52734abf203a7873c3560",
-      "php-extension/CHANGELOG.ko.md": "80fb7cd03bc9d3b930e53c7fbbd46ed60a1fd3a3abd9bb11d9e23fbffe126f9e",
-      "php-extension/CHANGELOG.md": "562aa1349dffe575650a4ae21df5d0931a13c33958f28c4bdf289cdda7663df3",
+      "php-extension/CHANGELOG.ko.md": "235c99e0fbf5af5ac0f74fbf82aafb322ec1c4986c9ce1beb249e7cf6787ab16",
+      "php-extension/CHANGELOG.md": "0c52b0d4b4eee90589fa426f0f7ca0a9f1b022cde7e2092ea55744f837593781",
       "php-extension/Makefile": "06d845ea5afb41f4532244be8c8e41bd86206cf9e9286f2144222c4335d80537",
       "php-extension/README.ko.md": "f6a8b6c10aa5f226e83e486f47c170e26d5d7d34b65373540d44abf63896048d",
       "php-extension/README.md": "9bf343fe78ed79371309fa3e7b41e5375ef20276cee53bbabb3ac82d3e73d748",
       "php-extension/composer.json": "1571c88e25b8302aff403e634abc6ebad100dac1df248ec2b0c0d81ceb37684c",
       "php-extension/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
       "php-extension/src/.gitignore": "a24cea86ccd06d6df27abe4079219b2c4f7b39a83718f7704b36d4e83121b71b",
-      "php-extension/src/config.m4": "1039ac44901bf34856402852b5996ec509ae2883ba83960b455005d8248ba5ed",
-      "php-extension/src/config.w32": "52f65b0c0ab32af3bac72f4c1265fac1fd475c52cdd74ae49a54b3fc337e7cf9",
-      "php-extension/src/ordered_json.c": "808bcef0335656f49d257e7d0875f20c5648dd0bbf0472be1cc39d32c5cd510f",
-      "php-extension/src/ordered_json.stub.php": "f2f309e5d74d354ff2462682529f8a41ef85c1b4183e3078cf5a092245b22091",
+      "php-extension/src/config.m4": "e0cb66d6c14d72535ee7731f57e83acb7c73036e380ad15d2f4c71322c0f32f9",
+      "php-extension/src/config.w32": "9ce035ae47c0a0968cc50bafb646e2dfb2287c2bc65e03635a335c61c8465849",
+      "php-extension/src/hydrate.c": "0980c03e6cb2be81dac983b8014228db06311f9c4f916b9160691c317c7c6dbd",
+      "php-extension/src/ordered_json.c": "579ab89623db4bfb098ac257a60a30b086dee98fd2477cf67cdf7d8dbc843639",
+      "php-extension/src/ordered_json.stub.php": "dcc832e762ee6a0f876b76e4f7bcc5739652cdbfec156857f703cdee89f72d22",
+      "php-extension/src/ordered_json_internal.h": "e589b7227bff28f413e5a6b90c16f7862467d86315a788ce5515c66edd48c479",
       "php/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "php/AGENTS.ko.md": "8d649fcf0107c94fd0c5fbcefd719f5b34456f4fe98c7fa642dd793795fcc4e4",
       "php/AGENTS.md": "07e4557cb5ec412b34e6a8bcc3e9dd5fd0ddb12bc1a52734abf203a7873c3560",
-      "php/CHANGELOG.ko.md": "7c866d3ad94f39c1514a559a9f26b8ead4c828a40531f5a50bce578309a13b7b",
-      "php/CHANGELOG.md": "eec86202430fd2c042fa27e1f97570f5c3f48e55ba089eb2e5da88555eb560fb",
+      "php/CHANGELOG.ko.md": "8ad693342672187855b01612bb8ed35db5fc2d5bb1c5cd52743cbcc6829aa1ef",
+      "php/CHANGELOG.md": "09382b8addd043c8d0086052a17d5b79821ca9129c7e008869ce6c9e53ebb895",
       "php/Makefile": "772a643f13be6c3cc91c2f2d961dd526d5307db5c130abac43fc407f1d21a30c",
       "php/README.ko.md": "28bdaf10ec369152722ee3e339cd4a2d1f7814aedbd7805328f039fb46c441ef",
       "php/README.md": "87c9d68421281d8dd5d5443dedd66039af459fb28afbbdd78e81958ce825fe26",
       "php/composer.json": "25853cd81a924cb7966c61b7ddfd412bbfde9dac10bc7d978379a2591e663370",
       "php/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
-      "php/src/OrderedJson.php": "7ca902d7e6a42240d11f052c8d60dcccea2ba5f0613c2fcf858574da29e0ba9c",
+      "php/src/OrderedJson.php": "1ef2cbe8bfd934f06c7e8c582738c6e62215fcf1a5975a78ccee5aa7075d753f",
       "php/tests/probe.php": "ca18015b946b6142f4a3080e5f4c415af080cff14454a26b1c2cb4e1df1a9228",
       "rust/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "rust/AGENTS.ko.md": "8d649fcf0107c94fd0c5fbcefd719f5b34456f4fe98c7fa642dd793795fcc4e4",
@@ -255,13 +257,13 @@
     },
     "php": {
       "path": "php",
-      "sha256": "5bd1b678d69d258d8cf184bc8864d1968560a23664cf9c976a5e8b2468106462",
+      "sha256": "c8c12565f9c864ce918ecf573ee2b96e21514f1242a953deb04d8e1d626ca3fb",
       "files": 12
     },
     "php-extension": {
       "path": "php-extension",
-      "sha256": "a9f23b3f6bec1586291511af9e8cbbd60395e1e842400ea3a8309d17219fe321",
-      "files": 15
+      "sha256": "12b0461feedfe0aa0d8aa5f3abc036d57bf5ab21ba0d2d44888a3872301364f0",
+      "files": 17
     }
   },
   "pie": {
@@ -305,7 +307,7 @@
   "build_warnings": [],
   "artifact": {
     "path": "php-extension/src/modules/ordered_json.so",
-    "sha256": "bf9b657c1580e76d91a5d0021153ee85ba9be47ca84adbcd179d592ebf510f72"
+    "sha256": "0ca0572a15010a73d7a6864ed91571cf1e70b9b60cdddbe43965280b46223a5e"
   },
   "cases": {
     "official": 17,
