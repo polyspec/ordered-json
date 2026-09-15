@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Reduced parser allocations: each value stores a kind-specific payload instead of an empty map, item vector, and unit vector; string units are decoded on first access; objects keep one entry list and build a hash index above eight members; values without insignificant whitespace or duplicate keys compact by copying their source token. Results, errors, and offsets are unchanged. The derived `Debug` output of `Value` and `OrderedMap` reflects the new internal fields.
 - Established an independent Rust repository with the existing implementation history.
 - Added standalone checks using the shared verifier at an explicit commit and the current candidate source.
 - Added English and Korean usage, development, and change records.

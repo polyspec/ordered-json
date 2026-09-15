@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Reduced parser allocations: values are allocated in chunks sized from document separators, string units are decoded on access, objects with up to eight members use linear key lookup, and values without insignificant whitespace or duplicate keys compact by copying their source token. Text returned by `Compact` and `StringValue` for `ParseBytesBorrowed` input is copied. Results, errors, and offsets are unchanged.
 - Established an independent Go repository with the existing implementation history.
 - Added standalone checks using the shared verifier at an explicit commit and the current candidate source.
 - Added English and Korean usage, development, and change records.
