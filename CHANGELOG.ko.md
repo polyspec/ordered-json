@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 0c0603fb95e32dc2c89597940f56714433afa7c966ed96bd93256463d6c03933 -->
+<!-- source-sha256: e579700626a2934332afe6227a708e6920aea6220c72311419637b5f6d7ff6ee -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,7 +7,6 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
-- JSON Lines처럼 공백으로 구분된 JSON 값 시퀀스를 위한 Go `ParseMany`와 `ParseManyWithMaxDepth`를 추가했습니다.
 - 결과, 오류, 오프셋을 바꾸지 않고 모든 구현에서 값마다 수행하던 파싱과 직렬화 작업을 줄였습니다. JavaScript는 `WeakSet` 등록 대신 private field brand로 값을 검사하고, escape가 없는 문자열을 원문에서 잘라 쓰며, 객체 키 토큰을 조회할 때 생성합니다. Go는 값을 묶음 단위로 할당하고 문자열 UTF-16 단위를 조회할 때 해석합니다. Rust는 값마다 빈 해시 맵, 항목 벡터, 단위 벡터를 두는 대신 종류별 payload를 저장합니다. PHP 라이브러리와 확장은 정수 디스크립터 테이프를 사용하며 확장은 별도 선검증 대신 문자열을 검사하면서 UTF-8을 검증합니다. 무의미한 공백과 중복 키가 없는 값은 원문 토큰을 복사하여 직렬화합니다. 이전 구현과 파싱 결과, 오류, 오프셋, 조회 API, 생성 API, 직렬화를 비교하는 차등 테스트를 수행했습니다. PHP 디스크립터 형식은 [API 계약](docs/spec/api.ko.md#php)에 설명합니다.
 - 벤치마크가 Rust release 빌드, 고정 workload 입력 digest, 반복 샘플, median/p95 통계, 실행 환경 fingerprint, 커밋된 결과를 사용하도록 수정했습니다.
 - 비교 가능한 실행이 허용오차를 초과할 때 커밋된 벤치마크 기준을 보존하고 실패한 측정값을 검토용으로 별도 기록하도록 수정했습니다.
