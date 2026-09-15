@@ -569,6 +569,14 @@ impl Parser<'_> {
                 let unchanged = (self.whitespace, self.duplicates) == (whitespace, duplicates);
                 let node = if object {
                     Node::Object(members)
+                } else if depth == 0 {
+                    // The root array is the last user of the pending item stack, so it takes the
+                    // stack instead of copying every item; large spare capacity is released.
+                    let mut items = std::mem::take(&mut self.items);
+                    if items.capacity() - items.len() > items.len() / 4 {
+                        items.shrink_to_fit();
+                    }
+                    Node::Array(items)
                 } else {
                     Node::Array(self.items.drain(base..).collect())
                 };

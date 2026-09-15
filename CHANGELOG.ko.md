@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 279e56ae8c9f5e863abe0c48f27d3233626e8d6af59fc2e73ab6039e4c277caa -->
+<!-- source-sha256: 9c3ad078f96025499bd860dc2c47547e91ee288bfcf4a0b8b326f99226015648 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- Rust 루트 배열은 모든 항목을 복사하지 않고 파서의 대기 항목 스택을 그대로 사용하며, 길이의 1/4을 넘는 여유 용량은 해제합니다. 숫자 90개와 110,000개로 된 루트 배열의 파싱 시간은 이전의 0.84~0.85였고 결과는 같습니다.
 - PHP 값 조회 비용을 줄였습니다. 조회 함수는 보조 메서드를 연쇄 호출하지 않고 디스크립터 테이프를 직접 읽고, 자식 값은 생성자 승격 없이 만들며, escape 문자열은 중간 UTF-16 단위 배열 없이 UTF-8로 해석합니다. 파싱 후 전체 조회 시간은 확장 사용 시 이전의 0.43~0.89, 순수 PHP에서 0.60~0.97이었고 결과는 같습니다.
 - JavaScript `Value` 객체를 파싱 중에 freeze하지 않도록 변경했습니다. 값의 상태는 private field에 있으므로 여전히 라이브러리 API로 변경할 수 없으며, 반환하는 항목 배열과 키 배열은 계속 freeze합니다. API 계약에 이 보장을 명시했습니다.
 - PHP `useNative` 파싱 옵션, `parseNative()`, 사용하지 않는 PHP `stringify()` compact 인자, 사용하지 않는 JavaScript `stringify()` options 인자, 네이티브 `ordered_json_compact()` 함수를 제거했습니다. PHP는 확장이 로드돼 있으면 확장을, 그렇지 않으면 순수 구현을 사용합니다.
