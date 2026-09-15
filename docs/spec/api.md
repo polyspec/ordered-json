@@ -10,7 +10,7 @@ The project and package name is `ordered-json`. Rust imports use `ordered_json`.
 <a id="values"></a>
 ## Values and parsing
 
-Parsed `Value` objects are immutable. Factories construct strings, number tokens, booleans, null, arrays, and objects. Factories validate constructed JSON through the library parser. Wrong-kind access returns absence or an error, depending on the accessor; invalid factory arguments produce language-specific errors. Core parsers and serializers do not delegate JSON behavior to host JSON APIs.
+Parsed `Value` objects cannot be modified through the library API. Factories construct strings, number tokens, booleans, null, arrays, and objects. Factories validate constructed JSON through the library parser. Wrong-kind access returns absence or an error, depending on the accessor; invalid factory arguments produce language-specific errors. Core parsers and serializers do not delegate JSON behavior to host JSON APIs.
 
 | Operation | JavaScript | Rust | Go | PHP |
 | --- | --- | --- | --- | --- |

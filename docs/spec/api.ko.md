@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 4b9711ea0ceacd7f593046fb818154fbc9707507e61e9be38896732de14ba572 -->
+<!-- source-sha256: 37268268e74298454fe4063251d056f89b088c96dcd3402c9f3c8d11a9f2faed -->
 # API 계약
 
 [English](api.md)
@@ -11,7 +11,7 @@
 <a id="values"></a>
 ## 값과 파싱
 
-파싱된 `Value` 객체는 불변입니다. 생성자는 문자열, 숫자 토큰, 불리언, null, 배열, 객체를 생성합니다. 생성자는 라이브러리 parser를 통해 값을 검사합니다. 종류가 맞지 않는 접근은 접근자에 따라 값 없음 또는 오류를 반환하며 잘못된 생성 인자는 언어별 오류를 발생시킵니다. 핵심 parser와 serializer는 JSON 동작을 host JSON API에 위임하지 않습니다.
+파싱된 `Value` 객체는 라이브러리 API로 변경할 수 없습니다. 생성자는 문자열, 숫자 토큰, 불리언, null, 배열, 객체를 생성합니다. 생성자는 라이브러리 parser를 통해 값을 검사합니다. 종류가 맞지 않는 접근은 접근자에 따라 값 없음 또는 오류를 반환하며 잘못된 생성 인자는 언어별 오류를 발생시킵니다. 핵심 parser와 serializer는 JSON 동작을 host JSON API에 위임하지 않습니다.
 
 | 동작 | JavaScript | Rust | Go | PHP |
 | --- | --- | --- | --- | --- |
