@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 9e41a8b7921bd770671f15e40e99a9a93f91685d4e68b7e95d421ffdd4ebaf57 -->
+<!-- source-sha256: 9d2468776ca478417bf8e4506039dc05e48802c549fafa849a5c5f73ed179b2b -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 결과, 오류, 오프셋을 바꾸지 않고 모든 구현에서 값마다 수행하던 파싱과 직렬화 작업을 줄였습니다. JavaScript는 `WeakSet` 등록 대신 private field brand로 값을 검사하고, escape가 없는 문자열을 원문에서 잘라 쓰며, 객체 키 토큰을 조회할 때 생성합니다. Go는 값을 묶음 단위로 할당하고 문자열 UTF-16 단위를 조회할 때 해석합니다. Rust는 값마다 빈 해시 맵, 항목 벡터, 단위 벡터를 두는 대신 종류별 payload를 저장합니다. PHP 라이브러리와 확장은 정수 디스크립터 테이프를 사용하며 확장은 별도 선검증 대신 문자열을 검사하면서 UTF-8을 검증합니다. 무의미한 공백과 중복 키가 없는 값은 원문 토큰을 복사하여 직렬화합니다. 이전 구현과 파싱 결과, 오류, 오프셋, 조회 API, 생성 API, 직렬화를 비교하는 차등 테스트를 수행했습니다. PHP 디스크립터 형식은 [API 계약](docs/spec/api.ko.md#php)에 설명합니다.
 - 네이티브 macOS 배포 대상과 번들 설정을 수정하여 오래된 `-single_module` 및 `-undefined suppress` 링커 경고를 해결했습니다.
 - 같은 공통 JSON 사례로 PIE 산출물을 검사하고 PHP 버전과 확장 버전을 별도로 기록하도록 추가했습니다.
 - Go 모듈을 `github.com/polyspec/ordered-json/go`로 변경했습니다.
@@ -17,6 +18,7 @@
 - 런타임 네이티브 JSON API와 비교하는 재현 가능한 다언어 성능 벤치마크를 추가했습니다.
 - 고정 workload manifest와 엄격한 벤치마크 행·입력 크기·출력 크기 검사를 추가했습니다.
 - PHP 네이티브 확장의 직렬화 중 재파싱을 제거하고 Go와 Rust 구현의 반복 순서 맵 조회를 줄였습니다.
+- JavaScript 직렬화와 유니코드 escape 파싱을 최적화하고 PHP 디스크립터 자식 값 생성을 지연했습니다. Rust 직렬화의 불필요한 캐시 할당을 제거하고 명시적인 zero-copy Go `ParseBytesBorrowed` API를 추가했습니다.
 - 미릴리스 패키지와 확장 버전을 `0.0.1`로 설정했으며 릴리스나 자동화는 구성하지 않았습니다.
 
 - 언어별 패키지, 네임스페이스, 가져오기, 네이티브 심볼, 빌드 출력을 [API 계약](docs/spec/api.ko.md)의 ordered-json 식별자로 변경했습니다.
