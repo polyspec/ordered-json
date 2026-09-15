@@ -274,6 +274,10 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ordered_json_compact, 0, 1, IS_S
     ZEND_ARG_TYPE_INFO(0, source, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, maxDepth, IS_LONG, 0, "256")
 ZEND_END_ARG_INFO()
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ordered_json_compact_node, 0, 2, IS_STRING, 0)
+    ZEND_ARG_TYPE_INFO(0, source, IS_STRING, 0)
+    ZEND_ARG_TYPE_INFO(0, node, IS_ARRAY, 0)
+ZEND_END_ARG_INFO()
 
 PHP_FUNCTION(ordered_json_scan) {
     zend_string *source;
@@ -343,9 +347,24 @@ PHP_FUNCTION(ordered_json_compact) {
     RETURN_STR(out);
 }
 
+PHP_FUNCTION(ordered_json_compact_node) {
+    zend_string *source;
+    zval *node;
+    ZEND_PARSE_PARAMETERS_START(2, 2)
+        Z_PARAM_STR(source)
+        Z_PARAM_ARRAY(node)
+    ZEND_PARSE_PARAMETERS_END();
+    zend_string *out = zend_string_alloc(ZSTR_LEN(source), 0);
+    size_t length = 0;
+    oj_render(source, node, ZSTR_VAL(out), &length);
+    ZSTR_VAL(out)[length] = '\0'; ZSTR_LEN(out) = length;
+    RETURN_STR(out);
+}
+
 static const zend_function_entry ordered_json_functions[] = {
     PHP_FE(ordered_json_scan, arginfo_ordered_json_scan)
     PHP_FE(ordered_json_compact, arginfo_ordered_json_compact)
+    PHP_FE(ordered_json_compact_node, arginfo_ordered_json_compact_node)
     PHP_FE_END
 };
 PHP_MINIT_FUNCTION(ordered_json) {
