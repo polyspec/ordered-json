@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-15T17:26:14+00:00",
+  "checked_at": "2026-09-15T18:23:21+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "aac4808bd2d1365b42277adc2ccd1db67fe1fb7ad2d03b5d796f4f248705db02",
+    "sha256": "0f7225522e9add35ffe2a7c2425045a0dcb91efa7120de44a1288d73fbf70bc8",
     "files": {
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "72246495efbec08ab1c4b4086db12babd37d3c98dfa3c2b33645137c8da86cc8",
       "AGENTS.md": "6c41691419dacdc2114d1087a3193cb6e04f25b552a147723cc2db5541535982",
-      "CHANGELOG.ko.md": "1ed6e7bdf9e7a44e63d60dd4535163e05aac9fe632166247afce7d37e17dcdea",
-      "CHANGELOG.md": "c445f117676b621d1702cfcdef0d3a4fb95c9a622760a730a8b5c231bbcf46db",
+      "CHANGELOG.ko.md": "402530a4782fba558bbef5447068012a16f937c0b0a75f6bd4be40ab2d7e04ca",
+      "CHANGELOG.md": "2c510f51978c71e2ea8f839903c877130911ac3ac7b1b674ef20fe7f232aac19",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
       "README.md": "8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75",
@@ -200,14 +200,14 @@
       "php/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "php/AGENTS.ko.md": "8d649fcf0107c94fd0c5fbcefd719f5b34456f4fe98c7fa642dd793795fcc4e4",
       "php/AGENTS.md": "07e4557cb5ec412b34e6a8bcc3e9dd5fd0ddb12bc1a52734abf203a7873c3560",
-      "php/CHANGELOG.ko.md": "8ad693342672187855b01612bb8ed35db5fc2d5bb1c5cd52743cbcc6829aa1ef",
-      "php/CHANGELOG.md": "09382b8addd043c8d0086052a17d5b79821ca9129c7e008869ce6c9e53ebb895",
+      "php/CHANGELOG.ko.md": "269e2d286a629146c819e397f345e0f4e5b0e13a574a2655078a6101b7934987",
+      "php/CHANGELOG.md": "afd52a5269b6a8effeebaa2bf4180e11f14478d86f5f2ee665a8e86e06b6001d",
       "php/Makefile": "772a643f13be6c3cc91c2f2d961dd526d5307db5c130abac43fc407f1d21a30c",
       "php/README.ko.md": "28bdaf10ec369152722ee3e339cd4a2d1f7814aedbd7805328f039fb46c441ef",
       "php/README.md": "87c9d68421281d8dd5d5443dedd66039af459fb28afbbdd78e81958ce825fe26",
       "php/composer.json": "25853cd81a924cb7966c61b7ddfd412bbfde9dac10bc7d978379a2591e663370",
       "php/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
-      "php/src/OrderedJson.php": "1ef2cbe8bfd934f06c7e8c582738c6e62215fcf1a5975a78ccee5aa7075d753f",
+      "php/src/OrderedJson.php": "ded9eacec8f9de87ea3734f7618094a0c55dac65ae63d78bf35876628dec8abe",
       "php/tests/probe.php": "ca18015b946b6142f4a3080e5f4c415af080cff14454a26b1c2cb4e1df1a9228",
       "rust/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "rust/AGENTS.ko.md": "8d649fcf0107c94fd0c5fbcefd719f5b34456f4fe98c7fa642dd793795fcc4e4",
@@ -311,7 +311,7 @@
     },
     "php": {
       "path": "php",
-      "sha256": "c8c12565f9c864ce918ecf573ee2b96e21514f1242a953deb04d8e1d626ca3fb",
+      "sha256": "dbe3402cb741f45c681a11930927106e04549d15a1d183edcd455c3110f4db66",
       "files": 12
     },
     "php-extension": {
