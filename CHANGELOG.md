@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Stopped freezing JavaScript `Value` objects during parsing. Values still cannot be modified through the library API because their state is held in private fields; returned item and key arrays remain frozen. The API contract now states this guarantee.
 - Removed the PHP `useNative` parse option, `parseNative()`, the unused PHP `stringify()` compact flag, the unused JavaScript `stringify()` options argument, and the native `ordered_json_compact()` function. PHP uses the extension when it is loaded and the pure implementation otherwise.
 - Fixed pure PHP UTF-8 validation that rejected valid input under very low PCRE backtrack or recursion limits, and reduced pure PHP parser overhead by passing offsets through local variables.
 - Documented running `make pie-check` before `make check` after source changes, because the documentation check rejects a stale PIE record.
