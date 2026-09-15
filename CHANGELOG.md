@@ -16,6 +16,7 @@
 - Separated PHP extension sources into `php-extension/src` and added PIE package metadata with a default-enabled standalone build.
 - Removed host JSON parser and serializer dependencies from core value construction and string handling, and added shared repeated round-trip verification across all implementations.
 - Added reproducible cross-language performance benchmarks against runtime-native JSON APIs.
+- Set the unreleased package and extension version to `0.0.1`; no release or automation is configured.
 
 - Renamed language packages, namespaces, imports, native symbols, and build outputs to the ordered-json identifiers in the [API contract](docs/spec/api.md).
 - Added English canonical documents and paired Korean translations for specifications, APIs, feature state, operations, examples, and development procedure.

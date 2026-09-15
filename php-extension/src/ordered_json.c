@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define ORDERED_JSON_VERSION "0.1.0"
+#define ORDERED_JSON_VERSION "0.0.1"
 #define ORDERED_JSON_MAX_DEPTH 256
 
 typedef struct {

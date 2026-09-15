@@ -1,6 +1,6 @@
 {
   "name": "ordered-json",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Strict JSON with insertion-ordered associative objects and exact number preservation",
   "type": "module",
   "exports": {
