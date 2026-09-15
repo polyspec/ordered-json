@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 6044c1fda9c0240b2d8c50d20fdb906d2b6cb41d35a6d3cb491cef250d629330 -->
+<!-- source-sha256: 823fcd3357d70f9fa67d7d9bca638d84b068c840eaad267217130818350a90e4 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -18,6 +18,7 @@
 - 핵심 값 생성과 문자열 처리에서 host JSON parser와 serializer 의존성을 제거하고 모든 구현에 공통 반복 round-trip 검증을 추가했습니다.
 - 런타임 네이티브 JSON API와 비교하는 재현 가능한 다언어 성능 벤치마크를 추가했습니다.
 - 고정 workload manifest와 엄격한 벤치마크 행·입력 크기·출력 크기 검사를 추가했습니다.
+- PHP 네이티브 확장의 직렬화 중 재파싱을 제거하고 Go와 Rust 구현의 반복 순서 맵 조회를 줄였습니다.
 - 미릴리스 패키지와 확장 버전을 `0.0.1`로 설정했으며 릴리스나 자동화는 구성하지 않았습니다.
 
 - 언어별 패키지, 네임스페이스, 가져오기, 네이티브 심볼, 빌드 출력을 [API 계약](docs/spec/api.ko.md)의 ordered-json 식별자로 변경했습니다.

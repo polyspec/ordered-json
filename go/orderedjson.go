@@ -35,8 +35,9 @@ type OrderedMap struct {
 }
 
 type orderedMapState struct {
-	keys   []*Value
-	values map[string]*Value
+	keys    []*Value
+	values  []*Value
+	indices map[string]int
 }
 
 // unitsKey is a lossless identity for decoded JSON keys, including lone surrogates.
@@ -55,20 +56,27 @@ func (m *OrderedMap) Set(key, value *Value) error {
 		return fmt.Errorf("expected orderedjson Value")
 	}
 	if m.state == nil {
-		m.state = &orderedMapState{values: make(map[string]*Value)}
+		m.state = &orderedMapState{indices: make(map[string]int)}
 	}
 	name := unitsKey(key.units)
-	if _, exists := m.state.values[name]; !exists {
-		m.state.keys = append(m.state.keys, key)
+	if index, exists := m.state.indices[name]; exists {
+		m.state.values[index] = value
+		return nil
 	}
-	m.state.values[name] = value
+	m.state.keys = append(m.state.keys, key)
+	m.state.values = append(m.state.values, value)
+	m.state.indices[name] = len(m.state.values) - 1
 	return nil
 }
 func (m *OrderedMap) GetUnits(key []uint16) *Value {
 	if m.state == nil {
 		return nil
 	}
-	return m.state.values[unitsKey(key)]
+	index, ok := m.state.indices[unitsKey(key)]
+	if !ok {
+		return nil
+	}
+	return m.state.values[index]
 }
 func (m *OrderedMap) Get(key string) *Value {
 	if !utf8.ValidString(key) {
@@ -82,6 +90,12 @@ func (m *OrderedMap) orderedKeys() []*Value {
 	}
 	return m.state.keys
 }
+func (m *OrderedMap) orderedValues() []*Value {
+	if m.state == nil {
+		return nil
+	}
+	return m.state.values
+}
 func (m *OrderedMap) Keys() []*Value { return append([]*Value{}, m.orderedKeys()...) }
 func (m *OrderedMap) Len() int       { return len(m.orderedKeys()) }
 func (m *OrderedMap) clone() *OrderedMap {
@@ -89,9 +103,9 @@ func (m *OrderedMap) clone() *OrderedMap {
 	if m.state == nil {
 		return out
 	}
-	out.state = &orderedMapState{keys: m.Keys(), values: make(map[string]*Value, m.Len())}
-	for key, value := range m.state.values {
-		out.state.values[key] = value
+	out.state = &orderedMapState{keys: m.Keys(), values: append([]*Value{}, m.state.values...), indices: make(map[string]int, m.Len())}
+	for key, index := range m.state.indices {
+		out.state.indices[key] = index
 	}
 	return out
 }
@@ -287,7 +301,7 @@ func (v *Value) writeJSON(out *strings.Builder) {
 			}
 			out.WriteString(strings.TrimSpace(key.Raw()))
 			out.WriteByte(':')
-			v.members.GetUnits(key.units).writeJSON(out)
+			v.members.orderedValues()[i].writeJSON(out)
 		}
 		out.WriteByte('}')
 	case ArrayKind:

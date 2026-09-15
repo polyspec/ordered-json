@@ -34,7 +34,8 @@ pub enum Kind {
 #[derive(Debug, Clone, Default)]
 pub struct OrderedMap {
     keys: Vec<Value>,
-    values: HashMap<Vec<u16>, Value>,
+    ordered_values: Vec<Value>,
+    indices: HashMap<Vec<u16>, usize>,
 }
 impl OrderedMap {
     pub fn new() -> Self {
@@ -44,25 +45,34 @@ impl OrderedMap {
         if key.kind != Kind::String {
             return Err(error("object key must be a string"));
         }
-        if !self.values.contains_key(&key.units) {
-            self.keys.push(key.clone());
+        if let Some(&index) = self.indices.get(&key.units) {
+            return Ok(Some(std::mem::replace(
+                &mut self.ordered_values[index],
+                value,
+            )));
         }
-        Ok(self.values.insert(key.units, value))
+        let index = self.keys.len();
+        self.indices.insert(key.units.clone(), index);
+        self.keys.push(key.clone());
+        self.ordered_values.push(value);
+        Ok(None)
     }
     pub fn get(&self, key: &str) -> Option<&Value> {
         self.get_units(&key.encode_utf16().collect::<Vec<_>>())
     }
     pub fn get_units(&self, key: &[u16]) -> Option<&Value> {
-        self.values.get(key)
+        self.indices
+            .get(key)
+            .and_then(|&index| self.ordered_values.get(index))
     }
     pub fn iter(&self) -> impl DoubleEndedIterator<Item = (&Value, &Value)> {
-        self.keys.iter().map(|key| (key, &self.values[&key.units]))
+        self.keys.iter().zip(self.ordered_values.iter())
     }
     pub fn len(&self) -> usize {
-        self.values.len()
+        self.ordered_values.len()
     }
     pub fn is_empty(&self) -> bool {
-        self.values.is_empty()
+        self.ordered_values.is_empty()
     }
 }
 

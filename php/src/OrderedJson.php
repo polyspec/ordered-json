@@ -113,6 +113,7 @@ final readonly class Value implements \JsonSerializable, \Stringable
         private array $items = [],
         private array $units = [],
         private array $keys = [],
+        private array $node = [],
     ) {}
 
     public static function parse(string $source, int $maxDepth = MAX_DEPTH, bool $useNative = true): self
@@ -140,7 +141,7 @@ final readonly class Value implements \JsonSerializable, \Stringable
         $items = [];
         foreach ($node['items'] ?? [] as $item) $items[] = self::hydrate($source, $item);
         return new self($source, $node['start'], $node['end'], $node['kind'],
-            $members, $items, $node['units'] ?? [], $keys);
+            $members, $items, $node['units'] ?? [], $keys, $node);
     }
 
     public function kind(): string { return $this->kind; }
@@ -207,7 +208,7 @@ final readonly class Value implements \JsonSerializable, \Stringable
     }
     public function compact(): string
     {
-        if (\extension_loaded('ordered_json')) return \ordered_json_compact($this->raw());
+        if (\extension_loaded('ordered_json')) return \ordered_json_compact_node($this->source, $this->node);
         if ($this->kind === 'object') {
             $parts = [];
             foreach ($this->members as $key => $value)
