@@ -43,7 +43,7 @@ For an independent clone:
 
 ~~~sh
 git clone https://github.com/polyspec/ordered-json.git
-cd php-extension
+cd ordered-json
 make check
 ~~~
 

@@ -8,9 +8,9 @@ Strict JSON with associative objects that preserve document key order recursivel
 <a id="usage"></a>
 ## Usage
 
-Go >= 1.22; module `github.com/ordered-json/ordered-json/go`, package `orderedjson`.
+Go >= 1.22; module `github.com/polyspec/ordered-json/go`, package `orderedjson`.
 
-The usage fragment takes `source` (or `$source`) from an object case in the [common official examples](https://github.com/polyspec/ordered-json/blob/main/examples/official.json). Import `github.com/ordered-json/ordered-json/go` and use the fragment inside a function that can return an error.
+The usage fragment takes `source` (or `$source`) from an object case in the [common official examples](https://github.com/polyspec/ordered-json/blob/main/examples/official.json). Import `github.com/polyspec/ordered-json/go` and use the fragment inside a function that can return an error.
 
 ~~~go
 value, err := orderedjson.Parse(source)

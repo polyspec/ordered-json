@@ -10,7 +10,7 @@
 | --- | --- | --- | --- |
 | JavaScript | Node.js >= 20, ESM | `ordered-json`, 0.1.0 | [package.json](https://github.com/polyspec/ordered-json/blob/main/js/package.json) |
 | Rust | Rust >= 1.70, edition 2021 | `ordered-json`, 0.1.0 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/rust/Cargo.toml) |
-| Go | Go >= 1.22 | `github.com/ordered-json/ordered-json/go` module, `orderedjson` package | [go.mod](https://github.com/polyspec/ordered-json/blob/main/go/go.mod) |
+| Go | Go >= 1.22 | `github.com/polyspec/ordered-json/go` module, `orderedjson` package | [go.mod](https://github.com/polyspec/ordered-json/blob/main/go/go.mod) |
 | PHP | PHP >= 8.2, JSON and PCRE extensions | `ordered-json/ordered-json`, `OrderedJson` namespace | [composer.json](https://github.com/polyspec/ordered-json/blob/main/php/composer.json) |
 | Native PHP | Matching PHP development headers, C compiler, phpize, make | `ordered_json` extension, 0.1.0 | [extension source](https://github.com/polyspec/ordered-json/blob/main/php-extension/src/ordered_json.c) |
 | Repository checks | Python >= 3.9, Git, make, all runtimes above | `make check` | [verification](validation.md) |
@@ -29,7 +29,7 @@ The clone contains every implementation package. Use the package directory or a 
 
 - JavaScript: import from `js/index.js`. TypeScript declarations are in `js/index.d.ts`.
 - Rust: set a local Cargo dependency with `path` pointing to `rust/`.
-- Go: use a local `replace` for module `github.com/ordered-json/ordered-json/go` pointing to `go/`.
+- Go: use a local `replace` for module `github.com/polyspec/ordered-json/go` pointing to `go/`.
 - PHP: require `php/src/OrderedJson.php` or use `php/` as a Composer path repository.
 
 <a id="native-php"></a>

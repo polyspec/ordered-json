@@ -11,6 +11,7 @@ from registry import (IMPLEMENTATIONS, adapter_commands, parse_overrides, prepar
                       repository_paths)
 
 ROOT = Path(__file__).resolve().parents[1]
+FACTORY_STRING = '"quote \\\" slash \\\\ line\\n \\ud55c \\ud83c\\udf0d"'
 
 
 class ObjectPairs(list):
@@ -166,6 +167,8 @@ def verify_adapters(commands, suite=None):
             for (name, _, expected), line in zip(cases, lines):
                 actual = json.loads(line)
                 if actual.get('ok'):
+                    expected = dict(expected, roundtrip=expected['compact'],
+                                    roundtrip_tree=expected['tree'], factory=FACTORY_STRING)
                     # Constructors may quote keys differently; independently
                     # validate their JSON, decoded keys, order and exact numbers.
                     try:
