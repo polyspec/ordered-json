@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Child values are created by `ordered_json_hydrate()` when the extension is loaded.
 - Reduced value access cost by reading the descriptor tape directly in accessors, creating child values without a promoted constructor, and decoding escaped strings to UTF-8 without an intermediate UTF-16 unit array.
 - Removed the `useNative` parse option, `parseNative()`, and the unused `stringify()` compact flag; `parse()` uses the extension when it is loaded.
 - Fixed UTF-8 validation that rejected valid input under very low PCRE backtrack or recursion limits, and reduced parser overhead by passing offsets through local variables.

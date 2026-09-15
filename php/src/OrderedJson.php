@@ -223,6 +223,8 @@ final class Value implements \JsonSerializable, \Stringable
     /** @return array{array<string|int, Value>, array<string|int, Value>} Members and first key tokens. */
     private function hydrateMembers(): array
     {
+        if (self::$native ??= \extension_loaded('ordered_json'))
+            return \ordered_json_hydrate($this->source, $this->tape, $this->index);
         $members = $keys = [];
         $source = $this->source;
         $tape = $this->tape;
@@ -253,6 +255,8 @@ final class Value implements \JsonSerializable, \Stringable
     /** @return list<Value> */
     private function hydrateItems(): array
     {
+        if (self::$native ??= \extension_loaded('ordered_json'))
+            return \ordered_json_hydrate($this->source, $this->tape, $this->index);
         $items = [];
         $source = $this->source;
         $tape = $this->tape;
