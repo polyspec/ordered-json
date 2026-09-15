@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Reduced PHP value access cost: accessors read the descriptor tape directly instead of chaining helper calls, child values are created without a promoted constructor, and escaped strings decode to UTF-8 without an intermediate UTF-16 unit array. Parse followed by full traversal took 0.43-0.89 of the previous time with the extension and 0.60-0.97 in pure PHP, with identical results.
 - Stopped freezing JavaScript `Value` objects during parsing. Values still cannot be modified through the library API because their state is held in private fields; returned item and key arrays remain frozen. The API contract now states this guarantee.
 - Removed the PHP `useNative` parse option, `parseNative()`, the unused PHP `stringify()` compact flag, the unused JavaScript `stringify()` options argument, and the native `ordered_json_compact()` function. PHP uses the extension when it is loaded and the pure implementation otherwise.
 - Fixed pure PHP UTF-8 validation that rejected valid input under very low PCRE backtrack or recursion limits, and reduced pure PHP parser overhead by passing offsets through local variables.
