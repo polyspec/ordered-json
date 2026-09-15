@@ -9,6 +9,7 @@ $mode = $argv[1] ?? 'custom';
 $files = array_slice($argv, 2);
 $clock = static fn(): float => hrtime(true);
 $digest = static fn(string $value): string => hash('sha256', $value);
+$sink = null;
 $measure = static function (callable $fn) use ($iterations, $clock): array {
     $start = $clock(); $result = '';
     for ($i = 0; $i < $iterations; $i++) $result = $fn();
@@ -23,7 +24,7 @@ foreach ($files as $file) {
     $stringifyFn = $mode === 'native-json'
         ? static fn($value) => json_encode($value, JSON_THROW_ON_ERROR)
         : static fn($value) => $value->compact();
-    [$parseNs] = $measure($parseFn);
+    [$parseNs] = $measure(function () use ($parseFn, &$sink) { $sink = $parseFn(); return $sink; });
     $value = $parseFn();
     [$stringifyNs, $output] = $measure(fn() => $stringifyFn($value));
     [$roundtripNs, $roundtrip] = $measure(fn() => $stringifyFn($parseFn()));

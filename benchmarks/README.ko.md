@@ -1,5 +1,5 @@
 <!-- doc-id: performance-benchmarks -->
-<!-- source-sha256: 5e46e3b373ade0ad8c09a13eeb4e8411f2b2131d53e829455cafec6c01c23c18 -->
+<!-- source-sha256: ba4db66ea2109d8d7eb37f99253d10b64a34e039a0b89c5a175104f57fda694b -->
 # 성능 벤치마크
 
 `run.py`는 모든 런타임에서 같은 입력 문서와 반복 횟수를 사용해
@@ -20,3 +20,8 @@ Rust 표준 라이브러리에는 JSON 파서가 없으므로 네이티브 비�
 사실상 표준인 `serde_json`입니다. JavaScript, Go, PHP는 각 런타임의
 네이티브 JSON API를 사용합니다. PHP는 순수 PHP 구현과 네이티브 확장도
 별도로 측정합니다.
+
+네이티브 측정값은 동등한 동작이라고 주장하는 값이 아니라 별도의 기준값입니다.
+일반적인 네이티브 API는 객체 순서나 정확한 숫자 토큰을 보존하지 않습니다.
+ordered-json 구현체끼리는 출력 digest가 일치해야 하며, 이러한 의도적인
+동작 차이로 네이티브 출력 digest는 달라질 수 있습니다.

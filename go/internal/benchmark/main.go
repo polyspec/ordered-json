@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -22,6 +23,7 @@ func iterations() int {
 }
 func main() {
 	n := iterations()
+	var sink any
 	for _, file := range os.Args[1:] {
 		source, err := os.ReadFile(file)
 		if err != nil {
@@ -42,7 +44,7 @@ func main() {
 			}
 			return v
 		}
-		parseNs, _ := measure(func() []byte { parseOrdered(); return nil })
+		parseNs, _ := measure(func() []byte { sink = parseOrdered(); runtime.KeepAlive(sink); return nil })
 		value := parseOrdered()
 		stringifyNs, output := measure(func() []byte {
 			out, err := value.Compact()
@@ -63,6 +65,7 @@ func main() {
 			if err := json.Unmarshal(source, &nativeValue); err != nil {
 				panic(err)
 			}
+			runtime.KeepAlive(nativeValue)
 			return nil
 		})
 		nativeValue, err = func() (any, error) { var value any; err := json.Unmarshal(source, &value); return value, err }()
@@ -76,7 +79,18 @@ func main() {
 			}
 			return out
 		})
+		nativeRoundtripNs, _ := measure(func() []byte {
+			var value any
+			if err := json.Unmarshal(source, &value); err != nil {
+				panic(err)
+			}
+			out, err := json.Marshal(value)
+			if err != nil {
+				panic(err)
+			}
+			return out
+		})
 		fmt.Printf("%s\tordered-json\t%f\t%f\t%f\t%s\n", file, parseNs, stringifyNs, roundtripNs, digest(output))
-		fmt.Printf("%s\tnative-json\t%f\t%f\t\t%s\n", file, nativeParseNs, nativeStringifyNs, digest(nativeOutput))
+		fmt.Printf("%s\tnative-json\t%f\t%f\t%f\t%s\n", file, nativeParseNs, nativeStringifyNs, nativeRoundtripNs, digest(nativeOutput))
 	}
 }
