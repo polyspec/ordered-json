@@ -8,11 +8,11 @@
 
 | Component | Declared requirement | Current identifier | Metadata |
 | --- | --- | --- | --- |
-| JavaScript | Node.js >= 20, ESM | `ordered-json`, 0.1.0 | [package.json](https://github.com/polyspec/ordered-json/blob/main/js/package.json) |
-| Rust | Rust >= 1.70, edition 2021 | `ordered-json`, 0.1.0 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/rust/Cargo.toml) |
+| JavaScript | Node.js >= 20, ESM | `ordered-json`, 0.0.1 | [package.json](https://github.com/polyspec/ordered-json/blob/main/js/package.json) |
+| Rust | Rust >= 1.70, edition 2021 | `ordered-json`, 0.0.1 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/rust/Cargo.toml) |
 | Go | Go >= 1.22 | `github.com/polyspec/ordered-json/go` module, `orderedjson` package | [go.mod](https://github.com/polyspec/ordered-json/blob/main/go/go.mod) |
 | PHP | PHP >= 8.2, JSON and PCRE extensions | `ordered-json/ordered-json`, `OrderedJson` namespace | [composer.json](https://github.com/polyspec/ordered-json/blob/main/php/composer.json) |
-| Native PHP | Matching PHP development headers, C compiler, phpize, make | `ordered_json` extension, 0.1.0 | [extension source](https://github.com/polyspec/ordered-json/blob/main/php-extension/src/ordered_json.c) |
+| Native PHP | Matching PHP development headers, C compiler, phpize, make | `ordered_json` extension, 0.0.1 | [extension source](https://github.com/polyspec/ordered-json/blob/main/php-extension/src/ordered_json.c) |
 | Repository checks | Python >= 3.9, Git, make, all runtimes above | `make check` | [verification](validation.md) |
 
 These are declared minimum versions, not a claim that every minimum version was tested. Actual versions are recorded in [verification.json](../verification.json). JavaScript, Rust, and Go have no external runtime library dependencies.
