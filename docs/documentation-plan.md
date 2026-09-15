@@ -18,6 +18,7 @@ Each topic has one English canonical document and one `.ko.md` translation. The 
 | `docs/operations/` | Current installation, execution, verification, publication procedures |
 | `CHANGELOG.md` | Actual changes, reasons, verification |
 | `docs/plans/` | Proposals pending approval |
+| `benchmarks/` | Reproducible performance comparisons and benchmark inputs |
 | `AGENTS.md` | Development procedure and required checks |
 | Outside Git | Personal preferences, conversation context, local authentication and backup details |
 

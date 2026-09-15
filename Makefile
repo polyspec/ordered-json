@@ -2,7 +2,7 @@ PYTHON ?= python3
 JSON_TEST_SUITE ?=
 PIE ?= .cache/pie/pie.phar
 
-.PHONY: check test docs-check pie-check
+.PHONY: check test docs-check pie-check benchmark
 
 check:
 	$(PYTHON) scripts/test.py $(if $(JSON_TEST_SUITE),--suite "$(JSON_TEST_SUITE)")
@@ -14,3 +14,6 @@ docs-check:
 
 pie-check:
 	$(PYTHON) scripts/check_pie.py --pie "$(PIE)" $(if $(JSON_TEST_SUITE),--suite "$(JSON_TEST_SUITE)")
+
+benchmark:
+	$(PYTHON) benchmarks/run.py
