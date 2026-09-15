@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 3d0625990e9cc5317693cf4e6b93b1f5bc925f2b5b757104320251438481dce5 -->
+<!-- source-sha256: cfbe527f58ce24bdcd4b961b693e25a99155befe165979488482188eb07baa38 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- PHP 값 조회 비용을 줄였습니다. 조회 함수는 보조 메서드를 연쇄 호출하지 않고 디스크립터 테이프를 직접 읽고, 자식 값은 생성자 승격 없이 만들며, escape 문자열은 중간 UTF-16 단위 배열 없이 UTF-8로 해석합니다. 파싱 후 전체 조회 시간은 확장 사용 시 이전의 0.43~0.89, 순수 PHP에서 0.60~0.97이었고 결과는 같습니다.
 - JavaScript `Value` 객체를 파싱 중에 freeze하지 않도록 변경했습니다. 값의 상태는 private field에 있으므로 여전히 라이브러리 API로 변경할 수 없으며, 반환하는 항목 배열과 키 배열은 계속 freeze합니다. API 계약에 이 보장을 명시했습니다.
 - PHP `useNative` 파싱 옵션, `parseNative()`, 사용하지 않는 PHP `stringify()` compact 인자, 사용하지 않는 JavaScript `stringify()` options 인자, 네이티브 `ordered_json_compact()` 함수를 제거했습니다. PHP는 확장이 로드돼 있으면 확장을, 그렇지 않으면 순수 구현을 사용합니다.
 - PCRE backtrack 또는 recursion 한계가 매우 낮으면 올바른 입력을 거부하던 순수 PHP UTF-8 검증을 수정하고, 오프셋을 지역 변수로 전달하여 순수 PHP 파서 부담을 줄였습니다.

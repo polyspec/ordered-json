@@ -109,6 +109,44 @@ function textUnits(string $text): array
     return strspn($text, $ascii) === strlen($text) ? array_values(unpack('C*', $text)) : utf8Units($text);
 }
 
+/**
+ * @internal UTF-8 text of validated string token contents. A lone surrogate becomes WTF-8
+ * when $allowUnpaired is true; otherwise it is rejected like unitsToUtf8().
+ */
+function tokenText(string $content, bool $allowUnpaired): string
+{
+    $slash = strpos($content, '\\');
+    if ($slash === false) return $content;
+    $out = '';
+    $offset = 0;
+    do {
+        $out .= substr($content, $offset, $slash - $offset);
+        $escape = $content[$slash + 1];
+        if ($escape !== 'u') {
+            $out .= match ($escape) { 'b' => "\x08", 'f' => "\f", 'n' => "\n", 'r' => "\r", 't' => "\t", default => $escape };
+            $offset = $slash + 2;
+        } else {
+            $point = hexdec(substr($content, $slash + 2, 4));
+            $offset = $slash + 6;
+            if ($point >= 0xd800 && $point <= 0xdbff && substr($content, $offset, 2) === '\\u') {
+                $low = hexdec(substr($content, $offset + 2, 4));
+                if ($low >= 0xdc00 && $low <= 0xdfff) {
+                    $point = 0x10000 + (($point - 0xd800) << 10) + $low - 0xdc00;
+                    $offset += 6;
+                }
+            }
+            if ($point >= 0xd800 && $point <= 0xdfff && !$allowUnpaired)
+                throw new UnexpectedValueException('Unpaired surrogate; use stringUnits()');
+            if ($point < 0x80) $out .= chr($point);
+            elseif ($point < 0x800) $out .= chr(0xc0 | $point >> 6) . chr(0x80 | $point & 63);
+            elseif ($point < 0x10000) $out .= chr(0xe0 | $point >> 12) . chr(0x80 | $point >> 6 & 63) . chr(0x80 | $point & 63);
+            else $out .= chr(0xf0 | $point >> 18) . chr(0x80 | $point >> 12 & 63) . chr(0x80 | $point >> 6 & 63) . chr(0x80 | $point & 63);
+        }
+        $slash = strpos($content, '\\', $offset);
+    } while ($slash !== false);
+    return $out . substr($content, $offset);
+}
+
 /** @internal Encode UTF-16 units with the shared constructor spelling. */
 function quoteUnits(array $units): string
 {
@@ -148,33 +186,20 @@ final class Tape
     /** A repeated object key; the first key of that name links to the final value. */
     public const SKIP = 32;
     public const LINK = 8;
-
-    /** Index of the record that follows the value at $index and its descendants. */
-    public static function next(array $tape, int $index): int
-    {
-        return ($tape[$index] & self::KIND) <= self::ARRAY ? $tape[$index] >> self::LINK : $index + 3;
-    }
 }
 
 /** JSON value. Objects use insertion-ordered PHP associative arrays. Child values hydrate lazily. */
 final class Value implements \JsonSerializable, \Stringable
 {
     private static ?bool $native = null;
-    /** @var array<string|int, Value>|null */
-    private ?array $members = null;
-    /** @var array<string|int, Value>|null The first key token of each member. */
-    private ?array $keys = null;
-    /** @var list<Value>|null */
-    private ?array $items = null;
-    /** @var list<int>|null */
-    private ?array $units = null;
+    private string $source;
+    /** @var list<int> Descriptor tape; this value's record starts at $index. */
+    private array $tape;
+    private int $index;
+    /** Members and key tokens of an object, items of an array, or UTF-16 units of a string once read. */
+    private mixed $cache = null;
 
-    /** @param list<int> $tape Descriptor tape; this value's record starts at $index. */
-    private function __construct(
-        private string $source,
-        private array $tape,
-        private int $index,
-    ) {}
+    private function __construct() {}
 
     public static function parse(string $source, int $maxDepth = MAX_DEPTH): self
     {
@@ -188,35 +213,59 @@ final class Value implements \JsonSerializable, \Stringable
         } else {
             $tape = (new Parser($source, $maxDepth))->parse();
         }
-        return new self($source, $tape, 0);
+        $value = new self();
+        $value->source = $source;
+        $value->tape = $tape;
+        $value->index = 0;
+        return $value;
     }
 
-    private function hydrateMembers(): void
+    /** @return array{array<string|int, Value>, array<string|int, Value>} Members and first key tokens. */
+    private function hydrateMembers(): array
     {
-        if ($this->members !== null) return;
         $members = $keys = [];
+        $source = $this->source;
         $tape = $this->tape;
-        for ($i = $this->index + 3, $end = $tape[$this->index] >> Tape::LINK; $i < $end; $i = Tape::next($tape, $i + 3)) {
+        for ($i = $this->index + 3, $end = $tape[$this->index] >> Tape::LINK; $i < $end;) {
             $meta = $tape[$i];
-            if ($meta & Tape::SKIP) continue;
-            $start = $tape[$i + 1] + 1;
-            $name = substr($this->source, $start, $tape[$i + 2] - 1 - $start);
-            if ($meta & Tape::ESCAPED) $name = keyText(tokenUnits($name));
-            $keys[$name] = new self($this->source, $tape, $i);
-            $members[$name] = new self($this->source, $tape, $meta >> Tape::LINK);
+            $valueMeta = $tape[$i + 3];
+            $next = ($valueMeta & Tape::KIND) <= Tape::ARRAY ? $valueMeta >> Tape::LINK : $i + 6;
+            if (!($meta & Tape::SKIP)) {
+                $start = $tape[$i + 1] + 1;
+                $name = substr($source, $start, $tape[$i + 2] - 1 - $start);
+                if ($meta & Tape::ESCAPED) $name = tokenText($name, true);
+                $key = new self();
+                $key->source = $source;
+                $key->tape = $tape;
+                $key->index = $i;
+                $keys[$name] = $key;
+                $member = new self();
+                $member->source = $source;
+                $member->tape = $tape;
+                $member->index = $meta >> Tape::LINK;
+                $members[$name] = $member;
+            }
+            $i = $next;
         }
-        $this->keys = $keys;
-        $this->members = $members;
+        return [$members, $keys];
     }
 
-    private function hydrateItems(): void
+    /** @return list<Value> */
+    private function hydrateItems(): array
     {
-        if ($this->items !== null) return;
         $items = [];
+        $source = $this->source;
         $tape = $this->tape;
-        for ($i = $this->index + 3, $end = $tape[$this->index] >> Tape::LINK; $i < $end; $i = Tape::next($tape, $i))
-            $items[] = new self($this->source, $tape, $i);
-        $this->items = $items;
+        for ($i = $this->index + 3, $end = $tape[$this->index] >> Tape::LINK; $i < $end;) {
+            $item = new self();
+            $item->source = $source;
+            $item->tape = $tape;
+            $item->index = $i;
+            $items[] = $item;
+            $meta = $tape[$i];
+            $i = ($meta & Tape::KIND) <= Tape::ARRAY ? $meta >> Tape::LINK : $i + 3;
+        }
+        return $items;
     }
 
     public function kind(): string { return Tape::KINDS[$this->tape[$this->index] & Tape::KIND]; }
@@ -226,30 +275,61 @@ final class Value implements \JsonSerializable, \Stringable
         $start = $this->tape[$this->index + 1];
         return substr($this->source, $start, $this->tape[$this->index + 2] - $start);
     }
-    private function content(): string
+    private function mismatch(string $kind): never
     {
-        $start = $this->tape[$this->index + 1] + 1;
-        return substr($this->source, $start, $this->tape[$this->index + 2] - 1 - $start);
-    }
-    private function expect(string $kind): void
-    {
-        if ($this->kind() !== $kind) throw new \LogicException("Expected $kind, got {$this->kind()}");
+        throw new \LogicException("Expected $kind, got {$this->kind()}");
     }
     /** @return array<string|int, Value> Key order is the first insertion order. */
-    public function members(): array { $this->expect('object'); $this->hydrateMembers(); return $this->members; }
+    public function members(): array
+    {
+        if (($this->tape[$this->index] & Tape::KIND) !== Tape::OBJECT) $this->mismatch('object');
+        return ($this->cache ??= $this->hydrateMembers())[0];
+    }
     /** @return list<Value> */
-    public function items(): array { $this->expect('array'); $this->hydrateItems(); return $this->items; }
+    public function items(): array
+    {
+        if (($this->tape[$this->index] & Tape::KIND) !== Tape::ARRAY) $this->mismatch('array');
+        return $this->cache ??= $this->hydrateItems();
+    }
     /** @return list<int> UTF-16 units, including escaped unpaired surrogates. */
-    public function stringUnits(): array { $this->expect('string'); return $this->units ??= tokenUnits($this->content()); }
+    public function stringUnits(): array
+    {
+        $tape = $this->tape;
+        $index = $this->index;
+        if (($tape[$index] & Tape::KIND) !== Tape::STRING) $this->mismatch('string');
+        $start = $tape[$index + 1] + 1;
+        return $this->cache ??= tokenUnits(substr($this->source, $start, $tape[$index + 2] - 1 - $start));
+    }
     public function stringValue(): string
     {
-        $this->expect('string');
-        if (!($this->tape[$this->index] & Tape::ESCAPED)) return $this->content();
-        return unitsToUtf8($this->stringUnits(), false);
+        $tape = $this->tape;
+        $index = $this->index;
+        $meta = $tape[$index];
+        if (($meta & Tape::KIND) !== Tape::STRING) $this->mismatch('string');
+        $start = $tape[$index + 1] + 1;
+        $content = substr($this->source, $start, $tape[$index + 2] - 1 - $start);
+        return $meta & Tape::ESCAPED ? tokenText($content, false) : $content;
     }
-    public function numberLiteral(): string { $this->expect('number'); return trim($this->raw()); }
-    public function booleanValue(): bool { $this->expect('boolean'); return trim($this->raw()) === 'true'; }
-    public function get(string $key): ?self { $this->expect('object'); $this->hydrateMembers(); return $this->members[$key] ?? null; }
+    public function numberLiteral(): string
+    {
+        $tape = $this->tape;
+        $index = $this->index;
+        if (($tape[$index] & Tape::KIND) !== Tape::NUMBER) $this->mismatch('number');
+        $start = $tape[$index + 1];
+        return substr($this->source, $start, $tape[$index + 2] - $start);
+    }
+    public function booleanValue(): bool
+    {
+        $tape = $this->tape;
+        $index = $this->index;
+        if (($tape[$index] & Tape::KIND) !== Tape::BOOLEAN) $this->mismatch('boolean');
+        return $this->source[$tape[$index + 1]] === 't';
+    }
+    public function get(string $key): ?self
+    {
+        if (($this->tape[$this->index] & Tape::KIND) !== Tape::OBJECT) $this->mismatch('object');
+        return ($this->cache ??= $this->hydrateMembers())[0][$key] ?? null;
+    }
     public function getUnits(array $units): ?self
     {
         return $this->get(keyText($units));
@@ -300,14 +380,13 @@ final class Value implements \JsonSerializable, \Stringable
         $kind = $meta & Tape::KIND;
         if ($meta & Tape::COMPACT || $kind > Tape::ARRAY) return $this->token();
         if ($kind === Tape::OBJECT) {
-            $this->hydrateMembers();
+            [$members, $keys] = $this->cache ??= $this->hydrateMembers();
             $parts = [];
-            foreach ($this->members as $key => $value)
-                $parts[] = $this->keys[$key]->token() . ':' . $value->compact();
+            foreach ($members as $key => $value)
+                $parts[] = $keys[$key]->token() . ':' . $value->compact();
             return '{' . implode(',', $parts) . '}';
         }
-        $this->hydrateItems();
-        return '[' . implode(',', array_map(fn(self $v) => $v->compact(), $this->items)) . ']';
+        return '[' . implode(',', array_map(fn(self $v) => $v->compact(), $this->cache ??= $this->hydrateItems())) . ']';
     }
     public function __toString(): string { return $this->compact(); }
     public function jsonSerialize(): never
@@ -469,7 +548,7 @@ final class Parser
                     }
                     if (($s[$pos] ?? '') !== ':') $this->fail('Expected colon', $pos);
                     $pos = $this->value($depth + 1, $pos + 1);
-                    if ($result & 1) $name = keyText(tokenUnits($name));
+                    if ($result & 1) $name = tokenText($name, true);
                     if (isset($names[$name])) {
                         $first = $names[$name];
                         $this->tape[$first] = $this->tape[$first] & 0xff | ($key + 3) << Tape::LINK;
