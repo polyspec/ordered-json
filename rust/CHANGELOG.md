@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Root arrays take the pending item stack instead of copying every item; spare capacity above one quarter of the length is released.
 - Reduced parser allocations: each value stores a kind-specific payload instead of an empty map, item vector, and unit vector; string units are decoded on first access; objects keep one entry list and build a hash index above eight members; values without insignificant whitespace or duplicate keys compact by copying their source token. Results, errors, and offsets are unchanged. The derived `Debug` output of `Value` and `OrderedMap` reflects the new internal fields.
 - Added the package's own development procedure, changelog, Makefile and documentation manifest.
 - Added English and Korean usage, development, and change records.
