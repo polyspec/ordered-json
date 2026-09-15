@@ -6,9 +6,15 @@ implementation available in each runtime. The benchmark uses the same input
 documents and iteration count for every implementation.
 
 The benchmark reports parse, stringify, and parse-plus-stringify timings. It
-also checks a digest of the produced output so a fast but incorrect result is
-not reported as a valid measurement. Results are machine-specific and are
-written to `.cache/benchmark.json`; they are not committed.
+also checks a digest of the produced output so a fast but incorrect ordered-json
+implementation is not reported as a valid measurement. Results are
+machine-specific and are written to `.cache/benchmark.json`; they are not
+committed.
+
+Native timings are separate baselines, not claims of equivalent behavior:
+standard native APIs generally do not retain object order or exact number
+tokens. The ordered-json implementations must agree with each other; native
+output digests may differ for those intentional reasons.
 
 Run from the repository root:
 
