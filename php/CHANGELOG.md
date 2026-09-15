@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Moved PHP container serialization out of `compact()` into a private method, so serializing with the extension uses a smaller call frame. Extension stringify took 0.92-0.95 of the time before the current accessor changes.
 - Child values are created by `ordered_json_hydrate()` when the extension is loaded.
 - Reduced value access cost by reading the descriptor tape directly in accessors, creating child values without a promoted constructor, and decoding escaped strings to UTF-8 without an intermediate UTF-16 unit array.
 - Removed the `useNative` parse option, `parseNative()`, and the unused `stringify()` compact flag; `parse()` uses the extension when it is loaded.
