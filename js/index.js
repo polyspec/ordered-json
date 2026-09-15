@@ -64,7 +64,6 @@ export class Value {
     this.#source = source; this.#start = start; this.#end = end;
     this.#kind = kind; this.#flags = flags; this.#members = members; this.#keys = keys;
     this.#items = items === noItems ? items : Object.freeze(items); this.#text = text;
-    Object.freeze(this);
   }
   static {
     isValue = value => typeof value === 'object' && value !== null && #kind in value;
