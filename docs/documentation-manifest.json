@@ -84,6 +84,12 @@
       "kind": "specification",
       "en": "docs/spec/repositories.md",
       "ko": "docs/spec/repositories.ko.md"
+    },
+    {
+      "id": "performance-benchmarks",
+      "kind": "report",
+      "en": "benchmarks/README.md",
+      "ko": "benchmarks/README.ko.md"
     }
   ],
   "role": "common"

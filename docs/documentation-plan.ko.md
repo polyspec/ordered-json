@@ -1,5 +1,5 @@
 <!-- doc-id: documentation-plan -->
-<!-- source-sha256: 0560e7ccd84d88bb35964e3bd49b6d968a1951a3e537cd086fa56733162a8c15 -->
+<!-- source-sha256: dc46000de51d094f5add21baeef59ef7066e6c45e1d9c6663d221dd7fc341bbb -->
 # 문서 관리
 
 [English](documentation-plan.md)
@@ -19,6 +19,7 @@
 | `docs/operations/` | 현재 설치, 실행, 검증, 게시 절차 |
 | `CHANGELOG.md` | 실제 변경, 원인, 검증 |
 | `docs/plans/` | 승인 대기 제안 |
+| `benchmarks/` | 재현 가능한 성능 비교와 벤치마크 입력 |
 | `AGENTS.md` | 개발 절차와 필수 검사 |
 | Git 외부 | 개인 선호, 대화 맥락, 로컬 인증 및 백업 정보 |
 

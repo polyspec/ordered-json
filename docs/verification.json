@@ -1,26 +1,38 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-15T08:23:30+00:00",
+  "checked_at": "2026-09-15T09:18:52+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "585ffbd1bc4b29851d922dac2a08551943bb375de01a1b462599a3f0ad2669ab",
+    "sha256": "315b83b533c8e4b31901956f2ec916f32668fa79ea0a073a4fd8f7edd304f8a2",
     "files": {
+      "benchmarks/README.ko.md": "d7d650e99f27d8b648bc803b18dfa062b1de128a010b1f72fc485ca39e3d079f",
+      "benchmarks/README.md": "5e46e3b373ade0ad8c09a13eeb4e8411f2b2131d53e829455cafec6c01c23c18",
+      "benchmarks/fixtures/empty-array.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "benchmarks/fixtures/empty-object.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "benchmarks/fixtures/large-array.json": "e57f10beb9a91d19f2c3b564afb3f627c775431b59cfebac5fe618c5389f862a",
+      "benchmarks/fixtures/mixed-unicode.json": "cb6f171b0a53de7aac3fd15cf81db7bd789ee90910d9d083e6ab593c3e4ae8f1",
+      "benchmarks/fixtures/nested-order.json": "ee4d0c53ac06ed42d611f115ec3935f672711c506547268fb1381e8d71d335a5",
+      "benchmarks/js.mjs": "9b02496072c282e7f6d6bb8633725ccea724fa1820628e70548bb534e40ef4c0",
+      "benchmarks/php.php": "59ab335a3876d3949b8c4b07b9ef8e9952a068ef9b1e51a574980748735dc4f5",
+      "benchmarks/run.py": "9aa2c0c082c0c8a0ad0577c42ea9ee68aa25ea81f648d8d29e6e2518f5406209",
+      "go/internal/benchmark/main.go": "82823497e72d47e7600dbf33af4409614814bb083424977ed4e09ed39fe9a9ba",
+      "rust/examples/benchmark.rs": "a96eb1b91c1d2585f3e878c29dc3e5d89a42c20b0a0061bcc7238719fc8ee46f",
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "a8b0309d3832249dd7605b6404a644701e5456a67924f2b7f5ab69f13ad31196",
       "AGENTS.md": "f61e8588ac0a6af7ec4b66534866aa67f6bf50a0cb07de5841b04b9928e5de54",
-      "CHANGELOG.ko.md": "0b43a33179f093835629c13c55210625888a5da7a359a39ba32c572d479560e7",
-      "CHANGELOG.md": "bd7ad971e1f1a3dd8a96d4ce89e0d6d5d3e3642808161155184565175c7a48b0",
-      "Makefile": "1ebb3caea29bd194496e1de49e05cb650751857a438560874ceb4cd9e41a6478",
+      "CHANGELOG.ko.md": "99450866fd7840c2d93ff893866a9aca9276008ef5544c383ee68b3a77e6f80c",
+      "CHANGELOG.md": "3d256d1381c6178b9e99bbf41bc0c50bc84bff5d3edb6736a642b10464846d37",
+      "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "23939bfc76849af3ab82fc3e6decdc00f6aee752adf48c04837a1a103b6549ac",
       "README.md": "3e58b47a5a2372e81072b0f5f08bf549fea6d73b11b79fa65bb558e748216927",
       "docs/distribution.json": "1ccded31251e48286d97c8df62bb87d70cf6eadba4f88cc99a146447fcb2eb8a",
-      "docs/documentation-manifest.json": "b42e35c227be040edcff8a72915e96d4b2706c8d094e7139380aa760257e0a25",
-      "docs/documentation-plan.ko.md": "c3be28cb0598c48c8097c72773980a02bb469cf80531e9b92718378cdef9c206",
-      "docs/documentation-plan.md": "0560e7ccd84d88bb35964e3bd49b6d968a1951a3e537cd086fa56733162a8c15",
+      "docs/documentation-manifest.json": "4c119554db5cdc4aaf40fb17539c69934c49de532f175904dcc9c961af4e10c9",
+      "docs/documentation-plan.ko.md": "1124d913a7068f671bd7fde8720406fb5a25e159a01071187b963ab1610dbc8d",
+      "docs/documentation-plan.md": "dc46000de51d094f5add21baeef59ef7066e6c45e1d9c6663d221dd7fc341bbb",
       "docs/features.ko.md": "3ac80ad5e7ce42cf6c22f1cfdc16c38a52f3077da02ffab6cfcb91c073c6ccf4",
       "docs/features.md": "9a8ad6873ed6ba3d462989060197b837a2e722ad5a2030217851902a31740d5e",
       "docs/operations/distribution.ko.md": "3b36dc47eea16e49720ba0f669511024af32e04276cc3b7476dac7ebaf7dfd26",
@@ -199,8 +211,8 @@
       "rust/AGENTS.md": "07e4557cb5ec412b34e6a8bcc3e9dd5fd0ddb12bc1a52734abf203a7873c3560",
       "rust/CHANGELOG.ko.md": "1ff80bfba2b67316bc9adaab51c9be07d8aa12e1f266a3a6d302a0fe025a112a",
       "rust/CHANGELOG.md": "cb49a100e400c0217f4ecefbd3785fb9192c53d33fd9eecb5f83440e0cf5b907",
-      "rust/Cargo.lock": "dd9beee9a75c8331d090c13e730cf3fc188a3e0560878833a85baae689f15bde",
-      "rust/Cargo.toml": "bdc67c31a4cbb17822d42f73380f0144b1c78be934962887134bf818ac398598",
+      "rust/Cargo.lock": "315ef8448529e161920867e905b76627df3dbbfde172019a8fba7ca5d52ecf5f",
+      "rust/Cargo.toml": "7e6283d6655eccc58e91c13e2ea132c31aae4ed19273671708bca923729ee19c",
       "rust/Makefile": "834f720591ef8747ce5e53d25b83005bf802472404adba7f5e64dfdc8510ad88",
       "rust/README.ko.md": "d5ac5e9857c793fb5dc17932207f12f80ea4ccb460653865a282d8a03eaeff7b",
       "rust/README.md": "e3c04eba3326d309a6e793f57ac7979c1429fdb9e135e85d022adb573029c8e3",
@@ -280,13 +292,13 @@
     },
     "rust": {
       "path": "rust",
-      "sha256": "21fe5a8b9f6557ec6110103ebfbd86373754a60cc8fb75f9ffcd052f6852f3e0",
-      "files": 13
+      "sha256": "2c0821912f5d09c91f0a3356612b856d7d9dcaf398abcb9dbb4f1753e022dfbd",
+      "files": 14
     },
     "go": {
       "path": "go",
-      "sha256": "830d579c668db5c3d50ee86a72da5252ba009d52f938fbfcb3964bdbd4288eae",
-      "files": 12
+      "sha256": "aaa852a100f3aefd197e4853c5cee6d41139fd461c07556902008c62268e64b6",
+      "files": 13
     },
     "php": {
       "path": "php",
