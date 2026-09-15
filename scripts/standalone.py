@@ -14,7 +14,7 @@ from verification_record import (output, repository_manifest, sha256, supplement
                                  write_record)
 from verify import verify
 
-COMMON_URL = 'https://github.com/ordered-json/ordered-json.git'
+COMMON_URL = 'https://github.com/polyspec/ordered-json.git'
 
 
 def validate_pin(pin, expected_url):

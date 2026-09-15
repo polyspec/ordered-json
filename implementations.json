@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "repositories": {
-    "javascript": {"path": "js", "url": "https://github.com/ordered-json/javascript.git"},
-    "rust": {"path": "rust", "url": "https://github.com/ordered-json/rust.git"},
-    "go": {"path": "go", "url": "https://github.com/ordered-json/go.git"},
-    "php": {"path": "php", "url": "https://github.com/ordered-json/php.git"},
-    "php-extension": {"path": "php-extension", "url": "https://github.com/ordered-json/php-extension.git"}
+    "javascript": {"path": "js", "url": "https://github.com/polyspec/ordered-json.git"},
+    "rust": {"path": "rust", "url": "https://github.com/polyspec/ordered-json.git"},
+    "go": {"path": "go", "url": "https://github.com/polyspec/ordered-json.git"},
+    "php": {"path": "php", "url": "https://github.com/polyspec/ordered-json.git"},
+    "php-extension": {"path": "php-extension", "url": "https://github.com/polyspec/ordered-json.git"}
   },
   "implementations": {
     "js": {

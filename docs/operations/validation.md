@@ -6,16 +6,16 @@
 <a id="repository-check"></a>
 ## Aggregate check
 
-Install the [required tools](installation.md#requirements), initialize the submodules, and run from the common repository root:
+Install the [required tools](installation.md#requirements) and run from the repository root:
 
 ~~~sh
 git submodule update --init --recursive
 make check
 ~~~
 
-The command runs the verification and documentation checker tests, builds the selected sources, tests every registered implementation against the common JSON cases, writes [verification.json](../verification.json), and checks common and implementation documentation. An aggregate record requires initialized, clean submodules whose commits match the Git index.
+The command runs the verification and documentation checker tests, builds the selected packages, tests every registered implementation against the common JSON cases, writes [verification.json](../verification.json), and checks common and package documentation. An aggregate record includes the source hash of every tracked package file.
 
-The record includes source hashes, submodule revisions, actual runtime versions, case counts, results, checker test count, build warnings, and supplementary input revision. PHP and extension versions are separate fields. A changed input invalidates the record as current evidence. The verifier rejects changes during execution and incomplete implementation results. The record does not establish publication.
+The record includes source hashes, package file records, actual runtime versions, case counts, results, checker test count, build warnings, and supplementary input revision. PHP and extension versions are separate fields. A changed input invalidates the record as current evidence. The verifier rejects changes during execution and incomplete implementation results. The record does not establish publication.
 
 <a id="supplementary"></a>
 ## Supplementary inputs
@@ -48,7 +48,7 @@ cd php-extension
 make check
 ~~~
 
-Each implementation's `conformance.json` pins a full common verifier commit. Its bootstrap tests the current candidate checkout, fetches only declared test dependencies at their exact commits, and writes `.cache/verification.json`. Pure PHP requires no native checkout. The extension fetches the pinned PHP Value API for its native adapter.
+Each package has an independent build target, while the root registry and verifier define the shared test commands. The native extension is built from `php-extension/` and is tested with the sibling PHP package in the same checkout.
 
 Run `make check JSON_TEST_SUITE=/path/to/JSONTestSuite` for supplementary inputs. `make check HARNESS=/path/to/ordered-json` explicitly selects a local verifier; reports identify that override. A standalone result records candidate and dependency source hashes, revisions, local modifications, runtime versions, and results. A parent result does not verify a newer candidate commit.
 
@@ -63,7 +63,7 @@ make pie-check PIE=/path/to/pie.phar JSON_TEST_SUITE=.cache/JSONTestSuite
 
 The [PIE checker](../../scripts/check_pie.py) isolates PIE configuration under `.cache/`, registers the current extension checkout as a path repository, validates package recognition, and builds it with PIE. It tests that artifact directly with the same shared adapter and expectations. It does not run the ordinary native build in between.
 
-[pie-verification.json](../pie-verification.json) records the PIE version and PHAR hash, extension artifact hash, commands, source hashes, PHP and extension versions, and case results. Build errors, missing build tools, adapter warnings, or changes during the check fail verification. Compilation warnings remain in the record. This check does not install the module or publish a package. Re-run it when its recorded inputs change.
+When available, `pie-verification.json` records the PIE version and PHAR hash, extension artifact hash, commands, source hashes, PHP and extension versions, and case results. Build errors, missing build tools, adapter warnings, or changes during the check fail verification. Compilation warnings remain in the record. This check does not install the module or publish a package. Re-run it when its recorded inputs change.
 
 <a id="documentation-checks"></a>
 ## Documentation checks

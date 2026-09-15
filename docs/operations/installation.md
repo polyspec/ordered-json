@@ -21,11 +21,11 @@ These are declared minimum versions, not a claim that every minimum version was 
 ## Source checkout
 
 ~~~sh
-git clone --recurse-submodules https://github.com/ordered-json/ordered-json.git
+git clone https://github.com/polyspec/ordered-json.git
 cd ordered-json
 ~~~
 
-Initialize an existing checkout with `git submodule update --init --recursive`. Each implementation can also be cloned independently from its repository. Use the local module or source directory. Registry installation and publication are not verified; see [distribution](distribution.md).
+The clone contains every implementation package. Use the package directory or a published package when available. Registry installation and publication are not verified; see [distribution](distribution.md).
 
 - JavaScript: import from `js/index.js`. TypeScript declarations are in `js/index.d.ts`.
 - Rust: set a local Cargo dependency with `path` pointing to `rust/`.

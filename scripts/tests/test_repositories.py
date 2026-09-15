@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from registry import (REGISTRY, adapter_commands, load_registry, parse_overrides, prepare,
                       repository_paths, runtime_versions)
 from standalone import COMMON_URL, validate_configuration
-from verification_record import submodule_revisions
+from verification_record import package_revisions
 
 
 def configuration(name):
@@ -36,7 +36,7 @@ class RepositoryChecks(unittest.TestCase):
             candidate = root / 'future-language'
             candidate.mkdir()
             registry = {'schema_version': 1,
-                'repositories': {'future': {'path': 'future-language', 'url': 'https://github.com/ordered-json/future.git'}},
+                'repositories': {'future': {'path': 'future-language', 'url': 'https://github.com/polyspec/ordered-json.git'}},
                 'implementations': {'future': {'repository': 'future',
                     'prepare': [{'cwd': '{future}', 'command': [sys.executable, '-c', 'from pathlib import Path; Path("built").write_text("ok")']}],
                     'command': [sys.executable, '-c', 'print("adapter")'],
@@ -86,40 +86,15 @@ class RepositoryChecks(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'relative child directories'):
                 load_registry(root)
 
-    def test_uninitialized_submodule_cannot_produce_aggregate_record(self):
+    def test_monorepo_package_records_use_source_content(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
-            subprocess.run(['git', 'init', '--quiet', str(root)], check=True)
-            (root / '.gitmodules').write_text('[submodule "javascript"]\npath = js\n')
-            with self.assertRaisesRegex(ValueError, 'Missing initialized submodule'):
-                submodule_revisions(root, require_pinned=True)
-
-    def test_modified_or_unrecorded_submodule_cannot_produce_aggregate_record(self):
-        with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
-
-            def git(path, *arguments):
-                return subprocess.check_output(['git', '-c', 'user.name=Test', '-c',
-                    'user.email=test@example.invalid', *arguments], cwd=path,
-                    text=True, stderr=subprocess.PIPE).strip()
-
-            git(root, 'init', '--quiet')
-            (root / '.gitmodules').write_text('')
             for entry in REGISTRY['repositories'].values():
                 path = root / entry['path']
                 path.mkdir()
-                git(path, 'init', '--quiet')
                 (path / 'source').write_text('first')
-                git(path, 'add', 'source')
-                git(path, 'commit', '--quiet', '-m', 'Add source')
-                revision = git(path, 'rev-parse', 'HEAD')
-                git(root, 'update-index', '--add', '--cacheinfo', '160000', revision, entry['path'])
-            self.assertEqual(set(submodule_revisions(root, require_pinned=True)), set(REGISTRY['repositories']))
+            before = package_revisions(root)
+            self.assertEqual(set(before), set(REGISTRY['repositories']))
             candidate = root / REGISTRY['repositories']['javascript']['path']
             (candidate / 'source').write_text('second')
-            with self.assertRaisesRegex(ValueError, 'Submodule is modified'):
-                submodule_revisions(root, require_pinned=True)
-            git(candidate, 'add', 'source')
-            git(candidate, 'commit', '--quiet', '-m', 'Update source')
-            with self.assertRaisesRegex(ValueError, 'differs from its recorded commit'):
-                submodule_revisions(root, require_pinned=True)
+            self.assertNotEqual(before['javascript'], package_revisions(root)['javascript'])

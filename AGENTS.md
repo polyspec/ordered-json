@@ -17,7 +17,7 @@ Do not infer authorization to send messages, publish artifacts, change access co
 <a id="verification"></a>
 ## Required checks
 
-Initialize the submodules before running aggregate checks. Each implementation owns its source and document manifest. Run these commands from the repository root:
+Each implementation package owns its source and document manifest. Run these commands from the repository root:
 
 ~~~sh
 make check
@@ -32,7 +32,7 @@ make check JSON_TEST_SUITE=.cache/JSONTestSuite
 
 Run `make docs-check` for documentation-only review. If verification source hashes changed, run `make check` to generate a current record. If the PIE record is stale, also run `make pie-check PIE=/path/to/pie.phar` with the applicable supplementary suite. Do not edit verification results or source hashes to make checks pass.
 
-The [implementation registry](implementations.json) declares repository, build, adapter, and runtime commands. Add new languages there and in their own repositories without changing the shared JSON comparison algorithm. Publish changed implementation commits before updating and staging their submodule paths. For a contract change, publish the verifier revision first. See the [repository contract](docs/spec/repositories.md).
+The [implementation registry](implementations.json) declares package paths, build, adapter, and runtime commands. Add new languages there and in a package directory without changing the shared JSON comparison algorithm. A contract change updates the verifier and affected packages in one repository revision. See the [repository contract](docs/spec/repositories.md).
 
 All language adapters use [official.json](examples/official.json) and [scripts/verify.py](scripts/verify.py). Add shared cases there or under `fixtures/`. Do not create separate language-specific examples or expected results.
 

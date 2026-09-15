@@ -1,5 +1,5 @@
 <!-- doc-id: documentation-plan -->
-<!-- source-sha256: aa7b3b9cb0b9f6fc2ca82a4cdaf3613a65840d049d94bcc26a7ad1ac73c897ed -->
+<!-- source-sha256: 0560e7ccd84d88bb35964e3bd49b6d968a1951a3e537cd086fa56733162a8c15 -->
 # 문서 관리
 
 [English](documentation-plan.md)
@@ -9,7 +9,7 @@
 <a id="ownership"></a>
 ## 정본 문서
 
-각 주제에는 영어 정본 하나와 `.ko.md` 번역 하나를 관리합니다. [목록](documentation-manifest.json)은 모든 공통 Markdown 문서와 주제를 등록합니다. 각 구현 서브모듈은 자체 문서를 등록하며 공통 검사기는 두 단계 모두 검사합니다. 다른 문서는 같은 규칙을 반복하지 않고 정본 주제로 연결합니다.
+각 주제에는 영어 정본 하나와 `.ko.md` 번역 하나를 관리합니다. [목록](documentation-manifest.json)은 모든 공통 Markdown 문서와 주제를 등록합니다. 각 구현 패키지는 자체 문서를 등록하며 공통 검사기는 두 단계 모두 검사합니다. 다른 문서는 같은 규칙을 반복하지 않고 정본 주제로 연결합니다.
 
 | 위치 | 내용 |
 | --- | --- |

@@ -37,7 +37,7 @@ class DocumentationChecks(unittest.TestCase):
             '| --- | --- | --- | --- | --- | --- | --- |\n'
             '| F-ORDER | Order | implemented | shared-suite | [result](verification.json) | source-only | [contract](../README.md#contract) |\n')
         self.distribution = {'schema_version': 1, 'checked_at': '2026-09-07T00:00:00+00:00',
-            'source': {'state': 'available', 'url': 'https://github.com/ordered-json/ordered-json',
+            'source': {'state': 'available', 'url': 'https://github.com/polyspec/ordered-json',
                        'branch': 'main', 'visibility': 'public'},
             'github_releases': [], 'version_tags': [],
             'registries': {name: {'state': 'not-verified'} for name in

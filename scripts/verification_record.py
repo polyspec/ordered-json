@@ -17,7 +17,7 @@ SOURCE_PATTERNS = (
     'php/composer.json', 'php-extension/src/*.c', 'php-extension/src/*.h', 'php-extension/src/*.stub.php',
     'php-extension/src/config.m4', 'php-extension/src/config.w32', 'scripts/**/*.py', 'scripts/**/*.erl',
     'examples/official.json', 'examples/README*.md', 'fixtures/**/*.json', 'docs/spec/*.md',
-    'implementations.json', '.gitmodules', 'php-extension/composer.json',
+    'implementations.json',
 )
 
 
@@ -26,13 +26,22 @@ def sha256(data):
 
 
 def source_manifest(root):
-    paths = {path for pattern in SOURCE_PATTERNS for path in root.glob(pattern)
-             if path.is_file() and path.name not in ('config.h',)}
-    files = {path.relative_to(root).as_posix(): sha256(path.read_bytes()) for path in sorted(paths)}
-    for name, path in repository_paths(root).items():
-        if (path / '.git').exists():
-            for filename, digest in repository_manifest(path)['files'].items():
-                files[REGISTRY['repositories'][name]['path'] + '/' + filename] = digest
+    excluded = {'docs/verification.json', 'docs/pie-verification.json'}
+    files = {}
+    if (root / '.git').exists():
+        tracked = output(['git', 'ls-files', '--cached', '--others', '--exclude-standard', '-z'], cwd=root)
+        candidates = [root / filename for filename in tracked.split('\0') if filename]
+    else:
+        candidates = [path for pattern in SOURCE_PATTERNS for path in root.glob(pattern)]
+    for path in candidates:
+        name = path.relative_to(root).as_posix()
+        if path.is_file() and name not in excluded and not name.endswith('/config.h'):
+            files[name] = sha256(path.read_bytes())
+    for pattern in SOURCE_PATTERNS:
+        for path in root.glob(pattern):
+            name = path.relative_to(root).as_posix()
+            if path.is_file() and name not in excluded and not name.endswith('/config.h'):
+                files[name] = sha256(path.read_bytes())
     return {'sha256': sha256(json.dumps(files, sort_keys=True, separators=(',', ':')).encode()),
             'files': files}
 
@@ -48,19 +57,25 @@ def repository_manifest(path):
             'files': files}
 
 
-def submodule_revisions(root, require_pinned=False):
+def package_revisions(root):
+    """Identify each package by the current root-tracked file content."""
+    files = source_manifest(root)['files']
     result = {}
-    if not (root / '.gitmodules').exists():
-        return result
     for name, entry in REGISTRY['repositories'].items():
-        path = root / entry['path']
-        row = output(['git', 'ls-files', '--stage', '--', entry['path']], cwd=root).split()
-        if len(row) != 4 or row[0] != '160000' or not (path / '.git').exists():
-            raise ValueError('Missing initialized submodule: ' + name)
-        manifest = repository_manifest(path)
-        if require_pinned and (manifest['revision'] != row[1] or manifest['dirty']):
-            raise ValueError('Submodule is modified or differs from its recorded commit: ' + name)
-        result[name] = {'url': entry['url'], 'revision': manifest['revision'], 'pinned': row[1]}
+        prefix = entry['path'].rstrip('/') + '/'
+        package_files = {path.removeprefix(prefix): digest for path, digest in files.items()
+                         if path.startswith(prefix)}
+        if not package_files:
+            package_path = root / entry['path']
+            package_files = {path.relative_to(package_path).as_posix(): sha256(path.read_bytes())
+                             for path in package_path.rglob('*')
+                             if path.is_file() and '.git' not in path.parts}
+        if not package_files:
+            continue
+        result[name] = {'path': entry['path'],
+                        'sha256': sha256(json.dumps(package_files, sort_keys=True,
+                                                    separators=(',', ':')).encode()),
+                        'files': len(package_files)}
     return result
 
 
@@ -94,7 +109,7 @@ def create_record(root, before, results, counts, documentation_tests, runtime_ve
                             for name in IMPLEMENTATIONS},
         'documentation_tests': {'status': 'passed', 'count': documentation_tests},
         'supplementary': supplementary, 'build_warnings': list(build_warnings),
-        'submodules': submodule_revisions(root, require_pinned=True),
+        'packages': package_revisions(root),
     }
 
 

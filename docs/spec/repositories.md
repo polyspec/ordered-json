@@ -6,34 +6,32 @@
 <a id="ownership"></a>
 ## Ownership
 
-The common repository owns the JSON specification, official inputs and expected results, shared verifier, implementation registry, and aggregate verification records. Each implementation repository owns its source, adapter, package metadata, documentation, and release process.
+The repository owns the JSON specification, official inputs and expected results, shared verifier, implementation registry, aggregate verification records, and all implementation source. Each language directory owns its source, adapter, package metadata, documentation, and package build configuration within the same Git revision.
 
-| Repository | Checkout path | Implementation |
+| Package | Checkout path | Implementation |
 | --- | --- | --- |
-| ordered-json/ordered-json | . | Common contract and verification |
-| ordered-json/javascript | js | JavaScript |
-| ordered-json/rust | rust | Rust |
-| ordered-json/go | go | Go |
-| ordered-json/php | php | Pure PHP and the PHP Value API |
-| ordered-json/php-extension | php-extension | Native PHP extension |
+| common | . | Contract, fixtures, verification and registry |
+| javascript | js | JavaScript |
+| rust | rust | Rust |
+| go | go | Go |
+| php | php | Pure PHP and the PHP Value API |
+| php-extension | php-extension | Native PHP extension |
 
-The common repository records exact implementation commits as Git submodules. Implementation repositories do not contain reverse submodules to the common repository. Pure PHP and the extension have separate source and release histories. The native implementation is tested with an explicitly selected PHP Value API revision.
+The repository records one revision for the common contract and all implementations. The implementation directories do not contain nested Git repositories or reverse submodules. Pure PHP and the extension retain separate package metadata and build processes, but their source changes are reviewed and verified in the same repository revision. The native implementation is tested against the PHP Value API in that same revision.
 
 <a id="verification"></a>
 ## Shared verification
 
 Official inputs and expected results exist only in the common repository. Adapters return the shared reporting protocol and contain no independent goldens. The implementation registry declares repository locations, adapter commands, build commands, and runtime version commands. Adding a language must not require changing the JSON comparison algorithm.
 
-A standalone implementation check fetches the common verifier at the full commit recorded in its conformance configuration and tests the current local implementation checkout. Required test dependencies also use full commit IDs. An explicit local verifier override is available for coordinated development. Test reports identify verifier sources, implementation sources, dependency revisions, runtimes, and results.
-
-The aggregate check verifies every registered implementation using the checked-out submodule commits. It rejects missing or modified pinned submodules when recording an aggregate result. An implementation PR must run the shared check against its candidate source; the aggregate result applies only to the recorded combination.
+Each package check runs against the verifier and fixtures in the same checkout. Test reports identify the common revision, implementation paths, dependencies, runtimes, and results. The aggregate check verifies every registered implementation from the same working tree and rejects an incomplete package or missing declared build command.
 
 <a id="documents"></a>
 ## Documents and changes
 
 Each repository registers its own English documents and Korean translations. Shared contracts and aggregate feature state are referenced from implementation documents. The common documentation check also checks documents in initialized implementation repositories.
 
-For a shared contract change, publish the verifier revision, update affected implementations and their conformance revision, run candidate checks, then update the common repository's submodule commits and run the aggregate check. Test success and source or package publication remain separate observations.
+For a shared contract change, update the verifier, affected implementations, and conformance fixtures in one change, run package and aggregate checks, then publish the resulting repository revision. Test success and source or package publication remain separate observations.
 
 <a id="php-extension"></a>
 ## PHP extension package
@@ -47,4 +45,4 @@ PIE package recognition, a local PIE build, and the shared JSON check against th
 <a id="state"></a>
 ## Implementation state
 
-The five implementation repositories are published and included as pinned submodules. [Feature state](../features.md) records completion and evidence separately from this contract.
+The five implementation packages are maintained in this repository. [Feature state](../features.md) records completion and evidence separately from this contract.

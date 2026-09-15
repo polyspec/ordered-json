@@ -14,7 +14,7 @@ def main():
     parser.add_argument('--harness', type=Path, help='Use an explicit local verifier checkout')
     args, remaining = parser.parse_known_args()
     pin = json.loads((root / 'conformance.json').read_text())['harness']
-    if pin.get('url') != 'https://github.com/ordered-json/ordered-json.git' or not re.fullmatch(r'[a-f0-9]{40}', pin.get('revision', '')):
+    if pin.get('url') != 'https://github.com/polyspec/ordered-json.git' or not re.fullmatch(r'[a-f0-9]{40}', pin.get('revision', '')):
         raise ValueError('The common verifier requires its expected URL and a full commit ID')
     harness = args.harness.resolve() if args.harness else root / '.cache/harness' / pin['revision']
     if not args.harness:

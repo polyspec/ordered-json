@@ -1,5 +1,5 @@
 <!-- doc-id: installation -->
-<!-- source-sha256: 4e8ef38dda81719a87c6014728f66626a94ecbfe44f3ddc275268f64fef8c6ff -->
+<!-- source-sha256: bc7e0cd53594b5c2a53c9156c02cc7f6aabd8f9710bde6fb9cc1fa3e8b95b060 -->
 # 설치와 실행
 
 [English](installation.md)
@@ -22,11 +22,11 @@
 ## 소스 체크아웃
 
 ~~~sh
-git clone --recurse-submodules https://github.com/ordered-json/ordered-json.git
+git clone https://github.com/polyspec/ordered-json.git
 cd ordered-json
 ~~~
 
-기존 체크아웃은 `git submodule update --init --recursive`로 초기화합니다. 각 구현을 자체 저장소에서 독립적으로 복제할 수도 있습니다. 로컬 모듈 또는 소스 디렉터리를 사용합니다. 레지스트리 설치와 게시는 검증되지 않았습니다. [배포](distribution.ko.md)를 확인합니다.
+복제본에는 모든 구현 패키지가 포함됩니다. 패키지 디렉터리 또는 게시된 패키지가 준비된 경우 게시 패키지를 사용합니다. 레지스트리 설치와 게시는 검증되지 않았습니다. [배포](distribution.ko.md)를 확인합니다.
 
 - JavaScript: `js/index.js`에서 가져옵니다. TypeScript 선언은 `js/index.d.ts`에 있습니다.
 - Rust: `path`가 `rust/`를 지정하는 로컬 Cargo 의존성을 설정합니다.

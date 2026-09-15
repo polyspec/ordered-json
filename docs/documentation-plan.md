@@ -8,7 +8,7 @@ This document defines the repository's documentation structure and update proced
 <a id="ownership"></a>
 ## Canonical documents
 
-Each topic has one English canonical document and one `.ko.md` translation. The [manifest](documentation-manifest.json) registers every common Markdown document and its topic. Each implementation submodule registers its own documents. The common checker checks both levels. Other documents link to the canonical topic instead of repeating its rules.
+Each topic has one English canonical document and one `.ko.md` translation. The [manifest](documentation-manifest.json) registers every common Markdown document and its topic. Each implementation package registers its own documents. The common checker checks both levels. Other documents link to the canonical topic instead of repeating its rules.
 
 | Location | Content |
 | --- | --- |

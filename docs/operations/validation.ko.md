@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 5ff14ba2f9bb94756502d14280f1c05b1016be2f1ae241d8973f9359b31f5c6b -->
+<!-- source-sha256: 55624142a462da49bbc5b6790c0ec8c435c9f1bc6b4cd2d81260f297ce8c6483 -->
 # 검증
 
 [English](validation.md)
@@ -7,16 +7,16 @@
 <a id="repository-check"></a>
 ## 통합 검사
 
-[필수 도구](installation.ko.md#requirements)를 설치하고 서브모듈을 초기화한 뒤 공통 저장소 루트에서 실행합니다.
+[필수 도구](installation.ko.md#requirements)를 설치하고 저장소 루트에서 실행합니다.
 
 ~~~sh
 git submodule update --init --recursive
 make check
 ~~~
 
-검증기와 문서 검사기 테스트를 실행하고, 선택한 소스를 빌드하고, 등록된 모든 구현에 공통 JSON 사례를 적용하고, [verification.json](../verification.json)을 생성한 뒤 공통·구현 문서를 검사합니다. 통합 기록에는 초기화되어 있고 수정 사항이 없으며 Git 인덱스와 커밋이 일치하는 서브모듈이 필요합니다.
+검증기와 문서 검사기 테스트를 실행하고, 선택한 패키지를 빌드하고, 등록된 모든 구현에 공통 JSON 사례를 적용하고, [verification.json](../verification.json)을 생성한 뒤 공통·패키지 문서를 검사합니다. 통합 기록에는 추적된 모든 패키지 파일의 소스 해시가 포함됩니다.
 
-기록에는 소스 해시, 서브모듈 개정본, 실제 런타임 버전, 사례 수, 결과, 검사기 테스트 수, 빌드 경고, 추가 입력 개정본이 포함됩니다. PHP 버전과 확장 버전은 별도 필드입니다. 입력이 변경되면 현재 검증 근거로 유효하지 않습니다. 실행 중 변경과 불완전한 구현 결과는 거부합니다. 이 기록은 게시 근거가 아닙니다.
+기록에는 소스 해시, 패키지 파일 기록, 실제 런타임 버전, 사례 수, 결과, 검사기 테스트 수, 빌드 경고, 추가 입력 개정본이 포함됩니다. PHP 버전과 확장 버전은 별도 필드입니다. 입력이 변경되면 현재 검증 근거로 유효하지 않습니다. 실행 중 변경과 불완전한 구현 결과는 거부합니다. 이 기록은 게시 근거가 아닙니다.
 
 <a id="supplementary"></a>
 ## 추가 입력
@@ -49,7 +49,7 @@ cd php-extension
 make check
 ~~~
 
-각 구현의 `conformance.json`은 공통 검증기를 전체 커밋으로 고정합니다. 부트스트랩은 현재 후보 체크아웃을 검사하고, 명시된 테스트 의존성만 정확한 커밋으로 가져오고, `.cache/verification.json`을 생성합니다. 순수 PHP에는 네이티브 체크아웃이 필요하지 않습니다. 확장은 네이티브 어댑터에 필요한 PHP Value API를 고정된 커밋으로 가져옵니다.
+각 패키지는 독립 빌드 대상으로 유지하지만 공유 검사 명령은 루트 registry와 검증기가 정의합니다. 네이티브 확장은 `php-extension/`에서 빌드하며 같은 체크아웃의 형제 PHP 패키지와 함께 검사합니다.
 
 추가 입력은 `make check JSON_TEST_SUITE=/path/to/JSONTestSuite`로 검사합니다. `make check HARNESS=/path/to/ordered-json`은 로컬 검증기를 명시적으로 선택하며 결과에 해당 지정을 기록합니다. 단독 결과에는 후보·의존성 소스 해시, 개정본, 로컬 수정 여부, 런타임 버전, 결과가 포함됩니다. 상위 결과는 더 새로운 후보 커밋의 검증 근거가 아닙니다.
 
@@ -64,7 +64,7 @@ make pie-check PIE=/path/to/pie.phar JSON_TEST_SUITE=.cache/JSONTestSuite
 
 [PIE 검사기](../../scripts/check_pie.py)는 `.cache/` 아래에 PIE 설정을 격리하고, 현재 확장 체크아웃을 경로 저장소로 등록하고, 패키지 인식을 확인하고, PIE로 빌드합니다. 같은 공통 어댑터와 기대값으로 해당 산출물을 직접 검사합니다. 중간에 일반 네이티브 빌드를 실행하지 않습니다.
 
-[pie-verification.json](../pie-verification.json)은 PIE 버전과 PHAR 해시, 확장 산출물 해시, 명령, 소스 해시, PHP·확장 버전, 사례 결과를 기록합니다. 빌드 오류, 빌드 도구 누락, 어댑터 경고, 검사 중 변경은 검증 실패로 처리합니다. 컴파일 경고는 기록에 유지합니다. 이 검사는 모듈을 설치하거나 패키지를 게시하지 않습니다. 기록된 입력이 변경되면 다시 실행합니다.
+준비된 경우 `pie-verification.json`은 PIE 버전과 PHAR 해시, 확장 산출물 해시, 명령, 소스 해시, PHP·확장 버전, 사례 결과를 기록합니다. 빌드 오류, 빌드 도구 누락, 어댑터 경고, 검사 중 변경은 검증 실패로 처리합니다. 컴파일 경고는 기록에 유지합니다. 이 검사는 모듈을 설치하거나 패키지를 게시하지 않습니다. 기록된 입력이 변경되면 다시 실행합니다.
 
 <a id="documentation-checks"></a>
 ## 문서 검사

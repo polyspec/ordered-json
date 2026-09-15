@@ -19,11 +19,11 @@
 | F-CONSTRUCT | Construction from ordered maps and arrays of Value objects | implemented | shared-suite | [result](verification.json) | source-only | [construction](spec/json-contract.md#construction) |
 | F-PHP-NATIVE | PHP extension parser and serializer with the shared PHP API | implemented | shared-suite | [result](verification.json) | source-only | [PHP](spec/api.md#php) |
 | F-DOCS | Bilingual documents, link/status checks, verification freshness | implemented | docs-tests | [result](verification.json) | source-only | [procedure](documentation-plan.md#checks) |
-| F-REPOS | Independent implementation repositories and shared conformance | implemented | shared-suite | [result](verification.json) | source-only | [repositories](spec/repositories.md) |
+| F-REPOS | Single repository with independently buildable implementation packages and shared conformance | implemented | shared-suite | [result](verification.json) | source-only | [repositories](spec/repositories.md) |
 
 <a id="limits"></a>
 ## Verification and distribution limits
 
-Current native macOS and PIE builds have no build warnings. The [aggregate record](verification.json) and [PIE record](pie-verification.json) identify their source revisions and results.
+The previous native macOS and PIE records belonged to the former submodule checkout and are not current evidence for this monorepo. A new PIE record will be created only after a local PHAR is available and `make pie-check` passes.
 
 Passing shared cases establishes their recorded acceptance criteria. It does not establish exhaustive input coverage, all declared minimum runtimes, all platforms, or every host encoder integration. See [verification limits](operations/validation.md#limits). Source metadata contains development version strings; this table does not identify a registry release.

@@ -5,17 +5,17 @@
 
 JSON libraries for JavaScript, Rust, Go, and PHP. Objects use associative maps that preserve document key order at every depth. Repeated keys retain the first position and the last value.
 
-This repository maintains the common specification, official examples, expected results, and verifier. Five independent implementation repositories are included as submodules at exact commits. PHP and the native PHP extension have separate repositories.
+This repository is the single source repository for the common specification, official examples, expected results, verifier, and all five implementations. The language directories are independent packages and build targets inside this repository; they share one revision without sharing language-specific APIs.
 
 <a id="start"></a>
 ## Start
 
 ~~~sh
-git clone --recurse-submodules https://github.com/ordered-json/ordered-json.git
+git clone https://github.com/polyspec/ordered-json.git
 cd ordered-json
 ~~~
 
-For an existing checkout, run `git submodule update --init --recursive`. Run JavaScript with an official input from the repository root:
+Run JavaScript with an official input from the repository root:
 
 ~~~sh
 node --input-type=module <<'JS'
@@ -27,13 +27,13 @@ console.log(stringify(parse(example.input)));
 JS
 ~~~
 
-| Repository | Contents | Checkout path |
+| Package | Contents | Path |
 | --- | --- | --- |
-| [javascript](https://github.com/ordered-json/javascript) | JavaScript and TypeScript declarations | `js/` |
-| [rust](https://github.com/ordered-json/rust) | Rust | `rust/` |
-| [go](https://github.com/ordered-json/go) | Go | `go/` |
-| [php](https://github.com/ordered-json/php) | Pure PHP and the Value API | `php/` |
-| [php-extension](https://github.com/ordered-json/php-extension) | Native PHP extension with PIE metadata | `php-extension/` |
+| JavaScript | JavaScript and TypeScript declarations | `js/` |
+| Rust | Rust crate | `rust/` |
+| Go | Go package | `go/` |
+| PHP | Pure PHP and the Value API | `php/` |
+| PHP extension | Native PHP extension with PIE metadata | `php-extension/` |
 
 <a id="verification"></a>
 ## Verification
@@ -44,7 +44,7 @@ All implementations use the same [official examples](examples/README.md) and sha
 make check
 ~~~
 
-The aggregate record applies to the pinned submodule commits. See [installation](docs/operations/installation.md) for tools and identifiers, and [verification](docs/operations/validation.md) for standalone, supplementary, and PIE checks. Tests and package publication are recorded separately.
+The aggregate record applies to the common revision and all package sources in that checkout. See [installation](docs/operations/installation.md) for tools and identifiers, and [verification](docs/operations/validation.md) for supplementary and PIE checks. Tests and package publication are recorded separately.
 
 <a id="documents"></a>
 ## Documents

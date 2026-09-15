@@ -9,7 +9,7 @@ import re
 import sys
 from urllib.parse import unquote, urlsplit
 
-from verification_record import IMPLEMENTATIONS, sha256, source_manifest, submodule_revisions
+from verification_record import IMPLEMENTATIONS, package_revisions, sha256, source_manifest
 from registry import REGISTRY, repository_paths
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -88,7 +88,12 @@ def local_target(root, source, target):
 
 def authored_markdown(root):
     paths = set()
+    package_roots = {Path(entry['path']).parts[0] for entry in REGISTRY['repositories'].values()}
     for folder, directories, files in os.walk(root):
+        relative = Path(folder).resolve().relative_to(Path(root).resolve())
+        if root.resolve() == ROOT.resolve() and relative.parts and relative.parts[0] in package_roots:
+            directories[:] = []
+            continue
         directories[:] = [name for name in directories if name not in IGNORED
                           and not (Path(folder) / name / '.git').exists()]
         for name in files:
@@ -154,8 +159,8 @@ def check_verification(root, record):
     native = implementations.get('php-extension', {}).get('runtime', {})
     if 'php-extension' in implementations and (not native.get('extension_version') or not native.get('php')):
         raise ValueError('PHP runtime and extension versions must both be recorded')
-    if record.get('submodules', {}) != submodule_revisions(root, require_pinned=True):
-        raise ValueError('Verification submodule revisions differ from the current pins')
+    if record.get('packages', {}) != package_revisions(root):
+        raise ValueError('Verification package records differ from the current source')
     tests = record['documentation_tests']
     if tests.get('status') != 'passed' or type(tests.get('count')) is not int or tests['count'] <= 0:
         raise ValueError('Passing documentation checker tests are required')
@@ -174,10 +179,13 @@ def check_distribution(record, features):
         raise ValueError('Invalid distribution schema')
     datetime.fromisoformat(record['checked_at'])
     source = record['source']
-    if source.get('state') != 'available' or source.get('url') != 'https://github.com/ordered-json/ordered-json' or source.get('branch') != 'main':
-        raise ValueError('Confirmed source distribution is missing')
-    if source.get('visibility') != 'public':
-        raise ValueError('Source visibility observation is missing')
+    if source.get('state') not in ('available', 'not-verified'):
+        raise ValueError('Invalid source distribution state')
+    if source.get('state') == 'available':
+        if source.get('url') != 'https://github.com/polyspec/ordered-json' or source.get('branch') != 'main':
+            raise ValueError('Confirmed source distribution is missing')
+        if source.get('visibility') != 'public':
+            raise ValueError('Source visibility observation is missing')
     if not isinstance(record.get('github_releases'), list) or not isinstance(record.get('version_tags'), list):
         raise ValueError('Release and tag observations are required')
     if 'implementation_sources' in record:
@@ -215,8 +223,8 @@ def check_pie_verification(root, record):
     datetime.fromisoformat(record['checked_at'])
     if record.get('sources') != source_manifest(root):
         raise ValueError('PIE verification is stale; run scripts/check_pie.py')
-    if record.get('submodules') != submodule_revisions(root, require_pinned=True):
-        raise ValueError('PIE verification submodule revisions differ from the current pins')
+    if record.get('packages') != package_revisions(root):
+        raise ValueError('PIE verification package records differ from the current source')
     if record.get('package') != 'ordered-json/ordered-json-extension:*@dev':
         raise ValueError('PIE verification uses an unexpected package')
     for value in (record['pie']['phar_sha256'], record['artifact']['sha256']):
@@ -266,7 +274,7 @@ def check_repository(root, include_children=True):
         if manifest.get('schema_version') != 1 or not isinstance(manifest.get('documents'), list):
             raise ValueError('Expected documentation manifest schema version 1')
         role = manifest.get('role', 'common')
-        if role not in ('common', 'implementation'):
+        if role not in ('common', 'implementation', 'package'):
             raise ValueError('Unknown documentation repository role')
         for entry in manifest['documents']:
             identifier, en, ko, kind = (entry[key] for key in ('id', 'en', 'ko', 'kind'))
@@ -335,10 +343,11 @@ def check_repository(root, include_children=True):
                 error('docs/pie-verification.json', str(issue))
         if include_children:
             for name, path in repository_paths(root).items():
-                if (path / '.git').exists():
+                manifest = path / 'docs/documentation-manifest.json'
+                if manifest.is_file():
                     child_errors, count, _ = check_repository(path, include_children=False)
                     errors.extend(name + '/' + issue for issue in child_errors)
-    else:
+    elif role == 'implementation':
         try:
             from standalone import validate_configuration
             validate_configuration(read_json('conformance.json'))

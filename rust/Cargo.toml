@@ -1,0 +1,11 @@
+[package]
+name = "ordered-json"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"
+description = "Strict JSON with insertion-ordered associative objects and exact number literals"
+readme = "README.md"
+repository = "https://github.com/ordered-json/rust"
+
+[lib]
+path = "src/lib.rs"

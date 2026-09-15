@@ -1,4 +1,4 @@
-"""Load implementation commands and resolve independent repository checkouts."""
+"""Load implementation commands and resolve monorepo package paths."""
 import json
 from pathlib import Path
 import re
@@ -21,8 +21,8 @@ def load_registry(root=ROOT):
         path = Path(repository['path'])
         if path.is_absolute() or '..' in path.parts or str(path) == '.':
             raise ValueError('Repository paths must be relative child directories')
-        if not repository['url'].startswith('https://github.com/ordered-json/'):
-            raise ValueError('Repository URLs must use the ordered-json organization')
+        if repository['url'] != 'https://github.com/polyspec/ordered-json.git':
+            raise ValueError('Package URLs must use the polyspec/ordered-json monorepo')
     for name, implementation in implementations.items():
         if not re.fullmatch(r'[a-z][a-z0-9-]*', name):
             raise ValueError('Invalid implementation name: ' + name)

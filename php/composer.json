@@ -1,0 +1,21 @@
+{
+  "name": "ordered-json/ordered-json",
+  "description": "JSON document order at every depth, with optional native parser",
+  "type": "library",
+  "require": {
+    "php": ">=8.2",
+    "ext-json": "*",
+    "ext-pcre": "*"
+  },
+  "suggest": {
+    "ext-ordered_json": "Native backend from the ordered-json/ordered-json-extension PIE package"
+  },
+  "autoload": {
+    "files": [
+      "src/OrderedJson.php"
+    ]
+  },
+  "scripts": {
+    "test": "python3 scripts/check.py"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "ordered-json/ordered-json-extension",
+  "description": "Native PHP extension for strict JSON with document-order associative objects",
+  "type": "php-ext",
+  "require": {"php": ">=8.2"},
+  "php-ext": {
+    "extension-name": "ordered_json",
+    "build-path": "src"
+  }
+}

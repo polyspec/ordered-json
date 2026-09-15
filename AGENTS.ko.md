@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: a47557783d00b8bad722f4fbef611f8c6a5626ff4ed3eeb91ec4d2485b7068ee -->
+<!-- source-sha256: f61e8588ac0a6af7ec4b66534866aa67f6bf50a0cb07de5841b04b9928e5de54 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -18,7 +18,7 @@
 <a id="verification"></a>
 ## 필수 검사
 
-통합 검사 전에 서브모듈을 초기화합니다. 각 구현은 자체 소스와 문서 목록을 관리합니다. 저장소 루트에서 다음 명령을 실행합니다.
+각 구현 패키지는 자체 소스와 문서 목록을 관리합니다. 저장소 루트에서 다음 명령을 실행합니다.
 
 ~~~sh
 make check
@@ -33,7 +33,7 @@ make check JSON_TEST_SUITE=.cache/JSONTestSuite
 
 문서만 검토할 때는 `make docs-check`를 실행합니다. 검증 소스 해시가 변경됐으면 `make check`를 실행하여 현재 기록을 생성합니다. PIE 기록이 오래됐으면 해당 추가 사례와 함께 `make pie-check PIE=/path/to/pie.phar`도 실행합니다. 검사를 통과시키기 위해 검증 결과나 소스 해시를 직접 수정하지 않습니다.
 
-[구현 등록 정보](implementations.json)는 저장소·빌드·어댑터·런타임 명령을 정의합니다. 공통 JSON 비교 알고리즘을 변경하지 않고 해당 등록 정보와 독립 저장소로 새 언어를 추가합니다. 변경한 구현 커밋을 먼저 게시한 다음 서브모듈 경로를 갱신하고 스테이징합니다. 계약 변경은 검증기 개정본을 먼저 게시합니다. [저장소 계약](docs/spec/repositories.ko.md)을 참조합니다.
+[구현 등록 정보](implementations.json)는 패키지 경로·빌드·어댑터·런타임 명령을 정의합니다. 공통 JSON 비교 알고리즘을 변경하지 않고 해당 등록 정보와 패키지 디렉터리로 새 언어를 추가합니다. 계약 변경은 같은 저장소 리비전에서 검증기와 관련 패키지를 갱신합니다. [저장소 계약](docs/spec/repositories.ko.md)을 참조합니다.
 
 모든 언어 어댑터는 [official.json](examples/official.json)과 [scripts/verify.py](scripts/verify.py)를 사용합니다. 공통 사례는 해당 파일이나 `fixtures/`에 추가합니다. 언어별로 다른 예제나 기대 결과를 만들지 않습니다.
 

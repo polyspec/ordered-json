@@ -9,7 +9,7 @@ import re
 import subprocess
 
 from registry import ROOT, adapter_commands, repository_paths, runtime_versions
-from verification_record import (sha256, source_manifest, submodule_revisions,
+from verification_record import (package_revisions, sha256, source_manifest,
                                  supplementary_manifest, write_record)
 from verify import verify_adapters
 
@@ -26,7 +26,7 @@ def main():
     cache.mkdir(parents=True, exist_ok=True)
     environment = dict(os.environ, PIE_WORKING_DIRECTORY=str(cache / 'work'))
     sources = source_manifest(ROOT)
-    pins = submodule_revisions(ROOT, require_pinned=True)
+    packages = package_revisions(ROOT)
     supplementary = supplementary_manifest(suite)
     pie_hash = sha256(pie.read_bytes())
     commands, warnings = [], []
@@ -57,7 +57,7 @@ def main():
     selected = ['php-extension']
     results, counts = verify_adapters(adapter_commands(selected, paths, cache), suite)
     versions = runtime_versions(selected, paths, cache)
-    if (sources != source_manifest(ROOT) or pins != submodule_revisions(ROOT, require_pinned=True)
+    if (sources != source_manifest(ROOT) or packages != package_revisions(ROOT)
             or supplementary != supplementary_manifest(suite) or pie_hash != sha256(pie.read_bytes())
             or artifact_hash != sha256(module.read_bytes())):
         raise ValueError('PIE verification inputs or artifact changed during verification')
@@ -66,7 +66,7 @@ def main():
     record = {'schema_version': 1, 'scope': 'pie-build', 'status': 'passed',
               'checked_at': datetime.now(timezone.utc).isoformat(timespec='seconds'),
               'platform': {'system': platform.system(), 'machine': platform.machine()},
-              'sources': sources, 'submodules': pins,
+              'sources': sources, 'packages': packages,
               'pie': {'version': version, 'phar_sha256': pie_hash},
               'package': package, 'commands': commands, 'build_warnings': warnings,
               'artifact': {'path': module.relative_to(ROOT).as_posix(), 'sha256': artifact_hash},
