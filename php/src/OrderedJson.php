@@ -104,7 +104,9 @@ function tokenUnits(string $content): array
 /** @internal UTF-16 units of valid UTF-8 text. */
 function textUnits(string $text): array
 {
-    return preg_match('/[\x80-\xff]/', $text) === 1 ? utf8Units($text) : array_values(unpack('C*', $text));
+    static $ascii = null;
+    $ascii ??= implode('', array_map('chr', range(0, 127)));
+    return strspn($text, $ascii) === strlen($text) ? array_values(unpack('C*', $text)) : utf8Units($text);
 }
 
 /** @internal Encode UTF-16 units with the shared constructor spelling. */
@@ -328,7 +330,8 @@ final class Parser
 {
     /** Bytes that end the ordinary run of a string: quote, backslash and control characters. */
     private const STRING_STOP = "\"\\\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f";
-    private int $pos = 0;
+    private const WHITESPACE = " \t\n\r";
+    private const DIGITS = '0123456789';
     private int $length;
     /** @var list<int> */
     private array $tape = [];
@@ -338,89 +341,104 @@ final class Parser
     {
         $this->length = strlen($source);
     }
-    private function fail(string $message): never { throw new ParseError($message, $this->pos); }
-    private function ws(): void
-    {
-        if (($skipped = strspn($this->source, " \t\n\r", $this->pos)) !== 0) {
-            $this->pos += $skipped;
-            $this->whitespace += $skipped;
-        }
-    }
-    private function digits(): void
-    {
-        $count = strspn($this->source, '0123456789', $this->pos);
-        if ($count === 0) $this->fail('Expected digit');
-        $this->pos += $count;
-    }
+    private function fail(string $message, int $pos): never { throw new ParseError($message, $pos); }
     public function parse(): array
     {
-        if (preg_match('//u', $this->source) !== 1) $this->fail('Invalid UTF-8');
-        $this->value(0); $this->ws();
-        if ($this->pos !== $this->length) $this->fail('Unexpected trailing input');
+        // PCRE validates UTF-8 before matching, so only a UTF-8 error means invalid input;
+        // other errors come from the backtrack or recursion limits in php.ini.
+        if (preg_match('//u', $this->source) !== 1 && preg_last_error() === PREG_BAD_UTF8_ERROR) $this->fail('Invalid UTF-8', 0);
+        $pos = $this->value(0, 0);
+        $pos += strspn($this->source, self::WHITESPACE, $pos);
+        if ($pos !== $this->length) $this->fail('Unexpected trailing input', $pos);
         return $this->tape;
     }
-    /** Validates the string token at the cursor and returns its flags. */
-    private function string(): int
+    /**
+     * Validates the string token at $pos. Returns the offset after it shifted left by one,
+     * with the low bit set when the token contains escapes.
+     */
+    private function string(int $pos): int
     {
-        if (($this->source[$this->pos] ?? '') !== '"') $this->fail('Expected string');
-        $this->pos++;
-        $flags = Tape::COMPACT;
+        $s = $this->source;
+        if (($s[$pos] ?? '') !== '"') $this->fail('Expected string', $pos);
+        $pos++;
+        $escaped = 0;
         while (true) {
-            $this->pos += strcspn($this->source, self::STRING_STOP, $this->pos);
-            if ($this->pos >= $this->length) $this->fail('Unterminated string');
-            $ch = $this->source[$this->pos++];
-            if ($ch === '"') return $flags;
-            if ($ch !== '\\') $this->fail('Unescaped control character');
-            $flags |= Tape::ESCAPED;
-            $escape = $this->source[$this->pos] ?? '';
-            if ($escape === '') $this->fail('Unfinished escape');
-            $this->pos++;
+            $pos += strcspn($s, self::STRING_STOP, $pos);
+            if ($pos >= $this->length) $this->fail('Unterminated string', $pos);
+            $ch = $s[$pos++];
+            if ($ch === '"') return $pos << 1 | $escaped;
+            if ($ch !== '\\') $this->fail('Unescaped control character', $pos);
+            $escaped = 1;
+            $escape = $s[$pos] ?? '';
+            if ($escape === '') $this->fail('Unfinished escape', $pos);
+            $pos++;
             if ($escape === 'u') {
-                if (strspn($this->source, '0123456789abcdefABCDEF', $this->pos, 4) !== 4) $this->fail('Invalid Unicode escape');
-                $this->pos += 4;
+                if (strspn($s, '0123456789abcdefABCDEF', $pos, 4) !== 4) $this->fail('Invalid Unicode escape', $pos);
+                $pos += 4;
             } elseif (!str_contains('"\\/bfnrt', $escape)) {
-                $this->fail('Invalid escape');
+                $this->fail('Invalid escape', $pos);
             }
         }
     }
-    private function value(int $depth): void
+    /** Parses the value at or after $pos and returns the offset after it. */
+    private function value(int $depth, int $pos): int
     {
-        $this->ws();
-        $start = $this->pos;
-        $ch = $this->source[$start] ?? '';
+        $s = $this->source;
+        if (($skipped = strspn($s, self::WHITESPACE, $pos)) !== 0) {
+            $pos += $skipped;
+            $this->whitespace += $skipped;
+        }
+        $start = $pos;
+        $ch = $s[$pos] ?? '';
         if ($ch === '{' || $ch === '[') {
-            if ($depth >= $this->maxDepth) $this->fail('Maximum nesting depth exceeded');
-            $this->container($depth, $start, $ch === '{');
-            return;
+            if ($depth >= $this->maxDepth) $this->fail('Maximum nesting depth exceeded', $pos);
+            return $this->container($depth, $pos, $ch === '{');
         }
         if ($ch === '"') {
-            $kind = Tape::STRING | $this->string();
+            $result = $this->string($pos);
+            $pos = $result >> 1;
+            $kind = Tape::STRING | Tape::COMPACT | ($result & 1 ? Tape::ESCAPED : 0);
         } elseif ($ch === '-' || ($ch !== '' && $ch >= '0' && $ch <= '9')) {
-            if ($ch === '-') $this->pos++;
-            if (($this->source[$this->pos] ?? '') === '0') $this->pos++; else $this->digits();
-            if (($this->source[$this->pos] ?? '') === '.') { $this->pos++; $this->digits(); }
-            $ch = $this->source[$this->pos] ?? '';
+            if ($ch === '-') $pos++;
+            if (($s[$pos] ?? '') === '0') {
+                $pos++;
+            } else {
+                if (($count = strspn($s, self::DIGITS, $pos)) === 0) $this->fail('Expected digit', $pos);
+                $pos += $count;
+            }
+            if (($s[$pos] ?? '') === '.') {
+                if (($count = strspn($s, self::DIGITS, ++$pos)) === 0) $this->fail('Expected digit', $pos);
+                $pos += $count;
+            }
+            $ch = $s[$pos] ?? '';
             if ($ch === 'e' || $ch === 'E') {
-                $this->pos++;
-                $ch = $this->source[$this->pos] ?? '';
-                if ($ch === '+' || $ch === '-') $this->pos++;
-                $this->digits();
+                $ch = $s[++$pos] ?? '';
+                if ($ch === '+' || $ch === '-') $pos++;
+                if (($count = strspn($s, self::DIGITS, $pos)) === 0) $this->fail('Expected digit', $pos);
+                $pos += $count;
             }
             $kind = Tape::NUMBER | Tape::COMPACT;
+        } elseif ($ch === 't' && substr_compare($s, 'true', $pos, 4) === 0) {
+            $pos += 4;
+            $kind = Tape::BOOLEAN | Tape::COMPACT;
+        } elseif ($ch === 'f' && substr_compare($s, 'false', $pos, 5) === 0) {
+            $pos += 5;
+            $kind = Tape::BOOLEAN | Tape::COMPACT;
+        } elseif ($ch === 'n' && substr_compare($s, 'null', $pos, 4) === 0) {
+            $pos += 4;
+            $kind = Tape::NULL | Tape::COMPACT;
         } else {
-            if ($ch === 't') { $literal = 'true'; $kind = Tape::BOOLEAN | Tape::COMPACT; }
-            elseif ($ch === 'f') { $literal = 'false'; $kind = Tape::BOOLEAN | Tape::COMPACT; }
-            elseif ($ch === 'n') { $literal = 'null'; $kind = Tape::NULL | Tape::COMPACT; }
-            else $this->fail('Expected JSON value');
-            if (substr_compare($this->source, $literal, $this->pos, strlen($literal)) !== 0) $this->fail('Expected JSON value');
-            $this->pos += strlen($literal);
+            $this->fail('Expected JSON value', $pos);
         }
         $this->tape[] = $kind;
         $this->tape[] = $start;
-        $this->tape[] = $this->pos;
+        $this->tape[] = $pos;
+        return $pos;
     }
-    private function container(int $depth, int $start, bool $object): void
+    /** Parses the container that opens at $start and returns the offset after it. */
+    private function container(int $depth, int $start, bool $object): int
     {
+        $s = $this->source;
         $close = $object ? '}' : ']';
         $whitespace = $this->whitespace;
         $duplicates = $this->duplicates;
@@ -429,22 +447,29 @@ final class Parser
         $this->tape[] = $start;
         $this->tape[] = 0;
         $names = [];
-        $this->pos++; $this->ws();
-        if (($this->source[$this->pos] ?? '') !== $close) {
+        $pos = $start + 1;
+        if (($skipped = strspn($s, self::WHITESPACE, $pos)) !== 0) {
+            $pos += $skipped;
+            $this->whitespace += $skipped;
+        }
+        if (($s[$pos] ?? '') !== $close) {
             while (true) {
                 if ($object) {
                     $key = count($this->tape);
-                    $keyStart = $this->pos;
-                    $flags = $this->string();
-                    $this->tape[] = Tape::STRING | $flags | ($key + 3) << Tape::LINK;
+                    $keyStart = $pos;
+                    $result = $this->string($pos);
+                    $pos = $result >> 1;
+                    $this->tape[] = Tape::STRING | Tape::COMPACT | ($result & 1 ? Tape::ESCAPED : 0) | ($key + 3) << Tape::LINK;
                     $this->tape[] = $keyStart;
-                    $this->tape[] = $this->pos;
-                    $this->ws();
-                    if (($this->source[$this->pos] ?? '') !== ':') $this->fail('Expected colon');
-                    $this->pos++;
-                    $this->value($depth + 1);
-                    $name = substr($this->source, $keyStart + 1, $this->tape[$key + 2] - $keyStart - 2);
-                    if ($flags & Tape::ESCAPED) $name = keyText(tokenUnits($name));
+                    $this->tape[] = $pos;
+                    $name = substr($s, $keyStart + 1, $pos - $keyStart - 2);
+                    if (($skipped = strspn($s, self::WHITESPACE, $pos)) !== 0) {
+                        $pos += $skipped;
+                        $this->whitespace += $skipped;
+                    }
+                    if (($s[$pos] ?? '') !== ':') $this->fail('Expected colon', $pos);
+                    $pos = $this->value($depth + 1, $pos + 1);
+                    if ($result & 1) $name = keyText(tokenUnits($name));
                     if (isset($names[$name])) {
                         $first = $names[$name];
                         $this->tape[$first] = $this->tape[$first] & 0xff | ($key + 3) << Tape::LINK;
@@ -454,18 +479,26 @@ final class Parser
                         $names[$name] = $key;
                     }
                 } else {
-                    $this->value($depth + 1);
+                    $pos = $this->value($depth + 1, $pos);
                 }
-                $this->ws();
-                $next = $this->source[$this->pos] ?? '';
+                if (($skipped = strspn($s, self::WHITESPACE, $pos)) !== 0) {
+                    $pos += $skipped;
+                    $this->whitespace += $skipped;
+                }
+                $next = $s[$pos] ?? '';
                 if ($next === $close) break;
-                if ($next !== ',') $this->fail('Expected comma or closing delimiter');
-                $this->pos++; $this->ws();
+                if ($next !== ',') $this->fail('Expected comma or closing delimiter', $pos);
+                $pos++;
+                if (($skipped = strspn($s, self::WHITESPACE, $pos)) !== 0) {
+                    $pos += $skipped;
+                    $this->whitespace += $skipped;
+                }
             }
         }
-        $this->pos++;
+        $pos++;
         $compact = $this->whitespace === $whitespace && $this->duplicates === $duplicates ? Tape::COMPACT : 0;
         $this->tape[$index] = ($object ? Tape::OBJECT : Tape::ARRAY) | $compact | count($this->tape) << Tape::LINK;
-        $this->tape[$index + 2] = $this->pos;
+        $this->tape[$index + 2] = $pos;
+        return $pos;
     }
 }
