@@ -38,7 +38,7 @@ JavaScript returns a copied `Map<string, Value>`, exposed as `ReadonlyMap` in Ty
 
 Rust returns an immutable `OrderedMap` reference. `OrderedMap::insert(key, value)` accepts a string `Value` key and returns the replaced value when present. `iter()` returns key/value references in insertion order.
 
-Go returns an independent `OrderedMap` copy. `Set(key, value)` accepts a string `Value` key; `Keys()` returns key values in insertion order. `Get` and `GetUnits` return a value pointer or nil. `ParseBytes` copies its input. `ParseBytesBorrowed` is an explicit zero-copy API; callers must not mutate the byte slice while the returned value is alive. `ParseMany(source)` and `ParseManyWithMaxDepth(source, limit)` parse a whitespace-separated sequence of JSON values, such as JSON Lines, and return one root value per document; an invalid value rejects the whole input.
+Go returns an independent `OrderedMap` copy. `Set(key, value)` accepts a string `Value` key; `Keys()` returns key values in insertion order. `Get` and `GetUnits` return a value pointer or nil. `ParseBytes` copies its input. `ParseBytesBorrowed` is an explicit zero-copy API; callers must not mutate the byte slice while the returned value is alive.
 
 PHP returns an associative array of `Value` objects. Object construction accepts that associative array. A missing key returns null in PHP, undefined in JavaScript, `None` in Rust, and nil in Go.
 

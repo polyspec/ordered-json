@@ -1,20 +1,19 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-15T12:16:43+00:00",
+  "checked_at": "2026-09-15T12:29:57+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "672d4efd109caffeaec486e0c3678dae4fbea5dde4c1d9b71f5afad2d2a52d8f",
+    "sha256": "1d2be80a4765fda6e74346ede36f42641b0b4dd2cb19487e970649caedd13403",
     "files": {
-      "benchmarks/results.json": "d10acc4355e63a52a7fb1d6b1be9f9d8cbbded8dc9e73a650e8c33a94671b323",
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "689d4664673fbe8c17efff3966f7fc7938abec95cb48f1304ecd6cabdf7231dc",
       "AGENTS.md": "acff0c9afb73feec36e9d64ba58e9feddeaa2c7fb466264e3fee2da3c2c5fee3",
-      "CHANGELOG.ko.md": "068d735f61d3ffe98c159f3407193e309bba4a6eef99a73aaf9026e9a3a749f0",
-      "CHANGELOG.md": "c75de6e8cb27dac4b5c12a9dca54b8cd8ad8ae5282e82d1b79d604c54ba1acec",
+      "CHANGELOG.ko.md": "529f7bf0751b60350984a570cc2cebc6f31994fb8cd3e74bf3032aba5647bf0b",
+      "CHANGELOG.md": "858bd2eaad79d0d13d2804952be6bbefc286bd8ad3bfcbcbb16a33118cde4452",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
       "README.md": "8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75",
@@ -27,6 +26,7 @@
       "benchmarks/fixtures/nested-order.json": "ee4d0c53ac06ed42d611f115ec3935f672711c506547268fb1381e8d71d335a5",
       "benchmarks/js.mjs": "c4d244abc5bcff07d50f4f89d6756353d4aeaea3f988481523c450a37ffe5976",
       "benchmarks/php.php": "3ca5fab8a0e9cf45129435320fe804bde38705071c26f434ed3232347fd8e0c7",
+      "benchmarks/results.json": "d10acc4355e63a52a7fb1d6b1be9f9d8cbbded8dc9e73a650e8c33a94671b323",
       "benchmarks/run.py": "2f12b6267a5e5977f6d94bb55502e116cb1ccbb5b1f84177715b2623563ee32f",
       "benchmarks/workload.json": "555599212bdaf5d7fe33d76416e962c59cb8f67834ed22d43e2a3f092e5f6cc2",
       "docs/distribution.json": "1ccded31251e48286d97c8df62bb87d70cf6eadba4f88cc99a146447fcb2eb8a",
@@ -46,8 +46,8 @@
       "docs/reports/ojson-comparison.json": "4f6bc37d9fba4be253b8b11c3a813eec52d53d139ee202ca9693d8a17ecb5ba2",
       "docs/reports/ojson-comparison.ko.md": "4a8fdd346be00b60b020b79ea9cbd38fa6f73b7c9b468465361664e884b8cc7a",
       "docs/reports/ojson-comparison.md": "f51637e54cbf5e4fb650608261647ff4c7c508cb6e867c8d72f9a44db0a95373",
-      "docs/spec/api.ko.md": "106d833865a4c7a8b059535b5b46b70985bebd105faa0c8fd996d90a8464a197",
-      "docs/spec/api.md": "18fe09943999d56e672b9195743c55a2bb6785177097b07d324dec1ebc089ed4",
+      "docs/spec/api.ko.md": "cf2a98505a1e91590f4bd250052e4ef995f73f088a115922f59278eed955eb57",
+      "docs/spec/api.md": "e1825a45d7cf76c9d4e2cae402b134e88de29f586f470fcefa985042a63bf192",
       "docs/spec/json-contract.ko.md": "f6cad701fed404d7a8eb091eb86013ea04b0f01b10574a109c219da3dab30d63",
       "docs/spec/json-contract.md": "0f6e76611fff775c3a8c1aee128bfd345deba9d1dca442c2c05a2f2a986bfe27",
       "docs/spec/repositories.ko.md": "ec6b5e5686719dafa0404ddc36a00e74ea3539dfef742b61bbbd565d20ad9078",
@@ -156,8 +156,8 @@
       "go/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "go/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
       "go/AGENTS.md": "a8e43aea261abd8edd34b1495814884e55fcf6c17f24ad412ac708e9d55765b0",
-      "go/CHANGELOG.ko.md": "41b14cab0521e4dadb1f2ae6c3432e2309592564cf1d76acbcf38c758d2b418d",
-      "go/CHANGELOG.md": "1bd1f321150c9a0140786f36102edb8023e2e0699f55a8537c3ff9d38e84e064",
+      "go/CHANGELOG.ko.md": "ddde6639648285f651487fccc9ec5f5ec44d80a24433e4b52b96192ac268f5f4",
+      "go/CHANGELOG.md": "c01d0c866b1e9c0a338841ec6582038711c16b560608b47c7f5c201fd8d08de3",
       "go/Makefile": "562d18666e2ba1722a7e4d985d9393eff37abf2d454b3a928438158f551dcb99",
       "go/README.ko.md": "1021065cb281a7c306d03f5590b8047c4a7a227cd5bfefd43f8ba40e1bb17bf3",
       "go/README.md": "b6d24c0d70545747c5ac3a8430f938fc68fcc97799df78b7fc6c722bef69175e",
@@ -165,8 +165,7 @@
       "go/go.mod": "e06c222c5b837816e28456ce5a7f46a5896be5c46a89a7d2a01c85aa888018f2",
       "go/internal/benchmark/main.go": "4e1c75773fcfd5f170ab3af85ae4d79c21cac6b4d48a2093cf27f1ae0eb7a1f8",
       "go/internal/probe/main.go": "cbdf69a4210d9b98f7b41e267ac519a3f6fee4a8c3dba43b9932bbda5fc689be",
-      "go/orderedjson.go": "d9b6a7e1ea8eb04cd679cece125008dc6e80dd90d6b6fb3ef93da22b1529c2f0",
-      "go/orderedjson_test.go": "4f2aae854c05ceb7c434cd94026db3a35d8bec73821a4d585029c193e9191f28",
+      "go/orderedjson.go": "d2e4403112cec0c8f4991838215a1025859f7236868b2f98bced42891d93900f",
       "implementations.json": "60472aa090cc5ad1cdb6516fc2fde710ee12db8706aa8ea031d7ab2715f7835c",
       "js/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "js/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
@@ -303,8 +302,8 @@
     },
     "go": {
       "path": "go",
-      "sha256": "01b3ed1d0902c114fc52b605ee28fd7cf706d0735f6360256f42267ba76cb277",
-      "files": 14
+      "sha256": "6156b7171fadf9c9604502d802d7e76390918935903d58b4d86da2773a9c88e0",
+      "files": 13
     },
     "php": {
       "path": "php",

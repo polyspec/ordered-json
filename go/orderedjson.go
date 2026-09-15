@@ -504,36 +504,6 @@ func parse(source string, maxDepth int, flags uint8) (*Value, error) {
 	return v, nil
 }
 
-// ParseMany parses a whitespace-separated sequence of JSON values. It is
-// intended for JSON Lines and tools such as `go list -json`; each value keeps
-// the same node-kind and ordering guarantees as Parse.
-func ParseMany(source string) ([]*Value, error) {
-	return ParseManyWithMaxDepth(source, MaxDepth)
-}
-
-func ParseManyWithMaxDepth(source string, maxDepth int) ([]*Value, error) {
-	if maxDepth < 0 || maxDepth > MaxDepth {
-		return nil, fmt.Errorf("maxDepth must be between 0 and 256")
-	}
-	if !utf8.ValidString(source) {
-		return nil, &ParseError{0, "invalid UTF-8"}
-	}
-	p := parser{source: source, maxDepth: maxDepth, flags: 0, estimate: -1}
-	values := make([]*Value, 0)
-	for {
-		p.ws()
-		if p.pos == len(source) {
-			return values, nil
-		}
-		value, err := p.value(0)
-		if err != nil {
-			return nil, err
-		}
-		value.flags |= flagRoot
-		values = append(values, value)
-	}
-}
-
 type member struct {
 	name       string
 	key, value *Value
@@ -786,7 +756,7 @@ func (p *parser) container(depth, start int, object bool) (*Value, error) {
 		}
 	} else if items := p.items[base:]; len(items) > 0 {
 		if depth == 0 {
-			// A root array takes the stack; ParseMany may continue with a fresh one.
+			// The root array is the last user of the stack.
 			v.items = items[:len(items):len(items)]
 			p.items = nil
 		} else {
