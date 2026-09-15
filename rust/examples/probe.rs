@@ -67,14 +67,24 @@ fn main() {
         let bytes = fs::read(line.unwrap()).expect("cannot read document");
         match parse_bytes(&bytes) {
             Err(_) => println!("{{\"ok\":false}}"),
-            Ok(v) => println!(
-                "{{\"ok\":true,\"raw\":{},\"serialized\":{},\"compact\":{},\"tree\":{},\"rebuilt\":{}}}",
+            Ok(v) => {
+                let serialized = stringify(&v);
+                let roundtrip = parse_bytes(serialized.as_bytes()).unwrap();
+                let factory = Value::string("quote \" slash \\ line\n 한 🌍")
+                    .raw()
+                    .to_owned();
+                println!(
+                "{{\"ok\":true,\"raw\":{},\"serialized\":{},\"compact\":{},\"tree\":{},\"roundtrip\":{},\"roundtrip_tree\":{},\"rebuilt\":{},\"factory\":{}}}",
                 quote(v.raw()),
-                quote(&stringify(&v)),
+                quote(&serialized),
                 quote(&v.compact()),
                 tree(&v),
-                quote(&rebuild(&v).compact())
-            ),
+                quote(&stringify(&roundtrip)),
+                tree(&roundtrip),
+                quote(&rebuild(&v).compact()),
+                quote(&factory)
+                )
+            }
         }
     }
 }

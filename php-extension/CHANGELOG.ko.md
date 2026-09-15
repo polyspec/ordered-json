@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 1ebe9c0ddc45ce11be5ea01aecfde661a629d52b9b31813210bcc7d5eee67aa0 -->
+<!-- source-sha256: 31c1ce6911c407850710a462c286a2c4452eae3b999dc005aab1983c48fd5568 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -13,4 +13,4 @@
 - 영어와 한국어 사용 방법, 개발 절차, 변경 기록을 추가했습니다.
 - PIE `php-ext` 메타데이터, `src` 빌드 경로, 기본 활성화된 단독 빌드를 추가했습니다.
 
-공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 [공통 저장소](https://github.com/ordered-json/ordered-json/blob/main/docs/verification.json)에서 관리합니다. 여기서는 레지스트리 게시와 버전 릴리스를 선언하지 않습니다.
+공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 [공통 저장소](https://github.com/polyspec/ordered-json/blob/main/docs/verification.json)에서 관리합니다. 여기서는 레지스트리 게시와 버전 릴리스를 선언하지 않습니다.

@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 5e27bdd564f6271c5616c8e27bc7801ca167a496c7437ccd0ee77590e7feb05a -->
+<!-- source-sha256: bd7ad971e1f1a3dd8a96d4ce89e0d6d5d3e3642808161155184565175c7a48b0 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -11,10 +11,11 @@
 - 기존 소스 이력을 포함하는 독립 구현 저장소 다섯 개를 게시하고 공통 구현 디렉터리를 고정된 서브모듈로 변경했습니다.
 - 고정된 공통 검증기와 명시적인 테스트 의존성 커밋을 사용하는 단독 후보 검사를 추가했습니다.
 - 같은 공통 JSON 사례로 PIE 산출물을 검사하고 PHP 버전과 확장 버전을 별도로 기록하도록 추가했습니다.
-- Go 모듈을 `github.com/ordered-json/go`로 변경했습니다.
+- Go 모듈을 `github.com/polyspec/ordered-json/go`로 변경했습니다.
 - 이동한 의존성 파일에 이전 빌드 경로가 남아 반복 네이티브 설정 전에 `make distclean`을 추가했습니다.
 - 구현 빌드·어댑터·런타임 명령 등록 정보와 공통 단독 검증 진입점을 추가했습니다.
 - PHP 확장 소스를 `php-extension/src`로 분리하고 단독 빌드를 기본 활성화하는 PIE 패키지 메타데이터를 추가했습니다.
+- 핵심 값 생성과 문자열 처리에서 host JSON parser와 serializer 의존성을 제거하고 모든 구현에 공통 반복 round-trip 검증을 추가했습니다.
 
 - 언어별 패키지, 네임스페이스, 가져오기, 네이티브 심볼, 빌드 출력을 [API 계약](docs/spec/api.ko.md)의 ordered-json 식별자로 변경했습니다.
 - 명세, API, 기능 상태, 운영, 예제, 개발 절차에 영어 정본과 한국어 번역을 추가했습니다.
@@ -24,6 +25,6 @@
 - JSON 객체를 순서 있는 연관배열로 변경했습니다. 중복 키는 최초 키 위치를 유지하면서 값을 덮어쓰므로 디코딩한 키마다 값이 하나입니다. 중복 조회와 멤버 목록 API를 제거했습니다. 기본 직렬화는 연관배열 객체를 출력하며 원문 조회는 별도로 제공합니다.
 - 엄격한 파싱, 재귀 문서 순서, 정확한 숫자 토큰, 생성 API를 제공하는 JavaScript, Rust, Go, 순수 PHP, PHP 확장 구현을 추가했습니다.
 - 공식 입력과 기대 결과를 [official.json](examples/official.json)으로 통합하고 공통 문법 사례와 선택적 추가 입력을 제공합니다.
-- 새 독립 복제본과 통합 서브모듈 체크아웃에서 구현별 공통 사례 433개를 검증했습니다. PIE 빌드 산출물도 같은 433개를 통과했으며 검사기 테스트 42개가 통과했습니다. 당시 PHP 빌드 도구의 링커 옵션 사용 중단 경고 두 건은 해당 [검증 기록](https://github.com/ordered-json/ordered-json/blob/ee734ae1cd6f26976e28a81e7442b0f1fe11350f/docs/verification.json)에 기록했습니다.
+- 새 독립 복제본과 통합 서브모듈 체크아웃에서 구현별 공통 사례 433개를 검증했습니다. PIE 빌드 산출물도 같은 433개를 통과했으며 검사기 테스트 42개가 통과했습니다. 당시 PHP 빌드 도구의 링커 옵션 사용 중단 경고 두 건은 해당 [검증 기록](https://github.com/polyspec/ordered-json/blob/main/docs/verification.json)에 기록했습니다.
 
 현재 [검증 기록](docs/verification.json)은 검사한 소스와 다섯 구현 및 문서 검사기 테스트의 결과를 명시합니다. [배포 확인 결과](docs/distribution.json)는 별도입니다. 이 항목은 개발 변경을 기록하며 패키지 릴리스를 선언하지 않습니다.

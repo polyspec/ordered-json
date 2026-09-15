@@ -1,3 +1,3 @@
-module github.com/ordered-json/go
+module github.com/polyspec/ordered-json/go
 
 go 1.22

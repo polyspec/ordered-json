@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: b9cdfb800cec66ae5eca7d545967206087a6d528b22ce876c7410c5b8f998a20 -->
+<!-- source-sha256: 846465f0a28974b6046b4a682ca212f580719bbefd25795e1fa7f5b327f2f6d0 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -12,4 +12,4 @@
 - 영어와 한국어 사용 방법, 개발 절차, 변경 기록을 추가했습니다.
 - 네이티브 확장을 별도 저장소로 분리했으며 PHP 라이브러리는 독립적으로 사용할 수 있습니다.
 
-공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 [공통 저장소](https://github.com/ordered-json/ordered-json/blob/main/docs/verification.json)에서 관리합니다. 여기서는 레지스트리 게시와 버전 릴리스를 선언하지 않습니다.
+공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 [공통 저장소](https://github.com/polyspec/ordered-json/blob/main/docs/verification.json)에서 관리합니다. 여기서는 레지스트리 게시와 버전 릴리스를 선언하지 않습니다.

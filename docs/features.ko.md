@@ -1,5 +1,5 @@
 <!-- doc-id: features -->
-<!-- source-sha256: db052f3caee9b62f6ea7c142884b22e837a0c3ff681f377f71c4162f1f860387 -->
+<!-- source-sha256: 9a8ad6873ed6ba3d462989060197b837a2e722ad5a2030217851902a31740d5e -->
 # 기능 상태
 
 [English](features.md)
@@ -17,6 +17,7 @@
 | F-NUMBER | 정확한 숫자 토큰 | implemented | shared-suite | [결과](verification.json) | source-only | [숫자](spec/json-contract.ko.md#numbers) |
 | F-STRING | 디코딩한 문자열과 이스케이프 surrogate 코드 단위 | implemented | shared-suite | [결과](verification.json) | source-only | [문자열](spec/json-contract.ko.md#strings) |
 | F-OUTPUT | 연관배열 직렬화와 원문 조회 | implemented | shared-suite | [결과](verification.json) | source-only | [직렬화](spec/json-contract.ko.md#serialization) |
+| F-IDEMPOTENT | 반복 파싱과 직렬화에서 같은 타입 트리와 출력을 유지 | implemented | shared-suite | [결과](verification.json) | source-only | [직렬화](spec/json-contract.ko.md#serialization) |
 | F-CONSTRUCT | 순서 있는 연관배열과 Value 객체 배열로 생성 | implemented | shared-suite | [결과](verification.json) | source-only | [생성](spec/json-contract.ko.md#construction) |
 | F-PHP-NATIVE | 공통 PHP API를 사용하는 PHP 확장 파서와 직렬화 | implemented | shared-suite | [결과](verification.json) | source-only | [PHP](spec/api.ko.md#php) |
 | F-DOCS | 영한 문서, 링크·상태 검사, 검증 최신 여부 | implemented | docs-tests | [결과](verification.json) | source-only | [절차](documentation-plan.ko.md#checks) |

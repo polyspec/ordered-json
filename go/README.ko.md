@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: 03449c3961fb06b36664d2d69afbe604ec2f557206717e67d2b67646c8f22bd4 -->
+<!-- source-sha256: b6d24c0d70545747c5ac3a8430f938fc68fcc97799df78b7fc6c722bef69175e -->
 # ordered-json for Go
 
 [English](README.md)
@@ -9,9 +9,9 @@
 <a id="usage"></a>
 ## 사용
 
-Go >= 1.22이며 모듈은 `github.com/ordered-json/go`, 패키지는 `orderedjson`입니다.
+Go >= 1.22이며 모듈은 `github.com/polyspec/ordered-json/go`, 패키지는 `orderedjson`입니다.
 
-사용 코드의 `source` 또는 `$source`는 [공통 공식 예제](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/examples/official.json)의 객체 사례에서 가져옵니다. `github.com/ordered-json/go`를 가져오고 오류를 반환할 수 있는 함수 안에서 사용합니다.
+사용 코드의 `source` 또는 `$source`는 [공통 공식 예제](https://github.com/polyspec/ordered-json/blob/main/examples/official.json)의 객체 사례에서 가져옵니다. `github.com/polyspec/ordered-json/go`를 가져오고 오류를 반환할 수 있는 함수 안에서 사용합니다.
 
 ~~~go
 value, err := orderedjson.Parse(source)
@@ -22,7 +22,7 @@ _ = output
 ~~~
 
 
-동작은 [JSON 계약](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
+동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
 
 <a id="verification"></a>
 ## 검증

@@ -5,8 +5,8 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"github.com/polyspec/ordered-json/go"
 	"os"
-	"github.com/ordered-json/go"
 	"strings"
 )
 
@@ -132,8 +132,24 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("{\"ok\":true,\"raw\":%s,\"serialized\":%s,\"compact\":%s,\"tree\":%s,\"rebuilt\":%s}\n",
-			quote(value.Raw()), quote(serialized), quote(compact), tree(value), quote(rebuilt))
+		roundtripValue, err := orderedjson.ParseBytes([]byte(serialized))
+		if err != nil {
+			panic(err)
+		}
+		roundtrip, err := roundtripValue.Compact()
+		if err != nil {
+			panic(err)
+		}
+		factoryValue, err := orderedjson.String("quote \" slash \\ line\n 한 🌍")
+		if err != nil {
+			panic(err)
+		}
+		factory, err := factoryValue.Compact()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("{\"ok\":true,\"raw\":%s,\"serialized\":%s,\"compact\":%s,\"tree\":%s,\"roundtrip\":%s,\"roundtrip_tree\":%s,\"rebuilt\":%s,\"factory\":%s}\n",
+			quote(value.Raw()), quote(serialized), quote(compact), tree(value), quote(roundtrip), tree(roundtripValue), quote(rebuilt), quote(factory))
 	}
 	if err := scanner.Err(); err != nil {
 		panic(err)

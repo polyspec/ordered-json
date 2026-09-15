@@ -120,10 +120,16 @@ impl Value {
         use std::fmt::Write;
         let mut out = String::from("\"");
         for &unit in units {
-            if (0x20..=0x7e).contains(&unit) && unit != 34 && unit != 92 {
-                out.push(char::from_u32(unit as u32).unwrap());
-            } else {
-                write!(out, "\\u{unit:04x}").unwrap();
+            match unit {
+                34 => out.push_str("\\\""),
+                92 => out.push_str("\\\\"),
+                8 => out.push_str("\\b"),
+                12 => out.push_str("\\f"),
+                10 => out.push_str("\\n"),
+                13 => out.push_str("\\r"),
+                9 => out.push_str("\\t"),
+                0x20..=0x7e => out.push(char::from_u32(unit as u32).unwrap()),
+                _ => write!(out, "\\u{unit:04x}").unwrap(),
             }
         }
         out.push('"');

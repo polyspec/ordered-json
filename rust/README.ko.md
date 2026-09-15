@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: 2b3097c56c750e598aa95e6cb342f99bc6bb0f760b64aa681d878bc5c4d2331a -->
+<!-- source-sha256: e3c04eba3326d309a6e793f57ac7979c1429fdb9e135e85d022adb573029c8e3 -->
 # ordered-json for Rust
 
 [English](README.md)
@@ -11,7 +11,7 @@
 
 Rust >= 1.70이며 Cargo 패키지는 `ordered-json`, 가져오기는 `ordered_json`입니다.
 
-사용 코드의 `source` 또는 `$source`는 [공통 공식 예제](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/examples/official.json)의 객체 사례에서 가져옵니다. 오류를 반환할 수 있는 함수 안에서 사용합니다.
+사용 코드의 `source` 또는 `$source`는 [공통 공식 예제](https://github.com/polyspec/ordered-json/blob/main/examples/official.json)의 객체 사례에서 가져옵니다. 오류를 반환할 수 있는 함수 안에서 사용합니다.
 
 ~~~rust
 use ordered_json::{parse, stringify};
@@ -20,7 +20,7 @@ let output = stringify(&value);
 ~~~
 
 
-동작은 [JSON 계약](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
+동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
 
 <a id="verification"></a>
 ## 검증

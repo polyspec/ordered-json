@@ -5,12 +5,12 @@
 
 The [JSON contract](json-contract.md) defines behavior shared by all implementations. This document defines the current language bindings. The current identifiers are listed in [installation](../operations/installation.md).
 
-The project and package name is `ordered-json`. Rust imports use `ordered_json`. Go uses module `github.com/ordered-json/go` and package `orderedjson`. PHP uses Composer package `ordered-json/ordered-json`, namespace `OrderedJson`, and extension `ordered_json`. Native function and constant prefixes are `ordered_json_` and `ORDERED_JSON_`.
+The project and package name is `ordered-json`. Rust imports use `ordered_json`. Go uses module `github.com/polyspec/ordered-json/go` and package `orderedjson`. PHP uses Composer package `ordered-json/ordered-json`, namespace `OrderedJson`, and extension `ordered_json`. Native function and constant prefixes are `ordered_json_` and `ORDERED_JSON_`.
 
 <a id="values"></a>
 ## Values and parsing
 
-Parsed `Value` objects are immutable. Factories construct strings, number tokens, booleans, null, arrays, and objects. Factories validate constructed JSON through the parser. Wrong-kind access returns absence or an error, depending on the accessor; invalid factory arguments produce language-specific errors.
+Parsed `Value` objects are immutable. Factories construct strings, number tokens, booleans, null, arrays, and objects. Factories validate constructed JSON through the library parser. Wrong-kind access returns absence or an error, depending on the accessor; invalid factory arguments produce language-specific errors. Core parsers and serializers do not delegate JSON behavior to host JSON APIs.
 
 | Operation | JavaScript | Rust | Go | PHP |
 | --- | --- | --- | --- | --- |

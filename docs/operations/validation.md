@@ -43,8 +43,8 @@ python3 scripts/verify.py --only php --only php-extension
 For an independent clone:
 
 ~~~sh
-git clone https://github.com/ordered-json/php-extension.git
-cd php-extension
+git clone https://github.com/polyspec/ordered-json.git
+cd ordered-json
 make check
 ~~~
 

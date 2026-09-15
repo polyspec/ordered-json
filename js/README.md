@@ -10,7 +10,7 @@ Strict JSON with associative objects that preserve document key order recursivel
 
 Node.js >= 20; ESM and TypeScript declarations.
 
-The usage fragment takes `source` (or `$source`) from an object case in the [common official examples](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/examples/official.json).
+The usage fragment takes `source` (or `$source`) from an object case in the [common official examples](https://github.com/polyspec/ordered-json/blob/main/examples/official.json).
 
 ~~~js
 import {parse, stringify} from './index.js';
@@ -20,7 +20,7 @@ const output = stringify(value);
 ~~~
 
 
-The [JSON contract](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/docs/spec/json-contract.md) and [API contract](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/docs/spec/api.md) define behavior. Source is provided by this repository. Registry publication and versioned releases are not verified; a source version string is not a release record.
+The [JSON contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.md) and [API contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.md) define behavior. Source is provided by this repository. Registry publication and versioned releases are not verified; a source version string is not a release record.
 
 <a id="verification"></a>
 ## Verification

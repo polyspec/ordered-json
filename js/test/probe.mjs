@@ -29,6 +29,10 @@ for await (const path of createInterface({input: process.stdin, crlfDelay: Infin
     if (!(error instanceof ParseError)) throw error;
     console.log('{"ok":false}'); continue;
   }
-  console.log(JSON.stringify({ok:true, raw:value.raw, serialized:stringify(value), compact:stringify(value,{compact:true}),
-    tree:tree(value), rebuilt:stringify(rebuild(value),{compact:true})}));
+  const serialized = stringify(value);
+  const roundtrip = parseBytes(new TextEncoder().encode(serialized));
+  const factory = stringify(Value.string('quote " slash \\ line\n 한 🌍'));
+  console.log(JSON.stringify({ok:true, raw:value.raw, serialized, compact:stringify(value,{compact:true}),
+    tree:tree(value), roundtrip:stringify(roundtrip), roundtrip_tree:tree(roundtrip),
+    rebuilt:stringify(rebuild(value),{compact:true}), factory}));
 }

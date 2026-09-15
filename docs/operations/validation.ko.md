@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 55624142a462da49bbc5b6790c0ec8c435c9f1bc6b4cd2d81260f297ce8c6483 -->
+<!-- source-sha256: cacdf5a331dacbebb042e64fc61a3b0597175f1b99c04647d74c61d0bbffcfc2 -->
 # 검증
 
 [English](validation.md)
@@ -44,8 +44,8 @@ python3 scripts/verify.py --only php --only php-extension
 독립 체크아웃은 다음과 같이 검사합니다.
 
 ~~~sh
-git clone https://github.com/ordered-json/php-extension.git
-cd php-extension
+git clone https://github.com/polyspec/ordered-json.git
+cd ordered-json
 make check
 ~~~
 

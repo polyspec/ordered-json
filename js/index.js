@@ -5,6 +5,32 @@ const values = new WeakSet();
 const whitespace = c => c === ' ' || c === '\t' || c === '\r' || c === '\n';
 const digit = c => c !== undefined && c >= '0' && c <= '9';
 
+function codeUnits(text) {
+  return Array.from({length: text.length}, (_, i) => text.charCodeAt(i));
+}
+
+function fromUnits(units) {
+  let out = '';
+  for (const unit of units) out += String.fromCharCode(unit);
+  return out;
+}
+
+function quoteUnits(units) {
+  let out = '"';
+  for (const unit of units) {
+    if (unit === 34) out += '\\\"';
+    else if (unit === 92) out += '\\\\';
+    else if (unit === 8) out += '\\b';
+    else if (unit === 12) out += '\\f';
+    else if (unit === 10) out += '\\n';
+    else if (unit === 13) out += '\\r';
+    else if (unit === 9) out += '\\t';
+    else if (unit >= 0x20 && unit <= 0x7e) out += String.fromCharCode(unit);
+    else out += `\\u${unit.toString(16).padStart(4, '0')}`;
+  }
+  return out + '"';
+}
+
 export class ParseError extends SyntaxError {
   constructor(message, offset) {
     super(`${message} at UTF-16 offset ${offset}`);
@@ -44,11 +70,11 @@ export class Value {
     return this.#members.get(key);
   }
   toString() { return stringify(this); }
-  // JSON.stringify must not silently serialize the AST as an ordinary object.
+  // Host JSON serialization must not silently serialize the AST as an ordinary object.
   toJSON() { throw new TypeError('Use stringify(value) from ordered-json'); }
   static string(text) {
     if (typeof text !== 'string') throw new TypeError('Expected string');
-    return parse(JSON.stringify(text));
+    return parse(quoteUnits(codeUnits(text)));
   }
   static number(literal) {
     if (typeof literal !== 'string') throw new TypeError('Pass a number literal as a string');
@@ -87,23 +113,30 @@ export function parse(source, {maxDepth = MAX_DEPTH} = {}) {
   const ws = () => { while (whitespace(source[pos])) pos++; };
   function string() {
     const start = pos++;
+    const units = [];
     while (pos < source.length) {
       const code = source.charCodeAt(pos++);
-      if (code === 34) return JSON.parse(source.slice(start, pos));
+      if (code === 34) return {text: fromUnits(units), units};
       if (code < 32) fail('Unescaped control character');
       if (code === 92) {
         const escape = source[pos++];
         if (escape === 'u') {
+          let unit = 0;
           for (let i = 0; i < 4; i++) {
             if (!/[0-9a-fA-F]/.test(source[pos] ?? '!')) fail('Invalid Unicode escape');
+            unit = (unit << 4) | Number.parseInt(source[pos], 16);
             pos++;
           }
+          units.push(unit);
         } else if (escape === undefined || !'"\\/bfnrt'.includes(escape)) fail('Invalid escape');
+        else units.push({b: 8, f: 12, n: 10, r: 13, t: 9}[escape] ?? escape.charCodeAt(0));
       } else if (code >= 0xd800 && code <= 0xdbff) {
         const low = source.charCodeAt(pos);
         if (!(low >= 0xdc00 && low <= 0xdfff)) fail('Unescaped unpaired surrogate');
+        units.push(code, low);
         pos++;
       } else if (code >= 0xdc00 && code <= 0xdfff) fail('Unescaped unpaired surrogate');
+      else units.push(code);
     }
     fail('Unterminated string');
   }
@@ -122,14 +155,14 @@ export function parse(source, {maxDepth = MAX_DEPTH} = {}) {
         while (true) {
           if (kind === 'object') {
             if (source[pos] !== '"') fail('Expected object key');
-            const keyStart = pos, keyText = string();
-            const key = new Value(internal, source, keyStart, pos, 'string', new Map(), [], keyText);
+            const keyStart = pos, keyData = string();
+            const key = new Value(internal, source, keyStart, pos, 'string', new Map(), [], keyData.text);
             ws();
             if (source[pos] !== ':') fail('Expected colon');
             pos++;
             const child = value(depth + 1);
-            if (!keys.has(keyText)) keys.set(keyText, key);
-            members.set(keyText, child);
+            if (!keys.has(keyData.text)) keys.set(keyData.text, key);
+            members.set(keyData.text, child);
           } else items.push(value(depth + 1));
           ws();
           if (source[pos] === close) break;
@@ -139,7 +172,7 @@ export function parse(source, {maxDepth = MAX_DEPTH} = {}) {
       }
       pos++;
     } else if (ch === '"') {
-      kind = 'string'; text = string();
+      kind = 'string'; text = string().text;
     } else if (ch === '-' || digit(ch)) {
       kind = 'number';
       if (source[pos] === '-') pos++;

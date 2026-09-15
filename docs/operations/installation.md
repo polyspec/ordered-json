@@ -8,11 +8,11 @@
 
 | Component | Declared requirement | Current identifier | Metadata |
 | --- | --- | --- | --- |
-| JavaScript | Node.js >= 20, ESM | `ordered-json`, 0.1.0 | [package.json](https://github.com/ordered-json/javascript/blob/d3b1f3473ce2645c79c772940df622c4d8b0bca7/package.json) |
-| Rust | Rust >= 1.70, edition 2021 | `ordered-json`, 0.1.0 | [Cargo.toml](https://github.com/ordered-json/rust/blob/266ab5c95d7095342521701994462c9f057cde1b/Cargo.toml) |
-| Go | Go >= 1.22 | `github.com/ordered-json/go` module, `orderedjson` package | [go.mod](https://github.com/ordered-json/go/blob/2588cbd59b442e9c7231a1b8d945a16142851141/go.mod) |
-| PHP | PHP >= 8.2, JSON and PCRE extensions | `ordered-json/ordered-json`, `OrderedJson` namespace | [composer.json](https://github.com/ordered-json/php/blob/2571dacad60affcc299972474b53f2b9e6848967/composer.json) |
-| Native PHP | Matching PHP development headers, C compiler, phpize, make | `ordered_json` extension, 0.1.0 | [extension source](https://github.com/ordered-json/php-extension/blob/1dcb0cff184a0618de810febfe651a50b2a06cd0/src/ordered_json.c) |
+| JavaScript | Node.js >= 20, ESM | `ordered-json`, 0.1.0 | [package.json](https://github.com/polyspec/ordered-json/blob/main/js/package.json) |
+| Rust | Rust >= 1.70, edition 2021 | `ordered-json`, 0.1.0 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/rust/Cargo.toml) |
+| Go | Go >= 1.22 | `github.com/polyspec/ordered-json/go` module, `orderedjson` package | [go.mod](https://github.com/polyspec/ordered-json/blob/main/go/go.mod) |
+| PHP | PHP >= 8.2, JSON and PCRE extensions | `ordered-json/ordered-json`, `OrderedJson` namespace | [composer.json](https://github.com/polyspec/ordered-json/blob/main/php/composer.json) |
+| Native PHP | Matching PHP development headers, C compiler, phpize, make | `ordered_json` extension, 0.1.0 | [extension source](https://github.com/polyspec/ordered-json/blob/main/php-extension/src/ordered_json.c) |
 | Repository checks | Python >= 3.9, Git, make, all runtimes above | `make check` | [verification](validation.md) |
 
 These are declared minimum versions, not a claim that every minimum version was tested. Actual versions are recorded in [verification.json](../verification.json). JavaScript, Rust, and Go have no external runtime library dependencies.
@@ -29,7 +29,7 @@ The clone contains every implementation package. Use the package directory or a 
 
 - JavaScript: import from `js/index.js`. TypeScript declarations are in `js/index.d.ts`.
 - Rust: set a local Cargo dependency with `path` pointing to `rust/`.
-- Go: use a local `replace` for module `github.com/ordered-json/go` pointing to `go/`.
+- Go: use a local `replace` for module `github.com/polyspec/ordered-json/go` pointing to `go/`.
 - PHP: require `php/src/OrderedJson.php` or use `php/` as a Composer path repository.
 
 <a id="native-php"></a>

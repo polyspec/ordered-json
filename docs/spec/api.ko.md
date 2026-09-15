@@ -1,17 +1,17 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 06c906c1cc749aed0c0c76e42c847481cfe0509034cebb3527ea16d73f9c0a00 -->
+<!-- source-sha256: 840a684b39ffbb76e38be079c00323f455f499f134fe94bc73e3130f0fc2859e -->
 # API 계약
 
 [English](api.md)
 
 [JSON 계약](json-contract.ko.md)은 모든 구현의 공통 동작을 정의합니다. 이 문서는 현재 언어별 API를 정의합니다. 현재 식별자는 [설치 문서](../operations/installation.ko.md)에 작성합니다.
 
-프로젝트와 패키지 이름은 `ordered-json`입니다. Rust 가져오기는 `ordered_json`을 사용합니다. Go는 `github.com/ordered-json/go` 모듈과 `orderedjson` 패키지를 사용합니다. PHP는 `ordered-json/ordered-json` Composer 패키지, `OrderedJson` 네임스페이스, `ordered_json` 확장을 사용합니다. 네이티브 함수와 상수 접두사는 `ordered_json_`과 `ORDERED_JSON_`입니다.
+프로젝트와 패키지 이름은 `ordered-json`입니다. Rust 가져오기는 `ordered_json`을 사용합니다. Go는 `github.com/polyspec/ordered-json/go` 모듈과 `orderedjson` 패키지를 사용합니다. PHP는 `ordered-json/ordered-json` Composer 패키지, `OrderedJson` 네임스페이스, `ordered_json` 확장을 사용합니다. 네이티브 함수와 상수 접두사는 `ordered_json_`과 `ORDERED_JSON_`입니다.
 
 <a id="values"></a>
 ## 값과 파싱
 
-파싱된 `Value` 객체는 불변입니다. 생성자는 문자열, 숫자 토큰, 불리언, null, 배열, 객체를 생성합니다. 생성자는 파서를 통해 값을 검사합니다. 종류가 맞지 않는 접근은 접근자에 따라 값 없음 또는 오류를 반환하며 잘못된 생성 인자는 언어별 오류를 발생시킵니다.
+파싱된 `Value` 객체는 불변입니다. 생성자는 문자열, 숫자 토큰, 불리언, null, 배열, 객체를 생성합니다. 생성자는 라이브러리 parser를 통해 값을 검사합니다. 종류가 맞지 않는 접근은 접근자에 따라 값 없음 또는 오류를 반환하며 잘못된 생성 인자는 언어별 오류를 발생시킵니다. 핵심 parser와 serializer는 JSON 동작을 host JSON API에 위임하지 않습니다.
 
 | 동작 | JavaScript | Rust | Go | PHP |
 | --- | --- | --- | --- | --- |

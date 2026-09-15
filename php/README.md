@@ -10,7 +10,7 @@ Strict JSON with associative objects that preserve document key order recursivel
 
 PHP >= 8.2 with JSON and PCRE; Composer package `ordered-json/ordered-json`.
 
-The usage fragment takes `source` (or `$source`) from an object case in the [common official examples](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/examples/official.json).
+The usage fragment takes `source` (or `$source`) from an object case in the [common official examples](https://github.com/polyspec/ordered-json/blob/main/examples/official.json).
 
 ~~~php
 require 'src/OrderedJson.php';
@@ -19,9 +19,9 @@ $output = OrderedJson\stringify($value);
 ~~~
 
 
-The [native extension](https://github.com/ordered-json/php-extension) is a separate optional package. Pure PHP needs no extension checkout. `parse(..., useNative: false)` selects the pure parser; `compact()` still uses the native serializer when the extension is loaded. The pure test process uses `php -n`.
+The [native extension](https://github.com/polyspec/ordered-json/php-extension) is a separate optional package. Pure PHP needs no extension checkout. `parse(..., useNative: false)` selects the pure parser; `compact()` still uses the native serializer when the extension is loaded. The pure test process uses `php -n`.
 
-The [JSON contract](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/docs/spec/json-contract.md) and [API contract](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/docs/spec/api.md) define behavior. Source is provided by this repository. Registry publication and versioned releases are not verified; a source version string is not a release record.
+The [JSON contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.md) and [API contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.md) define behavior. Source is provided by this repository. Registry publication and versioned releases are not verified; a source version string is not a release record.
 
 <a id="verification"></a>
 ## Verification

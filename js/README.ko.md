@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: b17f79a9287f7dd1ec6fd82acc1f384da7a6736dfb24bac61ceb422b95513858 -->
+<!-- source-sha256: 5271983a46de7fa75cfa6fa85a426383df94e4290b0929cf7fb142f8b3e397c5 -->
 # ordered-json for JavaScript
 
 [English](README.md)
@@ -11,7 +11,7 @@
 
 Node.js >= 20이며 ESM과 TypeScript 선언을 제공합니다.
 
-사용 코드의 `source` 또는 `$source`는 [공통 공식 예제](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/examples/official.json)의 객체 사례에서 가져옵니다.
+사용 코드의 `source` 또는 `$source`는 [공통 공식 예제](https://github.com/polyspec/ordered-json/blob/main/examples/official.json)의 객체 사례에서 가져옵니다.
 
 ~~~js
 import {parse, stringify} from './index.js';
@@ -21,7 +21,7 @@ const output = stringify(value);
 ~~~
 
 
-동작은 [JSON 계약](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
+동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
 
 <a id="verification"></a>
 ## 검증

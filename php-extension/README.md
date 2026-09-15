@@ -10,7 +10,7 @@ Strict JSON with associative objects that preserve document key order recursivel
 
 PHP >= 8.2 and matching development headers; PIE package `ordered-json/ordered-json-extension`, extension `ordered_json`.
 
-The source build produces `src/modules/ordered_json.so`. Load it with PHP using `-d extension=/absolute/path/to/ordered_json.so`. The [PHP library](https://github.com/ordered-json/php) provides the common Value API.
+The source build produces `src/modules/ordered_json.so`. Load it with PHP using `-d extension=/absolute/path/to/ordered_json.so`. The [PHP library](https://github.com/polyspec/ordered-json/php) provides the common Value API.
 
 ~~~sh
 cd src
@@ -31,7 +31,7 @@ pie build 'ordered-json/ordered-json-extension:*@dev'
 
 PIE configuration can be isolated with its `PIE_WORKING_DIRECTORY` environment variable. A build does not install or enable the extension. Windows binaries and ZTS builds have not been verified. PHP and extension versions are recorded separately by the shared check. The PHP library is the sibling `php/` package in this monorepo; it remains separate from the native build and PIE package.
 
-The [JSON contract](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/docs/spec/json-contract.md) and [API contract](https://github.com/ordered-json/ordered-json/blob/68963b9da95dd2bdb6adcb7d3b305b25190bafb0/docs/spec/api.md) define behavior. Source is provided by this repository. Registry publication and versioned releases are not verified; a source version string is not a release record.
+The [JSON contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.md) and [API contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.md) define behavior. Source is provided by this repository. Registry publication and versioned releases are not verified; a source version string is not a release record.
 
 <a id="verification"></a>
 ## Verification
