@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 0ebce0f99e7a3786775fc5da9c1c4efaa86a86ddd3e82ae3c0a89a6cab46e81a -->
+<!-- source-sha256: 608cb3ef38d4c26161ebe1fbdf8a6c2e38166729644411630856a6ac7aea50b2 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- JavaScript `Value` 객체를 파싱 중에 freeze하지 않도록 변경했습니다. 값의 상태는 private field에 있으므로 여전히 라이브러리 API로 변경할 수 없으며, 반환하는 항목 배열과 키 배열은 계속 freeze합니다. API 계약에 이 보장을 명시했습니다.
 - PHP `useNative` 파싱 옵션, `parseNative()`, 사용하지 않는 PHP `stringify()` compact 인자, 사용하지 않는 JavaScript `stringify()` options 인자, 네이티브 `ordered_json_compact()` 함수를 제거했습니다. PHP는 확장이 로드돼 있으면 확장을, 그렇지 않으면 순수 구현을 사용합니다.
 - PCRE backtrack 또는 recursion 한계가 매우 낮으면 올바른 입력을 거부하던 순수 PHP UTF-8 검증을 수정하고, 오프셋을 지역 변수로 전달하여 순수 PHP 파서 부담을 줄였습니다.
 - 문서 검사가 오래된 PIE 기록을 거부하므로 소스 변경 후 `make check`보다 `make pie-check`를 먼저 실행하도록 문서화했습니다.
