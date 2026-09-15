@@ -18,5 +18,5 @@ if test "$PHP_ORDERED_JSON" != "no"; then
     dnl A loadable bundle does not use the dynamic-library single-module flag.
     LT_MULTI_MODULE=yes
   ])
-  PHP_NEW_EXTENSION([ordered_json], [ordered_json.c], [$ext_shared])
+  PHP_NEW_EXTENSION([ordered_json], [ordered_json.c hydrate.c], [$ext_shared])
 fi
