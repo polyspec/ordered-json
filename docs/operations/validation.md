@@ -63,7 +63,7 @@ make pie-check PIE=/path/to/pie.phar JSON_TEST_SUITE=.cache/JSONTestSuite
 
 The [PIE checker](../../scripts/check_pie.py) isolates PIE configuration under `.cache/`, registers the current extension checkout as a path repository, validates package recognition, and builds it with PIE. It tests that artifact directly with the same shared adapter and expectations. It does not run the ordinary native build in between.
 
-When available, `pie-verification.json` records the PIE version and PHAR hash, extension artifact hash, commands, source hashes, PHP and extension versions, and case results. Build errors, missing build tools, adapter warnings, or changes during the check fail verification. Compilation warnings remain in the record. This check does not install the module or publish a package. Re-run it when its recorded inputs change.
+When available, `pie-verification.json` records the PIE version and PHAR hash, extension artifact hash, commands, source hashes, PHP and extension versions, and case results. Build errors, missing build tools, adapter warnings, or changes during the check fail verification. Compilation warnings remain in the record. This check does not install the module or publish a package. Re-run it when its recorded inputs change, before `make check`, because the documentation check in `make check` rejects a stale PIE record.
 
 <a id="documentation-checks"></a>
 ## Documentation checks
