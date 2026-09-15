@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 73e19d23bc7893b6512b56dd3b8739c6ab2b13157ab58275ba9b6dc7f77cb242 -->
+<!-- source-sha256: 0ebce0f99e7a3786775fc5da9c1c4efaa86a86ddd3e82ae3c0a89a6cab46e81a -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -8,6 +8,7 @@
 ## 미릴리스 — 2026-09-07
 
 - PHP `useNative` 파싱 옵션, `parseNative()`, 사용하지 않는 PHP `stringify()` compact 인자, 사용하지 않는 JavaScript `stringify()` options 인자, 네이티브 `ordered_json_compact()` 함수를 제거했습니다. PHP는 확장이 로드돼 있으면 확장을, 그렇지 않으면 순수 구현을 사용합니다.
+- PCRE backtrack 또는 recursion 한계가 매우 낮으면 올바른 입력을 거부하던 순수 PHP UTF-8 검증을 수정하고, 오프셋을 지역 변수로 전달하여 순수 PHP 파서 부담을 줄였습니다.
 - 문서 검사가 오래된 PIE 기록을 거부하므로 소스 변경 후 `make check`보다 `make pie-check`를 먼저 실행하도록 문서화했습니다.
 - 결과, 오류, 오프셋을 바꾸지 않고 모든 구현에서 값마다 수행하던 파싱과 직렬화 작업을 줄였습니다. JavaScript는 `WeakSet` 등록 대신 private field brand로 값을 검사하고, escape가 없는 문자열을 원문에서 잘라 쓰며, 객체 키 토큰을 조회할 때 생성합니다. Go는 값을 묶음 단위로 할당하고 문자열 UTF-16 단위를 조회할 때 해석합니다. Rust는 값마다 빈 해시 맵, 항목 벡터, 단위 벡터를 두는 대신 종류별 payload를 저장합니다. PHP 라이브러리와 확장은 정수 디스크립터 테이프를 사용하며 확장은 별도 선검증 대신 문자열을 검사하면서 UTF-8을 검증합니다. 무의미한 공백과 중복 키가 없는 값은 원문 토큰을 복사하여 직렬화합니다. 이전 구현과 파싱 결과, 오류, 오프셋, 조회 API, 생성 API, 직렬화를 비교하는 차등 테스트를 수행했습니다. PHP 디스크립터 형식은 [API 계약](docs/spec/api.ko.md#php)에 설명합니다.
 - 벤치마크가 Rust release 빌드, 고정 workload 입력 digest, 반복 샘플, median/p95 통계, 실행 환경 fingerprint, 커밋된 결과를 사용하도록 수정했습니다.
