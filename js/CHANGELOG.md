@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Reduced parser and serializer overhead: values use a private-field brand check instead of a `WeakSet` registry, unescaped strings are sliced from the source, object key tokens are created on access, and values without insignificant whitespace or duplicate keys serialize as their source token. Results, errors, and offsets are unchanged.
 - Added the package's own development procedure, changelog, Makefile and documentation manifest.
 - Added English and Korean usage, development, and change records.
 

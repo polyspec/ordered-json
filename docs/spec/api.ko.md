@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 840a684b39ffbb76e38be079c00323f455f499f134fe94bc73e3130f0fc2859e -->
+<!-- source-sha256: e1825a45d7cf76c9d4e2cae402b134e88de29f586f470fcefa985042a63bf192 -->
 # API 계약
 
 [English](api.md)
@@ -16,7 +16,7 @@
 | 동작 | JavaScript | Rust | Go | PHP |
 | --- | --- | --- | --- | --- |
 | 텍스트 파싱 | `parse(source, options)` | `parse(source)` | `Parse(source)` | `parse(source, maxDepth, useNative)` |
-| UTF-8 바이트 | `parseBytes(bytes, options)` | `parse_bytes(bytes)` | `ParseBytes(bytes)` | `parse(source)` |
+| UTF-8 바이트 | `parseBytes(bytes, options)` | `parse_bytes(bytes)` | `ParseBytes(bytes)` / `ParseBytesBorrowed(bytes)` | `parse(source)` |
 | 깊이 한도 | `options.maxDepth` | `parse_with_max_depth(source, limit)` | `ParseWithMaxDepth(source, limit)` | `maxDepth` |
 | 기본 출력 | `stringify(value)` | `stringify(&value)` | `Stringify(value)` | `stringify($value)` |
 | compact 출력 | `stringify(value)` | `value.compact()` | `value.Compact()` | `$value->compact()` |
@@ -39,7 +39,7 @@ JavaScript는 복사된 `Map<string, Value>`를 반환하며 TypeScript에는 `R
 
 Rust는 불변 `OrderedMap` 참조를 반환합니다. `OrderedMap::insert(key, value)`는 문자열 `Value` 키를 받고 교체된 값이 있으면 반환합니다. `iter()`는 등록 순서대로 키와 값의 참조를 반환합니다.
 
-Go는 독립적인 `OrderedMap` 복사본을 반환합니다. `Set(key, value)`는 문자열 `Value` 키를 받으며 `Keys()`는 등록 순서대로 키 값을 반환합니다. `Get`과 `GetUnits`는 값 포인터 또는 nil을 반환합니다.
+Go는 독립적인 `OrderedMap` 복사본을 반환합니다. `Set(key, value)`는 문자열 `Value` 키를 받으며 `Keys()`는 등록 순서대로 키 값을 반환합니다. `Get`과 `GetUnits`는 값 포인터 또는 nil을 반환합니다. `ParseBytes`는 입력을 복사합니다. `ParseBytesBorrowed`는 명시적인 zero-copy API이며 반환된 값이 살아 있는 동안 호출자는 바이트 슬라이스를 변경하면 안 됩니다.
 
 PHP는 `Value` 객체의 연관배열을 반환합니다. 객체 생성자는 해당 연관배열을 받습니다. 키가 없으면 PHP는 null, JavaScript는 undefined, Rust는 `None`, Go는 nil을 반환합니다.
 
@@ -65,10 +65,10 @@ JavaScript는 기존 UTF-16 텍스트로 문자열을 생성할 수 있습니다
 <a id="php"></a>
 ## PHP 파서
 
-`OrderedJson\parse`는 `ordered_json` 확장이 로드돼 있으면 네이티브 파서를 사용합니다. `useNative: false`는 순수 PHP 파싱을 선택합니다. `OrderedJson\parseNative`는 확장을 요구하며 확장이 없으면 실패합니다. 공통 `Value` API는 파서의 디스크립터를 값 객체로 변환합니다.
+`OrderedJson\parse`는 `ordered_json` 확장이 로드돼 있으면 네이티브 파서를 사용합니다. `useNative: false`는 순수 PHP 파싱을 선택합니다. `OrderedJson\parseNative`는 확장을 요구하며 확장이 없으면 실패합니다. 공통 `Value` API는 루트 파서 디스크립터만 보유하고 트리 접근이 필요할 때 자식 값을 지연 생성합니다.
 
 확장이 로드돼 있으면 `useNative: false`로 파싱한 값도 `compact()`에서 네이티브 직렬화를 사용합니다. 두 동작 모두 순수 PHP로 실행하려면 해당 확장 없이 PHP를 실행합니다.
 
-확장은 `ordered_json_scan(source, maxDepth)`와 `ordered_json_compact(source, maxDepth)`를 제공합니다. 디스크립터에는 `kind`, `start`, `end` 및 종류별 `members`, `keys`, `items`, `units`가 포함됩니다. `members`는 해석된 이름과 자식 디스크립터를 연결합니다. `keys`는 첫 키 토큰의 메타데이터를 유지합니다. 네이티브 파싱 실패는 `OrderedJsonNativeParseError`를 사용하며 공통 API가 이를 `OrderedJson\ParseError`로 변환합니다.
+확장은 `ordered_json_scan(source, maxDepth)`, `ordered_json_compact(source, maxDepth)`, `ordered_json_compact_node(source, descriptor, index)`를 제공합니다. 디스크립터는 문서 순서대로 값마다 `meta`, `start`, `end` 세 정수를 담은 목록입니다. `start`와 `end`는 값 토큰의 바이트 범위이며 첫 항목은 원문이 전체 소스인 루트 값입니다. `meta`는 0–2비트에 종류(1 object, 2 array, 3 string, 4 number, 5 boolean, 6 null), 3–5비트에 플래그, 8비트부터 연결 인덱스를 저장합니다. compact 플래그(8)는 무의미한 공백과 중복 키가 없는 값을 표시하며 이 값의 compact 출력은 토큰과 같습니다. escaped 플래그(16)는 escape 시퀀스가 있는 문자열 토큰을 표시하며 UTF-16 단위는 조회할 때 해석합니다. 컨테이너는 마지막 하위 값 다음 항목을 연결합니다. 객체 멤버는 키 항목 뒤에 값이 이어지며 키는 멤버가 유지하는 값을 연결합니다. 반복된 키에는 skip 플래그(32)가 있으며 같은 이름의 첫 키가 마지막 값을 연결합니다. 네이티브 파싱 실패는 `OrderedJsonNativeParseError`를 사용하며 공통 API가 이를 `OrderedJson\ParseError`로 변환합니다. `ordered_json_compact_node`는 소스와 맞지 않는 디스크립터를 `ValueError`로 거부합니다.
 
 네이티브 빌드는 PHP 버전, 플랫폼, 스레드 안전 설정과 일치해야 합니다. [네이티브 설치](../operations/installation.ko.md#native-php)를 확인합니다.

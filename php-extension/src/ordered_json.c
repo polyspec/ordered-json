@@ -6,16 +6,53 @@
 #include "ext/standard/info.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define ORDERED_JSON_VERSION "0.0.1"
 #define ORDERED_JSON_MAX_DEPTH 256
+
+/* A descriptor is a tape of three integers per value in document order:
+ * meta, start and end. meta = kind | flags | link << OJ_LINK_SHIFT. A container
+ * links past its subtree; an object key links to the value of its member. */
+#define OJ_OBJECT 1
+#define OJ_ARRAY 2
+#define OJ_STRING 3
+#define OJ_NUMBER 4
+#define OJ_BOOLEAN 5
+#define OJ_NULL 6
+#define OJ_KIND_MASK 7
+/* The value serializes to exactly its source token. */
+#define OJ_COMPACT 8
+/* The string token contains escape sequences. */
+#define OJ_ESCAPED 16
+/* A repeated object key; the first key of that name links to the final value. */
+#define OJ_SKIP 32
+#define OJ_LINK_SHIFT 8
+/* Objects with more members than this detect repeated keys with a hash table. */
+#define OJ_LINEAR_MEMBERS 8
 
 typedef struct {
     const unsigned char *source;
     size_t length, pos, error_offset;
     zend_long max_depth;
     const char *message;
+    zend_long *tape;
+    size_t count, capacity;
+    size_t whitespace, duplicates;
 } oj_parser;
+
+typedef struct {
+    const char *name;
+    size_t length, key;
+    bool owned;
+} oj_member;
+
+typedef struct {
+    oj_member inline_items[4];
+    oj_member *items;
+    size_t count, capacity;
+    HashTable *names;
+} oj_members;
 
 static zend_class_entry *oj_error_ce;
 
@@ -25,12 +62,31 @@ static bool oj_fail(oj_parser *p, const char *message) {
     return false;
 }
 static int oj_peek(oj_parser *p) { return p->pos < p->length ? p->source[p->pos] : -1; }
-static bool oj_ws_char(int ch) { return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'; }
-static void oj_ws(oj_parser *p) { while (oj_ws_char(oj_peek(p))) p->pos++; }
+static void oj_ws(oj_parser *p) {
+    size_t start = p->pos;
+    while (p->pos < p->length) {
+        unsigned char ch = p->source[p->pos];
+        if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r') break;
+        p->pos++;
+    }
+    p->whitespace += p->pos - start;
+}
 static bool oj_expect(oj_parser *p, int ch, const char *message) {
     if (oj_peek(p) != ch) return oj_fail(p, message);
     p->pos++;
     return true;
+}
+static size_t oj_push(oj_parser *p, zend_long meta, size_t start, size_t end) {
+    if (p->capacity - p->count < 3) {
+        p->capacity *= 2;
+        p->tape = safe_erealloc(p->tape, p->capacity, sizeof(zend_long), 0);
+    }
+    size_t index = p->count;
+    p->tape[index] = meta;
+    p->tape[index + 1] = (zend_long)start;
+    p->tape[index + 2] = (zend_long)end;
+    p->count += 3;
+    return index;
 }
 
 /* Decode only scalar UTF-8: reject overlong encodings, surrogate bytes and > U+10FFFF. */
@@ -60,65 +116,39 @@ static int oj_hex(int ch) {
     if (ch >= 'A' && ch <= 'F') return ch - 'A' + 10;
     return -1;
 }
-static bool oj_string(oj_parser *p, zval *out) {
-    ZVAL_UNDEF(out);
-    size_t start = p->pos;
+/* Validate a string token, including its UTF-8; flags receive OJ_COMPACT and OJ_ESCAPED as applicable. */
+static bool oj_string(oj_parser *p, zend_long *flags) {
     if (!oj_expect(p, '"', "Expected string")) return false;
-    zval units;
-    array_init(&units);
+    *flags = OJ_COMPACT;
     while (p->pos < p->length) {
-        int ch = p->source[p->pos++];
-        if (ch == '"') {
-            array_init(out);
-            add_assoc_string(out, "kind", "string");
-            add_assoc_long(out, "start", (zend_long)start);
-            add_assoc_long(out, "end", (zend_long)p->pos);
-            add_assoc_zval(out, "units", &units);
-            return true;
-        }
-        if (ch < 32) { oj_fail(p, "Unescaped control character"); goto fail; }
-        if (ch == '\\') {
-            int escape = oj_peek(p);
-            if (escape < 0) { oj_fail(p, "Unfinished escape"); goto fail; }
-            p->pos++;
-            zend_long unit;
-            if (escape == 'u') {
-                unit = 0;
-                for (int i = 0; i < 4; i++) {
-                    int d = oj_hex(oj_peek(p));
-                    if (d < 0) { oj_fail(p, "Invalid Unicode escape"); goto fail; }
-                    unit = (unit << 4) | d;
-                    p->pos++;
-                }
-            } else {
-                switch (escape) {
-                    case '"': case '\\': case '/': unit = escape; break;
-                    case 'b': unit = 8; break; case 'f': unit = 12; break;
-                    case 'n': unit = 10; break; case 'r': unit = 13; break;
-                    case 't': unit = 9; break;
-                    default: oj_fail(p, "Invalid escape"); goto fail;
-                }
-            }
-            add_next_index_long(&units, unit);
-        } else if (ch < 128) { add_next_index_long(&units, ch); }
-        else {
+        unsigned char ch = p->source[p->pos++];
+        if (ch == '"') return true;
+        if (ch < 32) return oj_fail(p, "Unescaped control character");
+        if (ch >= 0x80) {
             uint32_t point;
             p->pos--;
-            if (!oj_utf8(p->source, p->length, &p->pos, &point)) {
-                oj_fail(p, "Invalid UTF-8"); goto fail;
-            }
-            if (point <= 0xffff) add_next_index_long(&units, point);
-            else {
-                point -= 0x10000;
-                add_next_index_long(&units, 0xd800 | (point >> 10));
-                add_next_index_long(&units, 0xdc00 | (point & 1023));
-            }
+            if (!oj_utf8(p->source, p->length, &p->pos, &point)) return oj_fail(p, "Invalid UTF-8");
+            continue;
+        }
+        if (ch != '\\') continue;
+        *flags |= OJ_ESCAPED;
+        int escape = oj_peek(p);
+        if (escape < 0) return oj_fail(p, "Unfinished escape");
+        p->pos++;
+        switch (escape) {
+            case 'u':
+                for (int i = 0; i < 4; i++) {
+                    if (oj_hex(oj_peek(p)) < 0) return oj_fail(p, "Invalid Unicode escape");
+                    p->pos++;
+                }
+                break;
+            case '"': case '\\': case '/': case 'b': case 'f': case 'n': case 'r': case 't':
+                break;
+            default:
+                return oj_fail(p, "Invalid escape");
         }
     }
-    oj_fail(p, "Unterminated string");
-fail:
-    zval_ptr_dtor(&units);
-    return false;
+    return oj_fail(p, "Unterminated string");
 }
 static bool oj_digit(int ch) { return ch >= '0' && ch <= '9'; }
 static bool oj_digits(oj_parser *p) {
@@ -126,144 +156,339 @@ static bool oj_digits(oj_parser *p) {
     while (oj_digit(oj_peek(p))) p->pos++;
     return true;
 }
-/* Decoded key identity: UTF-8, with escaped lone surrogates retained as WTF-8. */
-static zend_string *oj_key_string(zval *key) {
-    zval *units = zend_hash_str_find(Z_ARRVAL_P(key), "units", sizeof("units") - 1);
-    size_t count = zend_hash_num_elements(Z_ARRVAL_P(units)), length = 0;
-    zend_string *out = zend_string_alloc(count * 3, 0);
-    for (size_t i = 0; i < count; i++) {
-        uint32_t cp = (uint32_t)Z_LVAL_P(zend_hash_index_find(Z_ARRVAL_P(units), i));
-        if (cp >= 0xd800 && cp <= 0xdbff && i + 1 < count) {
-            uint32_t low = (uint32_t)Z_LVAL_P(zend_hash_index_find(Z_ARRVAL_P(units), i + 1));
-            if (low >= 0xdc00 && low <= 0xdfff) {
-                cp = 0x10000 + ((cp - 0xd800) << 10) + low - 0xdc00;
-                i++;
-            }
-        }
-        if (cp < 0x80) ZSTR_VAL(out)[length++] = (char)cp;
-        else if (cp < 0x800) {
-            ZSTR_VAL(out)[length++] = (char)(0xc0 | (cp >> 6));
-            ZSTR_VAL(out)[length++] = (char)(0x80 | (cp & 63));
-        } else if (cp < 0x10000) {
-            ZSTR_VAL(out)[length++] = (char)(0xe0 | (cp >> 12));
-            ZSTR_VAL(out)[length++] = (char)(0x80 | ((cp >> 6) & 63));
-            ZSTR_VAL(out)[length++] = (char)(0x80 | (cp & 63));
-        } else {
-            ZSTR_VAL(out)[length++] = (char)(0xf0 | (cp >> 18));
-            ZSTR_VAL(out)[length++] = (char)(0x80 | ((cp >> 12) & 63));
-            ZSTR_VAL(out)[length++] = (char)(0x80 | ((cp >> 6) & 63));
-            ZSTR_VAL(out)[length++] = (char)(0x80 | (cp & 63));
-        }
-    }
-    ZSTR_VAL(out)[length] = '\0'; ZSTR_LEN(out) = length;
-    return out;
-}
-static bool oj_value(oj_parser *p, zend_long depth, zval *out) {
-    ZVAL_UNDEF(out);
-    oj_ws(p);
-    size_t start = p->pos;
-    int ch = oj_peek(p);
-    if (ch == '"') return oj_string(p, out);
-    array_init(out);
-    add_assoc_long(out, "start", (zend_long)start);
-    if (ch == '{' || ch == '[') {
-        if (depth >= p->max_depth) { oj_fail(p, "Maximum nesting depth exceeded"); goto fail; }
-        bool object = ch == '{';
-        int close = object ? '}' : ']';
-        add_assoc_string(out, "kind", object ? "object" : "array");
-        zval children, keys;
-        array_init(&children);
-        if (object) array_init(&keys);
-        p->pos++; oj_ws(p);
-        if (oj_peek(p) != close) {
-            while (true) {
-                if (object) {
-                    zval key, value;
-                    if (!oj_string(p, &key)) goto children_fail;
-                    oj_ws(p);
-                    if (!oj_expect(p, ':', "Expected colon")) { zval_ptr_dtor(&key); goto children_fail; }
-                    if (!oj_value(p, depth + 1, &value)) { zval_ptr_dtor(&key); goto children_fail; }
-                    zend_string *name = oj_key_string(&key);
-                    if (zend_symtable_exists(Z_ARRVAL(keys), name)) zval_ptr_dtor(&key);
-                    else zend_symtable_update(Z_ARRVAL(keys), name, &key);
-                    zend_symtable_update(Z_ARRVAL(children), name, &value);
-                    zend_string_release(name);
-                } else {
-                    zval item;
-                    if (!oj_value(p, depth + 1, &item)) goto children_fail;
-                    add_next_index_zval(&children, &item);
-                }
-                oj_ws(p);
-                if (oj_peek(p) == close) break;
-                if (!oj_expect(p, ',', "Expected comma or closing delimiter")) goto children_fail;
-                oj_ws(p);
-            }
-        }
-        p->pos++;
-        add_assoc_zval(out, object ? "members" : "items", &children);
-        if (object) add_assoc_zval(out, "keys", &keys);
-        goto done;
-children_fail:
-        zval_ptr_dtor(&children);
-        if (object) zval_ptr_dtor(&keys);
-        goto fail;
-    } else if (ch == '-' || oj_digit(ch)) {
-        add_assoc_string(out, "kind", "number");
-        if (oj_peek(p) == '-') p->pos++;
-        if (oj_peek(p) == '0') p->pos++;
-        else if (!oj_digits(p)) goto fail;
-        if (oj_peek(p) == '.') { p->pos++; if (!oj_digits(p)) goto fail; }
-        if (oj_peek(p) == 'e' || oj_peek(p) == 'E') {
-            p->pos++;
-            if (oj_peek(p) == '+' || oj_peek(p) == '-') p->pos++;
-            if (!oj_digits(p)) goto fail;
-        }
+
+static size_t oj_put_point(unsigned char *out, size_t n, uint32_t cp) {
+    if (cp < 0x80) out[n++] = (unsigned char)cp;
+    else if (cp < 0x800) {
+        out[n++] = (unsigned char)(0xc0 | (cp >> 6));
+        out[n++] = (unsigned char)(0x80 | (cp & 63));
+    } else if (cp < 0x10000) {
+        out[n++] = (unsigned char)(0xe0 | (cp >> 12));
+        out[n++] = (unsigned char)(0x80 | ((cp >> 6) & 63));
+        out[n++] = (unsigned char)(0x80 | (cp & 63));
     } else {
-        const char *literals[] = {"true", "false", "null"};
-        size_t lengths[] = {4, 5, 4};
-        bool found = false;
-        for (int i = 0; i < 3; i++) {
-            if (p->length - p->pos >= lengths[i] && memcmp(p->source + p->pos, literals[i], lengths[i]) == 0) {
-                p->pos += lengths[i]; found = true;
-                add_assoc_string(out, "kind", i == 2 ? "null" : "boolean");
+        out[n++] = (unsigned char)(0xf0 | (cp >> 18));
+        out[n++] = (unsigned char)(0x80 | ((cp >> 12) & 63));
+        out[n++] = (unsigned char)(0x80 | ((cp >> 6) & 63));
+        out[n++] = (unsigned char)(0x80 | (cp & 63));
+    }
+    return n;
+}
+/* Decoded key identity of validated string contents: UTF-8, with lone surrogates as WTF-8.
+ * The result is never longer than the contents. */
+static size_t oj_decode_name(const unsigned char *s, size_t i, size_t end, unsigned char *out) {
+    size_t n = 0;
+    uint32_t pending = 0;
+    while (i < end) {
+        uint32_t unit;
+        if (s[i] == '\\') {
+            unsigned char escape = s[i + 1];
+            if (escape == 'u') {
+                unit = 0;
+                for (int k = 2; k < 6; k++) unit = (unit << 4) | (uint32_t)oj_hex(s[i + k]);
+                i += 6;
+            } else {
+                switch (escape) {
+                    case 'b': unit = 8; break;
+                    case 'f': unit = 12; break;
+                    case 'n': unit = 10; break;
+                    case 'r': unit = 13; break;
+                    case 't': unit = 9; break;
+                    default: unit = escape;
+                }
+                i += 2;
+            }
+        } else if (s[i] < 0x80) {
+            unit = s[i++];
+        } else {
+            size_t width = s[i] < 0xe0 ? 2 : (s[i] < 0xf0 ? 3 : 4);
+            if (pending) { n = oj_put_point(out, n, pending); pending = 0; }
+            memcpy(out + n, s + i, width);
+            n += width; i += width;
+            continue;
+        }
+        if (pending) {
+            if (unit >= 0xdc00 && unit <= 0xdfff) {
+                n = oj_put_point(out, n, 0x10000 + ((pending - 0xd800) << 10) + (unit - 0xdc00));
+                pending = 0;
+                continue;
+            }
+            n = oj_put_point(out, n, pending);
+            pending = 0;
+        }
+        if (unit >= 0xd800 && unit <= 0xdbff) pending = unit;
+        else n = oj_put_point(out, n, unit);
+    }
+    if (pending) n = oj_put_point(out, n, pending);
+    return n;
+}
+
+static void oj_members_free(oj_members *m) {
+    for (size_t i = 0; i < m->count; i++) {
+        if (m->items[i].owned) efree((char *)m->items[i].name);
+    }
+    if (m->items != m->inline_items) efree(m->items);
+    if (m->names) {
+        zend_hash_destroy(m->names);
+        FREE_HASHTABLE(m->names);
+    }
+}
+/* Record the member whose key record is at `key`; a repeated name keeps the first key. */
+static void oj_add_member(oj_parser *p, oj_members *m, size_t key) {
+    size_t start = (size_t)p->tape[key + 1] + 1, end = (size_t)p->tape[key + 2] - 1;
+    oj_member member = {(const char *)p->source + start, end - start, key, false};
+    if (p->tape[key] & OJ_ESCAPED) {
+        unsigned char *name = emalloc(end - start + 1);
+        member.length = oj_decode_name(p->source, start, end, name);
+        member.name = (const char *)name;
+        member.owned = true;
+    }
+    zval *found = NULL;
+    size_t first = SIZE_MAX;
+    if (m->names) {
+        if ((found = zend_hash_str_find(m->names, member.name, member.length))) first = (size_t)Z_LVAL_P(found);
+    } else {
+        for (size_t i = 0; i < m->count; i++) {
+            if (m->items[i].length == member.length && memcmp(m->items[i].name, member.name, member.length) == 0) {
+                first = i;
                 break;
             }
         }
-        if (!found) { oj_fail(p, "Expected JSON value"); goto fail; }
     }
+    if (first != SIZE_MAX) {
+        size_t first_key = m->items[first].key;
+        p->tape[first_key] = (p->tape[first_key] & ((1 << OJ_LINK_SHIFT) - 1)) | ((zend_long)(key + 3) << OJ_LINK_SHIFT);
+        p->tape[key] |= OJ_SKIP;
+        p->duplicates++;
+        if (member.owned) efree((char *)member.name);
+        return;
+    }
+    if (m->count == m->capacity) {
+        oj_member *items = safe_emalloc(m->capacity, 2 * sizeof(oj_member), 0);
+        memcpy(items, m->items, m->count * sizeof(oj_member));
+        if (m->items != m->inline_items) efree(m->items);
+        m->items = items;
+        m->capacity *= 2;
+    }
+    m->items[m->count++] = member;
+    if (m->names || m->count > OJ_LINEAR_MEMBERS) {
+        size_t from = m->count - 1;
+        if (!m->names) {
+            ALLOC_HASHTABLE(m->names);
+            zend_hash_init(m->names, 32, NULL, NULL, 0);
+            from = 0;
+        }
+        for (size_t i = from; i < m->count; i++) {
+            zval position;
+            ZVAL_LONG(&position, (zend_long)i);
+            zend_hash_str_add_new(m->names, m->items[i].name, m->items[i].length, &position);
+        }
+    }
+}
+
+static bool oj_value(oj_parser *p, zend_long depth);
+
+static bool oj_container(oj_parser *p, zend_long depth, size_t start, bool object) {
+    if (depth >= p->max_depth) return oj_fail(p, "Maximum nesting depth exceeded");
+    int close = object ? '}' : ']';
+    size_t whitespace = p->whitespace, duplicates = p->duplicates;
+    size_t index = oj_push(p, 0, start, 0);
+    oj_members members;
+    members.items = members.inline_items;
+    members.count = 0;
+    members.capacity = sizeof(members.inline_items) / sizeof(oj_member);
+    members.names = NULL;
+    bool ok = false;
+    p->pos++;
+    oj_ws(p);
+    if (oj_peek(p) != close) {
+        while (true) {
+            if (object) {
+                size_t key_start = p->pos;
+                zend_long flags;
+                if (!oj_string(p, &flags)) goto done;
+                size_t key = oj_push(p, OJ_STRING | flags | ((zend_long)(p->count + 3) << OJ_LINK_SHIFT), key_start, p->pos);
+                oj_ws(p);
+                if (!oj_expect(p, ':', "Expected colon")) goto done;
+                if (!oj_value(p, depth + 1)) goto done;
+                oj_add_member(p, &members, key);
+            } else if (!oj_value(p, depth + 1)) goto done;
+            oj_ws(p);
+            if (oj_peek(p) == close) break;
+            if (!oj_expect(p, ',', "Expected comma or closing delimiter")) goto done;
+            oj_ws(p);
+        }
+    }
+    p->pos++;
+    zend_long flags = p->whitespace == whitespace && p->duplicates == duplicates ? OJ_COMPACT : 0;
+    p->tape[index] = (object ? OJ_OBJECT : OJ_ARRAY) | flags | ((zend_long)p->count << OJ_LINK_SHIFT);
+    p->tape[index + 2] = (zend_long)p->pos;
+    ok = true;
 done:
-    add_assoc_long(out, "end", (zend_long)p->pos);
+    oj_members_free(&members);
+    return ok;
+}
+
+static bool oj_value(oj_parser *p, zend_long depth) {
+    oj_ws(p);
+    size_t start = p->pos;
+    int ch = oj_peek(p);
+    if (ch == '{' || ch == '[') return oj_container(p, depth, start, ch == '{');
+    if (ch == '"') {
+        zend_long flags;
+        if (!oj_string(p, &flags)) return false;
+        oj_push(p, OJ_STRING | flags, start, p->pos);
+        return true;
+    }
+    if (ch == '-' || oj_digit(ch)) {
+        if (oj_peek(p) == '-') p->pos++;
+        if (oj_peek(p) == '0') p->pos++;
+        else if (!oj_digits(p)) return false;
+        if (oj_peek(p) == '.') { p->pos++; if (!oj_digits(p)) return false; }
+        if (oj_peek(p) == 'e' || oj_peek(p) == 'E') {
+            p->pos++;
+            if (oj_peek(p) == '+' || oj_peek(p) == '-') p->pos++;
+            if (!oj_digits(p)) return false;
+        }
+        oj_push(p, OJ_NUMBER | OJ_COMPACT, start, p->pos);
+        return true;
+    }
+    const char *literals[] = {"true", "false", "null"};
+    size_t lengths[] = {4, 5, 4};
+    for (int i = 0; i < 3; i++) {
+        if (p->length - p->pos >= lengths[i] && memcmp(p->source + p->pos, literals[i], lengths[i]) == 0) {
+            p->pos += lengths[i];
+            oj_push(p, (i == 2 ? OJ_NULL : OJ_BOOLEAN) | OJ_COMPACT, start, p->pos);
+            return true;
+        }
+    }
+    return oj_fail(p, "Expected JSON value");
+}
+
+/* Parse into p->tape. On failure the tape is released and OrderedJsonNativeParseError is thrown. */
+static bool oj_parse(zend_string *source, zend_long max_depth, oj_parser *p) {
+    memset(p, 0, sizeof(*p));
+    p->source = (const unsigned char *)ZSTR_VAL(source);
+    p->length = ZSTR_LEN(source);
+    p->max_depth = max_depth;
+    p->capacity = 3 * MIN(p->length / 2 + 2, 4096);
+    p->tape = safe_emalloc(p->capacity, sizeof(zend_long), 0);
+    if (!oj_value(p, 0)) goto fail;
+    oj_ws(p);
+    if (p->pos != p->length) {
+        oj_fail(p, "Unexpected trailing input"); goto fail;
+    }
     return true;
-fail:
-    zval_ptr_dtor(out);
-    ZVAL_UNDEF(out);
+fail:;
+    /* A successful parse validates UTF-8 inside strings, and every other byte is an
+     * ASCII token. Invalid UTF-8 anywhere takes precedence over other errors, so a
+     * failed parse scans the whole input before reporting. */
+    size_t cursor = 0;
+    uint32_t point;
+    while (cursor < p->length) {
+        if (p->source[cursor] < 0x80) {
+            cursor++;
+            continue;
+        }
+        size_t start = cursor;
+        if (!oj_utf8(p->source, p->length, &cursor, &point)) {
+            p->message = "Invalid UTF-8";
+            p->error_offset = start;
+            break;
+        }
+    }
+    if (p->tape) efree(p->tape);
+    p->tape = NULL;
+    zend_object *exception = zend_throw_exception(oj_error_ce, p->message, 0);
+    zend_update_property_long(oj_error_ce, exception, "offset", sizeof("offset") - 1, (zend_long)p->error_offset);
     return false;
 }
 
-static bool oj_parse(zend_string *source, zend_long max_depth, zval *out) {
-    oj_parser p = {(const unsigned char *)ZSTR_VAL(source), ZSTR_LEN(source), 0, 0, max_depth, NULL};
-    size_t cursor = 0;
-    uint32_t point;
-    while (cursor < p.length) {
-        p.pos = cursor;
-        if (!oj_utf8(p.source, p.length, &cursor, &point)) {
-            oj_fail(&p, "Invalid UTF-8"); goto fail;
-        }
+/* A read-only view of a tape held either in C memory or in a PHP array. */
+typedef struct {
+    const zend_long *slots;
+    HashTable *array;
+    size_t count;
+} oj_tape;
+
+typedef struct {
+    const char *source;
+    size_t source_length;
+    char *out;
+    size_t length, capacity;
+} oj_writer;
+
+static bool oj_slot(const oj_tape *t, size_t index, zend_long *value) {
+    if (index >= t->count) return false;
+    if (t->slots) {
+        *value = t->slots[index];
+        return true;
     }
-    p.pos = 0;
-    if (!oj_value(&p, 0, out)) goto fail;
-    oj_ws(&p);
-    if (p.pos != p.length) {
-        zval_ptr_dtor(out); ZVAL_UNDEF(out);
-        oj_fail(&p, "Unexpected trailing input"); goto fail;
-    }
-    add_assoc_long(out, "start", 0);
-    add_assoc_long(out, "end", (zend_long)p.length);
+    zval *slot = zend_hash_index_find(t->array, index);
+    if (!slot || Z_TYPE_P(slot) != IS_LONG) return false;
+    *value = Z_LVAL_P(slot);
     return true;
-fail:;
-    zend_object *exception = zend_throw_exception(oj_error_ce, p.message, 0);
-    zend_update_property_long(oj_error_ce, exception, "offset", sizeof("offset") - 1, (zend_long)p.error_offset);
-    return false;
+}
+static bool oj_write_token(oj_writer *w, zend_long start, zend_long end) {
+    if (start < 0 || end <= start || (zend_ulong)end > w->source_length || (size_t)(end - start) > w->capacity - w->length) return false;
+    memcpy(w->out + w->length, w->source + start, (size_t)(end - start));
+    w->length += (size_t)(end - start);
+    return true;
+}
+static bool oj_write_byte(oj_writer *w, char ch) {
+    if (w->length == w->capacity) return false;
+    w->out[w->length++] = ch;
+    return true;
+}
+/* Serialize the value at index. Every write is bounded by the source length, so a
+ * malformed tape fails instead of overrunning the buffer or looping. */
+static bool oj_render(const oj_tape *t, oj_writer *w, size_t index, int depth) {
+    zend_long meta, start, end;
+    if (depth > ORDERED_JSON_MAX_DEPTH || !oj_slot(t, index, &meta) || !oj_slot(t, index + 1, &start) || !oj_slot(t, index + 2, &end)) return false;
+    zend_long kind = meta & OJ_KIND_MASK;
+    if (kind < OJ_OBJECT || kind > OJ_NULL) return false;
+    if ((meta & OJ_COMPACT) || kind > OJ_ARRAY) return oj_write_token(w, start, end);
+    bool object = kind == OJ_OBJECT, first = true;
+    size_t limit = (size_t)(meta >> OJ_LINK_SHIFT), i = index + 3;
+    if (meta < 0 || limit < i || limit > t->count || !oj_write_byte(w, object ? '{' : '[')) return false;
+    while (i < limit) {
+        zend_long key_meta = 0, value_meta;
+        size_t value = object ? i + 3 : i;
+        if ((object && !oj_slot(t, i, &key_meta)) || !oj_slot(t, value, &value_meta) || value_meta < 0) return false;
+        size_t next = (value_meta & OJ_KIND_MASK) <= OJ_ARRAY ? (size_t)(value_meta >> OJ_LINK_SHIFT) : value + 3;
+        if (next <= value || next > limit) return false;
+        if (!(key_meta & OJ_SKIP)) {
+            if (!first && !oj_write_byte(w, ',')) return false;
+            first = false;
+            if (object) {
+                zend_long key_start, key_end;
+                size_t target = (size_t)(key_meta >> OJ_LINK_SHIFT);
+                if (key_meta < 0 || target <= i || target >= limit || !oj_slot(t, i + 1, &key_start) || !oj_slot(t, i + 2, &key_end)
+                    || !oj_write_token(w, key_start, key_end) || !oj_write_byte(w, ':') || !oj_render(t, w, target, depth + 1)) return false;
+            } else if (!oj_render(t, w, value, depth + 1)) {
+                return false;
+            }
+        }
+        i = next;
+    }
+    return oj_write_byte(w, object ? '}' : ']');
+}
+static zend_string *oj_compact(zend_string *source, const oj_tape *t, size_t index) {
+    zend_long meta, start, end;
+    if (oj_slot(t, index, &meta) && (meta & OJ_COMPACT) && oj_slot(t, index + 1, &start) && oj_slot(t, index + 2, &end)
+        && start >= 0 && end > start && (zend_ulong)end <= ZSTR_LEN(source)) {
+        if (start == 0 && (size_t)end == ZSTR_LEN(source)) return zend_string_copy(source);
+        return zend_string_init(ZSTR_VAL(source) + start, (size_t)(end - start), 0);
+    }
+    zend_string *out = zend_string_alloc(ZSTR_LEN(source), 0);
+    oj_writer w = {ZSTR_VAL(source), ZSTR_LEN(source), ZSTR_VAL(out), 0, ZSTR_LEN(source)};
+    if (!oj_render(t, &w, index, 0)) {
+        zend_string_efree(out);
+        return NULL;
+    }
+    ZSTR_VAL(out)[w.length] = '\0';
+    ZSTR_LEN(out) = w.length;
+    return out;
 }
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ordered_json_scan, 0, 1, IS_ARRAY, 0)
@@ -277,6 +502,7 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ordered_json_compact_node, 0, 2, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, source, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, node, IS_ARRAY, 0)
+    ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, index, IS_LONG, 0, "0")
 ZEND_END_ARG_INFO()
 
 PHP_FUNCTION(ordered_json_scan) {
@@ -290,40 +516,17 @@ PHP_FUNCTION(ordered_json_scan) {
     if (max_depth < 0 || max_depth > ORDERED_JSON_MAX_DEPTH) {
         zend_argument_value_error(2, "must be between 0 and 256"); RETURN_THROWS();
     }
-    if (!oj_parse(source, max_depth, return_value)) RETURN_THROWS();
-}
-
-static void oj_render(zend_string *source, zval *node, char *out, size_t *length) {
-    zval *kind = zend_hash_str_find(Z_ARRVAL_P(node), "kind", sizeof("kind") - 1);
-    bool object = zend_string_equals_literal(Z_STR_P(kind), "object");
-    bool array = zend_string_equals_literal(Z_STR_P(kind), "array");
-    if (object || array) {
-        zval *children = zend_hash_str_find(Z_ARRVAL_P(node), object ? "members" : "items", object ? 7 : 5);
-        zval *keys = object ? zend_hash_str_find(Z_ARRVAL_P(node), "keys", sizeof("keys") - 1) : NULL;
-        zend_ulong index;
-        zend_string *name;
-        zval *child;
-        bool first = true;
-        out[(*length)++] = object ? '{' : '[';
-        ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(children), index, name, child) {
-            if (!first) out[(*length)++] = ',';
-            first = false;
-            if (object) {
-                zval *key = name ? zend_hash_find(Z_ARRVAL_P(keys), name) : zend_hash_index_find(Z_ARRVAL_P(keys), index);
-                oj_render(source, key, out, length);
-                out[(*length)++] = ':';
-            }
-            oj_render(source, child, out, length);
-        } ZEND_HASH_FOREACH_END();
-        out[(*length)++] = object ? '}' : ']';
-    } else {
-        size_t start = (size_t)Z_LVAL_P(zend_hash_str_find(Z_ARRVAL_P(node), "start", sizeof("start") - 1));
-        size_t end = (size_t)Z_LVAL_P(zend_hash_str_find(Z_ARRVAL_P(node), "end", sizeof("end") - 1));
-        while (start < end && oj_ws_char((unsigned char)ZSTR_VAL(source)[start])) start++;
-        while (end > start && oj_ws_char((unsigned char)ZSTR_VAL(source)[end - 1])) end--;
-        memcpy(out + *length, ZSTR_VAL(source) + start, end - start);
-        *length += end - start;
-    }
+    oj_parser p;
+    if (!oj_parse(source, max_depth, &p)) RETURN_THROWS();
+    array_init_size(return_value, (uint32_t)p.count);
+    zend_hash_real_init_packed(Z_ARRVAL_P(return_value));
+    ZEND_HASH_FILL_PACKED(Z_ARRVAL_P(return_value)) {
+        for (size_t i = 0; i < p.count; i++) {
+            ZEND_HASH_FILL_SET_LONG(p.tape[i]);
+            ZEND_HASH_FILL_NEXT();
+        }
+    } ZEND_HASH_FILL_END();
+    efree(p.tape);
 }
 
 PHP_FUNCTION(ordered_json_compact) {
@@ -337,27 +540,30 @@ PHP_FUNCTION(ordered_json_compact) {
     if (max_depth < 0 || max_depth > ORDERED_JSON_MAX_DEPTH) {
         zend_argument_value_error(2, "must be between 0 and 256"); RETURN_THROWS();
     }
-    zval node;
-    if (!oj_parse(source, max_depth, &node)) RETURN_THROWS();
-    zend_string *out = zend_string_alloc(ZSTR_LEN(source), 0);
-    size_t length = 0;
-    oj_render(source, &node, ZSTR_VAL(out), &length);
-    zval_ptr_dtor(&node);
-    ZSTR_VAL(out)[length] = '\0'; ZSTR_LEN(out) = length;
+    oj_parser p;
+    if (!oj_parse(source, max_depth, &p)) RETURN_THROWS();
+    oj_tape t = {p.tape, NULL, p.count};
+    zend_string *out = oj_compact(source, &t, 0);
+    efree(p.tape);
     RETURN_STR(out);
 }
 
 PHP_FUNCTION(ordered_json_compact_node) {
     zend_string *source;
-    zval *node;
-    ZEND_PARSE_PARAMETERS_START(2, 2)
+    HashTable *node;
+    zend_long index = 0;
+    ZEND_PARSE_PARAMETERS_START(2, 3)
         Z_PARAM_STR(source)
-        Z_PARAM_ARRAY(node)
+        Z_PARAM_ARRAY_HT(node)
+        Z_PARAM_OPTIONAL
+        Z_PARAM_LONG(index)
     ZEND_PARSE_PARAMETERS_END();
-    zend_string *out = zend_string_alloc(ZSTR_LEN(source), 0);
-    size_t length = 0;
-    oj_render(source, node, ZSTR_VAL(out), &length);
-    ZSTR_VAL(out)[length] = '\0'; ZSTR_LEN(out) = length;
+    oj_tape t = {NULL, node, zend_hash_num_elements(node)};
+    zend_string *out = index < 0 ? NULL : oj_compact(source, &t, (size_t)index);
+    if (!out) {
+        zend_argument_value_error(2, "must be a descriptor from ordered_json_scan() for argument #1 ($source)");
+        RETURN_THROWS();
+    }
     RETURN_STR(out);
 }
 
