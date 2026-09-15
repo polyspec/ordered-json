@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "fixtures": [
+    {"file": "empty-array.json", "input_bytes": 3, "objects": 0, "arrays": 1, "strings": 0, "numbers": 0, "booleans": 0, "nulls": 0, "nodes": 1, "max_depth": 0},
+    {"file": "empty-object.json", "input_bytes": 3, "objects": 1, "arrays": 0, "strings": 0, "numbers": 0, "booleans": 0, "nulls": 0, "nodes": 1, "max_depth": 0},
+    {"file": "large-array.json", "input_bytes": 182, "objects": 0, "arrays": 1, "strings": 0, "numbers": 90, "booleans": 0, "nulls": 0, "nodes": 91, "max_depth": 1},
+    {"file": "mixed-unicode.json", "input_bytes": 130, "objects": 1, "arrays": 1, "strings": 5, "numbers": 4, "booleans": 0, "nulls": 0, "nodes": 11, "max_depth": 2},
+    {"file": "nested-order.json", "input_bytes": 66, "objects": 5, "arrays": 3, "strings": 6, "numbers": 5, "booleans": 0, "nulls": 0, "nodes": 19, "max_depth": 4}
+  ]
+}

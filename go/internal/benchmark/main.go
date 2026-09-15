@@ -90,7 +90,7 @@ func main() {
 			}
 			return out
 		})
-		fmt.Printf("%s\tordered-json\t%f\t%f\t%f\t%s\n", file, parseNs, stringifyNs, roundtripNs, digest(output))
-		fmt.Printf("%s\tnative-json\t%f\t%f\t%f\t%s\n", file, nativeParseNs, nativeStringifyNs, nativeRoundtripNs, digest(nativeOutput))
+		fmt.Printf("%s\tordered-json\t%f\t%f\t%f\t%s\t%d\t%d\n", file, parseNs, stringifyNs, roundtripNs, digest(output), len(source), len(output))
+		fmt.Printf("%s\tnative-json\t%f\t%f\t%f\t%s\t%d\t%d\n", file, nativeParseNs, nativeStringifyNs, nativeRoundtripNs, digest(nativeOutput), len(source), len(nativeOutput))
 	}
 }

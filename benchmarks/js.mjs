@@ -23,6 +23,6 @@ for (const file of files) {
   const [nativeParseNs] = measure(() => JSON.parse(source));
   const [nativeStringifyNs, nativeOutput] = measure(() => JSON.stringify(nativeValue));
   const [nativeRoundtripNs] = measure(() => JSON.stringify(JSON.parse(source)));
-  console.log([file, 'ordered-json', parseNs, stringifyNs, roundtripNs, digest(output)].join('\t'));
-  console.log([file, 'native-json', nativeParseNs, nativeStringifyNs, nativeRoundtripNs, digest(nativeOutput)].join('\t'));
+  console.log([file, 'ordered-json', parseNs, stringifyNs, roundtripNs, digest(output), Buffer.byteLength(source), Buffer.byteLength(output)].join('\t'));
+  console.log([file, 'native-json', nativeParseNs, nativeStringifyNs, nativeRoundtripNs, digest(nativeOutput), Buffer.byteLength(source), Buffer.byteLength(nativeOutput)].join('\t'));
 }

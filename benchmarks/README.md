@@ -16,6 +16,11 @@ standard native APIs generally do not retain object order or exact number
 tokens. The ordered-json implementations must agree with each other; native
 output digests may differ for those intentional reasons.
 
+`workload.json` is the authority for fixture byte counts, node counts, scalar
+counts, and maximum depth. The runner rejects changed inputs, missing or
+duplicate implementation rows, and incorrect reported input sizes. Output
+byte counts remain observable results because native serialization can differ.
+
 Run from the repository root:
 
 ```sh

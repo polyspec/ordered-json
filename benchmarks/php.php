@@ -28,5 +28,5 @@ foreach ($files as $file) {
     $value = $parseFn();
     [$stringifyNs, $output] = $measure(fn() => $stringifyFn($value));
     [$roundtripNs, $roundtrip] = $measure(fn() => $stringifyFn($parseFn()));
-    echo implode("\t", [$file, $mode, $parseNs, $stringifyNs, $roundtripNs, $digest($output)]), "\n";
+    echo implode("\t", [$file, $mode, $parseNs, $stringifyNs, $roundtripNs, $digest($output), strlen($source), strlen($output)]), "\n";
 }
