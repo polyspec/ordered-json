@@ -4,22 +4,20 @@
 [한국어](validation.ko.md)
 
 <a id="repository-check"></a>
-## Repository check
+## Aggregate check
 
-Install the [required tools](installation.md#requirements), then run from the repository root:
+Install the [required tools](installation.md#requirements) and run from the repository root:
 
 ~~~sh
 make check
 ~~~
 
-The command builds the PHP extension, runs the documentation checker tests and the same JSON cases against JavaScript, Rust, Go, pure PHP, and native PHP, writes [verification.json](../verification.json) only after successful verification, and runs the documentation check.
+The command runs the verification and documentation checker tests, builds the selected packages, tests every registered implementation against the common JSON cases, writes [verification.json](../verification.json), and checks common and package documentation. An aggregate record includes the source hash of every tracked package file.
 
-`verification.json` records the actual runtime versions, case counts, result per implementation, documentation test count, source hashes, and supplementary input revision. It records verification, not publication. The record is invalid as current evidence if the checked source files change. The verifier refuses to write a record when sources change during execution or only some implementations are selected.
+The record includes source hashes, package file records, actual runtime versions, case counts, results, checker test count, build warnings, and supplementary input revision. PHP and extension versions are separate fields. A changed input invalidates the record as current evidence. The verifier rejects changes during execution and incomplete implementation results. The record does not establish publication.
 
 <a id="supplementary"></a>
 ## Supplementary inputs
-
-The optional supplementary checkout is pinned for reproducibility:
 
 ~~~sh
 git clone https://github.com/nst/JSONTestSuite.git .cache/JSONTestSuite
@@ -27,12 +25,12 @@ git -C .cache/JSONTestSuite checkout 1ef36fa01286573e846ac449e8683f8833c5b26a
 make check JSON_TEST_SUITE=.cache/JSONTestSuite
 ~~~
 
-The record states whether supplementary inputs were used. `i_` cases use this library's UTF-8 and depth policy. The source contains every required official expectation; language adapters contain no separate examples or expected results.
+The record states whether supplementary inputs were used. `i_` cases use the shared UTF-8 and depth policy. Official inputs and expectations exist only at the repository root; adapters contain no separate goldens.
 
 <a id="individual"></a>
 ## Individual implementations
 
-These commands run a selected implementation against the same expectations. They do not replace the repository check or update its complete verification record.
+From the common checkout, selected checks build and run the declared adapters. They do not update the aggregate record:
 
 ~~~sh
 python3 scripts/verify.py --only js
@@ -41,7 +39,30 @@ python3 scripts/verify.py --only go
 python3 scripts/verify.py --only php --only php-extension
 ~~~
 
-The native extension must already be built for the last command. The PHP adapter verifies whether the intended extension backend is loaded.
+For an independent clone:
+
+~~~sh
+git clone https://github.com/polyspec/ordered-json.git
+cd php-extension
+make check
+~~~
+
+Each package has an independent build target, while the root registry and verifier define the shared test commands. The native extension is built from `php-extension/` and is tested with the sibling PHP package in the same checkout.
+
+Run `make check JSON_TEST_SUITE=/path/to/JSONTestSuite` for supplementary inputs.
+
+<a id="pie"></a>
+## PIE artifact check
+
+Download a PIE PHAR from the [official releases](https://github.com/php/pie/releases) and verify its provenance with `gh attestation verify --owner php /path/to/pie.phar`. From the common root:
+
+~~~sh
+make pie-check PIE=/path/to/pie.phar JSON_TEST_SUITE=.cache/JSONTestSuite
+~~~
+
+The [PIE checker](../../scripts/check_pie.py) isolates PIE configuration under `.cache/`, registers the current extension checkout as a path repository, validates package recognition, and builds it with PIE. It tests that artifact directly with the same shared adapter and expectations. It does not run the ordinary native build in between.
+
+When available, `pie-verification.json` records the PIE version and PHAR hash, extension artifact hash, commands, source hashes, PHP and extension versions, and case results. Build errors, missing build tools, adapter warnings, or changes during the check fail verification. Compilation warnings remain in the record. This check does not install the module or publish a package. Re-run it when its recorded inputs change.
 
 <a id="documentation-checks"></a>
 ## Documentation checks
@@ -50,13 +71,13 @@ The native extension must already be built for the last command. The PHP adapter
 make docs-check
 ~~~
 
-The [checker](../../scripts/docs_check.py) validates the [manifest](../documentation-manifest.json), local links and anchors, translation pairs and revision hashes, section and code-block parity, feature fields, evidence references, and verification freshness. Its [tests](../../scripts/tests/test_docs_check.py) cover valid documentation and deliberate failures.
+The [checker](../../scripts/docs_check.py) validates each document manifest, links, translation pairs and revision hashes, section and code-block parity, feature state, and current aggregate and PIE evidence. The common manifest registers only common documents. Each package directory is checked with its own manifest.
 
-Review the English and Korean prose against code and tests. Then update the Korean `source-sha256` marker to the SHA-256 of the complete English file. Do not update a marker before completing that review. External links are syntax-checked, not fetched by this command.
+Review English and Korean prose against code and tests before updating a Korean `source-sha256` marker. Matching hashes do not prove translation accuracy. External links are syntax-checked, not fetched. Hosted CI is not configured; required candidate checks must run before PR submission or source publication.
 
 <a id="limits"></a>
 ## Limits
 
-The suite compares parser acceptance and the operations in the [acceptance contract](../spec/json-contract.md#acceptance). It does not establish exhaustive API argument coverage, all nondefault depth settings, every minimum runtime version, or all platform builds. Tests of library serialization do not establish every host encoder's behavior.
+The suite checks parser acceptance and the [acceptance contract](../spec/json-contract.md#acceptance). It does not establish exhaustive API argument coverage, all nondefault depth settings, every declared minimum runtime, all platforms, or every host encoder integration. Windows and ZTS native builds have not been verified.
 
-Compilation warnings and failed checks must be reported directly. Do not replace missing results with earlier runs. A passing JSON record can exist after a later documentation check fails; the complete `make check` command must also succeed before the change is complete.
+Report failed checks and compiler warnings directly. Do not reuse results for changed inputs. A JSON record may be written before a later documentation failure; the complete check must succeed before completion.

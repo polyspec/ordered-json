@@ -1,22 +1,47 @@
-<!-- doc-id: php-extension -->
-# PHP extension
+<!-- doc-id: overview -->
+# ordered-json for PHP extension
 
 [한국어](README.ko.md)
 
+Strict JSON with associative objects that preserve document key order recursively. Repeated keys retain the first position and the last value. Official inputs and expected results are maintained in the monorepo examples.
+
 <a id="usage"></a>
-## Build and use
+## Usage
 
-The C extension implements strict parsing and associative JSON serialization. The [common PHP package](../php/README.md) provides the public API. The extension's `ordered_json` version and the PHP runtime version are separate; both are recorded in [verification.json](../docs/verification.json).
+PHP >= 8.2 and matching development headers; PIE package `ordered-json/ordered-json-extension`, extension `ordered_json`.
 
-Follow [native installation](../docs/operations/installation.md#native-php) to build `modules/ordered_json.so` for the target PHP runtime. The [API contract](../docs/spec/api.md#php) defines `ordered_json_scan`, `ordered_json_compact`, descriptor fields, and parser selection. Windows configuration is included, but a Windows build has not been verified.
+The source build produces `src/modules/ordered_json.so`. Load it with PHP using `-d extension=/absolute/path/to/ordered_json.so`. The [PHP library](https://github.com/polyspec/ordered-json/tree/main/php) provides the common Value API.
+
+~~~sh
+cd src
+phpize
+./configure
+make -j2
+~~~
+
+
+On macOS, configure preserves `MACOSX_DEPLOYMENT_TARGET` when supplied. Otherwise, it derives the value from the active compiler, including its target flags. The bundle uses dynamic symbol lookup for modern macOS targets. Libtool's `LT_MULTI_MODULE` option omits the unnecessary dynamic-library single-module flag check.
+
+PIE metadata declares type `php-ext`, extension name `ordered_json`, and build path `src`. The package name is distinct from the PHP library. For a local PIE build, register this checkout and build the development package:
+
+~~~sh
+pie repository:add path .
+pie build 'ordered-json/ordered-json-extension:*@dev'
+~~~
+
+PIE configuration can be isolated with its `PIE_WORKING_DIRECTORY` environment variable. A build does not install or enable the extension. Windows binaries and ZTS builds have not been verified. PHP and extension versions are recorded separately by the shared check. The PHP library is the sibling `php/` package in this monorepo; it remains separate from the native build and PIE package.
+
+The [JSON contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.md) and [API contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.md) define behavior. Source is provided by this repository. Registry publication and versioned releases are not verified; a source version string is not a release record.
 
 <a id="verification"></a>
 ## Verification
 
-After building, run from the repository root:
+Install Python >= 3.9, Git, make, and this implementation's runtime/build tools. Run from this checkout:
 
 ~~~sh
-python3 scripts/verify.py --only php-extension
+make check
 ~~~
 
-The adapter requires the extension and uses the shared official expectations. The [repository check](../docs/operations/validation.md) builds the extension and compares both PHP backends with the other implementations.
+The command invokes the root verifier against this package. The root aggregate check tests all packages from the same source revision and writes the current result to `docs/verification.json`.
+
+Use `make check JSON_TEST_SUITE=/path/to/JSONTestSuite` for supplementary cases. [Development procedure](AGENTS.md) and [changelog](CHANGELOG.md) describe required checks and changes.

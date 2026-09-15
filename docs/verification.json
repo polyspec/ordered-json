@@ -1,21 +1,110 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-07T13:11:29+00:00",
+  "checked_at": "2026-09-15T07:40:00+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "0ce9d30b3412687e188301c07763b5b2c44f90242543746589d663932ae7c12e",
+    "sha256": "eb7b0d5786ea1961cfbb078498468e16e8d52d36877e2f4c83575fcc2fb2eced",
     "files": {
-      "Makefile": "d6d8b4312c45dae0a3da2da17eb57c14977976778af9984ccda41aedd7c42123",
+      "go/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
+      "go/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
+      "go/AGENTS.md": "a8e43aea261abd8edd34b1495814884e55fcf6c17f24ad412ac708e9d55765b0",
+      "go/CHANGELOG.ko.md": "a79bae2cb2e1e6c4571f3181127889015b0ef0c546596a7670115d8a07c9d242",
+      "go/CHANGELOG.md": "d929ea5076e9a6c019fcc66fc2a3642774de76f4122d6acaece289b678ca939a",
+      "go/Makefile": "562d18666e2ba1722a7e4d985d9393eff37abf2d454b3a928438158f551dcb99",
+      "go/README.ko.md": "f43d6ef70a9ee3e977a86d8d78ee00ef804a98e24043e2f3829211697278ed1d",
+      "go/README.md": "022bd46ae31be9887d1f6f57e8ba7bc600525663a373891eb219c9d718252fd5",
+      "go/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
+      "go/go.mod": "df40995792ec5f0fb858223c065493b06435556c65337bdd63206589bba8b41f",
+      "go/internal/probe/main.go": "78fc4b9be4ab84d9cc1da45ca84364fdd430610349747e874273019b9d6edd2d",
+      "go/orderedjson.go": "27f4ecebd1ea5cdc5fc56725fa90acc057cac8632c7fef0ecc650612b7ece529",
+      "js/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
+      "js/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
+      "js/AGENTS.md": "a8e43aea261abd8edd34b1495814884e55fcf6c17f24ad412ac708e9d55765b0",
+      "js/CHANGELOG.ko.md": "037141c78df8d2dae806314b440003cd3922bcfadcaead363b849ab2fbc6b8d5",
+      "js/CHANGELOG.md": "1473813c804f9648831053b5bdff38231e2417e80849137ac73dd745b2423e80",
+      "js/Makefile": "283f8460279d1378641fc986fd5663d04ce366b73681fc77259f6267c27bfef6",
+      "js/README.ko.md": "e1b6c8389af3f9a25e8fc7e80315a1dc20c44d7a57dc6e2eb433c6078c06554c",
+      "js/README.md": "5271983a46de7fa75cfa6fa85a426383df94e4290b0929cf7fb142f8b3e397c5",
+      "js/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
+      "js/index.d.ts": "9a699c64a708171c6b43d1dd27d9636a67f51582b959564caa15587fc82f612e",
+      "js/index.js": "93ddc3f11831e6eb779fcb732e802e15eb6637a978a28037a8861ec39ebef1b1",
+      "js/package.json": "f5d8dccc18e8795c45d09a41dd33b77fff8472e5cb52a3197d6585a5bab983f9",
+      "js/test/probe.mjs": "c1b87d90afc70c2cef94df27163043ad986c69a01e7ae9c4e6f38d33a3f7e355",
+      "php-extension/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
+      "php-extension/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
+      "php-extension/AGENTS.md": "a8e43aea261abd8edd34b1495814884e55fcf6c17f24ad412ac708e9d55765b0",
+      "php-extension/CHANGELOG.ko.md": "e5107d060bfbe3ccfec7c2523853654dc4dd37e46e20163b61e9fa9383945d3f",
+      "php-extension/CHANGELOG.md": "31c1ce6911c407850710a462c286a2c4452eae3b999dc005aab1983c48fd5568",
+      "php-extension/Makefile": "06d845ea5afb41f4532244be8c8e41bd86206cf9e9286f2144222c4335d80537",
+      "php-extension/README.ko.md": "54729851be125bae0f231d3f28128e5a61eb77172c9a81e5391d914fd1c607f7",
+      "php-extension/README.md": "e874c6da075208b21645d01032e9cc6ff26c7843e27fef4f73d81cdb60e00f5d",
+      "php-extension/composer.json": "1571c88e25b8302aff403e634abc6ebad100dac1df248ec2b0c0d81ceb37684c",
+      "php-extension/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
+      "php-extension/src/.gitignore": "a24cea86ccd06d6df27abe4079219b2c4f7b39a83718f7704b36d4e83121b71b",
+      "php-extension/src/config.m4": "1039ac44901bf34856402852b5996ec509ae2883ba83960b455005d8248ba5ed",
+      "php-extension/src/config.w32": "52f65b0c0ab32af3bac72f4c1265fac1fd475c52cdd74ae49a54b3fc337e7cf9",
+      "php-extension/src/ordered_json.c": "fa7979ab4c8701866a21084e473fe9befd832c2df6c23bf7c9e1e81d73c45454",
+      "php-extension/src/ordered_json.stub.php": "5a39353528294cb7a062c567ad5108f092101d886b70990c55c292a676687342",
+      "php/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
+      "php/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
+      "php/AGENTS.md": "a8e43aea261abd8edd34b1495814884e55fcf6c17f24ad412ac708e9d55765b0",
+      "php/CHANGELOG.ko.md": "a1c4082900dff466c0fab17ad3b9c86e670a3f6b9c951444e5d53b64b2bd02c2",
+      "php/CHANGELOG.md": "846465f0a28974b6046b4a682ca212f580719bbefd25795e1fa7f5b327f2f6d0",
+      "php/Makefile": "772a643f13be6c3cc91c2f2d961dd526d5307db5c130abac43fc407f1d21a30c",
+      "php/README.ko.md": "cc6ec0b8fa53bc4a69f1e8b682ae3e60e01771cc40323e1ccb28f881118fb8fe",
+      "php/README.md": "8c2078dbb5ca537a605a00f006a811961abf56e06c3e3977b3602b1ff7ffa572",
+      "php/composer.json": "25853cd81a924cb7966c61b7ddfd412bbfde9dac10bc7d978379a2591e663370",
+      "php/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
+      "php/src/OrderedJson.php": "00258117ab21c0e7b9b973cb07236ee4e11353d7b402de5a7c63e0357b89866b",
+      "php/tests/probe.php": "c93a114abcf1817d457d8ba098052b49658263d4a2e4eceb08cdbc55d2bf4ee1",
+      "rust/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
+      "rust/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
+      "rust/AGENTS.md": "a8e43aea261abd8edd34b1495814884e55fcf6c17f24ad412ac708e9d55765b0",
+      "rust/CHANGELOG.ko.md": "1ff80bfba2b67316bc9adaab51c9be07d8aa12e1f266a3a6d302a0fe025a112a",
+      "rust/CHANGELOG.md": "cb49a100e400c0217f4ecefbd3785fb9192c53d33fd9eecb5f83440e0cf5b907",
+      "rust/Cargo.lock": "dd9beee9a75c8331d090c13e730cf3fc188a3e0560878833a85baae689f15bde",
+      "rust/Cargo.toml": "ed9c232b690e5f8fbfe7096b40de35f44e8bf6d51e86852ffe897229ee7642b2",
+      "rust/Makefile": "834f720591ef8747ce5e53d25b83005bf802472404adba7f5e64dfdc8510ad88",
+      "rust/README.ko.md": "e75bfc699a9c4747dc9449430ea10c20b7a36dd9d2f85bd083d8b8696dcf1df6",
+      "rust/README.md": "e3c04eba3326d309a6e793f57ac7979c1429fdb9e135e85d022adb573029c8e3",
+      "rust/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
+      "rust/examples/probe.rs": "c6270d919c06f7c1666cb2e126cda45ceefea07e0126f9d29fc33f90f6ed8152",
+      "rust/src/lib.rs": "59135afc8f7f110e7c01d34153bdb05ccad8f46d760756755c2dadcddb7c07a9",
+      ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
+      "AGENTS.ko.md": "689d4664673fbe8c17efff3966f7fc7938abec95cb48f1304ecd6cabdf7231dc",
+      "AGENTS.md": "acff0c9afb73feec36e9d64ba58e9feddeaa2c7fb466264e3fee2da3c2c5fee3",
+      "CHANGELOG.ko.md": "57ab52ddcb58f3645f9a2dc083953b97521ae9da3380d970890ad06f5d89ddfe",
+      "CHANGELOG.md": "18ebbc024e47b50f7eb96220885507165368c922aa444d7112955a01af1e928c",
+      "Makefile": "1ebb3caea29bd194496e1de49e05cb650751857a438560874ceb4cd9e41a6478",
+      "README.ko.md": "23939bfc76849af3ab82fc3e6decdc00f6aee752adf48c04837a1a103b6549ac",
+      "README.md": "3e58b47a5a2372e81072b0f5f08bf549fea6d73b11b79fa65bb558e748216927",
+      "docs/distribution.json": "1ccded31251e48286d97c8df62bb87d70cf6eadba4f88cc99a146447fcb2eb8a",
+      "docs/documentation-manifest.json": "b42e35c227be040edcff8a72915e96d4b2706c8d094e7139380aa760257e0a25",
+      "docs/documentation-plan.ko.md": "e7feaa5a0a1c82092f409e2476357c1cb0a9171db79e25b5e3dd14acc8e84afd",
+      "docs/documentation-plan.md": "eca83d95baf26eb609e3702a876807e8d5c0354dd21e49bc329771c0d767656d",
+      "docs/features.ko.md": "ed5688499eb46831014154ce989c4725dd41fb884470378d2a34a5afeee287c7",
+      "docs/features.md": "b8087510faec753c360bd825e097a2b9030b3d067b420659b73925a0d4d72235",
+      "docs/operations/distribution.ko.md": "1c16f7a1ce39535bea9d5affe542dc8fe8afc77a293f329ec1d196950c9ad595",
+      "docs/operations/distribution.md": "659a7fdf3df1b4ddd7fea5368da9d9d1cc07d9eed15e812fc1b7729deac2af56",
+      "docs/operations/installation.ko.md": "c814451ec04980f6b82197e8b716b81222d7105afe2e83a25af8cb7a18c5eb79",
+      "docs/operations/installation.md": "936e96a153aef32db47aad15e52ab21d1a9d24452b07f4ca49ba59cc82ebe83a",
+      "docs/operations/validation.ko.md": "8bb2d149a6c0a3dfaafc84e8b768b42745a0c511a8a30631c4ebb498337ecf98",
+      "docs/operations/validation.md": "8af9f0934d1598dec0ee23bd4a6454f3144d1432a2afafb700083d27ff7b1462",
+      "docs/plans/README.ko.md": "b12490bd99031c50587613e425077a2f6b673834202e8b84bff62750974efd19",
+      "docs/plans/README.md": "2d012cdb4ebc1b599fbb75c77d41618f7eaf575d27da127050c30d59d6693f3a",
+      "docs/reports/ojson-comparison.json": "4f6bc37d9fba4be253b8b11c3a813eec52d53d139ee202ca9693d8a17ecb5ba2",
+      "docs/reports/ojson-comparison.ko.md": "4a8fdd346be00b60b020b79ea9cbd38fa6f73b7c9b468465361664e884b8cc7a",
+      "docs/reports/ojson-comparison.md": "f51637e54cbf5e4fb650608261647ff4c7c508cb6e867c8d72f9a44db0a95373",
       "docs/spec/api.ko.md": "a898db01f297804296cd7dd462485ca7e498bf945ccbd50078a95faf8136a5aa",
       "docs/spec/api.md": "06c906c1cc749aed0c0c76e42c847481cfe0509034cebb3527ea16d73f9c0a00",
       "docs/spec/json-contract.ko.md": "c9b26ae9f6dd4954426fedf6717b0aac307e0671c8758e3ce3db8f311ead9067",
       "docs/spec/json-contract.md": "27525c1be0241f6e90d606b4a441e2def782bb5d5984bcd3794da6852fd0f15b",
-      "docs/spec/repositories.ko.md": "983e83bb635225eb4c3a489cae34d702af3427fd6a8c21bb871b5ee5285aaf7c",
-      "docs/spec/repositories.md": "0db37d277a2840942c0e80d5a6b842a374271981de718a3a0acf58408c9de09a",
+      "docs/spec/repositories.ko.md": "ec6b5e5686719dafa0404ddc36a00e74ea3539dfef742b61bbbd565d20ad9078",
+      "docs/spec/repositories.md": "8ec75064168c4f93b9063ac71f2b627eaa5cdb2ee0571ab1cdd5f7c254d212aa",
       "examples/README.ko.md": "702a4a27ed68590c1a89ccfb7f90568ae187aadd986843f8d02fe614c226b21d",
       "examples/README.md": "5adddda24704fe97a3a005bce6ab4dd2ab91aa89f7c25fa54746ca0d698d1089",
       "examples/official.json": "008b05fe07142d9dcad9edd90fe6606926ccb279461664c19af5a3d0eedac830",
@@ -117,76 +206,58 @@
       "fixtures/valid/unicode.json": "a8236324f77bf7650c7f660e8238daa84baef1ba11265183374348bc5a4cecf6",
       "fixtures/valid/whitespace.json": "fde2ba473d5de7feaaba3339457ccd182f0f2156532e504fe47df1ed605e232e",
       "fixtures/valid/zero.json": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
-      "go/go.mod": "df40995792ec5f0fb858223c065493b06435556c65337bdd63206589bba8b41f",
-      "go/internal/probe/main.go": "78fc4b9be4ab84d9cc1da45ca84364fdd430610349747e874273019b9d6edd2d",
-      "go/orderedjson.go": "27f4ecebd1ea5cdc5fc56725fa90acc057cac8632c7fef0ecc650612b7ece529",
       "implementations.json": "60472aa090cc5ad1cdb6516fc2fde710ee12db8706aa8ea031d7ab2715f7835c",
-      "js/index.d.ts": "9a699c64a708171c6b43d1dd27d9636a67f51582b959564caa15587fc82f612e",
-      "js/index.js": "93ddc3f11831e6eb779fcb732e802e15eb6637a978a28037a8861ec39ebef1b1",
-      "js/package.json": "7a1ec5248a842da6a623657728777fa68aa58f9d9b83f3c26415bcea8846ffb2",
-      "js/test/probe.mjs": "c1b87d90afc70c2cef94df27163043ad986c69a01e7ae9c4e6f38d33a3f7e355",
-      "php/composer.json": "9e28a4664aa75ff0048b9e181d7e8d5c94a576f39e8a75fc5d7675317d4d55cd",
-      "php/src/OrderedJson.php": "00258117ab21c0e7b9b973cb07236ee4e11353d7b402de5a7c63e0357b89866b",
-      "php/tests/probe.php": "c93a114abcf1817d457d8ba098052b49658263d4a2e4eceb08cdbc55d2bf4ee1",
-      "php-extension/composer.json": "1571c88e25b8302aff403e634abc6ebad100dac1df248ec2b0c0d81ceb37684c",
-      "php-extension/src/config.m4": "13e0ddc6c0e391d7ff11c48f3bdd2a07ea2943684fb01949473d645949054c00",
-      "php-extension/src/config.w32": "52f65b0c0ab32af3bac72f4c1265fac1fd475c52cdd74ae49a54b3fc337e7cf9",
-      "php-extension/src/ordered_json.c": "fa7979ab4c8701866a21084e473fe9befd832c2df6c23bf7c9e1e81d73c45454",
-      "php-extension/src/ordered_json.stub.php": "5a39353528294cb7a062c567ad5108f092101d886b70990c55c292a676687342",
-      "rust/Cargo.lock": "dd9beee9a75c8331d090c13e730cf3fc188a3e0560878833a85baae689f15bde",
-      "rust/Cargo.toml": "a63cf801f64d9c66dc53bab946312ba53ac337cb825de0225c53f53958ad7eac",
-      "rust/examples/probe.rs": "c6270d919c06f7c1666cb2e126cda45ceefea07e0126f9d29fc33f90f6ed8152",
-      "rust/src/lib.rs": "59135afc8f7f110e7c01d34153bdb05ccad8f46d760756755c2dadcddb7c07a9",
+      "scripts/check_pie.py": "3a89741d4582e7f3a49367978f89a0a5dd417a887aa8d561db67c8d710990639",
       "scripts/compare_ojson.py": "bd45cccfc0b64c45a262cde1c2e7509cd23a554040beee4cb598c957786fdef8",
       "scripts/comparison/ojson_comparison.erl": "d267254b5de99b8f3d815639a18dbc97d953be86dc1c28dabce6cbf9218cba9c",
       "scripts/comparison/python_ojson_probe.py": "7939ea89a8c481b4e466969977149d72a1689991cf1d84661ddcc64cbadcf202",
-      "scripts/docs_check.py": "6574f1885bd5c8cf1a961ae44bd613ba5b1f56d3a914bfe876c61dc855e8501f",
-      "scripts/registry.py": "b25e2d469388d27c1aa2ae68d27434041931a87183b024a735b70ce5f4e13457",
+      "scripts/docs_check.py": "a6b113857a49152ae9780fce2929d7162a3634fdcc8a758a0f79164a88488b51",
+      "scripts/registry.py": "41fc953178fd42720f4cd5a23465d2f186c8a471375321d7d181573d5a6955d7",
       "scripts/test.py": "857a2df125e4be1e17d56774d5010ad0cdb23d7a50b08503a4ca048dcb07f631",
       "scripts/tests/test_docs_check.py": "f71fdbc2e88bedc992990e71942bebffd33e82d21dc55472db2b2a68c4d46a93",
-      "scripts/tests/test_repositories.py": "45e44c2c3237f3619d0aeae4c8f4f8b3e621f19a12f87ae65607e659cf43c4bd",
-      "scripts/verification_record.py": "ee26315e49128ee205cd68ea3dce3511ad5d83b098e1da9259b38f1f0b7225eb",
-      "scripts/verify.py": "b76641592f3023212e8c4e9214a8c4f50be06ea111ab649c68caf0202a599e36"
+      "scripts/tests/test_repositories.py": "0488d57c4e15666371dfc830de048385686322dd48d14ccdf7554cffbd48406e",
+      "scripts/verification_record.py": "49d4458f547c730c967e1877a38e317f7452edfd7e7bc9b51c7757514024e13a",
+      "scripts/verify.py": "82a777b300c91ddb154fd5a79b3b7e27588688226bb9718aeb217b5efc9ed6b8"
     }
   },
   "cases": {
     "official": 17,
     "fixtures": 98,
-    "supplementary": 318,
-    "total": 433
+    "supplementary": 0,
+    "total": 115
   },
   "implementations": {
     "js": {
       "status": "passed",
-      "cases": 433,
+      "cases": 115,
       "runtime": {
         "node": "v26.8.1"
       }
     },
     "rust": {
       "status": "passed",
-      "cases": 433,
+      "cases": 115,
       "runtime": {
-        "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)"
+        "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)"
       }
     },
     "go": {
       "status": "passed",
-      "cases": 433,
+      "cases": 115,
       "runtime": {
         "go": "go version go1.27.0 darwin/arm64"
       }
     },
     "php": {
       "status": "passed",
-      "cases": 433,
+      "cases": 115,
       "runtime": {
         "php": "8.5.10"
       }
     },
     "php-extension": {
       "status": "passed",
-      "cases": 433,
+      "cases": 115,
       "runtime": {
         "php": "8.5.10",
         "extension_version": "0.1.0"
@@ -197,20 +268,42 @@
     "status": "passed",
     "count": 41
   },
-  "supplementary": {
-    "project": "nst/JSONTestSuite",
-    "revision": "1ef36fa01286573e846ac449e8683f8833c5b26a",
-    "cases": 318,
-    "inputs_sha256": "dafa7facfed6700b0a2f16207fb1d3b557f9e45d3abd84f2dfb666538d10c332"
-  },
+  "supplementary": null,
   "build_warnings": [
     {
       "implementation": "php-extension",
-      "message": "checking for -single_module linker flag... ld: warning: -single_module is obsolete"
+      "message": "shtool:echo:Warning: unable to determine terminal sequence for bold mode"
     },
     {
       "implementation": "php-extension",
-      "message": "ld: warning: -undefined suppress is deprecated"
+      "message": "shtool:echo:Warning: unable to determine terminal sequence for bold mode"
     }
-  ]
+  ],
+  "packages": {
+    "javascript": {
+      "path": "js",
+      "sha256": "c3b205bc3c029d8b6e8edce7e69edd5c795719d1c4bd09ff1d5442be729befd2",
+      "files": 13
+    },
+    "rust": {
+      "path": "rust",
+      "sha256": "0c2446fe6708865259084bdbdff767bbc634ad53ee5566b6cbf6daa61c5720be",
+      "files": 13
+    },
+    "go": {
+      "path": "go",
+      "sha256": "2723e6a9fed88a9f94dd4bc25c7fda4fef55af7e0deae94fca0a2777f5a0eedc",
+      "files": 12
+    },
+    "php": {
+      "path": "php",
+      "sha256": "e2814c5d53bd072ec3bd9323bf40b8038183a64ebc6e1f4f15ced4e5cf77b928",
+      "files": 12
+    },
+    "php-extension": {
+      "path": "php-extension",
+      "sha256": "22274ad45c0c9cdb6fea23477bd3b7ea303abc06a3b2c15720afe157807f0b97",
+      "files": 15
+    }
+  }
 }

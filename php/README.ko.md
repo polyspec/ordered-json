@@ -1,32 +1,38 @@
-<!-- doc-id: php -->
-<!-- source-sha256: 57cdb70e07813f151d7237cc329b42d4447468bfc3dfe142d85db643a3bbc1a6 -->
-# PHP
+<!-- doc-id: overview -->
+<!-- source-sha256: 89281821bbc0f43005d9b1169497d81414ec62f661bd70213b2c3a7659ab5c42 -->
+# ordered-json for PHP
 
 [English](README.md)
+
+객체를 연관배열로 처리하고 모든 깊이에서 문서 키 순서를 유지하는 엄격한 JSON 구현입니다. 중복 키는 최초 위치와 마지막 값을 유지합니다. 공식 입력과 기대 결과는 모노레포의 examples에서 관리합니다.
 
 <a id="usage"></a>
 ## 사용
 
-순수 PHP 패키지와 선택적 [네이티브 확장](../php-extension/README.ko.md)은 같은 `Value` API를 사용합니다. 요구사항과 로드 방법은 [설치](../docs/operations/installation.ko.md)를 확인합니다. 여기서 `$source`는 [official.json](../examples/official.json)의 객체 사례에 있는 `input` 문자열이며 파일 경로는 이 디렉터리 기준입니다.
+JSON 및 PCRE를 제공하는 PHP >= 8.2를 요구하며 Composer 패키지는 `ordered-json/ordered-json`입니다.
+
+사용 코드의 `source` 또는 `$source`는 [공통 공식 예제](https://github.com/polyspec/ordered-json/blob/main/examples/official.json)의 객체 사례에서 가져옵니다.
 
 ~~~php
 require 'src/OrderedJson.php';
-
 $value = OrderedJson\parse($source);
-$members = $value->members();
 $output = OrderedJson\stringify($value);
-$rebuilt = OrderedJson\stringify(OrderedJson\Value::object($members));
 ~~~
 
-`members()`는 라이브러리 값의 연관배열을 반환합니다. 연관배열에는 `Value::object`를, JSON 배열에는 `Value::array`를 사용합니다. 라이브러리의 `stringify`를 사용합니다. `json_encode($value)`는 예외를 발생시킵니다. [API 계약](../docs/spec/api.ko.md#php)에 파싱과 네이티브 직렬화의 개별 규칙을 포함한 백엔드 선택을 정의합니다.
+
+[네이티브 확장](https://github.com/polyspec/ordered-json/tree/main/php-extension)은 별도의 선택적 패키지입니다. 순수 PHP에는 확장 체크아웃이 필요하지 않습니다. `parse(..., useNative: false)`는 순수 파서를 선택하며 확장이 로드되어 있으면 `compact()`는 네이티브 직렬화를 사용합니다. 순수 구현 테스트는 `php -n`을 사용합니다.
+
+동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
 
 <a id="verification"></a>
 ## 검증
 
-확장을 빌드한 뒤 저장소 루트에서 실행합니다.
+Python >= 3.9, Git, make, 해당 구현의 런타임·빌드 도구를 설치하고 이 체크아웃에서 실행합니다.
 
 ~~~sh
-python3 scripts/verify.py --only php --only php-extension
+make check
 ~~~
 
-두 백엔드는 공통 검증기와 공식 기대 결과를 사용합니다. [저장소 검사](../docs/operations/validation.ko.md)는 확장을 빌드하고 모든 구현을 검사합니다.
+루트 검증기를 호출하여 이 패키지를 검사합니다. 루트 통합 검사는 같은 소스 리비전의 모든 패키지를 검사하고 현재 결과를 `docs/verification.json`에 기록합니다.
+
+추가 사례는 `make check JSON_TEST_SUITE=/path/to/JSONTestSuite`로 검사합니다. [개발 절차](AGENTS.ko.md)와 [변경 기록](CHANGELOG.ko.md)에 필수 검사와 변경 사항이 있습니다.

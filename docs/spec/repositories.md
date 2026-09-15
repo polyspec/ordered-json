@@ -38,9 +38,11 @@ For a shared contract change, update the verifier, affected implementations, and
 
 The PHP library uses Composer package `ordered-json/ordered-json`. The extension uses the distinct PIE package `ordered-json/ordered-json-extension`, type `php-ext`, extension name `ordered_json`, and build path `src`. Its configuration enables a standalone extension build by default. The PHP library is a test dependency, not a native build or PIE package dependency.
 
-PIE package validation and a local PIE build must succeed before recording PIE compatibility. A local build does not establish Packagist publication, a released version, Windows binary availability, or installation into a user's PHP configuration. The [PIE maintainer contract](https://github.com/php/pie/blob/1.5.x/docs/extension-maintainers.md) defines package metadata and build behavior.
+On macOS, configure preserves an explicit `MACOSX_DEPLOYMENT_TARGET` or obtains the missing value from the active C compiler's deployment target. The extension is a loadable bundle; configure uses Libtool's `LT_MULTI_MODULE` option to omit the unnecessary dynamic-library single-module flag check. Modern macOS targets use dynamic symbol lookup. Ordinary and PIE builds must complete without the obsolete `-single_module` and `-undefined suppress` warnings.
+
+PIE package recognition, a local PIE build, and the shared JSON check against the PIE-built artifact must succeed before recording PIE compatibility. A local build does not establish Packagist publication, a released version, Windows binary availability, or installation into a user's PHP configuration. The [PIE maintainer contract](https://github.com/php/pie/blob/1.4.10/docs/extension-maintainers.md) defines package metadata and build behavior.
 
 <a id="state"></a>
 ## Implementation state
 
-The package registry and shared checks are in progress. [Feature state](../features.md) records completion and evidence separately from this contract.
+The five implementation packages are maintained in this repository. [Feature state](../features.md) records completion and evidence separately from this contract.

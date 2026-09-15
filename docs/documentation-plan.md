@@ -8,7 +8,7 @@ This document defines the repository's documentation structure and update proced
 <a id="ownership"></a>
 ## Canonical documents
 
-Each topic has one English canonical document and one `.ko.md` translation. The [manifest](documentation-manifest.json) registers every Markdown document and its topic. Other documents link to the canonical topic instead of repeating its rules.
+Each topic has one English canonical document and one `.ko.md` translation. The [manifest](documentation-manifest.json) registers every common Markdown document and its topic. Each implementation package registers its own documents. The common checker checks both levels. Other documents link to the canonical topic instead of repeating its rules.
 
 | Location | Content |
 | --- | --- |
@@ -42,7 +42,7 @@ After a proposal is approved, update the specification and remove the proposal d
 
 The Korean file's `source-sha256` comment records the English revision reviewed for that translation. Update it only after reviewing the translation. Matching hashes do not prove translation accuracy. The checker does not verify external website availability or prose meaning; those require review against code and test results.
 
-`make check` runs the documentation checker tests, all five JSON implementations, and `make docs-check`. Hosted CI is not configured. Developers must run the required commands before committing.
+`make check` runs the verifier and documentation checker tests, every registered JSON implementation, and `make docs-check`. [PIE verification](operations/validation.md#pie) records a separate build and shared case result. Hosted CI is not configured. Developers must run the required commands before committing.
 
 <a id="records"></a>
 ## Technical records

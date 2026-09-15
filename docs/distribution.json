@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-09-07T11:39:14+00:00",
+  "checked_at": "2026-09-07T13:59:34+00:00",
   "source": {
-    "state": "available",
+    "state": "not-verified",
     "url": "https://github.com/polyspec/ordered-json",
     "branch": "main",
-    "visibility": "public"
+    "visibility": "not-verified"
   },
   "github_releases": [],
   "version_tags": [],

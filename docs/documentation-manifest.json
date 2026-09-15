@@ -74,36 +74,6 @@
       "ko": "examples/README.ko.md"
     },
     {
-      "id": "javascript",
-      "kind": "usage",
-      "en": "js/README.md",
-      "ko": "js/README.ko.md"
-    },
-    {
-      "id": "rust",
-      "kind": "usage",
-      "en": "rust/README.md",
-      "ko": "rust/README.ko.md"
-    },
-    {
-      "id": "go",
-      "kind": "usage",
-      "en": "go/README.md",
-      "ko": "go/README.ko.md"
-    },
-    {
-      "id": "php",
-      "kind": "usage",
-      "en": "php/README.md",
-      "ko": "php/README.ko.md"
-    },
-    {
-      "id": "php-extension",
-      "kind": "usage",
-      "en": "php-extension/README.md",
-      "ko": "php-extension/README.ko.md"
-    },
-    {
       "id": "ojson-comparison",
       "kind": "report",
       "en": "docs/reports/ojson-comparison.md",
@@ -115,5 +85,6 @@
       "en": "docs/spec/repositories.md",
       "ko": "docs/spec/repositories.ko.md"
     }
-  ]
+  ],
+  "role": "common"
 }

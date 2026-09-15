@@ -1,32 +1,36 @@
-<!-- doc-id: javascript -->
-# JavaScript
+<!-- doc-id: overview -->
+# ordered-json for JavaScript
 
 [한국어](README.ko.md)
+
+Strict JSON with associative objects that preserve document key order recursively. Repeated keys retain the first position and the last value. Official inputs and expected results are maintained in the monorepo examples.
 
 <a id="usage"></a>
 ## Usage
 
-This implementation provides ESM and TypeScript declarations without runtime dependencies. See [installation](../docs/operations/installation.md) for runtime requirements and source usage. In the following fragment, `source` is the `input` string from an object case in [official.json](../examples/official.json). The import path is relative to this directory.
+Node.js >= 20; ESM and TypeScript declarations.
+
+The usage fragment takes `source` (or `$source`) from an object case in the [common official examples](https://github.com/polyspec/ordered-json/blob/main/examples/official.json).
 
 ~~~js
-import {parse, stringify, Value} from './index.js';
-
+import {parse, stringify} from './index.js';
 const value = parse(source);
 const members = value.members;
-const keys = [...members.keys()];
 const output = stringify(value);
-const rebuilt = stringify(Value.object(members));
 ~~~
 
-`members` is a copied `Map<string, Value>`. Use `Value.object` with ordered entries and `Value.array` with an array of library values. The [API contract](../docs/spec/api.md) defines parsing, scalar factories, lookup, and serialization. Use the library's `stringify`; `JSON.stringify(value)` throws.
+
+The [JSON contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.md) and [API contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.md) define behavior. Source is provided by this repository. Registry publication and versioned releases are not verified; a source version string is not a release record.
 
 <a id="verification"></a>
 ## Verification
 
-From this directory:
+Install Python >= 3.9, Git, make, and this implementation's runtime/build tools. Run from this checkout:
 
 ~~~sh
-npm test
+make check
 ~~~
 
-This runs the shared verifier and official expectations. The [repository check](../docs/operations/validation.md) tests all implementations.
+The command invokes the root verifier against this package. The root aggregate check tests all packages from the same source revision and writes the current result to `docs/verification.json`.
+
+Use `make check JSON_TEST_SUITE=/path/to/JSONTestSuite` for supplementary cases. [Development procedure](AGENTS.md) and [changelog](CHANGELOG.md) describe required checks and changes.

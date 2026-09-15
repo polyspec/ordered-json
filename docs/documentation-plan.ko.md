@@ -1,5 +1,5 @@
 <!-- doc-id: documentation-plan -->
-<!-- source-sha256: 459cbe4727f54bfe0ad5e12ce895beeae9faf9b8afc6e30ff7e5aa6a6b4ceca2 -->
+<!-- source-sha256: eca83d95baf26eb609e3702a876807e8d5c0354dd21e49bc329771c0d767656d -->
 # 문서 관리
 
 [English](documentation-plan.md)
@@ -9,7 +9,7 @@
 <a id="ownership"></a>
 ## 정본 문서
 
-각 주제에는 영어 정본 하나와 `.ko.md` 번역 하나를 관리합니다. [목록](documentation-manifest.json)은 모든 Markdown 문서와 주제를 등록합니다. 다른 문서는 같은 규칙을 반복하지 않고 정본 주제로 연결합니다.
+각 주제에는 영어 정본 하나와 `.ko.md` 번역 하나를 관리합니다. [목록](documentation-manifest.json)은 모든 공통 Markdown 문서와 주제를 등록합니다. 각 구현 패키지는 자체 문서를 등록하며 공통 검사기는 두 단계 모두 검사합니다. 다른 문서는 같은 규칙을 반복하지 않고 정본 주제로 연결합니다.
 
 | 위치 | 내용 |
 | --- | --- |
@@ -43,7 +43,7 @@
 
 한국어 파일의 `source-sha256` 주석은 번역을 검토한 영어 개정본을 기록합니다. 번역 검토 후에만 갱신합니다. 해시 일치는 번역의 정확성을 증명하지 않습니다. 검사기는 외부 사이트의 접속 가능 여부나 문장의 의미를 검증하지 않으며, 코드와 테스트 결과를 읽고 확인해야 합니다.
 
-`make check`는 문서 검사기 테스트, 다섯 JSON 구현, `make docs-check`를 실행합니다. 호스팅 CI는 설정돼 있지 않습니다. 개발자는 커밋 전에 필수 명령을 실행해야 합니다.
+`make check`는 검증기와 문서 검사기 테스트, 등록된 모든 JSON 구현, `make docs-check`를 실행합니다. [PIE 검증](operations/validation.ko.md#pie)은 별도의 빌드와 공통 사례 결과를 기록합니다. 호스팅 CI는 설정돼 있지 않습니다. 개발자는 커밋 전에 필수 명령을 실행해야 합니다.
 
 <a id="records"></a>
 ## 기술 기록

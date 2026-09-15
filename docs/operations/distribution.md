@@ -6,14 +6,16 @@
 <a id="state"></a>
 ## Observed state
 
-The canonical publication observations are in [distribution.json](../distribution.json). Source is available in the public [ordered-json repository](https://github.com/polyspec/ordered-json), on `main`. The recorded observation contains no GitHub releases or version tags.
+[distribution.json](../distribution.json) records source and publication observations. The repository holds the five [implementation packages](../spec/repositories.md#ownership) in one revision. No GitHub releases or version tags were found in the recorded observations.
 
-Registry publication for npm, crates.io, Packagist, Go, and the PHP extension is not verified. The confirmed distribution is source checkout. Version strings in source metadata do not establish a released artifact. There is no registry publishing workflow or hosted CI configuration in this repository. A LICENSE file is not present.
+Registry publication for npm, crates.io, Packagist, Go, and the PHP extension is not verified. Source checkout is the confirmed local distribution. PIE metadata and a passing PIE build establish local build compatibility, not Packagist publication. The extension package is `ordered-json/ordered-json-extension`; the PHP library is `ordered-json/ordered-json`.
+
+Source version strings do not establish a released artifact. Registry publishing workflows and hosted CI are not configured. LICENSE files are not present.
 
 <a id="source-publication"></a>
 ## Source publication
 
-After the required checks succeed, publish authorized source changes:
+Run each changed package's required checks and commit the package with the common contract. For an authorized source push:
 
 ~~~sh
 git push origin main
@@ -21,11 +23,13 @@ git rev-parse HEAD
 git ls-remote origin refs/heads/main
 ~~~
 
-Compare the full local and remote commit IDs. Record a source publication only when they match. Authentication details belong in the system credential store, not repository documents.
+Confirm that the full local and remote repository commit IDs match. Run the aggregate and applicable PIE checks from the same checkout before publishing. Verify a clean clone can build every package from the published revision. A shared contract change is published only with its verifier, fixtures, and affected packages in that same revision.
+
+Keep authentication information in the system credential store. Keep publication observations separate from test results.
 
 <a id="releases"></a>
 ## Registry and release records
 
-No registry publishing command is established or verified for this repository. Before recording a release, verify the exact package name, version, included files, target registry, published artifact, and its relationship to the tested source. Record the artifact URL and the observation separately from verification results.
+No registry publication is established or verified. Before recording a release, verify its package name, version, included files, registry, artifact, and tested source revision. Record the artifact URL and publication observation separately. Register the extension for PIE through Packagist using its `php-ext` Composer metadata when publishing a release.
 
-Update the English and Korean distribution documents, feature distribution state, and changelog when publication state changes. Do not infer publication from a successful test, version declaration, tag plan, or push of source files.
+Update English and Korean distribution documents, feature distribution state, and the changelog when publication state changes. Do not infer publication from a test, version declaration, planned tag, or source push.
