@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Added `ordered_json_hydrate()`, which creates the child `OrderedJson\Value` objects of a container from a descriptor and rejects a descriptor that does not match the source with `ValueError`. Hydration is compiled from a separate `hydrate.c`; the class lookup is cached for each request.
 - Removed `ordered_json_compact()`; the PHP library serializes with `ordered_json_compact_node()`.
 - Replaced associative descriptor arrays with an integer tape, validated UTF-8 while scanning strings instead of in a separate pass while still reporting invalid UTF-8 before other errors, and serialized compact subtrees with one copy. `ordered_json_compact_node` accepts a descriptor index and rejects a descriptor that does not match the source with `ValueError`. The format is described in the [API contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.md#php). Parse results, errors, and offsets are unchanged.
 - Corrected macOS bundle configuration: derive an omitted deployment target from the compiler and omit the unused dynamic-library single-module flag check. This removes the obsolete `-single_module` and `-undefined suppress` linker warnings.
