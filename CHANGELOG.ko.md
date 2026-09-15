@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 266d231a7eb7914d4d20acc1c94043efeead106ed020b65424ff647da059aaad -->
+<!-- source-sha256: 8bbf6f0cb0463a305a97573c21bfb72f6ded3fbac7cd9fba0d645a0ef0b0d732 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -15,6 +15,7 @@
 - PHP 확장 소스를 `php-extension/src`로 분리하고 단독 빌드를 기본 활성화하는 PIE 패키지 메타데이터를 추가했습니다.
 - 핵심 값 생성과 문자열 처리에서 host JSON parser와 serializer 의존성을 제거하고 모든 구현에 공통 반복 round-trip 검증을 추가했습니다.
 - 런타임 네이티브 JSON API와 비교하는 재현 가능한 다언어 성능 벤치마크를 추가했습니다.
+- 고정 workload manifest와 엄격한 벤치마크 행·입력 크기·출력 크기 검사를 추가했습니다.
 - 미릴리스 패키지와 확장 버전을 `0.0.1`로 설정했으며 릴리스나 자동화는 구성하지 않았습니다.
 
 - 언어별 패키지, 네임스페이스, 가져오기, 네이티브 심볼, 빌드 출력을 [API 계약](docs/spec/api.ko.md)의 ordered-json 식별자로 변경했습니다.
