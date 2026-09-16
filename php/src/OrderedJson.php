@@ -220,12 +220,12 @@ final class Value implements \JsonSerializable, \Stringable
         return $value;
     }
 
-    /** @return array{array<string|int, Value>, array<string|int, Value>} Members and first key tokens. */
+    /** @return array<string|int, Value> Members keyed by decoded name, in first insertion order. */
     private function hydrateMembers(): array
     {
         if (self::$native ??= \extension_loaded('ordered_json'))
             return \ordered_json_hydrate($this->source, $this->tape, $this->index);
-        $members = $keys = [];
+        $members = [];
         $source = $this->source;
         $tape = $this->tape;
         for ($i = $this->index + 3, $end = $tape[$this->index] >> Tape::LINK; $i < $end;) {
@@ -236,11 +236,6 @@ final class Value implements \JsonSerializable, \Stringable
                 $start = $tape[$i + 1] + 1;
                 $name = substr($source, $start, $tape[$i + 2] - 1 - $start);
                 if ($meta & Tape::ESCAPED) $name = tokenText($name, true);
-                $key = new self();
-                $key->source = $source;
-                $key->tape = $tape;
-                $key->index = $i;
-                $keys[$name] = $key;
                 $member = new self();
                 $member->source = $source;
                 $member->tape = $tape;
@@ -249,7 +244,7 @@ final class Value implements \JsonSerializable, \Stringable
             }
             $i = $next;
         }
-        return [$members, $keys];
+        return $members;
     }
 
     /** @return list<Value> */
@@ -287,7 +282,7 @@ final class Value implements \JsonSerializable, \Stringable
     public function members(): array
     {
         if (($this->tape[$this->index] & Tape::KIND) !== Tape::OBJECT) $this->mismatch('object');
-        return ($this->cache ??= $this->hydrateMembers())[0];
+        return $this->cache ??= $this->hydrateMembers();
     }
     /** @return list<Value> */
     public function items(): array
@@ -332,7 +327,7 @@ final class Value implements \JsonSerializable, \Stringable
     public function get(string $key): ?self
     {
         if (($this->tape[$this->index] & Tape::KIND) !== Tape::OBJECT) $this->mismatch('object');
-        return ($this->cache ??= $this->hydrateMembers())[0][$key] ?? null;
+        return ($this->cache ??= $this->hydrateMembers())[$key] ?? null;
     }
     public function getUnits(array $units): ?self
     {
@@ -386,11 +381,20 @@ final class Value implements \JsonSerializable, \Stringable
     /** Serializes a container in PHP; kept out of compact() so the extension path has a small call frame. */
     private function render(): string
     {
-        if (($this->tape[$this->index] & Tape::KIND) === Tape::OBJECT) {
-            [$members, $keys] = $this->cache ??= $this->hydrateMembers();
+        $tape = $this->tape;
+        $index = $this->index;
+        if (($tape[$index] & Tape::KIND) === Tape::OBJECT) {
+            $source = $this->source;
+            // Members and the tape records share one order, so key tokens pair with hydrated values.
+            $values = array_values($this->cache ??= $this->hydrateMembers());
             $parts = [];
-            foreach ($members as $key => $value)
-                $parts[] = $keys[$key]->token() . ':' . $value->compact();
+            $n = 0;
+            for ($i = $index + 3, $end = $tape[$index] >> Tape::LINK; $i < $end;) {
+                $valueMeta = $tape[$i + 3];
+                if (!($tape[$i] & Tape::SKIP))
+                    $parts[] = substr($source, $tape[$i + 1], $tape[$i + 2] - $tape[$i + 1]) . ':' . $values[$n++]->compact();
+                $i = ($valueMeta & Tape::KIND) <= Tape::ARRAY ? $valueMeta >> Tape::LINK : $i + 6;
+            }
             return '{' . implode(',', $parts) . '}';
         }
         return '[' . implode(',', array_map(fn(self $v) => $v->compact(), $this->cache ??= $this->hydrateItems())) . ']';

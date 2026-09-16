@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Object hydration no longer creates a second value for each key token; serialization pairs members with key tokens read from the descriptor.
 - Moved PHP container serialization out of `compact()` into a private method, so serializing with the extension uses a smaller call frame. Extension stringify took 0.92-0.95 of the time before the current accessor changes.
 - Child values are created by `ordered_json_hydrate()` when the extension is loaded.
 - Reduced value access cost by reading the descriptor tape directly in accessors, creating child values without a promoted constructor, and decoding escaped strings to UTF-8 without an intermediate UTF-16 unit array.
