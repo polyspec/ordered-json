@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: de82464c232e394fd83fb7de882bc587469eafc8efc8b5d1bd711f8586205f13 -->
+<!-- source-sha256: 652b0ee17b2667b0f47dfa2968ae6220dbdbf9f2d24ee65b3b4132e373496fb6 -->
 # 검증
 
 [English](validation.md)
@@ -53,7 +53,7 @@ make check
 
 각 패키지는 독립 빌드 대상으로 유지하지만 공유 검사 명령은 루트 registry와 검증기가 정의합니다. 네이티브 확장은 `php-extension/`에서 빌드하며 같은 체크아웃의 형제 PHP 패키지와 함께 검사합니다.
 
-추가 입력은 `make check JSON_TEST_SUITE=/path/to/JSONTestSuite`로 검사합니다. `make check HARNESS=/path/to/ordered-json`은 로컬 검증기를 명시적으로 선택하며 결과에 해당 지정을 기록합니다. 단독 결과에는 후보·의존성 소스 해시, 개정본, 로컬 수정 여부, 런타임 버전, 결과가 포함됩니다. 상위 결과는 더 새로운 후보 커밋의 검증 근거가 아닙니다.
+추가 입력은 `make check JSON_TEST_SUITE=/path/to/JSONTestSuite`로 검사합니다.
 
 <a id="pie"></a>
 ## PIE 산출물 검사
