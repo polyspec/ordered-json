@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- `Marshal` now contributes the fields of anonymous struct fields instead of dropping them, reports a repeated field name as an error instead of emitting a duplicate key, and stops at the parser's nesting limit so a cyclic value returns an error instead of exhausting memory.
 - Reduced parser allocations: values are allocated in chunks sized from document separators, string units are decoded on access, objects with up to eight members use linear key lookup, and values without insignificant whitespace or duplicate keys compact by copying their source token. Text returned by `Compact` and `StringValue` for `ParseBytesBorrowed` input is copied. Results, errors, and offsets are unchanged.
 - Established an independent Go repository with the existing implementation history.
 - Added standalone checks using the shared verifier at an explicit commit and the current candidate source.

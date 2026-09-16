@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Fixed Go `Marshal`: anonymous struct fields contributed no fields, a repeated field name silently lost a field, and a cyclic value recursed until the process died. Promotion now matches Go field promotion, repeated names and values deeper than the parser's limit are errors.
 - PHP object hydration creates one value per member instead of two; serialization reads key tokens from the descriptor. Parse followed by full traversal took 0.85-0.99 of the previous time with the extension and 0.90-1.00 in pure PHP, with identical results.
 - Added the Go `Marshal` binding for typed struct, map, slice, scalar, time and byte values. It validates custom marshaler output through ordered-json and produces compact JSON without using the host JSON encoder.
 - Kept PHP container serialization out of `compact()`, whose larger call frame had made extension stringify about 1ns slower after the accessor changes. Extension stringify now takes 0.92-0.95 of the time before those changes.
