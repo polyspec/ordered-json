@@ -24,7 +24,7 @@ Parsed `Value` objects cannot be modified through the library API. Factories con
 
 JavaScript parse errors report UTF-16 offsets. Rust, Go, and PHP parse errors report UTF-8 byte offsets. The Go `Value` zero value is invalid. Empty `OrderedMap` values in Rust and Go are valid object inputs.
 
-The Go binding also provides `Marshal(value)`. It encodes exported struct fields in declaration order, applies `json` field names and omission options, encodes byte slices as base64 strings, accepts types implementing the `MarshalJSON() ([]byte, error)` boundary, and validates custom output through the ordered-json parser. Go map keys are sorted because native map iteration has no defined order. The result is compact JSON and never delegates typed encoding to the host JSON encoder.
+The Go binding also provides `Marshal(value)`. It encodes exported struct fields in declaration order, contributes the fields of an anonymous field that has no `json` name, rejects a repeated field name and a value nested deeper than the parser allows, applies `json` field names and omission options, encodes byte slices as base64 strings, accepts types implementing the `MarshalJSON() ([]byte, error)` boundary, and validates custom output through the ordered-json parser. Go map keys are sorted because native map iteration has no defined order. The result is compact JSON and never delegates typed encoding to the host JSON encoder.
 
 <a id="objects"></a>
 ## Associative objects

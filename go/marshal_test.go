@@ -3,9 +3,14 @@ package orderedjson
 import (
 	"errors"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 )
+
+type inner struct {
+	A int `json:"a"`
+}
 
 func TestMarshalPreservesTypedJSONContract(t *testing.T) {
 	type document struct {
@@ -86,5 +91,53 @@ func TestMarshalTimeAndBytesMatchTypedValues(t *testing.T) {
 	data, _ := value.Get("data").StringValue()
 	if !reflect.DeepEqual([]string{when, data}, []string{"2026-09-16T01:02:03.000000004Z", "eA=="}) {
 		t.Fatalf("unexpected typed output: %s", got)
+	}
+}
+
+type promoted struct {
+	inner
+	B int `json:"b"`
+}
+
+func TestMarshalPromotesEmbeddedFields(t *testing.T) {
+	got, err := Marshal(promoted{inner: inner{A: 1}, B: 2})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(got) != `{"a":1,"b":2}` {
+		t.Fatalf("Marshal() = %s, want {\"a\":1,\"b\":2}", got)
+	}
+}
+
+type collides struct {
+	inner
+	A int `json:"a"`
+}
+
+func TestMarshalRejectsRepeatedFieldNames(t *testing.T) {
+	if _, err := Marshal(collides{inner: inner{A: 1}, A: 2}); err == nil {
+		t.Fatal("Marshal() silently dropped a field with a repeated name")
+	}
+}
+
+func TestMarshalRejectsCyclicValues(t *testing.T) {
+	type node struct {
+		Next *node `json:"next"`
+	}
+	cycle := &node{}
+	cycle.Next = cycle
+	_, err := Marshal(cycle)
+	if err == nil || !strings.Contains(err.Error(), "maximum nesting depth exceeded") {
+		t.Fatalf("Marshal() on a cyclic value returned %v", err)
+	}
+}
+
+func TestMarshalRejectsValuesDeeperThanTheParser(t *testing.T) {
+	var deep any = "leaf"
+	for i := 0; i <= MaxDepth; i++ {
+		deep = []any{deep}
+	}
+	if _, err := Marshal(deep); err == nil {
+		t.Fatal("Marshal() accepted a value deeper than the parser allows")
 	}
 }
