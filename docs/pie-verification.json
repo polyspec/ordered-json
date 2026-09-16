@@ -2,7 +2,7 @@
   "schema_version": 1,
   "scope": "pie-build",
   "status": "passed",
-  "checked_at": "2026-09-16T03:25:37+00:00",
+  "checked_at": "2026-09-16T03:27:14+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
@@ -315,29 +315,31 @@
       "exit_code": 0
     }
   ],
-  "build_warnings": [
-    "shtool:echo:Warning: unable to determine terminal sequence for bold mode",
-    "shtool:echo:Warning: unable to determine terminal sequence for bold mode"
-  ],
+  "build_warnings": [],
   "artifact": {
     "path": "php-extension/src/modules/ordered_json.so",
-    "sha256": "20359ce2ec786375abc4d42b6a1ba6c01decbba5478acfe4118a0774b21e34d1"
+    "sha256": "a109b7e77ce9e550be4c5f4ce90af1dcbfe26b93397f269cdf5b49c21d668319"
   },
   "cases": {
     "official": 17,
     "fixtures": 98,
-    "supplementary": 0,
-    "total": 115
+    "supplementary": 318,
+    "total": 433
   },
   "implementations": {
     "php-extension": {
       "status": "passed",
-      "cases": 115,
+      "cases": 433,
       "runtime": {
         "php": "8.5.10",
         "extension_version": "0.0.1"
       }
     }
   },
-  "supplementary": null
+  "supplementary": {
+    "project": "nst/JSONTestSuite",
+    "revision": "1ef36fa01286573e846ac449e8683f8833c5b26a",
+    "cases": 318,
+    "inputs_sha256": "dafa7facfed6700b0a2f16207fb1d3b557f9e45d3abd84f2dfb666538d10c332"
+  }
 }
