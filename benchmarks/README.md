@@ -20,9 +20,17 @@ standard native APIs generally do not retain object order or exact number
 tokens. The ordered-json implementations must agree with each other; native
 output digests may differ for those intentional reasons.
 
+Each measurement warms up for at least the declared iteration count and at least
+the declared duration. A process runs below its steady speed until it has been
+busy for a while, and a warm-up counted only in iterations ends in microseconds
+on a small input: whichever fixtures a process measured first then read 1.5 to
+1.7 times slower than the same fixtures measured last, in the native baseline as
+well as in ordered-json. Reversing the fixture order moved the slowdown with the
+position rather than with the fixture.
+
 `workload.json` is the authority for fixture digests, byte counts, node counts,
-scalar counts, maximum depth, warm-up, iterations, samples, and regression
-tolerances. The runner rejects changed inputs, missing or duplicate
+scalar counts, maximum depth, warm-up count and duration, iterations, samples,
+and regression tolerances. The runner rejects changed inputs, missing or duplicate
 implementation rows, and incorrect reported input sizes. Output byte counts
 remain observable results because native serialization can differ.
 
