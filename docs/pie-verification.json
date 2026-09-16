@@ -2,19 +2,20 @@
   "schema_version": 1,
   "scope": "pie-build",
   "status": "passed",
-  "checked_at": "2026-09-16T02:35:15+00:00",
+  "checked_at": "2026-09-16T02:50:35+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "7f79369afb7a0f1e7152a35a695327362255ae44be1286cebbf09e660b1b9b9f",
+    "sha256": "1ea3034a721ea4d1699e2eca26fb0b5f2bf9e3a973a0671c92148fadd6d503be",
     "files": {
+      "php-extension/tests/descriptors.php": "0f7d56baf0e9f5c42248e30c7f6dfcd0fe92251456ebf5e64763660cbb874eca",
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "633404e91a19e92ec2ee724932abd555e1abdac29b7e5fd67c534dd03da98ba9",
       "AGENTS.md": "fbe791c06fccf49768b31640bbaff710d8fc184a989d813fcbd377a3774a2160",
-      "CHANGELOG.ko.md": "d23bd6bfdb5688241ef6347ad21a0b004284638b1feedbc207a7f1b0f7e2f72b",
-      "CHANGELOG.md": "f78e68d2c281f95630af86103fb57fedfeb46758c93b6f10b7285feb83916edc",
+      "CHANGELOG.ko.md": "5d42501eeabd02932aedcd63d8a464463411395854952344cde37cbb1b678acc",
+      "CHANGELOG.md": "5324f78fe49a47c8fad573eb5bf47300cba75318e88aaaa4ba003a582dc429be",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
       "README.md": "8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75",
@@ -170,7 +171,7 @@
       "go/marshal_fuzz_test.go": "28989222139f7086f3d30aa843318ac0f5d20ea34e0c7c88618d86111d49c7db",
       "go/marshal_test.go": "bc096d58700355f42d472c20d6e75ad40dc311cac19bac17fff60490de32f2d5",
       "go/orderedjson.go": "d2e4403112cec0c8f4991838215a1025859f7236868b2f98bced42891d93900f",
-      "implementations.json": "296f45d1796d32aa4aadc1c744e62080e757b4dcab3b651be69208f5a26bd3d3",
+      "implementations.json": "162e102b84468e538638a4abaf3f005202f1ff30e20c802740dec08b66346b13",
       "js/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "js/AGENTS.ko.md": "8d649fcf0107c94fd0c5fbcefd719f5b34456f4fe98c7fa642dd793795fcc4e4",
       "js/AGENTS.md": "07e4557cb5ec412b34e6a8bcc3e9dd5fd0ddb12bc1a52734abf203a7873c3560",
@@ -187,8 +188,8 @@
       "php-extension/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "php-extension/AGENTS.ko.md": "8d649fcf0107c94fd0c5fbcefd719f5b34456f4fe98c7fa642dd793795fcc4e4",
       "php-extension/AGENTS.md": "07e4557cb5ec412b34e6a8bcc3e9dd5fd0ddb12bc1a52734abf203a7873c3560",
-      "php-extension/CHANGELOG.ko.md": "ab3fbca846816ca50ae3987b3a841d6f1debc830de3769ca1c1a9fa63c1d020e",
-      "php-extension/CHANGELOG.md": "6cd33a0261471cf1a01d624a667bc506a2ed92fefef24137ec5b9d57179e2b9e",
+      "php-extension/CHANGELOG.ko.md": "ddd0339fa49e7542343b943c297262bd4615ece633100b66ee52bfd2c785313d",
+      "php-extension/CHANGELOG.md": "ddd1caabf3aa57cc4f95520d90db5814c045f73c3ae891eea9e9785abada6119",
       "php-extension/Makefile": "06d845ea5afb41f4532244be8c8e41bd86206cf9e9286f2144222c4335d80537",
       "php-extension/README.ko.md": "f6a8b6c10aa5f226e83e486f47c170e26d5d7d34b65373540d44abf63896048d",
       "php-extension/README.md": "9bf343fe78ed79371309fa3e7b41e5375ef20276cee53bbabb3ac82d3e73d748",
@@ -233,13 +234,13 @@
       "scripts/comparison/ojson_comparison.erl": "d267254b5de99b8f3d815639a18dbc97d953be86dc1c28dabce6cbf9218cba9c",
       "scripts/comparison/python_ojson_probe.py": "7939ea89a8c481b4e466969977149d72a1689991cf1d84661ddcc64cbadcf202",
       "scripts/docs_check.py": "87fe969ccc8a86f4bd94d3107f3ff218e93db29f3802c5cde8b254305f35eb5c",
-      "scripts/registry.py": "8d650350a6f7938929e5db59935045ae09072822d031ceed2cef732d0344e2f6",
+      "scripts/registry.py": "e763d4bff0ee61b1db06a8e2802e78bbe1b74611b0f325286a7dc1648e22bba4",
       "scripts/standalone.py": "bd203544b227dadbea8ec7a233262b6e4561dcb28c785706a05529ee8df0603c",
       "scripts/test.py": "fb53c3f6a7bf1d9190428e04ea1aee6bc0eb0fe515a0abafaa3f772d84372a52",
       "scripts/tests/test_docs_check.py": "97ce6215381e601f31ab2428a2b53415f2884fa2d0f7cb5c91b3e120d4908049",
-      "scripts/tests/test_repositories.py": "e43726eb61d22d8e16bf25d83b3a0b44b6ea06c6f4bbf14e58c15818ac79f657",
+      "scripts/tests/test_repositories.py": "ee3d81f05f3d6cfea361a6eff01fbe12c8851344b1d065094637a85b3215d9fe",
       "scripts/verification_record.py": "25cd535a0d82bc4cff932d79a6c37d149323a2a79ed2dbed404a76906ef756a1",
-      "scripts/verify.py": "60535f813cb0ee4245afae5b243c67b28309016c3396daade7d7057f8ac6a828"
+      "scripts/verify.py": "a81f9439b080295bb4579069a6e07a964cdc326969cba737f2bda8f6de230aaa"
     }
   },
   "packages": {
@@ -265,8 +266,8 @@
     },
     "php-extension": {
       "path": "php-extension",
-      "sha256": "00ed85d52f770153104f9228c9a0011dd876c85ba62b06fe6fdf95b832ef1e57",
-      "files": 17
+      "sha256": "194f8efb256c6fe8ed617b1dce8c1c0b5329a8f27d277ff4c5626577cd132df8",
+      "files": 18
     }
   },
   "pie": {
@@ -310,7 +311,7 @@
   "build_warnings": [],
   "artifact": {
     "path": "php-extension/src/modules/ordered_json.so",
-    "sha256": "f19262dba946681812e032a0276f6395c65ad44c857009544f47251ef13ae3f3"
+    "sha256": "b8fcbf8bed065f6640c3b68c2543489dfaed786e9c18f06589e07741bbdd52e2"
   },
   "cases": {
     "official": 17,
