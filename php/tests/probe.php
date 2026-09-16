@@ -44,7 +44,7 @@ while (($line = fgets(STDIN)) !== false) {
     $source = file_get_contents(rtrim($line, "\r\n"));
     if ($source === false) throw new RuntimeException('Cannot read document');
     try { $value = parse($source); }
-    catch (ParseError $e) { echo '{"ok":false,"offset":', $e->offset, ',"unit":"byte"}', "\n"; continue; }
+    catch (ParseError $e) { echo '{"ok":false,"offset":', $e->offset, ',"unit":"byte","kind":', quote($e->kind), '}', "\n"; continue; }
     $serialized = OrderedJson\stringify($value);
     $roundtrip = parse($serialized);
     $factory = Value::string("quote \" slash \\ line\n 한 🌍")->compact();
