@@ -31,11 +31,12 @@ def load_registry(root=ROOT):
             raise ValueError('Implementation references an unknown repository: ' + name)
         commands = [implementation['command']] + list(implementation['runtime'].values())
         commands += [step['command'] for step in implementation.get('prepare', [])]
-        tests = implementation.get('tests')
-        if tests is not None:
-            if not isinstance(tests, dict) or set(tests) != {'cwd', 'command'} or not tests['cwd']:
-                raise ValueError('Package tests declare cwd and command: ' + name)
-            commands.append(tests['command'])
+        for key in ('tests', 'test_cases'):
+            declaration = implementation.get(key)
+            if declaration is not None:
+                if not isinstance(declaration, dict) or set(declaration) != {'cwd', 'command'} or not declaration['cwd']:
+                    raise ValueError(f'{key} declares cwd and command: ' + name)
+                commands.append(declaration['command'])
         if any(not command or not isinstance(command, list) or
                any(not isinstance(argument, str) for argument in command) for command in commands):
             raise ValueError('Commands must be nonempty argument lists: ' + name)
@@ -110,17 +111,27 @@ def adapter_commands(selected, paths, cache, registry=REGISTRY):
             for name in selected}
 
 
-def test_commands(selected, paths, cache, registry=REGISTRY):
-    """Resolve each declared package test command, keeping the declared form for records."""
+def declared_commands(key, selected, paths, cache, registry=REGISTRY):
+    """Resolve a declared per-package command, keeping the declared form for records."""
     variables = context(paths, cache)
     result = {}
     for name in selected:
-        tests = registry['implementations'][name].get('tests')
-        if tests is not None:
-            result[name] = {'cwd': expand(tests['cwd'], variables),
-                            'command': [expand(argument, variables) for argument in tests['command']],
-                            'declared': list(tests['command'])}
+        declaration = registry['implementations'][name].get(key)
+        if declaration is not None:
+            result[name] = {'cwd': expand(declaration['cwd'], variables),
+                            'command': [expand(argument, variables) for argument in declaration['command']],
+                            'declared': list(declaration['command'])}
     return result
+
+
+def test_commands(selected, paths, cache, registry=REGISTRY):
+    """Resolve each declared package test command."""
+    return declared_commands('tests', selected, paths, cache, registry)
+
+
+def case_commands(selected, paths, cache, registry=REGISTRY):
+    """Resolve each declared command that lists the package test cases."""
+    return declared_commands('test_cases', selected, paths, cache, registry)
 
 
 def runtime_versions(selected, paths, cache, registry=REGISTRY):

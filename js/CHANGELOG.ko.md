@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 0242d3ce43ee61cba5a134309340f355d580dfb5d1cdd7a964290b1ec5bc6b95 -->
+<!-- source-sha256: acf4e7b0720f41622c3da817c3c05017e4c7548cd759d40cf1e675665603f1d7 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- `parseBytes`가 0 대신 첫 잘못된 바이트의 바이트 위치를 보고하며, 이 오류에는 UTF-16 위치가 없으므로 메시지에 단위를 함께 적습니다.
 - 값 API의 패키지 테스트를 추가하고 구현 등록 정보에 선언했습니다. 생성 제한, 고정된 항목·키 배열, 접근할 때마다 새로 만드는 멤버 맵, 종류가 맞지 않는 접근, 키 타입 검사, 옵션 검증, `parseBytes` 입력 검사, UTF-16 파싱 위치, 짝 없는 서로게이트의 코드 단위, 팩토리 인자를 다룹니다. 공통 사례는 어댑터를 통해서만 이 패키지에 닿아 그 표면을 다루지 않습니다.
 - 파싱한 `Value`마다 `Object.freeze`를 호출하지 않도록 변경했습니다. private field로 값은 API로 변경할 수 없으며 `items`와 `keys` 배열은 계속 freeze합니다.
 - 사용하지 않는 `stringify()` options 인자를 제거했습니다.

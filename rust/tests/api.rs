@@ -4,17 +4,21 @@
 use ordered_json::{parse, parse_bytes, parse_with_max_depth, Kind, OrderedMap, Value, MAX_DEPTH};
 
 #[test]
-fn max_depth_argument_is_bounded() {
+fn depth_argument_is_bounded() {
     let error = parse_with_max_depth("[]", MAX_DEPTH + 1).unwrap_err();
     assert_eq!(error.message, "max_depth exceeds 256");
     assert_eq!(error.offset, 0);
+}
+
+#[test]
+fn depth_limit_is_enforced() {
     assert!(parse_with_max_depth("[[1]]", 2).is_ok());
     let shallow = parse_with_max_depth("[[1]]", 1).unwrap_err();
     assert_eq!(shallow.message, "maximum nesting depth exceeded");
 }
 
 #[test]
-fn parse_bytes_reports_where_utf8_ends() {
+fn bytes_input_is_validated() {
     let error = parse_bytes(b"[\"\xff\"]").unwrap_err();
     assert_eq!(error.message, "invalid UTF-8");
     assert_eq!(error.offset, 2);
@@ -22,14 +26,22 @@ fn parse_bytes_reports_where_utf8_ends() {
 }
 
 #[test]
-fn parse_errors_carry_the_byte_offset() {
+fn invalid_utf8_reports_the_first_bad_byte() {
+    // The bad byte sits at index 2 of ["<bad>"]; the error names that position.
+    let error = parse_bytes(b"[\"\xff\"]").unwrap_err();
+    assert_eq!(error.message, "invalid UTF-8");
+    assert_eq!(error.offset, 2);
+}
+
+#[test]
+fn parse_errors_report_offsets() {
     let error = parse("[1,]").unwrap_err();
     assert_eq!(error.offset, 3);
     assert_eq!(error.to_string(), "expected JSON value at byte 3");
 }
 
 #[test]
-fn object_keys_must_be_strings() {
+fn ordered_map_rejects_non_string_key() {
     let mut members = OrderedMap::new();
     let error = members.insert(Value::number("1").unwrap(), Value::null()).unwrap_err();
     assert_eq!(error.message, "object key must be a string");
@@ -37,7 +49,7 @@ fn object_keys_must_be_strings() {
 }
 
 #[test]
-fn a_repeated_key_keeps_its_first_position_and_last_value() {
+fn repeated_key_keeps_first_position_and_last_value() {
     let mut members = OrderedMap::new();
     members.insert(Value::string("a"), Value::number("1").unwrap()).unwrap();
     members.insert(Value::string("b"), Value::number("2").unwrap()).unwrap();
@@ -57,18 +69,22 @@ fn member_lookup_uses_decoded_names() {
 }
 
 #[test]
-fn unpaired_surrogates_stay_in_units() {
+fn unpaired_surrogate_stays_in_units() {
     let lone = Value::from_units(&[0x61, 0xd800]);
     assert_eq!(lone.compact(), "\"a\\ud800\"");
     assert_eq!(lone.string_units(), Some(&[0x61u16, 0xd800][..]));
     assert_eq!(lone.string_value().unwrap_err().message, "unpaired surrogate; use string_units");
+}
+
+#[test]
+fn surrogate_pair_decodes() {
     let pair = parse("\"\\ud83c\\udf0d\"").unwrap();
     assert_eq!(pair.string_units(), Some(&[0xd83cu16, 0xdf0d][..]));
     assert_eq!(pair.string_value().unwrap(), "🌍");
 }
 
 #[test]
-fn constructors_validate_their_arguments() {
+fn factories_validate_arguments() {
     assert_eq!(Value::number(" 1").unwrap_err().message, "expected a number literal without whitespace");
     assert_eq!(Value::number("x").unwrap_err().message, "expected JSON value");
     assert_eq!(Value::array(&[Value::boolean(true), Value::null()]).unwrap().compact(), "[true,null]");
@@ -77,7 +93,7 @@ fn constructors_validate_their_arguments() {
 }
 
 #[test]
-fn wrong_kind_access_returns_absence() {
+fn wrong_kind_access_is_reported() {
     let array = parse("[1]").unwrap();
     let object = parse("{\"a\":1}").unwrap();
     assert!(array.members().is_none());
@@ -90,7 +106,7 @@ fn wrong_kind_access_returns_absence() {
 }
 
 #[test]
-fn the_root_keeps_its_surrounding_text() {
+fn root_keeps_surrounding_text() {
     let value = parse("  [1] \n").unwrap();
     assert_eq!(value.raw(), "  [1] \n");
     assert_eq!(value.compact(), "[1]");
