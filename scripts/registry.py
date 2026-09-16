@@ -40,6 +40,10 @@ def load_registry(root=ROOT):
         if any(not command or not isinstance(command, list) or
                any(not isinstance(argument, str) for argument in command) for command in commands):
             raise ValueError('Commands must be nonempty argument lists: ' + name)
+        artifacts = implementation.get('artifacts')
+        if artifacts is not None and (not isinstance(artifacts, list) or not artifacts or any(
+                not isinstance(path, str) or not path for path in artifacts)):
+            raise ValueError('Declared artifacts must be nonempty paths: ' + name)
     return registry
 
 
@@ -77,6 +81,13 @@ def expand(value, variables):
     if re.search(r'\{[a-z][a-z0-9-]*\}', value):
         raise ValueError('Unknown command variable: ' + value)
     return value
+
+
+def artifact_paths(name, paths, registry=REGISTRY):
+    """The files a prepared build leaves behind, as the registry declares them."""
+    variables = {key: str(value) for key, value in paths.items()}
+    return [Path(expand(value, variables))
+            for value in registry['implementations'][name].get('artifacts', [])]
 
 
 def prepare(selected, paths, cache, registry=REGISTRY):

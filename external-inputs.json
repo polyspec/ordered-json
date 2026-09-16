@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "description": "Expected identity of every external input a verification record may name. A record that names one must match its pin, so a recorded external hash can be wrong and the check can say so. Update a pin deliberately, with the same review as a source change.",
+  "pie": {
+    "release": "1.4.10",
+    "url": "https://github.com/php/pie/releases",
+    "phar_sha256": "b88792235c8e80be568436d4cb043b49fd1869c89b64e83d23e2882ae19d70a8"
+  },
+  "supplementary": {
+    "project": "nst/JSONTestSuite",
+    "url": "https://github.com/nst/JSONTestSuite.git",
+    "revision": "1ef36fa01286573e846ac449e8683f8833c5b26a",
+    "cases": 318,
+    "inputs_sha256": "dafa7facfed6700b0a2f16207fb1d3b557f9e45d3abd84f2dfb666538d10c332"
+  }
+}
