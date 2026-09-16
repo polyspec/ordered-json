@@ -42,6 +42,7 @@
         {"cwd": "{php-extension}/src", "command": ["make", "-j2"]}
       ],
       "command": ["php", "-n", "-d", "extension={php-extension}/src/modules/ordered_json.so", "{php}/tests/probe.php", "--native"],
+      "tests": {"cwd": "{php-extension}", "command": ["php", "-n", "-d", "extension={php-extension}/src/modules/ordered_json.so", "tests/descriptors.php", "{php}/src/OrderedJson.php"]},
       "runtime": {
         "php": ["php", "-n", "-r", "echo PHP_VERSION;"],
         "extension_version": ["php", "-n", "-d", "extension={php-extension}/src/modules/ordered_json.so", "-r", "if (phpversion('ordered_json') !== ORDERED_JSON_VERSION) exit(1); echo ORDERED_JSON_VERSION;"]
