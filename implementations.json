@@ -1,25 +1,21 @@
 {
   "schema_version": 1,
+  "url": "https://github.com/polyspec/ordered-json.git",
   "repositories": {
     "javascript": {
-      "path": "js",
-      "url": "https://github.com/polyspec/ordered-json.git"
+      "path": "js"
     },
     "rust": {
-      "path": "rust",
-      "url": "https://github.com/polyspec/ordered-json.git"
+      "path": "rust"
     },
     "go": {
-      "path": "go",
-      "url": "https://github.com/polyspec/ordered-json.git"
+      "path": "go"
     },
     "php": {
-      "path": "php",
-      "url": "https://github.com/polyspec/ordered-json.git"
+      "path": "php"
     },
     "php-extension": {
-      "path": "php-extension",
-      "url": "https://github.com/polyspec/ordered-json.git"
+      "path": "php-extension"
     }
   },
   "implementations": {
