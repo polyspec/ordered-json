@@ -2,16 +2,7 @@
 // JSON contract through the adapter; construction guards, frozen results,
 // wrong-kind access, option validation and UTF-16 offsets live only here.
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
 import {MAX_DEPTH, ParseError, Value, parse, parseBytes, stringify} from '../index.js';
-
-if (process.argv.includes('--cases')) {
-  const standard = JSON.parse(readFileSync(new URL('../../package-tests.json', import.meta.url)));
-  const cases = standard.cases.filter(({exemptions = {}}) => !exemptions.js)
-    .map(({id}) => id).concat(standard.package_cases.js.map(({id}) => id));
-  console.log(cases.join('\n'));
-  process.exit(0);
-}
 
 const cases = new Map();
 const check = (id, body) => cases.set(id, body);
@@ -146,3 +137,8 @@ if (failures.length) {
   console.error(failures.join('\n'));
   process.exit(1);
 }
+
+// Report the cases that were registered and executed above. This must remain
+// independent of package-tests.json so removing a test cannot leave a false
+// positive listing.
+if (process.argv.includes('--cases')) console.log([...cases.keys()].join('\n'));
