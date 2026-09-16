@@ -32,7 +32,7 @@ for await (const path of createInterface({input: process.stdin, crlfDelay: Infin
   const serialized = stringify(value);
   const roundtrip = parseBytes(new TextEncoder().encode(serialized));
   const factory = stringify(Value.string('quote " slash \\ line\n 한 🌍'));
-  console.log(JSON.stringify({ok:true, raw:value.raw, serialized, compact:stringify(value,{compact:true}),
+  console.log(JSON.stringify({ok:true, raw:value.raw, serialized, compact:stringify(value),
     tree:tree(value), roundtrip:stringify(roundtrip), roundtrip_tree:tree(roundtrip),
-    rebuilt:stringify(rebuild(value),{compact:true}), factory}));
+    rebuilt:stringify(rebuild(value)), factory}));
 }

@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The package reports its public symbols for the shared coverage check; the UTF-8 offset helper is marked internal like the other helpers.
 - An unescaped control character is reported at its own offset, an invalid Unicode escape at the first byte that is not a hex digit, and the adapter reports the rejection position for the shared comparison.
 - An unpaired surrogate raises `UnexpectedValueException` again. Inside the namespace the unqualified name resolved to a missing `OrderedJson\UnexpectedValueException`, so `stringValue()` and UTF-8 conversion raised a class-not-found error instead.
 - Added package tests for accessor errors, UTF-16 units, member lookup, factory arguments, parse error offsets, and UTF-8 validation under low PCRE limits, and declared them in the implementation registry. Shared cases reach this package through its adapter and do not cover that surface.
