@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 80696139b61c850e41e8dbfbfb2a4223030524b3110ecf7a08f028b89d2395c0 -->
+<!-- source-sha256: cf73451e7852fb89fca5511935be30eafe2e906fcbd99b8ca1bde5f9509af404 -->
 # API 계약
 
 [English](api.md)
@@ -69,6 +69,6 @@ JavaScript는 기존 UTF-16 텍스트로 문자열을 생성할 수 있습니다
 
 `OrderedJson\parse`는 `ordered_json` 확장이 로드돼 있으면 네이티브 파서와 직렬화를, 그렇지 않으면 순수 PHP 구현을 사용합니다. 공통 `Value` API는 루트 파서 디스크립터만 보유하고 트리 접근이 필요할 때 자식 값을 지연 생성합니다.
 
-확장은 `ordered_json_scan(source, maxDepth)`, `ordered_json_hydrate(source, descriptor, index)`, `ordered_json_compact_node(source, descriptor, index)`를 제공합니다. 디스크립터는 문서 순서대로 값마다 `meta`, `start`, `end` 세 정수를 담은 목록입니다. `start`와 `end`는 값 토큰의 바이트 범위이며 첫 항목은 원문이 전체 소스인 루트 값입니다. `meta`는 0–2비트에 종류(1 object, 2 array, 3 string, 4 number, 5 boolean, 6 null), 3–5비트에 플래그, 8비트부터 연결 인덱스를 저장합니다. compact 플래그(8)는 무의미한 공백과 중복 키가 없는 값을 표시하며 이 값의 compact 출력은 토큰과 같습니다. escaped 플래그(16)는 escape 시퀀스가 있는 문자열 토큰을 표시하며 UTF-16 단위는 조회할 때 해석합니다. 컨테이너는 마지막 하위 값 다음 항목을 연결합니다. 객체 멤버는 키 항목 뒤에 값이 이어지며 키는 멤버가 유지하는 값을 연결합니다. 반복된 키에는 skip 플래그(32)가 있으며 같은 이름의 첫 키가 마지막 값을 연결합니다. 네이티브 파싱 실패는 `OrderedJsonNativeParseError`를 사용하며 공통 API가 이를 `OrderedJson\ParseError`로 변환합니다. `ordered_json_hydrate`는 `index`에 있는 컨테이너의 자식 `Value` 객체를 만듭니다. 배열이면 항목 목록을, 객체이면 `[members, keys]`를 반환하며, 두 배열 모두 해석한 멤버 이름을 키로 첫 삽입 순서를 따르고 `keys`는 각 멤버의 첫 키 토큰을 담습니다. `ordered_json_hydrate`와 `ordered_json_compact_node`는 소스와 맞지 않는 디스크립터를 `ValueError`로 거부합니다.
+확장은 `ordered_json_scan(source, maxDepth)`, `ordered_json_hydrate(source, descriptor, index)`, `ordered_json_compact_node(source, descriptor, index)`를 제공합니다. 디스크립터는 문서 순서대로 값마다 `meta`, `start`, `end` 세 정수를 담은 목록입니다. `start`와 `end`는 값 토큰의 바이트 범위이며 첫 항목은 원문이 전체 소스인 루트 값입니다. `meta`는 0–2비트에 종류(1 object, 2 array, 3 string, 4 number, 5 boolean, 6 null), 3–5비트에 플래그, 8비트부터 연결 인덱스를 저장합니다. compact 플래그(8)는 무의미한 공백과 중복 키가 없는 값을 표시하며 이 값의 compact 출력은 토큰과 같습니다. escaped 플래그(16)는 escape 시퀀스가 있는 문자열 토큰을 표시하며 UTF-16 단위는 조회할 때 해석합니다. 컨테이너는 마지막 하위 값 다음 항목을 연결합니다. 객체 멤버는 키 항목 뒤에 값이 이어지며 키는 멤버가 유지하는 값을 연결합니다. 반복된 키에는 skip 플래그(32)가 있으며 같은 이름의 첫 키가 마지막 값을 연결합니다. 네이티브 파싱 실패는 `OrderedJsonNativeParseError`를 사용하며 공통 API가 이를 `OrderedJson\ParseError`로 변환합니다. `ordered_json_hydrate`는 `index`에 있는 컨테이너의 자식 `Value` 객체를 만듭니다. 배열이면 항목 목록을, 객체이면 해석한 멤버 이름을 키로 첫 삽입 순서를 따르는 멤버 배열을 반환합니다. 키 토큰은 직렬화할 때 디스크립터에서 읽으므로 멤버 하나에 값 하나만 만듭니다. `ordered_json_hydrate`와 `ordered_json_compact_node`는 소스와 맞지 않는 디스크립터를 `ValueError`로 거부합니다.
 
 네이티브 빌드는 PHP 버전, 플랫폼, 스레드 안전 설정과 일치해야 합니다. [네이티브 설치](../operations/installation.ko.md#native-php)를 확인합니다.
