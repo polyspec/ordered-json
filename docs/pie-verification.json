@@ -2,20 +2,19 @@
   "schema_version": 1,
   "scope": "pie-build",
   "status": "passed",
-  "checked_at": "2026-09-16T02:27:55+00:00",
+  "checked_at": "2026-09-16T02:33:05+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "17faaa7438a3f432c269745c19588851f14f681596c6b49bb8d3865943fdc619",
+    "sha256": "a821bcf0644cdd000a900ff9594bafdbcee2118a0fc3071a28e8cc8b6fc3f8ac",
     "files": {
-      "go/marshal_fuzz_test.go": "28989222139f7086f3d30aa843318ac0f5d20ea34e0c7c88618d86111d49c7db",
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
-      "AGENTS.ko.md": "72246495efbec08ab1c4b4086db12babd37d3c98dfa3c2b33645137c8da86cc8",
-      "AGENTS.md": "6c41691419dacdc2114d1087a3193cb6e04f25b552a147723cc2db5541535982",
-      "CHANGELOG.ko.md": "3da6c558ed6f25951c7b792f084751f13cc1d903ff5a311971f66d16c675f9cf",
-      "CHANGELOG.md": "54421360c7972d013ba1eaed481772283552e582f9d9b7746520133f96c84ba2",
+      "AGENTS.ko.md": "633404e91a19e92ec2ee724932abd555e1abdac29b7e5fd67c534dd03da98ba9",
+      "AGENTS.md": "fbe791c06fccf49768b31640bbaff710d8fc184a989d813fcbd377a3774a2160",
+      "CHANGELOG.ko.md": "4b571a5d7c30fc5f632eadb66f6b23451a51b47c50863b68bcba77c68223dd2b",
+      "CHANGELOG.md": "40c50bdf5d0a880491ee9500c6493c8b07bd1333847cd48cea8cab9b5086587e",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
       "README.md": "8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75",
@@ -52,8 +51,8 @@
       "docs/spec/api.md": "9e9ec38c1e2283c4820388374ce5f366897f6de454ca3d72983017b7f6e1b584",
       "docs/spec/json-contract.ko.md": "f6cad701fed404d7a8eb091eb86013ea04b0f01b10574a109c219da3dab30d63",
       "docs/spec/json-contract.md": "0f6e76611fff775c3a8c1aee128bfd345deba9d1dca442c2c05a2f2a986bfe27",
-      "docs/spec/repositories.ko.md": "ec6b5e5686719dafa0404ddc36a00e74ea3539dfef742b61bbbd565d20ad9078",
-      "docs/spec/repositories.md": "8ec75064168c4f93b9063ac71f2b627eaa5cdb2ee0571ab1cdd5f7c254d212aa",
+      "docs/spec/repositories.ko.md": "1fd915b765d28ab9c100abd43979ee82ec989b5743131bcc638f1b3ec2056568",
+      "docs/spec/repositories.md": "d081e6738fe4ee33b3be64039424d612e0ee9eaf58914b4748614034036aa0ba",
       "examples/README.ko.md": "1b0d76bd6e4a892d4de2ce55cfbe3f4569aab94a0e94dde2f49c1ab5ac551d06",
       "examples/README.md": "eae1287a4345fe931f4cacd4766a04b5ef533f9e5664eb0c1e4fd32af811820d",
       "examples/official.json": "008b05fe07142d9dcad9edd90fe6606926ccb279461664c19af5a3d0eedac830",
@@ -168,9 +167,10 @@
       "go/internal/benchmark/main.go": "4e1c75773fcfd5f170ab3af85ae4d79c21cac6b4d48a2093cf27f1ae0eb7a1f8",
       "go/internal/probe/main.go": "cbdf69a4210d9b98f7b41e267ac519a3f6fee4a8c3dba43b9932bbda5fc689be",
       "go/marshal.go": "537a27a4947409a0067099adf9be36bb4e40839d4c034c004c7d865294e78d9e",
+      "go/marshal_fuzz_test.go": "28989222139f7086f3d30aa843318ac0f5d20ea34e0c7c88618d86111d49c7db",
       "go/marshal_test.go": "bc096d58700355f42d472c20d6e75ad40dc311cac19bac17fff60490de32f2d5",
       "go/orderedjson.go": "d2e4403112cec0c8f4991838215a1025859f7236868b2f98bced42891d93900f",
-      "implementations.json": "60472aa090cc5ad1cdb6516fc2fde710ee12db8706aa8ea031d7ab2715f7835c",
+      "implementations.json": "296f45d1796d32aa4aadc1c744e62080e757b4dcab3b651be69208f5a26bd3d3",
       "js/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "js/AGENTS.ko.md": "8d649fcf0107c94fd0c5fbcefd719f5b34456f4fe98c7fa642dd793795fcc4e4",
       "js/AGENTS.md": "07e4557cb5ec412b34e6a8bcc3e9dd5fd0ddb12bc1a52734abf203a7873c3560",
@@ -232,14 +232,14 @@
       "scripts/compare_ojson.py": "bd45cccfc0b64c45a262cde1c2e7509cd23a554040beee4cb598c957786fdef8",
       "scripts/comparison/ojson_comparison.erl": "d267254b5de99b8f3d815639a18dbc97d953be86dc1c28dabce6cbf9218cba9c",
       "scripts/comparison/python_ojson_probe.py": "7939ea89a8c481b4e466969977149d72a1689991cf1d84661ddcc64cbadcf202",
-      "scripts/docs_check.py": "f0e43332b134944807c021a7776ae276e3099239876e05a38ba3714a70fde8f3",
-      "scripts/registry.py": "41fc953178fd42720f4cd5a23465d2f186c8a471375321d7d181573d5a6955d7",
+      "scripts/docs_check.py": "87fe969ccc8a86f4bd94d3107f3ff218e93db29f3802c5cde8b254305f35eb5c",
+      "scripts/registry.py": "8d650350a6f7938929e5db59935045ae09072822d031ceed2cef732d0344e2f6",
       "scripts/standalone.py": "bd203544b227dadbea8ec7a233262b6e4561dcb28c785706a05529ee8df0603c",
-      "scripts/test.py": "857a2df125e4be1e17d56774d5010ad0cdb23d7a50b08503a4ca048dcb07f631",
-      "scripts/tests/test_docs_check.py": "f71fdbc2e88bedc992990e71942bebffd33e82d21dc55472db2b2a68c4d46a93",
-      "scripts/tests/test_repositories.py": "0488d57c4e15666371dfc830de048385686322dd48d14ccdf7554cffbd48406e",
-      "scripts/verification_record.py": "49d4458f547c730c967e1877a38e317f7452edfd7e7bc9b51c7757514024e13a",
-      "scripts/verify.py": "a12be41ddfcd339ef60cca1934d824c94ad805ddb582049c9ef52f9701cfe9ba"
+      "scripts/test.py": "fb53c3f6a7bf1d9190428e04ea1aee6bc0eb0fe515a0abafaa3f772d84372a52",
+      "scripts/tests/test_docs_check.py": "97ce6215381e601f31ab2428a2b53415f2884fa2d0f7cb5c91b3e120d4908049",
+      "scripts/tests/test_repositories.py": "e43726eb61d22d8e16bf25d83b3a0b44b6ea06c6f4bbf14e58c15818ac79f657",
+      "scripts/verification_record.py": "25cd535a0d82bc4cff932d79a6c37d149323a2a79ed2dbed404a76906ef756a1",
+      "scripts/verify.py": "60535f813cb0ee4245afae5b243c67b28309016c3396daade7d7057f8ac6a828"
     }
   },
   "packages": {
@@ -310,7 +310,7 @@
   "build_warnings": [],
   "artifact": {
     "path": "php-extension/src/modules/ordered_json.so",
-    "sha256": "9675c6ab738cff89842f2cea3924e0acae78c066c6159f688242ac7472b20e75"
+    "sha256": "8100501672c31f1a34e1cf7b3288a143052d25775427491b7b95507a1eb37f75"
   },
   "cases": {
     "official": 17,
