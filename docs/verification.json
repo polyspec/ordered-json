@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-16T02:33:13+00:00",
+  "checked_at": "2026-09-16T02:35:22+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "a821bcf0644cdd000a900ff9594bafdbcee2118a0fc3071a28e8cc8b6fc3f8ac",
+    "sha256": "7f79369afb7a0f1e7152a35a695327362255ae44be1286cebbf09e660b1b9b9f",
     "files": {
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "9753f5b8913ca51cd893ccf2f916ae11832cb25f0e60295f35212aad412375ff",
       "AGENTS.md": "632a4dd8c3b603e5184c7c8db58d5b2a0de5a5370f98c556a01a33d55765c6dd",
-      "CHANGELOG.ko.md": "df619d15195d35c6dc8ac2d1d4b1f15f537a834b78493929a2c6e735a9d572f3",
-      "CHANGELOG.md": "a14073e6bfe42dd6008359c501e0ea30eab099e677a40c1a9f73cd9e49799520",
+      "CHANGELOG.ko.md": "2d93432e1c57b67940e89a32099f09004775dae491e5ef66eea8e149efb8de2d",
+      "CHANGELOG.md": "6f85305e76c02426baaa5fc8c54de651de410b1b64956b48c9b655fc74c1739e",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
       "README.md": "8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75",
@@ -46,8 +46,8 @@
       "docs/reports/ojson-comparison.json": "4f6bc37d9fba4be253b8b11c3a813eec52d53d139ee202ca9693d8a17ecb5ba2",
       "docs/reports/ojson-comparison.ko.md": "4a8fdd346be00b60b020b79ea9cbd38fa6f73b7c9b468465361664e884b8cc7a",
       "docs/reports/ojson-comparison.md": "f51637e54cbf5e4fb650608261647ff4c7c508cb6e867c8d72f9a44db0a95373",
-      "docs/spec/api.ko.md": "0d678e71f8ebeb3a06106771a09e756639ac3beb46ecd5ec4ba1dc282a61491e",
-      "docs/spec/api.md": "9e9ec38c1e2283c4820388374ce5f366897f6de454ca3d72983017b7f6e1b584",
+      "docs/spec/api.ko.md": "41ed7ace7712080c50323abf9f0e93b3bc57422b420a393efb7f9d4591da7e84",
+      "docs/spec/api.md": "51c4ba83fd52d744dd36519193b587cbeece715ddd21b793b0c5be281f42f4e3",
       "docs/spec/json-contract.ko.md": "f6cad701fed404d7a8eb091eb86013ea04b0f01b10574a109c219da3dab30d63",
       "docs/spec/json-contract.md": "0f6e76611fff775c3a8c1aee128bfd345deba9d1dca442c2c05a2f2a986bfe27",
       "docs/spec/repositories.ko.md": "1fd915b765d28ab9c100abd43979ee82ec989b5743131bcc638f1b3ec2056568",
