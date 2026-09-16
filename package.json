@@ -12,5 +12,5 @@
   "files": ["js"],
   "engines": {"node": ">=20"},
   "repository": {"type": "git", "url": "https://github.com/polyspec/ordered-json.git"},
-  "scripts": {"test": "cd js && python3 scripts/check.py"}
+  "scripts": {"test": "python3 scripts/verify.py --only js"}
 }
