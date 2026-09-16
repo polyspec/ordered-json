@@ -11,6 +11,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from docs_check import check_repository
+from registry import REGISTRY
 from verification_record import IMPLEMENTATIONS, create_record, sha256, source_manifest, write_record
 from test import build_extension
 
@@ -47,8 +48,12 @@ class DocumentationChecks(unittest.TestCase):
         self.versions = {name: {'version': 'synthetic fixture'} for name in IMPLEMENTATIONS}
         self.versions['php-extension'] = {'php': 'synthetic fixture', 'extension': 'ordered_json',
                                        'extension_version': 'synthetic fixture'}
+        self.package_tests = {name: {'status': 'passed', 'command': ['synthetic']}
+                              for name in IMPLEMENTATIONS
+                              if REGISTRY['implementations'][name].get('tests')}
         self.record = create_record(self.root, source_manifest(self.root), self.results,
-                                   {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions)
+                                   {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions,
+                                   package_tests=self.package_tests)
         self.json('docs/verification.json', self.record)
 
     def write(self, path, text):
@@ -191,20 +196,28 @@ class DocumentationChecks(unittest.TestCase):
         del results['go']
         with self.assertRaisesRegex(ValueError, 'all registered implementations'):
             create_record(self.root, source_manifest(self.root), results,
-                          {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions)
+                          {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions,
+                          package_tests=self.package_tests)
 
     def test_changed_sources_cannot_create_record(self):
         before = source_manifest(self.root)
         self.write('js/index.js', '// changed during run\n')
         with self.assertRaisesRegex(ValueError, 'Sources changed during verification'):
             create_record(self.root, before, self.results,
-                          {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions)
+                          {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions,
+                          package_tests=self.package_tests)
 
     def test_failed_case_cannot_create_record(self):
         results = copy.deepcopy(self.results)
         results['js']['status'] = 'failed'
         with self.assertRaisesRegex(ValueError, 'must pass every case'):
             create_record(self.root, source_manifest(self.root), results,
+                          {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions,
+                          package_tests=self.package_tests)
+
+    def test_missing_package_tests_cannot_create_record(self):
+        with self.assertRaisesRegex(ValueError, 'Declared package tests must run and pass'):
+            create_record(self.root, source_manifest(self.root), self.results,
                           {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions)
 
     def test_record_write_replaces_complete_json(self):

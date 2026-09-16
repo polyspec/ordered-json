@@ -156,6 +156,10 @@ def check_verification(root, record):
     for name, result in implementations.items():
         if result.get('status') != 'passed' or result.get('cases') != counts['total'] or not result.get('runtime'):
             raise ValueError('Incomplete implementation result: ' + name)
+        declared = REGISTRY['implementations'][name].get('tests') is not None
+        recorded = (result.get('tests') or {}).get('status') == 'passed'
+        if declared != recorded:
+            raise ValueError('Package tests declared in the registry must be recorded as passed: ' + name)
     native = implementations.get('php-extension', {}).get('runtime', {})
     if 'php-extension' in implementations and (not native.get('extension_version') or not native.get('php')):
         raise ValueError('PHP runtime and extension versions must both be recorded')
