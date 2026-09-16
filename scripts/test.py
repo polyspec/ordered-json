@@ -32,12 +32,12 @@ def main():
     test_result = unittest.TextTestRunner(verbosity=1).run(tests)
     if not test_result.wasSuccessful():
         return 1
-    results, counts = verify(IMPLEMENTATIONS, suite, build_warnings=warnings)
+    results, counts, package_tests = verify(IMPLEMENTATIONS, suite, build_warnings=warnings)
     versions = runtimes(ROOT)
     if supplementary_manifest(suite) != supplementary:
         raise ValueError('Supplementary inputs changed during verification')
     record = create_record(ROOT, before, results, counts, test_result.testsRun, versions,
-                           supplementary, warnings)
+                           supplementary, warnings, package_tests)
     write_record(ROOT / 'docs/verification.json', record)
     print('Saved docs/verification.json', flush=True)
     subprocess.run([sys.executable, str(ROOT / 'scripts/docs_check.py')], cwd=ROOT, check=True)
