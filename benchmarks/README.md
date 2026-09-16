@@ -31,7 +31,8 @@ position rather than with the fixture.
 `workload.json` is the authority for fixture digests, byte counts, node counts,
 scalar counts, maximum depth, warm-up count and duration, iterations, samples,
 and regression tolerances. The runner rejects changed inputs, missing or duplicate
-implementation rows, and incorrect reported input sizes. Output byte counts
+implementation rows, incorrect reported input sizes, and workload structure
+metadata that does not match the parsed fixture. Output byte counts
 remain observable results because native serialization can differ.
 
 Nanosecond values cannot be identical across different machines. A run is
