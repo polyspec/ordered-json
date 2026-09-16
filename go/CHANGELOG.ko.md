@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 6e8990acc630b456d020f7aee322d3bee9e704bedd0a68b1e21c0fd31dbcee41 -->
+<!-- source-sha256: 1bd3464f4186c442296bc4c6f3b56a0e1f37402c87fc00447109b1a57dd33722 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- 파싱이 0 대신 첫 잘못된 UTF-8 시퀀스의 바이트 위치를 보고합니다.
 - `Marshal`이 `omitempty`와 `omitzero`를 각각의 규칙으로 적용해 host 인코더와 맞습니다. zero `time.Time`은 `omitempty`에서 유지되고 `omitzero`에서 빠집니다. 유한하지 않은 부동소수점은 파서에서 뒤늦게 실패하지 않고 해당 필드를 지목해 보고하며, `time.Time`이 자체 `MarshalJSON`을 가지므로 도달하지 않던 `time.Time` 분기를 제거했습니다. 시드 기반 무작위 테스트가 host 인코더와 해석된 구조를 비교합니다.
 - `Marshal`이 익명 구조체 필드를 버리지 않고 그 필드들을 펼쳐 넣고, 이름이 겹치는 필드는 중복 키를 만드는 대신 오류로 알리며, 파서의 중첩 한도에서 멈춰 순환 참조 값이 메모리를 소진하지 않고 오류를 반환합니다.
 - 파서 할당을 줄였습니다. 값은 문서 구분자 수로 크기를 정한 묶음 단위로 할당하고, 문자열 단위는 조회할 때 해석하며, 멤버가 8개 이하인 객체는 선형 키 조회를 사용하고, 무의미한 공백과 중복 키가 없는 값은 원문 토큰을 복사하여 compact 출력을 만듭니다. `ParseBytesBorrowed` 입력에서 `Compact`와 `StringValue`가 반환하는 텍스트는 복사합니다. 결과, 오류, 오프셋은 바뀌지 않았습니다.

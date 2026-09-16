@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "description": "Package test cases. Shared cases reach an implementation through its adapter and cover the JSON contract only, so each package tests the API it exposes. Every implementation runs each case in `cases` unless it declares an exemption with a reason. A case a package runs beyond the standard belongs in `package_cases` for that implementation, so the listing and the standard always account for each other.",
+  "cases": [
+    {
+      "id": "depth_argument_is_bounded",
+      "description": "The depth argument is rejected outside 0..256."
+    },
+    {
+      "id": "depth_limit_is_enforced",
+      "description": "A document deeper than the given limit is rejected."
+    },
+    {
+      "id": "parse_errors_report_offsets",
+      "description": "A parse error reports the documented offset unit."
+    },
+    {
+      "id": "wrong_kind_access_is_reported",
+      "description": "Access for the wrong kind reports absence or an error naming the kind."
+    },
+    {
+      "id": "member_lookup_uses_decoded_names",
+      "description": "Lookup matches decoded member names and reports a miss."
+    },
+    {
+      "id": "repeated_key_keeps_first_position_and_last_value",
+      "description": "A repeated key keeps its first position and the last value."
+    },
+    {
+      "id": "root_keeps_surrounding_text",
+      "description": "The root raw text keeps surrounding whitespace; compact output drops it."
+    },
+    {
+      "id": "unpaired_surrogate_stays_in_units",
+      "description": "An unpaired surrogate survives as a code unit and is reported by the text accessor."
+    },
+    {
+      "id": "surrogate_pair_decodes",
+      "description": "A surrogate pair decodes to one code point and keeps both units."
+    },
+    {
+      "id": "factories_validate_arguments",
+      "description": "Factories reject arguments that would produce invalid JSON."
+    },
+    {
+      "id": "values_come_only_from_the_library",
+      "description": "A value cannot be forged; the library rejects a foreign or empty value.",
+      "exemptions": {
+        "rust": "Value has no public constructor and no invalid state"
+      }
+    },
+    {
+      "id": "returned_collections_are_immutable",
+      "description": "Collections returned to the caller cannot change the parsed value.",
+      "exemptions": {
+        "rust": "members and items are returned as shared references"
+      }
+    },
+    {
+      "id": "host_serialization_boundary",
+      "description": "Host serialization either refuses the value or writes the ordered text, as documented.",
+      "exemptions": {
+        "rust": "Rust has no host JSON encoder in the standard library"
+      }
+    },
+    {
+      "id": "bytes_input_is_validated",
+      "description": "Byte input rejects invalid UTF-8 with the documented offset.",
+      "exemptions": {
+        "php": "the PHP API takes strings only",
+        "php-extension": "the extension scans the same string input as the PHP API"
+      }
+    },
+    {
+      "id": "invalid_utf8_reports_the_first_bad_byte",
+      "description": "An invalid UTF-8 error reports the offset of the first invalid byte, in the unit each binding documents."
+    },
+    {
+      "id": "ordered_map_rejects_non_string_key",
+      "description": "The public map builder rejects a non-string key.",
+      "exemptions": {
+        "js": "objects are built from entries through the object factory",
+        "php": "objects are built from arrays through the object factory",
+        "php-extension": "objects are built through the PHP value API"
+      }
+    }
+  ],
+  "package_cases": {
+    "js": [],
+    "rust": [],
+    "go": [
+      {
+        "id": "marshal_preserves_typed_json_contract",
+        "description": "Typed values encode through the ordered-json model."
+      },
+      {
+        "id": "marshal_keeps_empty_object_and_array_distinct",
+        "description": "An empty map stays an object and an empty slice stays an array."
+      },
+      {
+        "id": "marshal_validates_custom_marshaler_through_ordered_parser",
+        "description": "Custom marshaler output is parsed before it is returned."
+      },
+      {
+        "id": "marshal_rejects_unsupported_map_key",
+        "description": "A non-string map key is an error."
+      },
+      {
+        "id": "marshal_time_and_bytes_match_typed_values",
+        "description": "Time and byte slices encode as documented."
+      },
+      {
+        "id": "marshal_promotes_embedded_fields",
+        "description": "An anonymous field contributes its own fields."
+      },
+      {
+        "id": "marshal_rejects_repeated_field_names",
+        "description": "A repeated field name is an error, not a lost field."
+      },
+      {
+        "id": "marshal_rejects_cyclic_values",
+        "description": "A cyclic value stops at the parser's nesting limit."
+      },
+      {
+        "id": "marshal_rejects_values_deeper_than_the_parser",
+        "description": "A value deeper than the parser allows is an error."
+      },
+      {
+        "id": "marshal_matches_host_encoder_structures",
+        "description": "Random values match the host encoder's decoded structures."
+      },
+      {
+        "id": "marshal_omit_rules_follow_the_host_encoder",
+        "description": "omitempty and omitzero follow the host encoder."
+      },
+      {
+        "id": "marshal_reports_non_finite_numbers",
+        "description": "NaN and infinities are errors that name the field."
+      }
+    ],
+    "php": [
+      {
+        "id": "utf8_validation_survives_low_pcre_limits",
+        "description": "A backtrack or recursion limit is not reported as invalid UTF-8."
+      }
+    ],
+    "php-extension": [
+      {
+        "id": "hydrate_without_the_value_class",
+        "description": "Hydration without the PHP value class reports a clear error."
+      },
+      {
+        "id": "hydrate_object_members",
+        "description": "Hydration returns object members keyed by decoded name."
+      },
+      {
+        "id": "hydrate_array_items",
+        "description": "Hydration returns array items in order."
+      },
+      {
+        "id": "hydrate_rejects_malformed_descriptors",
+        "description": "Every malformed descriptor shape raises ValueError."
+      },
+      {
+        "id": "compact_node_rejects_mismatched_descriptors",
+        "description": "A descriptor that does not match its source raises ValueError."
+      },
+      {
+        "id": "compact_node_copies_a_compact_token",
+        "description": "A compact subtree serializes by copying its source token."
+      },
+      {
+        "id": "scan_rejects_depth_outside_the_range",
+        "description": "The scan depth argument is bounded."
+      },
+      {
+        "id": "scan_reports_the_parse_error_offset",
+        "description": "A native parse error carries the byte offset."
+      },
+      {
+        "id": "escaped_member_name_decodes",
+        "description": "An escaped member name decodes to its text."
+      },
+      {
+        "id": "unpaired_surrogate_member_name_keeps_wtf8_identity",
+        "description": "An escaped unpaired surrogate key keeps its WTF-8 identity."
+      },
+      {
+        "id": "utf8_validation_survives_low_pcre_limits",
+        "description": "The shared PHP check also runs against the native backend."
+      }
+    ]
+  }
+}
