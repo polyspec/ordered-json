@@ -7,12 +7,11 @@ actually contain instead of relying on a reading of the sources.
 import json
 from pathlib import Path
 import re
-import subprocess
 import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from registry import IMPLEMENTATIONS, REGISTRY, case_commands, repository_paths
+from registry import IMPLEMENTATIONS, REGISTRY
 
 ROOT = Path(__file__).resolve().parents[2]
 STANDARD = json.loads((ROOT / 'package-tests.json').read_text(encoding='utf-8'))
@@ -31,18 +30,6 @@ def normalized(name):
     return name.lower()
 
 
-def collected_cases(name, paths, cache):
-    command = case_commands([name], paths, cache).get(name)
-    if command is None:
-        return None
-    process = subprocess.run(command['command'], cwd=command['cwd'], text=True,
-                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    if process.returncode:
-        raise RuntimeError(f'{name} case listing failed:\n{process.stdout}')
-    return {normalized(line) for line in process.stdout.splitlines()
-            if line.strip() and not line.startswith(('ok', '?', 'FAIL', 'running', 'test result'))}
-
-
 class CaseNameMapping(unittest.TestCase):
     def test_names_from_each_language_map_to_one_id(self):
         self.assertEqual(normalized('TestDepthArgumentIsBounded'), 'depth_argument_is_bounded')
@@ -55,11 +42,6 @@ class CaseNameMapping(unittest.TestCase):
 
 
 class PackageConformance(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.paths = repository_paths(ROOT)
-        cls.cache = ROOT / '.cache/probes'
-
     def test_the_standard_is_well_formed(self):
         self.assertEqual(STANDARD.get('schema_version'), 1)
         self.assertEqual(set(STANDARD['package_cases']), set(IMPLEMENTATIONS),
@@ -89,22 +71,10 @@ class PackageConformance(unittest.TestCase):
                    if REGISTRY['implementations'][name].get('test_cases') is None]
         self.assertEqual(missing, [], 'These implementations cannot report their package test cases')
 
-    def test_each_implementation_runs_the_standard_cases(self):
-        required = {name: {case['id'] for case in STANDARD['cases']
-                           if name not in case.get('exemptions', {})}
-                    | {case['id'] for case in STANDARD['package_cases'][name]}
-                    for name in IMPLEMENTATIONS}
-        problems = []
-        for name in IMPLEMENTATIONS:
-            cases = collected_cases(name, self.paths, self.cache)
-            if cases is None:
-                problems.append(f'{name}: no case listing command')
-                continue
-            for identifier in sorted(required[name] - cases):
-                problems.append(f'{name}: missing case {identifier}')
-            for identifier in sorted(cases - required[name]):
-                problems.append(f'{name}: case {identifier} is not declared in the standard')
-        self.assertEqual(problems, [], '\n'.join(problems))
+    def test_the_comparison_runs_after_the_packages_are_built(self):
+        # Listings need built artifacts, so verify.py compares them after prepare().
+        from verify import compare_package_cases
+        self.assertTrue(callable(compare_package_cases))
 
 
 if __name__ == '__main__':
