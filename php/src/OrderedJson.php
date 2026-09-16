@@ -483,16 +483,17 @@ final class Parser
             if ($pos >= $this->length) $this->fail('Unterminated string', $pos);
             $ch = $s[$pos++];
             if ($ch === '"') return $pos << 1 | $escaped;
-            if ($ch !== '\\') $this->fail('Unescaped control character', $pos);
+            if ($ch !== '\\') $this->fail('Unescaped control character', $pos - 1);
             $escaped = 1;
             $escape = $s[$pos] ?? '';
             if ($escape === '') $this->fail('Unfinished escape', $pos);
             $pos++;
             if ($escape === 'u') {
-                if (strspn($s, '0123456789abcdefABCDEF', $pos, 4) !== 4) $this->fail('Invalid Unicode escape', $pos);
+                if (($digits = strspn($s, '0123456789abcdefABCDEF', $pos, 4)) !== 4)
+                    $this->fail('Invalid Unicode escape', $pos + $digits);
                 $pos += 4;
             } elseif (!str_contains('"\\/bfnrt', $escape)) {
-                $this->fail('Invalid escape', $pos);
+                $this->fail('Invalid escape', $pos - 1);
             }
         }
     }

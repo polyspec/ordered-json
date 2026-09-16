@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- An unescaped control character is reported at its own offset instead of one past it, and the adapter reports the rejection position for the shared comparison.
 - Parsing reports the byte offset of the first invalid UTF-8 sequence instead of 0.
 - `Marshal` applies `omitempty` and `omitzero` as separate rules, matching the host encoder: a zero `time.Time` stays under `omitempty` and is dropped under `omitzero`. Non-finite floats report the field that holds them instead of failing later in the parser, and the unreachable `time.Time` branch is removed because `time.Time` carries its own `MarshalJSON`. A seeded randomized test compares decoded structures with the host encoder.
 - `Marshal` now contributes the fields of anonymous struct fields instead of dropping them, reports a repeated field name as an error instead of emitting a duplicate key, and stops at the parser's nesting limit so a cyclic value returns an error instead of exhausting memory.

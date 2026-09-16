@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- An unescaped control character is reported at its own offset instead of one past it.
 - Added package tests for the descriptor API and declared them in the implementation registry. They cover hydrated members and items, repeated and escaped member names, malformed descriptors rejected with `ValueError`, compact token copying, the supported depth range, and the reported parse error offset. Shared cases reach the extension only through the PHP Value API, so these are the only checks of that surface.
 - `ordered_json_hydrate()` returns an object's members alone; it no longer creates a value for each key token.
 - Added `ordered_json_hydrate()`, which creates the child `OrderedJson\Value` objects of a container from a descriptor and rejects a descriptor that does not match the source with `ValueError`. Hydration is compiled from a separate `hydrate.c`; the class lookup is cached for each request.

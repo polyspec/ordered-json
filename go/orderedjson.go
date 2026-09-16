@@ -610,7 +610,8 @@ func (p *parser) string() (bool, error) {
 		case ch == '"':
 			return escaped, nil
 		case ch < 32:
-			return false, p.fail("unescaped control character")
+			// The scanner has consumed the offending byte; the offset names it.
+			return false, &ParseError{p.pos - 1, "unescaped control character"}
 		case ch == '\\':
 			if p.pos >= len(p.source) {
 				return false, p.fail("unfinished escape")
@@ -628,7 +629,8 @@ func (p *parser) string() (bool, error) {
 				}
 			case '"', '\\', '/', 'b', 'f', 'n', 'r', 't':
 			default:
-				return false, p.fail("invalid escape")
+				// The escape character has been consumed; the offset names it.
+				return false, &ParseError{p.pos - 1, "invalid escape"}
 			}
 		}
 	}
