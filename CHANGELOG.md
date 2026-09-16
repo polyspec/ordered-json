@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Corrected Go `Marshal` omission rules and error reporting: `omitempty` and `omitzero` are separate rules, non-finite floats name the field that holds them, and the unreachable `time.Time` branch is removed. A seeded randomized test compares 20,000 values with the host encoder's decoded structures.
 - Fixed Go `Marshal`: anonymous struct fields contributed no fields, a repeated field name silently lost a field, and a cyclic value recursed until the process died. Promotion now matches Go field promotion, repeated names and values deeper than the parser's limit are errors.
 - PHP object hydration creates one value per member instead of two; serialization reads key tokens from the descriptor. Parse followed by full traversal took 0.85-0.99 of the previous time with the extension and 0.90-1.00 in pure PHP, with identical results.
 - Added the Go `Marshal` binding for typed struct, map, slice, scalar, time and byte values. It validates custom marshaler output through ordered-json and produces compact JSON without using the host JSON encoder.
