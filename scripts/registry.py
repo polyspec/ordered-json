@@ -31,7 +31,7 @@ def load_registry(root=ROOT):
             raise ValueError('Implementation references an unknown repository: ' + name)
         commands = [implementation['command']] + list(implementation['runtime'].values())
         commands += [step['command'] for step in implementation.get('prepare', [])]
-        for key in ('tests', 'test_cases'):
+        for key in ('tests', 'test_cases', 'api_symbols'):
             declaration = implementation.get(key)
             if declaration is not None:
                 if not isinstance(declaration, dict) or set(declaration) != {'cwd', 'command'} or not declaration['cwd']:
@@ -132,6 +132,11 @@ def test_commands(selected, paths, cache, registry=REGISTRY):
 def case_commands(selected, paths, cache, registry=REGISTRY):
     """Resolve each declared command that lists the package test cases."""
     return declared_commands('test_cases', selected, paths, cache, registry)
+
+
+def api_commands(selected, paths, cache, registry=REGISTRY):
+    """Resolve each declared command that lists the public API symbols."""
+    return declared_commands('api_symbols', selected, paths, cache, registry)
 
 
 def runtime_versions(selected, paths, cache, registry=REGISTRY):
