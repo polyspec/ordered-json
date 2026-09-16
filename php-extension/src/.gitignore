@@ -18,3 +18,5 @@
 /*.la
 /*.lo
 /*~
+/conftest*
+/confdefs.h
