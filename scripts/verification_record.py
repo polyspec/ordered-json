@@ -88,7 +88,7 @@ def runtimes(root):
 
 
 def create_record(root, before, results, counts, documentation_tests, runtime_versions,
-                  supplementary=None, build_warnings=()):
+                  supplementary=None, build_warnings=(), package_tests=None):
     if source_manifest(root) != before:
         raise ValueError('Sources changed during verification; no current record was written')
     if set(results) != set(IMPLEMENTATIONS):
@@ -100,12 +100,19 @@ def create_record(root, before, results, counts, documentation_tests, runtime_ve
         raise ValueError('Every implementation must pass every case')
     if documentation_tests <= 0 or set(runtime_versions) != set(IMPLEMENTATIONS):
         raise ValueError('Documentation tests and runtime versions are required')
+    package_tests = package_tests or {}
+    for name in IMPLEMENTATIONS:
+        declared = REGISTRY['implementations'][name].get('tests') is not None
+        passed = package_tests.get(name, {}).get('status') == 'passed'
+        if declared != passed:
+            raise ValueError('Declared package tests must run and pass: ' + name)
     return {
         'schema_version': 1, 'status': 'passed',
         'checked_at': datetime.now(timezone.utc).isoformat(timespec='seconds'),
         'platform': {'system': platform.system(), 'machine': platform.machine()},
         'sources': before, 'cases': {**counts, 'total': total},
-        'implementations': {name: {**results[name], 'runtime': runtime_versions[name]}
+        'implementations': {name: {**results[name], 'runtime': runtime_versions[name],
+                                   'tests': package_tests.get(name)}
                             for name in IMPLEMENTATIONS},
         'documentation_tests': {'status': 'passed', 'count': documentation_tests},
         'supplementary': supplementary, 'build_warnings': list(build_warnings),
