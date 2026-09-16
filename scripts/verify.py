@@ -7,11 +7,13 @@ import re
 import subprocess
 import tempfile
 
-from registry import (IMPLEMENTATIONS, adapter_commands, parse_overrides, prepare,
-                      repository_paths, test_commands)
-
 ROOT = Path(__file__).resolve().parents[1]
 FACTORY_STRING = '"quote \\\" slash \\\\ line\\n \\ud55c \\ud83c\\udf0d"'
+STANDARD = json.loads((ROOT / 'package-tests.json').read_text(encoding='utf-8'))
+CASE_ID = re.compile(r'^[a-z][a-z0-9_]*$')
+
+from registry import (IMPLEMENTATIONS, adapter_commands, case_commands, parse_overrides, prepare,
+                      repository_paths, test_commands)
 
 
 class ObjectPairs(list):
@@ -140,9 +142,53 @@ def verify(selected, suite=None, paths=None, cache=None, build_warnings=None):
     warnings = prepare(selected, paths, cache)
     if build_warnings is not None:
         build_warnings.extend(warnings)
+    compare_package_cases(case_commands(selected, paths, cache), selected)
     package_tests = run_package_tests(test_commands(selected, paths, cache))
     results, counts = verify_adapters(adapter_commands(selected, paths, cache), suite)
     return results, counts, package_tests
+
+
+def case_identifier(name):
+    """Map a test name from any language to a case id; a run of capitals is one word."""
+    name = name.split(':')[0].strip()
+    name = re.sub(r'^Test', '', name)
+    name = re.sub(r'(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])', '_', name)
+    return name.lower()
+
+
+def compare_package_cases(commands, selected):
+    """Each package reports the cases it runs; the standard says which are required."""
+    problems = []
+    for language in selected:
+        entry = commands.get(language)
+        if entry is None:
+            problems.append(f'{language}: declares no package test case listing')
+            continue
+        process = subprocess.run(entry['command'], cwd=entry['cwd'], text=True,
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if process.returncode or process.stderr:
+            raise RuntimeError(f'{language} case listing failed:\n{process.stdout}{process.stderr}')
+        reported, noise = set(), []
+        for line in process.stdout.splitlines():
+            identifier = case_identifier(line)
+            if not line.strip():
+                continue
+            if re.match(r'^(?:ok|\?)\s+', line) or line.startswith(('test result:', 'running', 'FAIL')):
+                continue
+            if CASE_ID.fullmatch(identifier):
+                reported.add(identifier)
+            else:
+                noise.append(line)
+        if noise:
+            raise RuntimeError(f'{language} case listing printed more than case ids:\n' + '\n'.join(noise))
+        required = {case['id'] for case in STANDARD['cases'] if language not in case.get('exemptions', {})}
+        required |= {case['id'] for case in STANDARD['package_cases'][language]}
+        problems += [f'{language}: missing case {identifier}' for identifier in sorted(required - reported)]
+        problems += [f'{language}: case {identifier} is not declared in the standard'
+                     for identifier in sorted(reported - required)]
+    if problems:
+        raise AssertionError('Package test cases do not match package-tests.json:\n' + '\n'.join(problems))
+    print('package test cases match the standard', flush=True)
 
 
 def run_package_tests(commands):
