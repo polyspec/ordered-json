@@ -94,7 +94,11 @@ static bool oj_string(oj_parser *p, zend_long *flags) {
     while (p->pos < p->length) {
         unsigned char ch = p->source[p->pos++];
         if (ch == '"') return true;
-        if (ch < 32) return oj_fail(p, "Unescaped control character");
+        if (ch < 32) {
+            /* The scanner has consumed the offending byte; the offset names it. */
+            p->pos--;
+            return oj_fail(p, "Unescaped control character");
+        }
         if (ch >= 0x80) {
             uint32_t point;
             p->pos--;
@@ -116,6 +120,8 @@ static bool oj_string(oj_parser *p, zend_long *flags) {
             case '"': case '\\': case '/': case 'b': case 'f': case 'n': case 'r': case 't':
                 break;
             default:
+                /* The escape character has been consumed; the offset names it. */
+                p->pos--;
                 return oj_fail(p, "Invalid escape");
         }
     }
