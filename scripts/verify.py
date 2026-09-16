@@ -205,13 +205,53 @@ def run_package_tests(commands):
     return results
 
 
+def byte_offset(document, offset, unit):
+    """Convert a reported position into a byte offset in the same document.
+
+    UTF-16 offsets count code units, so a prefix may end between the halves of a
+    surrogate pair; the byte position is then the first byte of that character.
+    """
+    if unit == 'byte':
+        return offset
+    if unit != 'utf16':
+        raise AssertionError('A rejection reports the unit of its offset: ' + repr(unit))
+    units = document.decode('utf-8').encode('utf-16-le')[:offset * 2]
+    prefix = units.decode('utf-16-le', 'surrogatepass')
+    if prefix and 0xd800 <= ord(prefix[-1]) <= 0xdbff:
+        prefix = prefix[:-1]
+    return len(prefix.encode('utf-8'))
+
+
+def compare_error_positions(positions, documents):
+    """Every implementation rejects the same input at the same place."""
+    disagreements = []
+    for name, reported in sorted(positions.items()):
+        if len(reported) < 2:
+            continue
+        resolved = {}
+        for language, (offset, unit) in reported.items():
+            if not isinstance(offset, int):
+                raise AssertionError(f'{language} {name}: a rejection reports its offset')
+            resolved[language] = byte_offset(documents[name], offset, unit)
+        if len(set(resolved.values())) > 1:
+            disagreements.append(f'{name}: ' + ', '.join(f'{language}={value}'
+                                                         for language, value in sorted(resolved.items())))
+    if disagreements:
+        raise AssertionError('Implementations reject the same input at different positions:\n'
+                             + '\n'.join(disagreements))
+    if positions:
+        print('rejection positions agree across implementations', flush=True)
+
+
 def verify_adapters(commands, suite=None):
     """Compare prepared adapters, including externally built modules, with shared cases."""
     if not commands:
         raise ValueError('At least one adapter is required')
     results = {}
+    positions = {}
     with tempfile.TemporaryDirectory(prefix='ordered-json-examples-') as folder:
         cases, official_count = prepare_cases(Path(folder), suite)
+        documents = {name: path.read_bytes() for name, path, _ in cases}
         requests = ''.join(str(path) + '\n' for _, path, _ in cases)
         for language, command in commands.items():
             process = subprocess.run(command, input=requests, encoding='utf-8',
@@ -228,6 +268,11 @@ def verify_adapters(commands, suite=None):
                 raise AssertionError(f'{language}: expected {len(cases)} responses, got {len(lines)}')
             for (name, _, expected), line in zip(cases, lines):
                 actual = json.loads(line)
+                if not actual.get('ok'):
+                    # A rejection also reports where it stopped; the unit is the
+                    # one the binding documents, and the comparison converts it.
+                    positions.setdefault(name, {})[language] = (actual.get('offset'), actual.get('unit'))
+                    actual = {'ok': False}
                 if actual.get('ok'):
                     expected = dict(expected, roundtrip=expected['compact'],
                                     roundtrip_tree=expected['tree'], factory=FACTORY_STRING)
@@ -249,6 +294,7 @@ def verify_adapters(commands, suite=None):
         counts = {'official': official_count,
                   'fixtures': sum(name.startswith('fixtures/') for name, _, _ in cases),
                   'supplementary': sum(name.startswith('JSONTestSuite/') for name, _, _ in cases)}
+        compare_error_positions(positions, documents)
     print('All selected implementations match the same expected results.', flush=True)
     return results, counts
 
