@@ -10,7 +10,7 @@ import sys
 from urllib.parse import unquote, urlsplit
 
 from verification_record import IMPLEMENTATIONS, package_revisions, sha256, source_manifest
-from registry import REGISTRY, repository_paths
+from registry import REGISTRY, artifact_paths, repository_paths
 
 ROOT = Path(__file__).resolve().parents[1]
 KINDS = {'overview', 'specification', 'state', 'operations', 'history', 'procedure', 'usage', 'report'}
@@ -133,6 +133,37 @@ def feature_rows(text):
     return rows
 
 
+def external_inputs(root):
+    """What the repository expects each external input to be, so a record can be wrong."""
+    path = root / 'external-inputs.json'
+    if not path.is_file():
+        raise ValueError('A repository that records external inputs declares them in external-inputs.json')
+    pin = json.loads(path.read_text(encoding='utf-8'))
+    if pin.get('schema_version') != 1:
+        raise ValueError('Unsupported external input pin schema')
+    if not pin['pie'].get('release') or not re.fullmatch(r'[a-f0-9]{64}', pin['pie'].get('phar_sha256', '')):
+        raise ValueError('The PIE pin requires a release and its content hash')
+    supplementary = pin['supplementary']
+    if (not re.fullmatch(r'[a-f0-9]{40}', supplementary.get('revision', ''))
+            or not re.fullmatch(r'[a-f0-9]{64}', supplementary.get('inputs_sha256', ''))
+            or type(supplementary.get('cases')) is not int or supplementary['cases'] <= 0):
+        raise ValueError('The supplementary pin requires a revision, a content hash and a case count')
+    return pin
+
+
+def check_supplementary(record, counts, pin):
+    """Supplementary inputs come from outside the repository, so they are pinned."""
+    supplementary = record.get('supplementary')
+    if not counts['supplementary']:
+        if supplementary is not None:
+            raise ValueError('Unused supplementary inputs cannot be recorded')
+        return
+    expected = {field: pin['supplementary'][field]
+                for field in ('project', 'revision', 'cases', 'inputs_sha256')}
+    if supplementary != expected or counts['supplementary'] != expected['cases']:
+        raise ValueError('Supplementary inputs differ from the pin in external-inputs.json')
+
+
 def check_verification(root, record):
     if record.get('schema_version') != 1 or record.get('status') != 'passed':
         raise ValueError('Verification record is not passed schema version 1')
@@ -168,14 +199,7 @@ def check_verification(root, record):
     tests = record['documentation_tests']
     if tests.get('status') != 'passed' or type(tests.get('count')) is not int or tests['count'] <= 0:
         raise ValueError('Passing documentation checker tests are required')
-    supplementary = record['supplementary']
-    if counts['supplementary']:
-        if not supplementary or supplementary.get('cases') != counts['supplementary']:
-            raise ValueError('Supplementary input count is inconsistent')
-        if not re.fullmatch(r'[a-f0-9]{40}', supplementary.get('revision', '')) or not re.fullmatch(r'[a-f0-9]{64}', supplementary.get('inputs_sha256', '')):
-            raise ValueError('Supplementary input revision and content hash are required')
-    elif supplementary is not None:
-        raise ValueError('Unused supplementary inputs cannot be recorded')
+    check_supplementary(record, counts, external_inputs(root))
 
 
 def check_distribution(record, features):
@@ -231,11 +255,15 @@ def check_pie_verification(root, record):
         raise ValueError('PIE verification package records differ from the current source')
     if record.get('package') != 'ordered-json/ordered-json-extension:*@dev':
         raise ValueError('PIE verification uses an unexpected package')
-    for value in (record['pie']['phar_sha256'], record['artifact']['sha256']):
-        if not re.fullmatch(r'[a-f0-9]{64}', value):
-            raise ValueError('PIE tool and artifact hashes are required')
-    if not record['pie'].get('version'):
-        raise ValueError('The PIE version is required')
+    pin = external_inputs(root)
+    if (record['pie'].get('phar_sha256') != pin['pie']['phar_sha256']
+            or pin['pie']['release'] not in record['pie'].get('version', '')):
+        raise ValueError('The PIE tool differs from the pin in external-inputs.json')
+    declared = [path.relative_to(root).as_posix() for path in artifact_paths('php-extension', repository_paths(root))]
+    if [record.get('artifact', {}).get('path')] != declared:
+        raise ValueError('The record must name the artifact the registry declares')
+    if set(record['artifact']) != {'path'}:
+        raise ValueError('A linked module has no reproducible hash, so the record carries its path alone')
     commands = record['commands']
     if any(command.get('exit_code') != 0 for command in commands) or not any(
             command['arguments'][:1] == ['build'] for command in commands):
@@ -257,9 +285,7 @@ def check_pie_verification(root, record):
         raise ValueError('The PIE artifact must pass every shared case')
     if not native['runtime'].get('php') or not native['runtime'].get('extension_version'):
         raise ValueError('PIE verification requires PHP and extension versions')
-    supplementary = record.get('supplementary')
-    if counts['supplementary'] and (not supplementary or supplementary.get('cases') != counts['supplementary']):
-        raise ValueError('PIE supplementary input count is inconsistent')
+    check_supplementary(record, counts, pin)
 
 
 def check_repository(root, include_children=True):
