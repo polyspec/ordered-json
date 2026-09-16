@@ -6,6 +6,7 @@ use OrderedJson\Value;
 
 $iterations = (int)($_SERVER['OJ_BENCH_ITERATIONS'] ?? 1000);
 $warmup = (int)($_SERVER['OJ_BENCH_WARMUP'] ?? 1000);
+$warmupMs = (int)($_SERVER['OJ_BENCH_WARMUP_MS'] ?? 50);
 $samples = (int)($_SERVER['OJ_BENCH_SAMPLES'] ?? 9);
 $mode = $argv[1] ?? 'custom';
 $files = array_slice($argv, 2);
@@ -16,8 +17,12 @@ $percentile = static function (array $values, float $p): float {
     sort($values, SORT_NUMERIC);
     return $values[min(count($values) - 1, (int)ceil(count($values) * $p) - 1)];
 };
-$measure = static function (callable $fn) use ($iterations, $warmup, $samples, $clock, $percentile): array {
-    for ($i = 0; $i < $warmup; $i++) $fn();
+$measure = static function (callable $fn) use ($iterations, $warmup, $warmupMs, $samples, $clock, $percentile): array {
+    // A process runs below its steady speed until it has been busy for a while,
+    // and a warm-up counted in iterations ends in microseconds on a small
+    // input, so the count is a floor and the duration decides.
+    $warming = $clock();
+    do { for ($i = 0; $i < $warmup; $i++) $fn(); } while (($clock() - $warming) < $warmupMs * 1e6);
     $values = []; $result = '';
     for ($sample = 0; $sample < $samples; $sample++) {
         $start = $clock();

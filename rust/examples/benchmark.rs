@@ -27,10 +27,20 @@ fn measure<F: FnMut() -> Vec<u8>>(
     mut f: F,
     count: usize,
     warmup: usize,
+    warmup_ms: usize,
     sample_count: usize,
 ) -> (Stats, Vec<u8>) {
-    for _ in 0..warmup {
-        f();
+    // A process runs below its steady speed until it has been busy for a
+    // while, and a warm-up counted in iterations ends in microseconds on a
+    // small input, so the count is a floor and the duration decides.
+    let warming = Instant::now();
+    loop {
+        for _ in 0..warmup {
+            f();
+        }
+        if warming.elapsed().as_millis() as usize >= warmup_ms {
+            break;
+        }
     }
     let mut values = Vec::with_capacity(sample_count);
     let mut output = Vec::new();
@@ -65,6 +75,7 @@ fn digest(bytes: &[u8]) -> String {
 fn main() {
     let count = iterations();
     let warmup = setting("OJ_BENCH_WARMUP", 1000);
+    let warmup_ms = setting("OJ_BENCH_WARMUP_MS", 50);
     let sample_count = setting("OJ_BENCH_SAMPLES", 9);
     for file in env::args().skip(1) {
         let source = fs::read(&file).expect("cannot read benchmark fixture");
@@ -76,6 +87,7 @@ fn main() {
             },
             count,
             warmup,
+            warmup_ms,
             sample_count,
         );
         let value = parse_ordered();
@@ -83,12 +95,14 @@ fn main() {
             || stringify(&value).into_bytes(),
             count,
             warmup,
+            warmup_ms,
             sample_count,
         );
         let (roundtrip_stats, _) = measure(
             || stringify(&parse_ordered()).into_bytes(),
             count,
             warmup,
+            warmup_ms,
             sample_count,
         );
 
@@ -99,6 +113,7 @@ fn main() {
             },
             count,
             warmup,
+            warmup_ms,
             sample_count,
         );
         let native_value: NativeValue = serde_json::from_slice(&source).unwrap();
@@ -106,6 +121,7 @@ fn main() {
             || serde_json::to_vec(&native_value).unwrap(),
             count,
             warmup,
+            warmup_ms,
             sample_count,
         );
         let (native_roundtrip_stats, _) = measure(
@@ -115,6 +131,7 @@ fn main() {
             },
             count,
             warmup,
+            warmup_ms,
             sample_count,
         );
         let sample_json = |p: &Stats, s: &Stats, r: &Stats| {
