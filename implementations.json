@@ -11,6 +11,7 @@
     "js": {
       "repository": "javascript",
       "command": ["node", "{javascript}/test/probe.mjs"],
+      "tests": {"cwd": "{javascript}", "command": ["node", "test/api.mjs"]},
       "runtime": {"node": ["node", "--version"]}
     },
     "rust": {
