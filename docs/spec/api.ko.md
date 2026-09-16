@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: cf73451e7852fb89fca5511935be30eafe2e906fcbd99b8ca1bde5f9509af404 -->
+<!-- source-sha256: 9e9ec38c1e2283c4820388374ce5f366897f6de454ca3d72983017b7f6e1b584 -->
 # API 계약
 
 [English](api.md)
@@ -25,7 +25,7 @@
 
 JavaScript 파싱 오류는 UTF-16 위치를 반환합니다. Rust, Go, PHP 파싱 오류는 UTF-8 바이트 위치를 반환합니다. Go `Value`의 영값은 유효하지 않습니다. Rust와 Go의 빈 `OrderedMap`은 유효한 객체 입력입니다.
 
-Go 바인딩은 `Marshal(value)`도 제공합니다. 내보낸 구조체 필드를 선언 순서로 인코딩하고 `json` 필드 이름과 생략 옵션을 적용하며 바이트 슬라이스를 base64 문자열로 인코딩합니다. `MarshalJSON() ([]byte, error)` 경계를 구현한 타입을 허용하고 사용자 정의 결과를 ordered-json parser로 검증합니다. 네이티브 map 순서가 정의되지 않았으므로 Go map 키는 정렬합니다. 결과는 compact JSON이며 typed 인코딩을 host JSON 인코더에 위임하지 않습니다.
+Go 바인딩은 `Marshal(value)`도 제공합니다. 내보낸 구조체 필드를 선언 순서로 인코딩하고, `json` 이름이 없는 익명 필드는 그 필드들을 펼쳐 넣으며, 이름이 겹치는 필드와 파서 한도보다 깊은 값은 오류로 거부하고, `json` 필드 이름과 생략 옵션을 적용하며 바이트 슬라이스를 base64 문자열로 인코딩합니다. `MarshalJSON() ([]byte, error)` 경계를 구현한 타입을 허용하고 사용자 정의 결과를 ordered-json parser로 검증합니다. 네이티브 map 순서가 정의되지 않았으므로 Go map 키는 정렬합니다. 결과는 compact JSON이며 typed 인코딩을 host JSON 인코더에 위임하지 않습니다.
 
 <a id="objects"></a>
 ## 연관 객체

@@ -27,7 +27,7 @@ func Marshal(value any) ([]byte, error) {
 		return []byte("null"), nil
 	}
 	var out strings.Builder
-	if err := marshalReflect(&out, reflect.ValueOf(value), "$", false); err != nil {
+	if err := marshalReflect(&out, reflect.ValueOf(value), "$", false, 0); err != nil {
 		return nil, err
 	}
 	encoded := out.String()
@@ -42,7 +42,11 @@ func Marshal(value any) ([]byte, error) {
 	return []byte(compact), nil
 }
 
-func marshalReflect(out *strings.Builder, value reflect.Value, path string, omit bool) error {
+func marshalReflect(out *strings.Builder, value reflect.Value, path string, omit bool, depth int) error {
+	// The depth limit matches the parser and ends cyclic values with an error.
+	if depth > MaxDepth {
+		return fmt.Errorf("maximum nesting depth exceeded at %d levels", depth)
+	}
 	if !value.IsValid() {
 		out.WriteString("null")
 		return nil
@@ -73,9 +77,12 @@ func marshalReflect(out *strings.Builder, value reflect.Value, path string, omit
 			out.WriteString("null")
 			return nil
 		}
-		return marshalReflect(out, value.Elem(), path, false)
+		return marshalReflect(out, value.Elem(), path, false, depth+1)
 	}
 	if value.Type() == timeType {
+		if !value.CanInterface() {
+			return fmt.Errorf("%s: unexported time value", path)
+		}
 		if value.Interface().(time.Time).IsZero() {
 			out.WriteString("null")
 			return nil
@@ -110,7 +117,7 @@ func marshalReflect(out *strings.Builder, value reflect.Value, path string, omit
 			if i > 0 {
 				out.WriteByte(',')
 			}
-			if err := marshalReflect(out, value.Index(i), fmt.Sprintf("%s[%d]", path, i), false); err != nil {
+			if err := marshalReflect(out, value.Index(i), fmt.Sprintf("%s[%d]", path, i), false, depth+1); err != nil {
 				return err
 			}
 		}
@@ -121,7 +128,7 @@ func marshalReflect(out *strings.Builder, value reflect.Value, path string, omit
 			if i > 0 {
 				out.WriteByte(',')
 			}
-			if err := marshalReflect(out, value.Index(i), fmt.Sprintf("%s[%d]", path, i), false); err != nil {
+			if err := marshalReflect(out, value.Index(i), fmt.Sprintf("%s[%d]", path, i), false, depth+1); err != nil {
 				return err
 			}
 		}
@@ -141,41 +148,90 @@ func marshalReflect(out *strings.Builder, value reflect.Value, path string, omit
 				return err
 			}
 			out.WriteByte(':')
-			if err := marshalReflect(out, value.MapIndex(key), path+"."+key.String(), false); err != nil {
+			if err := marshalReflect(out, value.MapIndex(key), path+"."+key.String(), false, depth+1); err != nil {
 				return err
 			}
 		}
 		out.WriteByte('}')
 	case reflect.Struct:
+		members, err := structMembers(value)
+		if err != nil {
+			return fmt.Errorf("%s: %w", path, err)
+		}
 		out.WriteByte('{')
-		written := 0
-		typeOfValue := value.Type()
-		for i := 0; i < value.NumField(); i++ {
-			field := typeOfValue.Field(i)
-			if field.PkgPath != "" {
-				continue
-			}
-			name, skip, omitEmpty := marshalFieldName(field)
-			if skip || (omitEmpty && isEmptyValue(value.Field(i))) {
-				continue
-			}
-			if written > 0 {
+		for i, member := range members {
+			if i > 0 {
 				out.WriteByte(',')
 			}
-			if err := writeString(out, name); err != nil {
+			if err := writeString(out, member.name); err != nil {
 				return err
 			}
 			out.WriteByte(':')
-			if err := marshalReflect(out, value.Field(i), path+"."+name, false); err != nil {
+			if err := marshalReflect(out, member.value, path+"."+member.name, false, depth+1); err != nil {
 				return err
 			}
-			written++
 		}
 		out.WriteByte('}')
 	default:
 		return fmt.Errorf("%s: unsupported Go value %s", path, value.Type())
 	}
 	return nil
+}
+
+type structMember struct {
+	name  string
+	value reflect.Value
+}
+
+// structMembers lists the encoded fields of a struct in declaration order. An
+// anonymous field without a `json` name contributes its own fields, matching Go
+// field promotion, and a repeated name is an error instead of a lost field.
+func structMembers(value reflect.Value) ([]structMember, error) {
+	var members []structMember
+	seen := make(map[string]struct{})
+	var walk func(reflect.Value) error
+	walk = func(current reflect.Value) error {
+		currentType := current.Type()
+		for i := 0; i < currentType.NumField(); i++ {
+			field := currentType.Field(i)
+			name, skip, omitEmpty := marshalFieldName(field)
+			if skip {
+				continue
+			}
+			_, tagged := field.Tag.Lookup("json")
+			if field.Anonymous && !tagged {
+				embeddedValue := current.Field(i)
+				for embeddedValue.Kind() == reflect.Pointer && !embeddedValue.IsNil() {
+					embeddedValue = embeddedValue.Elem()
+				}
+				if embeddedValue.Kind() == reflect.Struct && embeddedValue.Type() != timeType {
+					if err := walk(embeddedValue); err != nil {
+						return err
+					}
+					continue
+				}
+			}
+			if field.PkgPath != "" && !field.Anonymous {
+				continue
+			}
+			if field.PkgPath != "" {
+				continue
+			}
+			if omitEmpty && isEmptyValue(current.Field(i)) {
+				continue
+			}
+			if _, repeated := seen[name]; repeated {
+				return fmt.Errorf("duplicate field name %q", name)
+			}
+			seen[name] = struct{}{}
+			members = append(members, structMember{name: name, value: current.Field(i)})
+		}
+		return nil
+	}
+	if err := walk(value); err != nil {
+		return nil, err
+	}
+	return members, nil
 }
 
 func marshalFieldName(field reflect.StructField) (string, bool, bool) {
@@ -205,7 +261,7 @@ func isEmptyValue(value reflect.Value) bool {
 		return true
 	}
 	if value.Type() == timeType {
-		return value.Interface().(time.Time).IsZero()
+		return value.CanInterface() && value.Interface().(time.Time).IsZero()
 	}
 	switch value.Kind() {
 	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
