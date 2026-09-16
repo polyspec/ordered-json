@@ -14,6 +14,28 @@ pub struct Error {
     pub offset: usize,
     pub message: &'static str,
 }
+impl Error {
+    /// Why the document was rejected, named the same way by every implementation.
+    pub fn kind(&self) -> &'static str {
+        match self.message {
+            "expected JSON value" => "expected_value",
+            "expected digit" => "expected_digit",
+            "expected colon" => "expected_colon",
+            "expected comma or closing delimiter" => "expected_delimiter",
+            "expected string" => "expected_object_key",
+            "invalid escape" => "invalid_escape",
+            "invalid Unicode escape" => "invalid_unicode_escape",
+            "unfinished escape" => "unfinished_escape",
+            "unterminated string" => "unterminated_string",
+            "unescaped control character" => "unescaped_control_character",
+            "invalid UTF-8" => "invalid_utf8",
+            "maximum nesting depth exceeded" => "maximum_depth_exceeded",
+            "unexpected trailing input" => "trailing_input",
+            _ => "",
+        }
+    }
+}
+
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{} at byte {}", self.message, self.offset)
