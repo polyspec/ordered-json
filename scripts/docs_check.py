@@ -231,12 +231,13 @@ def check_distribution(record, features):
     if record.get('schema_version') != 1:
         raise ValueError('Invalid distribution schema')
     datetime.fromisoformat(record['checked_at'])
+    declared = REGISTRY['url'].removesuffix('.git')
     source = record['source']
     if source.get('state') not in ('available', 'not-verified'):
         raise ValueError('Invalid source distribution state')
     if source.get('state') == 'available':
-        if source.get('url') != 'https://github.com/polyspec/ordered-json' or source.get('branch') != 'main':
-            raise ValueError('Confirmed source distribution is missing')
+        if source.get('url') != declared or source.get('branch') != 'main':
+            raise ValueError('A confirmed source observation names the declared repository on main')
         if source.get('visibility') != 'public':
             raise ValueError('Source visibility observation is missing')
     if not isinstance(record.get('github_releases'), list) or not isinstance(record.get('version_tags'), list):
@@ -246,8 +247,7 @@ def check_distribution(record, features):
         if set(observations) != set(REGISTRY['repositories']):
             raise ValueError('Implementation source observations are incomplete')
         for name, observation in observations.items():
-            expected_url = REGISTRY['repositories'][name]['url'].removesuffix('.git')
-            if (observation.get('state') != 'available' or observation.get('url') != expected_url
+            if (observation.get('state') != 'available' or observation.get('url') != declared
                     or observation.get('branch') != 'main' or observation.get('visibility') != 'public'
                     or not re.fullmatch(r'[a-f0-9]{40}', observation.get('revision', ''))):
                 raise ValueError('Invalid implementation source observation: ' + name)
