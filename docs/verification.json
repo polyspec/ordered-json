@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-16T03:25:47+00:00",
+  "checked_at": "2026-09-16T03:27:23+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
@@ -252,13 +252,13 @@
   "cases": {
     "official": 17,
     "fixtures": 98,
-    "supplementary": 0,
-    "total": 115
+    "supplementary": 318,
+    "total": 433
   },
   "implementations": {
     "js": {
       "status": "passed",
-      "cases": 115,
+      "cases": 433,
       "runtime": {
         "node": "v26.8.1"
       },
@@ -272,7 +272,7 @@
     },
     "rust": {
       "status": "passed",
-      "cases": 115,
+      "cases": 433,
       "runtime": {
         "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)"
       },
@@ -287,7 +287,7 @@
     },
     "go": {
       "status": "passed",
-      "cases": 115,
+      "cases": 433,
       "runtime": {
         "go": "go version go1.27.0 darwin/arm64"
       },
@@ -302,7 +302,7 @@
     },
     "php": {
       "status": "passed",
-      "cases": 115,
+      "cases": 433,
       "runtime": {
         "php": "8.5.10"
       },
@@ -317,7 +317,7 @@
     },
     "php-extension": {
       "status": "passed",
-      "cases": 115,
+      "cases": 433,
       "runtime": {
         "php": "8.5.10",
         "extension_version": "0.0.1"
@@ -339,17 +339,13 @@
     "status": "passed",
     "count": 49
   },
-  "supplementary": null,
-  "build_warnings": [
-    {
-      "implementation": "php-extension",
-      "message": "shtool:echo:Warning: unable to determine terminal sequence for bold mode"
-    },
-    {
-      "implementation": "php-extension",
-      "message": "shtool:echo:Warning: unable to determine terminal sequence for bold mode"
-    }
-  ],
+  "supplementary": {
+    "project": "nst/JSONTestSuite",
+    "revision": "1ef36fa01286573e846ac449e8683f8833c5b26a",
+    "cases": 318,
+    "inputs_sha256": "dafa7facfed6700b0a2f16207fb1d3b557f9e45d3abd84f2dfb666538d10c332"
+  },
+  "build_warnings": [],
   "packages": {
     "javascript": {
       "path": "js",
