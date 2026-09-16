@@ -29,6 +29,7 @@
     "php": {
       "repository": "php",
       "command": ["php", "-n", "{php}/tests/probe.php"],
+      "tests": {"cwd": "{php}", "command": ["php", "-n", "tests/api.php"]},
       "runtime": {"php": ["php", "-n", "-r", "echo PHP_VERSION;"]}
     },
     "php-extension": {

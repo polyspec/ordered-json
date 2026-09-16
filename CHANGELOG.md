@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Fixed the PHP unpaired-surrogate error, which raised a class-not-found error instead of `UnexpectedValueException` because the exception name was unqualified inside the namespace. The PHP package now declares its own tests, which found it.
 - The PHP extension package declares its own tests for the descriptor API, which no shared case can reach.
 - The API contract states the rule for an API that only one binding provides: it uses the shared parser and serializer, leaves results, errors, and offsets unchanged, appears in the binding extensions section, and is covered by its package's declared tests. Go `Marshal` is documented there.
 - The implementation registry declares each package's own test command, `make check` runs the declared commands, and the verification record requires their results. Shared cases run through adapters and cannot reach a language-specific API, so a defect in one survived while every shared case passed.
