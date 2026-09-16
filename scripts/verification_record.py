@@ -47,17 +47,6 @@ def source_manifest(root):
             'files': files}
 
 
-def repository_manifest(path):
-    """Hash tracked candidate files, including local edits, without generated outputs."""
-    names = output(['git', 'ls-files', '--cached', '--others', '--exclude-standard', '-z'], cwd=path).split('\0')
-    files = {name: sha256((path / name).read_bytes()) for name in sorted(names)
-             if name and (path / name).is_file()}
-    return {'revision': output(['git', 'rev-parse', 'HEAD'], cwd=path),
-            'dirty': bool(output(['git', 'status', '--porcelain'], cwd=path)),
-            'sha256': sha256(json.dumps(files, sort_keys=True, separators=(',', ':')).encode()),
-            'files': files}
-
-
 def package_revisions(root):
     """Identify each package by the current root-tracked file content."""
     files = source_manifest(root)['files']
