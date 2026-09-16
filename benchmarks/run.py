@@ -120,7 +120,8 @@ def main():
     if min(iterations, warmup, samples) < 1: parser.error("measurement counts must be positive")
     validate_workload()
     files = [str(path) for path in FIXTURES]
-    env = os.environ.copy(); env.update({"OJ_BENCH_ITERATIONS": str(iterations), "OJ_BENCH_WARMUP": str(warmup), "OJ_BENCH_SAMPLES": str(samples)})
+    env = os.environ.copy(); env.update({"OJ_BENCH_ITERATIONS": str(iterations), "OJ_BENCH_WARMUP": str(warmup),
+                                         "OJ_BENCH_WARMUP_MS": str(PROTOCOL["warmup_ms"]), "OJ_BENCH_SAMPLES": str(samples)})
     commands = []
     required_tools = {name: shutil.which(name) for name in ("node", "go", "php", "cargo", "phpize", "php-config")}
     missing = [name for name, path in required_tools.items() if path is None]
@@ -161,7 +162,7 @@ def main():
             raise SystemExit(f"Input byte count mismatch for {row['implementation']}/{row['file']}")
     current_environment = environment()
     previous = json.loads(RESULTS.read_text()) if RESULTS.is_file() else None
-    protocol = {"iterations": iterations, "warmup": warmup, "samples": samples,
+    protocol = {"iterations": iterations, "warmup": warmup, "warmup_ms": PROTOCOL["warmup_ms"], "samples": samples,
                 "median_tolerance": PROTOCOL["median_tolerance"], "p95_tolerance": PROTOCOL["p95_tolerance"]}
     record = {"schema_version": 2,
               "source": source_state(),
@@ -178,7 +179,8 @@ def main():
         RESULTS.write_text(json.dumps(record, indent=2) + "\n")
     for row in rows: print(f"{row['file']:24} {row['implementation']:14} parse={row['parse_ns']:.0f}ns stringify={row['stringify_ns']:.0f}ns")
     print(f"Comparison: {json.dumps(record['comparison'], sort_keys=True)}")
-    print(f"{'Checked' if args.check else 'Saved'} {RESULTS}")
+    kept = record["comparison"]["status"] == "failed" and not args.update_baseline
+    print(f"{'Kept' if kept else 'Checked' if args.check else 'Saved'} {RESULTS}")
     if record["comparison"]["status"] == "failed" and not args.update_baseline:
         raise SystemExit("benchmark regression exceeded the documented tolerance")
 
