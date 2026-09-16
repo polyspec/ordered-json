@@ -12,8 +12,8 @@ FACTORY_STRING = '"quote \\\" slash \\\\ line\\n \\ud55c \\ud83c\\udf0d"'
 STANDARD = json.loads((ROOT / 'package-tests.json').read_text(encoding='utf-8'))
 CASE_ID = re.compile(r'^[a-z][a-z0-9_]*$')
 
-from registry import (IMPLEMENTATIONS, adapter_commands, case_commands, parse_overrides, prepare,
-                      repository_paths, test_commands)
+from registry import (IMPLEMENTATIONS, adapter_commands, api_commands, case_commands, parse_overrides,
+                      prepare, repository_paths, test_commands)
 
 
 class ObjectPairs(list):
@@ -143,6 +143,7 @@ def verify(selected, suite=None, paths=None, cache=None, build_warnings=None):
     if build_warnings is not None:
         build_warnings.extend(warnings)
     compare_package_cases(case_commands(selected, paths, cache), selected)
+    compare_api_coverage(api_commands(selected, paths, cache), selected)
     package_tests = run_package_tests(test_commands(selected, paths, cache))
     results, counts = verify_adapters(adapter_commands(selected, paths, cache), suite)
     return results, counts, package_tests
@@ -189,6 +190,46 @@ def compare_package_cases(commands, selected):
     if problems:
         raise AssertionError('Package test cases do not match package-tests.json:\n' + '\n'.join(problems))
     print('package test cases match the standard', flush=True)
+
+
+def reported_lines(language, entry, what):
+    """Run a declared listing command and return its non-empty lines."""
+    process = subprocess.run(entry['command'], cwd=entry['cwd'], text=True,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if process.returncode or process.stderr:
+        raise RuntimeError(f'{language} {what} failed:\n{process.stdout}{process.stderr}')
+    return [line.strip() for line in process.stdout.splitlines() if line.strip()]
+
+
+def compare_api_coverage(commands, selected):
+    """Every public symbol names the cases that cover it, and every named symbol exists."""
+    coverage = STANDARD.get('api_coverage', {})
+    problems = []
+    for language in selected:
+        entry = commands.get(language)
+        if entry is None:
+            problems.append(f'{language}: declares no public API listing')
+            continue
+        reported = set(reported_lines(language, entry, 'API listing'))
+        declared = coverage.get(language, {})
+        known = {case['id'] for case in STANDARD['cases'] if language not in case.get('exemptions', {})}
+        known |= {case['id'] for case in STANDARD['package_cases'][language]}
+        problems += [f'{language}: {symbol} is covered by no case' for symbol in sorted(reported - set(declared))]
+        problems += [f'{language}: {symbol} is declared but the package no longer exports it'
+                     for symbol in sorted(set(declared) - reported)]
+        for symbol, entry_value in sorted(declared.items()):
+            if isinstance(entry_value, dict):
+                if not str(entry_value.get('exempt', '')).strip():
+                    problems.append(f'{language}: {symbol} is exempt without a reason')
+                continue
+            cases = entry_value if isinstance(entry_value, list) else [entry_value]
+            if not cases:
+                problems.append(f'{language}: {symbol} names no case')
+            problems += [f'{language}: {symbol} names an unknown case {case}'
+                         for case in cases if case not in known]
+    if problems:
+        raise AssertionError('Public API coverage does not match package-tests.json:\n' + '\n'.join(problems))
+    print('every public symbol names the cases that cover it', flush=True)
 
 
 def run_package_tests(commands):

@@ -136,6 +136,10 @@
       {
         "id": "marshal_reports_non_finite_numbers",
         "description": "NaN and infinities are errors that name the field."
+      },
+      {
+        "id": "borrowed_input_is_copied_on_access",
+        "description": "Borrowed parsing hands back text that survives a change to the caller's bytes."
       }
     ],
     "php": [
@@ -190,5 +194,470 @@
         "description": "The shared PHP check also runs against the native backend."
       }
     ]
+  },
+  "api_coverage": {
+    "js": {
+      "Kind": {
+        "exempt": "a type alias with no runtime form"
+      },
+      "ParseOptions": {
+        "exempt": "an options type; its maxDepth field is covered by the depth cases"
+      },
+      "MAX_DEPTH": [
+        "depth_argument_is_bounded"
+      ],
+      "ParseError": [
+        "parse_errors_report_offsets",
+        "invalid_utf8_reports_the_first_bad_byte"
+      ],
+      "Value": [
+        "values_come_only_from_the_library"
+      ],
+      "Value.array": [
+        "factories_validate_arguments"
+      ],
+      "Value.boolean": [
+        "factories_validate_arguments"
+      ],
+      "Value.booleanValue": [
+        "wrong_kind_access_is_reported"
+      ],
+      "Value.get": [
+        "member_lookup_uses_decoded_names"
+      ],
+      "Value.items": [
+        "returned_collections_are_immutable",
+        "root_keeps_surrounding_text"
+      ],
+      "Value.keys": [
+        "returned_collections_are_immutable"
+      ],
+      "Value.kind": [
+        "wrong_kind_access_is_reported"
+      ],
+      "Value.members": [
+        "repeated_key_keeps_first_position_and_last_value",
+        "returned_collections_are_immutable"
+      ],
+      "Value.null": [
+        "factories_validate_arguments"
+      ],
+      "Value.number": [
+        "factories_validate_arguments"
+      ],
+      "Value.numberLiteral": [
+        "member_lookup_uses_decoded_names",
+        "wrong_kind_access_is_reported"
+      ],
+      "Value.object": [
+        "factories_validate_arguments"
+      ],
+      "Value.raw": [
+        "root_keeps_surrounding_text"
+      ],
+      "Value.string": [
+        "factories_validate_arguments"
+      ],
+      "Value.stringUnits": [
+        "unpaired_surrogate_stays_in_units",
+        "surrogate_pair_decodes"
+      ],
+      "Value.stringValue": [
+        "surrogate_pair_decodes",
+        "unpaired_surrogate_stays_in_units"
+      ],
+      "Value.toJSON": [
+        "host_serialization_boundary"
+      ],
+      "Value.toString": [
+        "host_serialization_boundary"
+      ],
+      "parse": [
+        "depth_argument_is_bounded",
+        "depth_limit_is_enforced",
+        "parse_errors_report_offsets"
+      ],
+      "parseBytes": [
+        "bytes_input_is_validated",
+        "invalid_utf8_reports_the_first_bad_byte"
+      ],
+      "stringify": [
+        "host_serialization_boundary",
+        "values_come_only_from_the_library"
+      ]
+    },
+    "rust": {
+      "Error": [
+        "parse_errors_report_offsets"
+      ],
+      "Kind": [
+        "wrong_kind_access_is_reported"
+      ],
+      "MAX_DEPTH": [
+        "depth_argument_is_bounded"
+      ],
+      "OrderedMap": [
+        "ordered_map_rejects_non_string_key"
+      ],
+      "OrderedMap.get": [
+        "member_lookup_uses_decoded_names"
+      ],
+      "OrderedMap.get_units": [
+        "member_lookup_uses_decoded_names"
+      ],
+      "OrderedMap.insert": [
+        "ordered_map_rejects_non_string_key",
+        "repeated_key_keeps_first_position_and_last_value"
+      ],
+      "OrderedMap.is_empty": [
+        "ordered_map_rejects_non_string_key"
+      ],
+      "OrderedMap.len": [
+        "repeated_key_keeps_first_position_and_last_value"
+      ],
+      "OrderedMap.new": [
+        "ordered_map_rejects_non_string_key"
+      ],
+      "Value": [
+        "factories_validate_arguments"
+      ],
+      "Value.array": [
+        "factories_validate_arguments"
+      ],
+      "Value.boolean": [
+        "factories_validate_arguments"
+      ],
+      "Value.boolean_value": [
+        "wrong_kind_access_is_reported"
+      ],
+      "Value.compact": [
+        "root_keeps_surrounding_text",
+        "factories_validate_arguments"
+      ],
+      "Value.from_units": [
+        "unpaired_surrogate_stays_in_units"
+      ],
+      "Value.get": [
+        "member_lookup_uses_decoded_names"
+      ],
+      "Value.get_units": [
+        "member_lookup_uses_decoded_names"
+      ],
+      "Value.items": [
+        "root_keeps_surrounding_text",
+        "wrong_kind_access_is_reported"
+      ],
+      "Value.kind": [
+        "wrong_kind_access_is_reported"
+      ],
+      "Value.members": [
+        "wrong_kind_access_is_reported"
+      ],
+      "Value.null": [
+        "ordered_map_rejects_non_string_key"
+      ],
+      "Value.number": [
+        "factories_validate_arguments"
+      ],
+      "Value.number_literal": [
+        "wrong_kind_access_is_reported"
+      ],
+      "Value.object": [
+        "repeated_key_keeps_first_position_and_last_value"
+      ],
+      "Value.raw": [
+        "root_keeps_surrounding_text"
+      ],
+      "Value.string": [
+        "repeated_key_keeps_first_position_and_last_value"
+      ],
+      "Value.string_units": [
+        "unpaired_surrogate_stays_in_units",
+        "surrogate_pair_decodes"
+      ],
+      "Value.string_value": [
+        "unpaired_surrogate_stays_in_units",
+        "surrogate_pair_decodes"
+      ],
+      "parse": [
+        "parse_errors_report_offsets",
+        "member_lookup_uses_decoded_names"
+      ],
+      "parse_bytes": [
+        "bytes_input_is_validated",
+        "invalid_utf8_reports_the_first_bad_byte"
+      ],
+      "parse_with_max_depth": [
+        "depth_argument_is_bounded",
+        "depth_limit_is_enforced"
+      ],
+      "OrderedMap.iter": [
+        "repeated_key_keeps_first_position_and_last_value"
+      ],
+      "stringify": [
+        "root_keeps_surrounding_text"
+      ]
+    },
+    "go": {
+      "MaxDepth": [
+        "depth_argument_is_bounded"
+      ],
+      "Kind": [
+        "wrong_kind_access_is_reported"
+      ],
+      "ObjectKind": [
+        "wrong_kind_access_is_reported"
+      ],
+      "ArrayKind": [
+        "wrong_kind_access_is_reported"
+      ],
+      "StringKind": [
+        "wrong_kind_access_is_reported"
+      ],
+      "NumberKind": [
+        "wrong_kind_access_is_reported"
+      ],
+      "BooleanKind": [
+        "wrong_kind_access_is_reported"
+      ],
+      "NullKind": [
+        "wrong_kind_access_is_reported"
+      ],
+      "Marshal": [
+        "marshal_preserves_typed_json_contract",
+        "marshal_matches_host_encoder_structures"
+      ],
+      "Marshaler": [
+        "marshal_validates_custom_marshaler_through_ordered_parser"
+      ],
+      "OrderedMap": [
+        "ordered_map_rejects_non_string_key"
+      ],
+      "OrderedMap.Get": [
+        "member_lookup_uses_decoded_names"
+      ],
+      "OrderedMap.GetUnits": [
+        "member_lookup_uses_decoded_names"
+      ],
+      "OrderedMap.Keys": [
+        "repeated_key_keeps_first_position_and_last_value"
+      ],
+      "OrderedMap.Len": [
+        "ordered_map_rejects_non_string_key",
+        "repeated_key_keeps_first_position_and_last_value"
+      ],
+      "OrderedMap.Set": [
+        "ordered_map_rejects_non_string_key",
+        "repeated_key_keeps_first_position_and_last_value"
+      ],
+      "ParseError": [
+        "parse_errors_report_offsets",
+        "invalid_utf8_reports_the_first_bad_byte"
+      ],
+      "ParseError.Error": [
+        "parse_errors_report_offsets"
+      ],
+      "Value": [
+        "values_come_only_from_the_library"
+      ],
+      "Value.BooleanValue": [
+        "wrong_kind_access_is_reported"
+      ],
+      "Value.Compact": [
+        "root_keeps_surrounding_text",
+        "values_come_only_from_the_library"
+      ],
+      "Value.Get": [
+        "member_lookup_uses_decoded_names"
+      ],
+      "Value.GetUnits": [
+        "member_lookup_uses_decoded_names"
+      ],
+      "Value.Items": [
+        "root_keeps_surrounding_text",
+        "returned_collections_are_immutable"
+      ],
+      "Value.Kind": [
+        "wrong_kind_access_is_reported"
+      ],
+      "Value.MarshalJSON": [
+        "host_serialization_boundary"
+      ],
+      "Value.Members": [
+        "returned_collections_are_immutable",
+        "wrong_kind_access_is_reported"
+      ],
+      "Value.NumberLiteral": [
+        "member_lookup_uses_decoded_names",
+        "wrong_kind_access_is_reported"
+      ],
+      "Value.Raw": [
+        "root_keeps_surrounding_text"
+      ],
+      "Value.String": [
+        "host_serialization_boundary"
+      ],
+      "Value.StringUnits": [
+        "unpaired_surrogate_stays_in_units",
+        "surrogate_pair_decodes"
+      ],
+      "Value.StringValue": [
+        "unpaired_surrogate_stays_in_units",
+        "surrogate_pair_decodes"
+      ],
+      "Array": [
+        "factories_validate_arguments"
+      ],
+      "Boolean": [
+        "ordered_map_rejects_non_string_key"
+      ],
+      "Null": [
+        "ordered_map_rejects_non_string_key"
+      ],
+      "Number": [
+        "factories_validate_arguments",
+        "repeated_key_keeps_first_position_and_last_value"
+      ],
+      "Object": [
+        "factories_validate_arguments",
+        "repeated_key_keeps_first_position_and_last_value"
+      ],
+      "Parse": [
+        "parse_errors_report_offsets",
+        "member_lookup_uses_decoded_names"
+      ],
+      "ParseBytes": [
+        "bytes_input_is_validated",
+        "invalid_utf8_reports_the_first_bad_byte"
+      ],
+      "ParseWithMaxDepth": [
+        "depth_argument_is_bounded",
+        "depth_limit_is_enforced"
+      ],
+      "String": [
+        "factories_validate_arguments",
+        "repeated_key_keeps_first_position_and_last_value"
+      ],
+      "StringFromUnits": [
+        "unpaired_surrogate_stays_in_units"
+      ],
+      "Stringify": [
+        "values_come_only_from_the_library"
+      ],
+      "ParseBytesBorrowed": [
+        "borrowed_input_is_copied_on_access"
+      ]
+    },
+    "php": {
+      "MAX_DEPTH": [
+        "depth_argument_is_bounded"
+      ],
+      "ParseError": [
+        "parse_errors_report_offsets"
+      ],
+      "ParseError.__construct": [
+        "parse_errors_report_offsets"
+      ],
+      "Value": [
+        "values_come_only_from_the_library"
+      ],
+      "Value.__toString": [
+        "host_serialization_boundary"
+      ],
+      "Value.array": [
+        "factories_validate_arguments"
+      ],
+      "Value.boolean": [
+        "factories_validate_arguments"
+      ],
+      "Value.booleanValue": [
+        "wrong_kind_access_is_reported"
+      ],
+      "Value.compact": [
+        "root_keeps_surrounding_text",
+        "factories_validate_arguments"
+      ],
+      "Value.fromUnits": [
+        "factories_validate_arguments"
+      ],
+      "Value.get": [
+        "member_lookup_uses_decoded_names"
+      ],
+      "Value.getUnits": [
+        "member_lookup_uses_decoded_names"
+      ],
+      "Value.items": [
+        "depth_limit_is_enforced",
+        "returned_collections_are_immutable"
+      ],
+      "Value.jsonSerialize": [
+        "host_serialization_boundary"
+      ],
+      "Value.kind": [
+        "wrong_kind_access_is_reported"
+      ],
+      "Value.members": [
+        "repeated_key_keeps_first_position_and_last_value",
+        "returned_collections_are_immutable"
+      ],
+      "Value.null": [
+        "factories_validate_arguments"
+      ],
+      "Value.number": [
+        "factories_validate_arguments"
+      ],
+      "Value.numberLiteral": [
+        "wrong_kind_access_is_reported"
+      ],
+      "Value.object": [
+        "factories_validate_arguments"
+      ],
+      "Value.parse": [
+        "depth_argument_is_bounded",
+        "parse_errors_report_offsets"
+      ],
+      "Value.raw": [
+        "root_keeps_surrounding_text"
+      ],
+      "Value.string": [
+        "factories_validate_arguments"
+      ],
+      "Value.stringUnits": [
+        "unpaired_surrogate_stays_in_units",
+        "surrogate_pair_decodes"
+      ],
+      "Value.stringValue": [
+        "unpaired_surrogate_stays_in_units",
+        "surrogate_pair_decodes"
+      ],
+      "parse": [
+        "utf8_validation_survives_low_pcre_limits"
+      ],
+      "stringify": [
+        "values_come_only_from_the_library"
+      ]
+    },
+    "php-extension": {
+      "ordered_json_scan": [
+        "scan_rejects_depth_outside_the_range",
+        "scan_reports_the_parse_error_offset"
+      ],
+      "ordered_json_hydrate": [
+        "hydrate_object_members",
+        "hydrate_array_items",
+        "hydrate_rejects_malformed_descriptors",
+        "hydrate_without_the_value_class"
+      ],
+      "ordered_json_compact_node": [
+        "compact_node_rejects_mismatched_descriptors",
+        "compact_node_copies_a_compact_token"
+      ],
+      "OrderedJsonNativeParseError": [
+        "scan_reports_the_parse_error_offset"
+      ],
+      "ORDERED_JSON_VERSION": {
+        "exempt": "the registry runtime command compares it with phpversion('ordered_json')"
+      }
+    }
   }
 }

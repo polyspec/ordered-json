@@ -44,6 +44,13 @@
           "--cases"
         ]
       },
+      "api_symbols": {
+        "cwd": "{javascript}",
+        "command": [
+          "node",
+          "test/api_symbols.mjs"
+        ]
+      },
       "runtime": {
         "node": [
           "node",
@@ -84,6 +91,16 @@
           "--quiet",
           "--",
           "--list"
+        ]
+      },
+      "api_symbols": {
+        "cwd": "{rust}",
+        "command": [
+          "{cargo}",
+          "run",
+          "--quiet",
+          "--example",
+          "api"
         ]
       },
       "runtime": {
@@ -128,6 +145,15 @@
           "./..."
         ]
       },
+      "api_symbols": {
+        "cwd": "{go}",
+        "command": [
+          "go",
+          "run",
+          "./internal/apilist",
+          "."
+        ]
+      },
       "runtime": {
         "go": [
           "go",
@@ -157,6 +183,14 @@
           "-n",
           "tests/api.php",
           "--cases"
+        ]
+      },
+      "api_symbols": {
+        "cwd": "{php}",
+        "command": [
+          "php",
+          "-n",
+          "tests/api_symbols.php"
         ]
       },
       "runtime": {
@@ -239,6 +273,17 @@
           "tests/descriptors.php",
           "{php}/src/OrderedJson.php",
           "--cases"
+        ]
+      },
+      "api_symbols": {
+        "cwd": "{php}",
+        "command": [
+          "php",
+          "-n",
+          "-d",
+          "extension={php-extension}/src/modules/ordered_json.so",
+          "tests/api_symbols.php",
+          "--native"
         ]
       },
       "runtime": {
