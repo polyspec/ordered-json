@@ -67,8 +67,9 @@ fn main() {
         let bytes = fs::read(line.unwrap()).expect("cannot read document");
         match parse_bytes(&bytes) {
             Err(error) => println!(
-                "{{\"ok\":false,\"offset\":{},\"unit\":\"byte\"}}",
-                error.offset
+                "{{\"ok\":false,\"offset\":{},\"unit\":\"byte\",\"kind\":{}}}",
+                error.offset,
+                quote(error.kind())
             ),
             Ok(v) => {
                 let serialized = stringify(&v);

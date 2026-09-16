@@ -22,6 +22,10 @@ if ($native) {
     foreach (get_extension_funcs('ordered_json') as $name) $symbols[] = $name;
     $symbols[] = 'ORDERED_JSON_VERSION';
     $symbols[] = 'OrderedJsonNativeParseError';
+    foreach ((new ReflectionClass('OrderedJsonNativeParseError'))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+        if ($property->getDeclaringClass()->getName() !== 'OrderedJsonNativeParseError') continue;
+        $symbols[] = 'OrderedJsonNativeParseError.' . $property->getName();
+    }
 } else {
     foreach (['OrderedJson\\Value', 'OrderedJson\\ParseError'] as $class) {
         $reflection = new ReflectionClass($class);
@@ -30,6 +34,10 @@ if ($native) {
             if ($method->getDeclaringClass()->getName() !== $class || internal($method->getDocComment())) continue;
             if ($method->getName() === '__construct' && !$method->isPublic()) continue;
             $symbols[] = $reflection->getShortName() . '.' . $method->getName();
+        }
+        foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+            if ($property->getDeclaringClass()->getName() !== $class || internal($property->getDocComment())) continue;
+            $symbols[] = $reflection->getShortName() . '.' . $property->getName();
         }
     }
     foreach (get_defined_functions()['user'] as $name) {

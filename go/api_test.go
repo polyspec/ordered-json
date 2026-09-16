@@ -27,6 +27,27 @@ func TestDepthLimitIsEnforced(t *testing.T) {
 	}
 }
 
+func TestRejectionNamesItsKind(t *testing.T) {
+	// The wording is Go's own; the kind is the shared contract.
+	cases := map[string]string{
+		"[1,]":       "expected_value",
+		"{1:2}":      "expected_object_key",
+		"[1.]":       "expected_digit",
+		"\"a\x01b\"": "unescaped_control_character",
+		"[1] x":      "trailing_input",
+	}
+	for document, kind := range cases {
+		var failure *ParseError
+		_, err := Parse(document)
+		if !errors.As(err, &failure) {
+			t.Fatalf("%q was accepted: %v", document, err)
+		}
+		if failure.Kind() != kind {
+			t.Errorf("%q: kind = %q, want %q (%s)", document, failure.Kind(), kind, failure.Message)
+		}
+	}
+}
+
 func TestInvalidUTF8ReportsTheFirstBadByte(t *testing.T) {
 	// The bad byte sits at index 2 of ["<bad>"]; the error names that position.
 	var failure *ParseError

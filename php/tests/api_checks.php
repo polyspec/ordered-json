@@ -119,6 +119,26 @@ function orderedJsonApiCases(): array
         expectSame('[1]', (string)Value::parse('[1]'));
     };
 
+    $cases['rejection_names_its_kind'] = static function () {
+        // The wording is PHP's own; the kind is the shared contract.
+        $kinds = [
+            '[1,]' => 'expected_value',
+            '{1:2}' => 'expected_object_key',
+            '[1.]' => 'expected_digit',
+            "\"a\x01b\"" => 'unescaped_control_character',
+            '[1] x' => 'trailing_input',
+        ];
+        foreach ($kinds as $document => $kind) {
+            try {
+                Value::parse($document);
+            } catch (ParseError $error) {
+                expectSame($kind, $error->kind);
+                continue;
+            }
+            throw new RuntimeException('accepted ' . $document);
+        }
+    };
+
     $cases['invalid_utf8_reports_the_first_bad_byte'] = static function () {
         // The bad byte sits at index 2 of ["<bad>"]; the error names that position.
         try {
