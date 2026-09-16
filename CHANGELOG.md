@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Added a package test standard and the check that enforces it. Each implementation reports the cases it runs, and `make check` fails when a required case is missing or a reported case is not declared, so cross-language coverage is decided by the tool rather than by review.
+- An invalid UTF-8 error reports the first invalid byte in every implementation. JavaScript and Go reported offset 0 while Rust and both PHP backends reported the byte, and no shared case compared the position. Package tests now require the rule in every implementation.
 - The JavaScript package declares its own tests for the value API, which no shared case can reach. Every implementation package now declares package tests.
 - The Rust package declares its own tests for the value API, which no shared case can reach.
 - Fixed the PHP unpaired-surrogate error, which raised a class-not-found error instead of `UnexpectedValueException` because the exception name was unqualified inside the namespace. The PHP package now declares its own tests, which found it.
