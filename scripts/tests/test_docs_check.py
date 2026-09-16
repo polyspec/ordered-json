@@ -194,6 +194,12 @@ class DocumentationChecks(unittest.TestCase):
             self.change('README.md', 'docs/features.md', 'outside')
             self.assert_failure('Link escapes repository')
 
+    def test_source_observation_must_name_the_declared_repository(self):
+        self.distribution['source'] = {'state': 'available', 'url': 'https://github.com/example/other',
+                                       'branch': 'main', 'visibility': 'public'}
+        self.json('docs/distribution.json', self.distribution)
+        self.assert_failure('names the declared repository')
+
     def test_unobserved_publication_fails(self):
         for path in ('docs/features.md', 'docs/features.ko.md'):
             self.change(path, '| source-only |', '| published |')

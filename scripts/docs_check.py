@@ -226,12 +226,13 @@ def check_distribution(record, features):
     if record.get('schema_version') != 1:
         raise ValueError('Invalid distribution schema')
     datetime.fromisoformat(record['checked_at'])
+    declared = REGISTRY['url'].removesuffix('.git')
     source = record['source']
     if source.get('state') not in ('available', 'not-verified'):
         raise ValueError('Invalid source distribution state')
     if source.get('state') == 'available':
-        if source.get('url') != 'https://github.com/polyspec/ordered-json' or source.get('branch') != 'main':
-            raise ValueError('Confirmed source distribution is missing')
+        if source.get('url') != declared or source.get('branch') != 'main':
+            raise ValueError('A confirmed source observation names the declared repository on main')
         if source.get('visibility') != 'public':
             raise ValueError('Source visibility observation is missing')
     if not isinstance(record.get('github_releases'), list) or not isinstance(record.get('version_tags'), list):

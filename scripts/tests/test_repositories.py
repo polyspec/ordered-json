@@ -28,8 +28,8 @@ class RepositoryChecks(unittest.TestCase):
             root = Path(folder)
             candidate = root / 'future-language'
             candidate.mkdir()
-            registry = {'schema_version': 1,
-                'repositories': {'future': {'path': 'future-language', 'url': 'https://github.com/polyspec/ordered-json.git'}},
+            registry = {'schema_version': 1, 'url': 'https://github.com/polyspec/ordered-json.git',
+                'repositories': {'future': {'path': 'future-language'}},
                 'implementations': {'future': {'repository': 'future',
                     'prepare': [{'cwd': '{future}', 'command': [sys.executable, '-c', 'from pathlib import Path; Path("built").write_text("ok")']}],
                     'command': [sys.executable, '-c', 'print("adapter")'],
@@ -78,6 +78,15 @@ class RepositoryChecks(unittest.TestCase):
     def test_duplicate_repository_override_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'one --repository'):
             parse_overrides(['javascript=/one', 'javascript=/two'])
+
+    def test_registry_declares_one_repository_url(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            registry = copy.deepcopy(REGISTRY)
+            del registry['url']
+            (root / 'implementations.json').write_text(json.dumps(registry))
+            with self.assertRaisesRegex(ValueError, 'one repository URL'):
+                load_registry(root)
 
     def test_invalid_repository_path_is_rejected(self):
         with tempfile.TemporaryDirectory() as folder:
