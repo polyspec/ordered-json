@@ -2,19 +2,19 @@
   "schema_version": 1,
   "scope": "pie-build",
   "status": "passed",
-  "checked_at": "2026-09-16T02:33:05+00:00",
+  "checked_at": "2026-09-16T02:35:15+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "a821bcf0644cdd000a900ff9594bafdbcee2118a0fc3071a28e8cc8b6fc3f8ac",
+    "sha256": "7f79369afb7a0f1e7152a35a695327362255ae44be1286cebbf09e660b1b9b9f",
     "files": {
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "633404e91a19e92ec2ee724932abd555e1abdac29b7e5fd67c534dd03da98ba9",
       "AGENTS.md": "fbe791c06fccf49768b31640bbaff710d8fc184a989d813fcbd377a3774a2160",
-      "CHANGELOG.ko.md": "4b571a5d7c30fc5f632eadb66f6b23451a51b47c50863b68bcba77c68223dd2b",
-      "CHANGELOG.md": "40c50bdf5d0a880491ee9500c6493c8b07bd1333847cd48cea8cab9b5086587e",
+      "CHANGELOG.ko.md": "d23bd6bfdb5688241ef6347ad21a0b004284638b1feedbc207a7f1b0f7e2f72b",
+      "CHANGELOG.md": "f78e68d2c281f95630af86103fb57fedfeb46758c93b6f10b7285feb83916edc",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
       "README.md": "8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75",
@@ -47,8 +47,8 @@
       "docs/reports/ojson-comparison.json": "4f6bc37d9fba4be253b8b11c3a813eec52d53d139ee202ca9693d8a17ecb5ba2",
       "docs/reports/ojson-comparison.ko.md": "4a8fdd346be00b60b020b79ea9cbd38fa6f73b7c9b468465361664e884b8cc7a",
       "docs/reports/ojson-comparison.md": "f51637e54cbf5e4fb650608261647ff4c7c508cb6e867c8d72f9a44db0a95373",
-      "docs/spec/api.ko.md": "0d678e71f8ebeb3a06106771a09e756639ac3beb46ecd5ec4ba1dc282a61491e",
-      "docs/spec/api.md": "9e9ec38c1e2283c4820388374ce5f366897f6de454ca3d72983017b7f6e1b584",
+      "docs/spec/api.ko.md": "41ed7ace7712080c50323abf9f0e93b3bc57422b420a393efb7f9d4591da7e84",
+      "docs/spec/api.md": "51c4ba83fd52d744dd36519193b587cbeece715ddd21b793b0c5be281f42f4e3",
       "docs/spec/json-contract.ko.md": "f6cad701fed404d7a8eb091eb86013ea04b0f01b10574a109c219da3dab30d63",
       "docs/spec/json-contract.md": "0f6e76611fff775c3a8c1aee128bfd345deba9d1dca442c2c05a2f2a986bfe27",
       "docs/spec/repositories.ko.md": "1fd915b765d28ab9c100abd43979ee82ec989b5743131bcc638f1b3ec2056568",
@@ -310,7 +310,7 @@
   "build_warnings": [],
   "artifact": {
     "path": "php-extension/src/modules/ordered_json.so",
-    "sha256": "8100501672c31f1a34e1cf7b3288a143052d25775427491b7b95507a1eb37f75"
+    "sha256": "f19262dba946681812e032a0276f6395c65ad44c857009544f47251ef13ae3f3"
   },
   "cases": {
     "official": 17,
