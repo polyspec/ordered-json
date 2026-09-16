@@ -1,24 +1,25 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-16T05:30:14+00:00",
+  "checked_at": "2026-09-16T06:20:34+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "e35d660616c5fff23b461479b601b8bbbfccb05523a40bad7babf528f8b0816c",
+    "sha256": "95fb6064768bd21c2ecc42fe8f328a074d2ecd32420f834dd4145107edd64109",
     "files": {
+      "scripts/tests/test_benchmark.py": "64becc160d1e8bef4ce356764dd3ceb8126a64922e5986395117603530898e07",
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "7df15e8297783132cc130064afe07173d10151335b9a87e22f1617ca51a33c39",
       "AGENTS.md": "e5eb7cef17eaf348a0b9b1da4256e55fb61d75ef0eb8efeab504daaca32a5c20",
-      "CHANGELOG.ko.md": "ba579bfd59ed9d3c780c5dd16f7619632eb9bb6af85c69b444652342573a5b8f",
-      "CHANGELOG.md": "a70fc4bd884eb87143eacc430db9de737c474d374ee556573e7a8b0d26b72d48",
+      "CHANGELOG.ko.md": "fb91129a72827e0dee58c667f5e648a8a7fd2e54d485e98663b6c9d81b47cbb3",
+      "CHANGELOG.md": "e2f70bff1320420c095ff8f30bf7ed31f4fc2ade0d81b3f931559be9159cfe2e",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
       "README.md": "8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75",
-      "benchmarks/README.ko.md": "0411a925fb971eca13294cbf3d0bf69e7c178913f48556b32e807b7414898c0a",
-      "benchmarks/README.md": "2e6c86ba464955e3e2d8f3240b50c48a9ee47eb9c07a80612eae154b8691bb78",
+      "benchmarks/README.ko.md": "333e3d8f15f37ab46d01d7c88a8efd09f19a3e817b87d5b0b457427d2a47913d",
+      "benchmarks/README.md": "1aa291e85bcc0bbac4cac13412fb70514c95726fb35859401cf65a60b2e0ffc0",
       "benchmarks/fixtures/empty-array.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
       "benchmarks/fixtures/empty-object.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
       "benchmarks/fixtures/large-array.json": "e57f10beb9a91d19f2c3b564afb3f627c775431b59cfebac5fe618c5389f862a",
@@ -26,7 +27,7 @@
       "benchmarks/fixtures/nested-order.json": "ee4d0c53ac06ed42d611f115ec3935f672711c506547268fb1381e8d71d335a5",
       "benchmarks/js.mjs": "5e34539f080d40abf7b6de5cc7f5447ada06104ffebaf369e6724cf85f42738e",
       "benchmarks/php.php": "0dd99e55272ec5b9d78a3361425308a3daf801e0a3e1f3e0ae0232af8e6ccc0c",
-      "benchmarks/run.py": "1369cf9c88e4181a3a61b514760704f2c504e8f73f78e9c91c2b40a7b44e575f",
+      "benchmarks/run.py": "8d21c55de9ff513a210501166dd9bde68280b0be73027d2e07a6ca5859cde282",
       "benchmarks/workload.json": "8fd58a6dfee1867c9236ad438fc23b308875f21aefa691cd621605832819ab79",
       "docs/distribution.json": "1ccded31251e48286d97c8df62bb87d70cf6eadba4f88cc99a146447fcb2eb8a",
       "docs/documentation-manifest.json": "4c119554db5cdc4aaf40fb17539c69934c49de532f175904dcc9c961af4e10c9",
@@ -339,7 +340,7 @@
   },
   "documentation_tests": {
     "status": "passed",
-    "count": 57
+    "count": 61
   },
   "supplementary": {
     "project": "nst/JSONTestSuite",

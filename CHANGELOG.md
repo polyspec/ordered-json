@@ -6,6 +6,10 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The benchmark runner now validates each fixture's declared object, array,
+  scalar, node, and maximum-depth counts against the parsed input. Added
+  regression tests for correct metadata, node counting, and depth mismatch
+  rejection.
 - Every benchmark harness warms up for a declared duration as well as a declared iteration count, and the runner no longer prints that it saved the committed result when it kept a failed measurement out of it. A warm-up counted only in iterations ended in microseconds on the small fixtures, so whichever fixtures a process measured first read 1.5 to 1.7 times slower, `serde_json` included; reversing the fixture order moved the slowdown with the position, not with the fixture. The recorded protocol now carries the warm-up duration, so results measured under the earlier protocol are not comparable and the baseline was measured again.
 - The registry declares the repository URL once. The same value sat in `implementations.json` five times, once per package, and as a literal in both the registry loader and the documentation checker, so a source observation was compared against a constant rather than against a declaration. It is now compared against the one the registry makes.
 - Removed the independent-repository verifier: `scripts/bootstrap.py`, `scripts/standalone.py`, the `implementation` documentation role, and the tests that exercised them. The entry point read a `conformance.json` this repository has never contained, and required each implementation to be its own Git checkout, which no directory of a monorepo can be, so no path could reach it. The validation procedure had also documented a `make check HARNESS=...` option the Makefile does not define.
