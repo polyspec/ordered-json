@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
 import sys
 from urllib.parse import unquote, urlsplit
 
@@ -124,8 +125,10 @@ def feature_rows(text):
         evidence_links, specification_links = link_targets(evidence), link_targets(specification)
         if len(specification_links) != 1:
             raise ValueError('A feature requires one specification link: ' + identifier)
-        if verification != 'not-verified' and evidence_links != ['verification.json']:
-            raise ValueError('A verified feature requires verification.json evidence: ' + identifier)
+        records = {'shared-suite': 'verification.json', 'docs-tests': 'verification.json',
+                   'benchmark': '../benchmarks/results.json'}
+        if verification != 'not-verified' and evidence_links != [records[verification]]:
+            raise ValueError('A verified feature names the record that backs it: ' + identifier)
         rows[identifier] = (implementation, verification, distribution,
                             tuple(evidence_links), tuple(link.replace('.ko.md', '.md') for link in specification_links))
     if not rows:
@@ -162,6 +165,28 @@ def check_supplementary(record, counts, pin):
                 for field in ('project', 'revision', 'cases', 'inputs_sha256')}
     if supplementary != expected or counts['supplementary'] != expected['cases']:
         raise ValueError('Supplementary inputs differ from the pin in external-inputs.json')
+
+
+def check_benchmark(root, record):
+    """Timings are machine-specific, so the record is checked on what it names."""
+    if record.get('schema_version') != 2:
+        raise ValueError('Unsupported benchmark record schema')
+    source = record.get('source', {})
+    if source.get('dirty') is not False:
+        raise ValueError('A benchmark result is evidence only when measured from a clean checkout')
+    commit = source.get('commit', '')
+    contained = re.fullmatch(r'[a-f0-9]{40}', commit) and (root / '.git').exists() and not subprocess.run(
+        ['git', 'merge-base', '--is-ancestor', commit, 'HEAD'], cwd=root,
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode
+    if not contained:
+        raise ValueError('A benchmark result names a commit this repository contains')
+    workload = json.loads((root / 'benchmarks/workload.json').read_text(encoding='utf-8'))
+    if record.get('protocol') != workload['benchmark']:
+        raise ValueError('A benchmark result uses the protocol the workload declares')
+    if record.get('fixtures') != workload['fixtures']:
+        raise ValueError('A benchmark result measures the inputs the workload declares')
+    if record.get('comparison', {}).get('status') == 'failed':
+        raise ValueError('A failed benchmark comparison is not evidence')
 
 
 def check_verification(root, record):
@@ -360,6 +385,8 @@ def check_repository(root, include_children=True):
                 raise ValueError('English and Korean feature states or references differ')
             if any(row[1] != 'not-verified' for row in features.values()):
                 check_verification(root, read_json('docs/verification.json'))
+            if any(row[1] == 'benchmark' for row in features.values()):
+                check_benchmark(root, read_json('benchmarks/results.json'))
         except (ValueError, KeyError, TypeError, OSError) as issue:
             error('docs/features.md', str(issue))
         try:
