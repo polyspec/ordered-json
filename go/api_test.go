@@ -55,6 +55,32 @@ func TestParseErrorsReportOffsets(t *testing.T) {
 	}
 }
 
+func TestBorrowedInputIsCopiedOnAccess(t *testing.T) {
+	// Borrowed parsing reads the caller's bytes, so text handed back is copied.
+	source := []byte(`{"a":"text"}`)
+	value, err := ParseBytesBorrowed(source)
+	if err != nil {
+		t.Fatal(err)
+	}
+	compact, err := value.Compact()
+	if err != nil {
+		t.Fatal(err)
+	}
+	text, err := value.Get("a").StringValue()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := range source {
+		source[i] = 'x'
+	}
+	if compact != `{"a":"text"}` {
+		t.Fatalf("Compact() changed with the caller's bytes: %s", compact)
+	}
+	if text != "text" {
+		t.Fatalf("StringValue() changed with the caller's bytes: %q", text)
+	}
+}
+
 func TestBytesInputIsValidated(t *testing.T) {
 	var invalid *ParseError
 	_, err := ParseBytes([]byte{'[', '"', 0xff, '"', ']'})

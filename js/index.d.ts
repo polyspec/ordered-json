@@ -1,6 +1,5 @@
 export type Kind = 'object' | 'array' | 'string' | 'number' | 'boolean' | 'null';
 export interface ParseOptions { maxDepth?: number }
-export interface StringifyOptions { compact?: boolean }
 export declare const MAX_DEPTH: 256;
 export declare class ParseError extends SyntaxError { readonly offset: number }
 export declare class Value {
@@ -26,4 +25,4 @@ export declare class Value {
 }
 export declare function parse(source: string, options?: ParseOptions): Value;
 export declare function parseBytes(bytes: Uint8Array, options?: ParseOptions): Value;
-export declare function stringify(value: Value, options?: StringifyOptions): string;
+export declare function stringify(value: Value): string;
