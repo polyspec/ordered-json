@@ -4,6 +4,7 @@ from contextlib import redirect_stdout
 import io
 import json
 from pathlib import Path
+import re
 import sys
 import tempfile
 import unittest
@@ -44,6 +45,12 @@ class DocumentationChecks(unittest.TestCase):
             'registries': {name: {'state': 'not-verified'} for name in
                           ('npm', 'crates.io', 'packagist', 'go', 'php-extension')}}
         self.json('docs/distribution.json', self.distribution)
+        self.supplementary = {'project': 'nst/JSONTestSuite', 'revision': 'a' * 40,
+                              'cases': 1, 'inputs_sha256': sha256(b'supplementary inputs')}
+        self.json('external-inputs.json', {'schema_version': 1,
+                  'pie': {'release': 'synthetic', 'url': 'https://example.invalid/pie',
+                          'phar_sha256': sha256(b'pie tool')},
+                  'supplementary': {**self.supplementary, 'url': 'https://example.invalid/suite'}})
         self.results = {name: {'status': 'passed', 'cases': 2} for name in IMPLEMENTATIONS}
         self.versions = {name: {'version': 'synthetic fixture'} for name in IMPLEMENTATIONS}
         self.versions['php-extension'] = {'php': 'synthetic fixture', 'extension': 'ordered_json',
@@ -225,6 +232,82 @@ class DocumentationChecks(unittest.TestCase):
         write_record(target, self.record)
         self.assertEqual(json.loads(target.read_text()), self.record)
         self.assertEqual(list(target.parent.glob('.verification-*')), [])
+
+    def supplementary_records(self):
+        """An aggregate and a PIE record that use every kind of recorded hash."""
+        supplementary = self.supplementary
+        results = {name: {'status': 'passed', 'cases': 3} for name in IMPLEMENTATIONS}
+        aggregate = create_record(self.root, source_manifest(self.root), results,
+                                  {'official': 1, 'fixtures': 1, 'supplementary': 1}, 1, self.versions,
+                                  supplementary, package_tests=self.package_tests)
+        pie = {'schema_version': 1, 'scope': 'pie-build', 'status': 'passed',
+               'checked_at': aggregate['checked_at'], 'platform': aggregate['platform'],
+               'sources': aggregate['sources'], 'packages': aggregate['packages'],
+               'pie': {'version': 'synthetic fixture', 'phar_sha256': sha256(b'pie tool')},
+               'package': 'ordered-json/ordered-json-extension:*@dev',
+               'commands': [{'arguments': ['build'], 'exit_code': 0}], 'build_warnings': [],
+               'artifact': {'path': 'php-extension/src/modules/ordered_json.so'},
+               'cases': aggregate['cases'],
+               'implementations': {'php-extension': {'status': 'passed', 'cases': 3,
+                                                     'runtime': self.versions['php-extension']}},
+               'supplementary': supplementary}
+        return aggregate, pie
+
+    def recorded_hashes(self, record, path=()):
+        """Every recorded content hash or revision, by its path inside the record."""
+        if isinstance(record, dict):
+            for key, value in record.items():
+                yield from self.recorded_hashes(value, path + (key,))
+        elif isinstance(record, list):
+            for index, value in enumerate(record):
+                yield from self.recorded_hashes(value, path + (index,))
+        elif isinstance(record, str) and re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', record):
+            yield path
+
+    def assert_recorded_hashes_are_falsifiable(self, name, record, other):
+        located = list(self.recorded_hashes(record))
+        self.assertTrue(located, name)
+        self.json(name, record)
+        self.json(other[0], other[1])
+        # Without this the mutations below could pass on an unrelated error.
+        self.assertEqual(check_repository(self.root)[0], [], 'The unchanged records must pass')
+        for path in located:
+            with self.subTest(field='.'.join(str(step) for step in path)):
+                mutated = copy.deepcopy(record)
+                target = mutated
+                for step in path[:-1]:
+                    target = target[step]
+                value = target[path[-1]]
+                target[path[-1]] = ('1' if value[0] == '0' else '0') + value[1:]
+                self.json(name, mutated)
+                self.json(other[0], other[1])
+                errors, _, _ = check_repository(self.root)
+                self.assertTrue(errors, 'A changed hash must fail the check: ' + '.'.join(
+                    str(step) for step in path))
+
+    def test_every_recorded_aggregate_hash_is_falsifiable(self):
+        aggregate, pie = self.supplementary_records()
+        self.assert_recorded_hashes_are_falsifiable(
+            'docs/verification.json', aggregate, ('docs/pie-verification.json', pie))
+
+    def test_every_recorded_pie_hash_is_falsifiable(self):
+        aggregate, pie = self.supplementary_records()
+        self.assert_recorded_hashes_are_falsifiable(
+            'docs/pie-verification.json', pie, ('docs/verification.json', aggregate))
+
+    def test_unreproducible_artifact_hash_cannot_be_recorded(self):
+        aggregate, pie = self.supplementary_records()
+        pie['artifact']['sha256'] = sha256(b'built artifact')
+        self.json('docs/verification.json', aggregate)
+        self.json('docs/pie-verification.json', pie)
+        self.assert_failure('carries its path alone')
+
+    def test_recorded_artifact_must_be_the_declared_one(self):
+        aggregate, pie = self.supplementary_records()
+        pie['artifact'] = {'path': 'php-extension/src/modules/other.so'}
+        self.json('docs/verification.json', aggregate)
+        self.json('docs/pie-verification.json', pie)
+        self.assert_failure('artifact the registry declares')
 
     def test_native_build_rejects_copy_error_with_zero_exit_status(self):
         from subprocess import CompletedProcess

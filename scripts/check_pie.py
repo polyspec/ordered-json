@@ -8,7 +8,7 @@ import platform
 import re
 import subprocess
 
-from registry import ROOT, adapter_commands, repository_paths, runtime_versions
+from registry import ROOT, adapter_commands, artifact_paths, repository_paths, runtime_versions
 from verification_record import (package_revisions, sha256, source_manifest,
                                  supplementary_manifest, write_record)
 from verify import verify_adapters
@@ -52,7 +52,12 @@ def main():
     package = 'ordered-json/ordered-json-extension:*@dev'
     run('info', package)
     run('build', package, '-j', '2', '-vv')
-    module = paths['php-extension'] / 'src/modules/ordered_json.so'
+    modules = artifact_paths('php-extension', paths)
+    if len(modules) != 1:
+        raise ValueError('The extension declares exactly one build artifact')
+    module = modules[0]
+    # A linked module carries a fresh UUID and signature, so its hash identifies
+    # this run only. It guards the artifact during the run and is not recorded.
     artifact_hash = sha256(module.read_bytes())
     selected = ['php-extension']
     results, counts = verify_adapters(adapter_commands(selected, paths, cache), suite)
@@ -69,7 +74,7 @@ def main():
               'sources': sources, 'packages': packages,
               'pie': {'version': version, 'phar_sha256': pie_hash},
               'package': package, 'commands': commands, 'build_warnings': warnings,
-              'artifact': {'path': module.relative_to(ROOT).as_posix(), 'sha256': artifact_hash},
+              'artifact': {'path': module.relative_to(ROOT).as_posix()},
               'cases': {**counts, 'total': sum(counts.values())},
               'implementations': {name: {**results[name], 'runtime': versions[name]} for name in selected},
               'supplementary': supplementary}
