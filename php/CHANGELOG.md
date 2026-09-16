@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- An unpaired surrogate raises `UnexpectedValueException` again. Inside the namespace the unqualified name resolved to a missing `OrderedJson\UnexpectedValueException`, so `stringValue()` and UTF-8 conversion raised a class-not-found error instead.
+- Added package tests for accessor errors, UTF-16 units, member lookup, factory arguments, parse error offsets, and UTF-8 validation under low PCRE limits, and declared them in the implementation registry. Shared cases reach this package through its adapter and do not cover that surface.
 - Object hydration no longer creates a second value for each key token; serialization pairs members with key tokens read from the descriptor.
 - Moved PHP container serialization out of `compact()` into a private method, so serializing with the extension uses a smaller call frame. Extension stringify took 0.92-0.95 of the time before the current accessor changes.
 - Child values are created by `ordered_json_hydrate()` when the extension is loaded.
