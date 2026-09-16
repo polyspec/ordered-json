@@ -111,14 +111,15 @@ def adapter_commands(selected, paths, cache, registry=REGISTRY):
 
 
 def test_commands(selected, paths, cache, registry=REGISTRY):
-    """Resolve the package test command of each implementation that declares one."""
+    """Resolve each declared package test command, keeping the declared form for records."""
     variables = context(paths, cache)
     result = {}
     for name in selected:
         tests = registry['implementations'][name].get('tests')
         if tests is not None:
-            result[name] = (expand(tests['cwd'], variables),
-                            [expand(argument, variables) for argument in tests['command']])
+            result[name] = {'cwd': expand(tests['cwd'], variables),
+                            'command': [expand(argument, variables) for argument in tests['command']],
+                            'declared': list(tests['command'])}
     return result
 
 
