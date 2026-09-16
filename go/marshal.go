@@ -3,6 +3,7 @@ package orderedjson
 import (
 	"encoding/base64"
 	"fmt"
+	"math"
 	"reflect"
 	"sort"
 	"strconv"
@@ -79,16 +80,6 @@ func marshalReflect(out *strings.Builder, value reflect.Value, path string, omit
 		}
 		return marshalReflect(out, value.Elem(), path, false, depth+1)
 	}
-	if value.Type() == timeType {
-		if !value.CanInterface() {
-			return fmt.Errorf("%s: unexported time value", path)
-		}
-		if value.Interface().(time.Time).IsZero() {
-			out.WriteString("null")
-			return nil
-		}
-		return writeString(out, value.Interface().(time.Time).Format(time.RFC3339Nano))
-	}
 	switch value.Kind() {
 	case reflect.Bool:
 		if value.Bool() {
@@ -103,6 +94,9 @@ func marshalReflect(out *strings.Builder, value reflect.Value, path string, omit
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		out.WriteString(strconv.FormatUint(value.Uint(), 10))
 	case reflect.Float32, reflect.Float64:
+		if math.IsNaN(value.Float()) || math.IsInf(value.Float(), 0) {
+			return fmt.Errorf("%s: %s has no JSON form", path, strconv.FormatFloat(value.Float(), 'g', -1, 64))
+		}
 		if value.Kind() == reflect.Float32 {
 			out.WriteString(strconv.FormatFloat(value.Float(), 'g', -1, 32))
 		} else {
@@ -194,7 +188,7 @@ func structMembers(value reflect.Value) ([]structMember, error) {
 		currentType := current.Type()
 		for i := 0; i < currentType.NumField(); i++ {
 			field := currentType.Field(i)
-			name, skip, omitEmpty := marshalFieldName(field)
+			name, skip, omitEmpty, omitZero := marshalFieldName(field)
 			if skip {
 				continue
 			}
@@ -211,13 +205,13 @@ func structMembers(value reflect.Value) ([]structMember, error) {
 					continue
 				}
 			}
-			if field.PkgPath != "" && !field.Anonymous {
-				continue
-			}
 			if field.PkgPath != "" {
 				continue
 			}
 			if omitEmpty && isEmptyValue(current.Field(i)) {
+				continue
+			}
+			if omitZero && current.Field(i).IsZero() {
 				continue
 			}
 			if _, repeated := seen[name]; repeated {
@@ -234,34 +228,37 @@ func structMembers(value reflect.Value) ([]structMember, error) {
 	return members, nil
 }
 
-func marshalFieldName(field reflect.StructField) (string, bool, bool) {
+// marshalFieldName reports the encoded name of a field, whether it is skipped,
+// and the two omission rules: omitempty drops empty scalars and containers,
+// omitzero drops a field that holds its type's zero value.
+func marshalFieldName(field reflect.StructField) (string, bool, bool, bool) {
 	tag, exists := field.Tag.Lookup("json")
 	if !exists {
-		return field.Name, false, false
+		return field.Name, false, false, false
 	}
 	parts := strings.Split(tag, ",")
-	if parts[0] == "-" {
-		return "", true, false
+	if parts[0] == "-" && len(parts) == 1 {
+		return "", true, false, false
 	}
 	name := field.Name
 	if parts[0] != "" {
 		name = parts[0]
 	}
-	omitEmpty := false
+	omitEmpty, omitZero := false, false
 	for _, option := range parts[1:] {
-		if option == "omitempty" || option == "omitzero" {
+		switch option {
+		case "omitempty":
 			omitEmpty = true
+		case "omitzero":
+			omitZero = true
 		}
 	}
-	return name, false, omitEmpty
+	return name, false, omitEmpty, omitZero
 }
 
 func isEmptyValue(value reflect.Value) bool {
 	if !value.IsValid() {
 		return true
-	}
-	if value.Type() == timeType {
-		return value.CanInterface() && value.Interface().(time.Time).IsZero()
 	}
 	switch value.Kind() {
 	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
