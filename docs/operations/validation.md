@@ -52,7 +52,7 @@ make check
 
 Each package has an independent build target, while the root registry and verifier define the shared test commands. The native extension is built from `php-extension/` and is tested with the sibling PHP package in the same checkout.
 
-Run `make check JSON_TEST_SUITE=/path/to/JSONTestSuite` for supplementary inputs. `make check HARNESS=/path/to/ordered-json` explicitly selects a local verifier; reports identify that override. A standalone result records candidate and dependency source hashes, revisions, local modifications, runtime versions, and results. A parent result does not verify a newer candidate commit.
+Run `make check JSON_TEST_SUITE=/path/to/JSONTestSuite` for supplementary inputs.
 
 <a id="pie"></a>
 ## PIE artifact check
