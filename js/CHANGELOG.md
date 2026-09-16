@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- `ParseError` carries a `kind` from the shared rejection list beside its own message.
 - Removed the `StringifyOptions` declaration and the second `stringify` parameter from the type declaration; the function takes one argument. The package reports its public symbols for the shared coverage check.
 - An unescaped control character is reported at its own offset instead of one past it, and the adapter reports the rejection position for the shared comparison.
 - `parseBytes` reports the byte offset of the first invalid byte instead of 0, and the message names the unit because this error has no UTF-16 position.

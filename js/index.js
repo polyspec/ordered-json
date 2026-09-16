@@ -47,6 +47,25 @@ function stringEnd(source, start) {
   }
 }
 
+const KINDS = {
+  'Expected JSON value': 'expected_value',
+  'Expected integer': 'expected_digit',
+  'Expected fraction digit': 'expected_digit',
+  'Expected exponent digit': 'expected_digit',
+  'Expected colon': 'expected_colon',
+  'Expected comma or closing delimiter': 'expected_delimiter',
+  'Expected object key': 'expected_object_key',
+  'Invalid escape': 'invalid_escape',
+  'Unfinished escape': 'unfinished_escape',
+  'Invalid Unicode escape': 'invalid_unicode_escape',
+  'Unterminated string': 'unterminated_string',
+  'Unescaped control character': 'unescaped_control_character',
+  'Unescaped unpaired surrogate': 'unescaped_lone_surrogate',
+  'Invalid UTF-8': 'invalid_utf8',
+  'Maximum nesting depth exceeded': 'maximum_depth_exceeded',
+  'Unexpected trailing input': 'trailing_input',
+};
+
 export class ParseError extends SyntaxError {
   constructor(message, offset, unit = 'UTF-16 offset') {
     super(`${message} at ${unit} ${offset}`);
@@ -54,6 +73,8 @@ export class ParseError extends SyntaxError {
     this.offset = offset;
     // 'utf16' for parse positions, 'byte' when the input never decoded.
     this.unit = unit === 'byte' ? 'byte' : 'utf16';
+    // The reason the document was rejected, shared by every implementation.
+    this.kind = KINDS[message];
   }
 }
 
@@ -200,6 +221,7 @@ function scanString() {
 function scanEscapedString(text) {
   const length = src.length;
   for (;;) {
+    if (pos >= length) failAt('Unfinished escape', pos);
     const escape = src.charCodeAt(pos++);
     if (escape === 117) {
       let unit = 0;

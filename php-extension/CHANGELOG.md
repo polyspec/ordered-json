@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- `OrderedJsonNativeParseError` carries a `kind` from the shared rejection list.
 - The package reports its functions, constant and error class for the shared coverage check.
 - An unescaped control character is reported at its own offset instead of one past it.
 - Added package tests for the descriptor API and declared them in the implementation registry. They cover hydrated members and items, repeated and escaped member names, malformed descriptors rejected with `ValueError`, compact token copying, the supported depth range, and the reported parse error offset. Shared cases reach the extension only through the PHP Value API, so these are the only checks of that surface.

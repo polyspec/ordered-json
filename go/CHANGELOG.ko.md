@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 166b2dbca458079d69f9ae0d6a28f5b125b16e8c5f4763339d440bf59285cabb -->
+<!-- source-sha256: 6ceba8bfb8e3511ef8957a275ad455190fa62a49c44a59fcd2cfc6ed862621c4 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- `ParseError.Kind`가 공통 식별자로 거부 이유를 알립니다.
 - `ParseBytesBorrowed`의 패키지 테스트를 추가했습니다. 반환된 문자열은 호출자의 바이트가 바뀌어도 유지됩니다. 패키지는 공통 커버리지 검사를 위해 공개 심볼을 보고합니다.
 - 이스케이프하지 않은 제어 문자를 한 칸 뒤가 아니라 그 문자의 위치로 보고하며, 어댑터는 공통 비교를 위해 거부 위치를 보고합니다.
 - 파싱이 0 대신 첫 잘못된 UTF-8 시퀀스의 바이트 위치를 보고합니다.

@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 7b0ff460f8094685dacf4478765b37b97b697337623e756f622b12059875b5b1 -->
+<!-- source-sha256: f5d5f8bb894226d784ccc496947ee07deee97fec3b10fb6fc6436efb8fa9f5a0 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- `ParseError`가 자체 메시지와 함께 공통 거부 목록의 `kind`를 전합니다.
 - 패키지는 공통 커버리지 검사를 위해 공개 심볼을 보고하며, UTF-8 위치 헬퍼는 다른 헬퍼와 같이 내부용으로 표시했습니다.
 - 이스케이프하지 않은 제어 문자는 그 문자의 위치로, 잘못된 Unicode 이스케이프는 16진수가 아닌 첫 바이트의 위치로 보고하며, 어댑터는 공통 비교를 위해 거부 위치를 보고합니다.
 - 짝 없는 서로게이트가 다시 `UnexpectedValueException`을 발생시킵니다. 네임스페이스 안에서 수식하지 않은 이름이 존재하지 않는 `OrderedJson\UnexpectedValueException`으로 해석되어, `stringValue()`와 UTF-8 변환이 클래스를 찾을 수 없다는 오류를 냈습니다.
