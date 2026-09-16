@@ -329,7 +329,7 @@ def check_repository(root, include_children=True):
         if manifest.get('schema_version') != 1 or not isinstance(manifest.get('documents'), list):
             raise ValueError('Expected documentation manifest schema version 1')
         role = manifest.get('role', 'common')
-        if role not in ('common', 'implementation', 'package'):
+        if role not in ('common', 'package'):
             raise ValueError('Unknown documentation repository role')
         for entry in manifest['documents']:
             identifier, en, ko, kind = (entry[key] for key in ('id', 'en', 'ko', 'kind'))
@@ -404,12 +404,6 @@ def check_repository(root, include_children=True):
                 if manifest.is_file():
                     child_errors, count, _ = check_repository(path, include_children=False)
                     errors.extend(name + '/' + issue for issue in child_errors)
-    elif role == 'implementation':
-        try:
-            from standalone import validate_configuration
-            validate_configuration(read_json('conformance.json'))
-        except (ValueError, KeyError, TypeError, OSError) as issue:
-            error('conformance.json', str(issue))
 
     for path in (root / 'docs').rglob('*.json'):
         try:

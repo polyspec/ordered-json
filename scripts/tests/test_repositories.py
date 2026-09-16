@@ -1,4 +1,4 @@
-"""Check repository selection, conformance pins, and aggregate commit validation."""
+"""Check repository selection, registry commands, and package record content."""
 import copy
 import json
 from pathlib import Path
@@ -11,15 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from registry import (REGISTRY, adapter_commands, load_registry, parse_overrides, prepare,
                       repository_paths, runtime_versions, test_commands)
 from verify import run_package_tests
-from standalone import COMMON_URL, validate_configuration
 from verification_record import package_revisions
-
-
-def configuration(name):
-    selected = [identifier for identifier, entry in REGISTRY['implementations'].items()
-                if entry['repository'] == name]
-    return {'schema_version': 1, 'repository': name, 'implementations': selected,
-            'harness': {'url': COMMON_URL, 'revision': '1' * 40}, 'dependencies': {}}
 
 
 class RepositoryChecks(unittest.TestCase):
@@ -82,29 +74,6 @@ class RepositoryChecks(unittest.TestCase):
             # A record identifies the declared command, never a resolved local path.
             self.assertEqual(run_package_tests(passing)['sample'],
                              {'status': 'passed', 'command': ['{sample}/run']})
-
-    def test_moving_branch_is_not_a_conformance_pin(self):
-        config = configuration('javascript')
-        config['harness']['revision'] = 'main'
-        with self.assertRaisesRegex(ValueError, 'full commit ID'):
-            validate_configuration(config)
-
-    def test_extension_requires_pinned_php_test_dependency(self):
-        config = configuration('php-extension')
-        with self.assertRaisesRegex(ValueError, 'dependency pins'):
-            validate_configuration(config)
-        config['dependencies']['php'] = {'url': REGISTRY['repositories']['php']['url'], 'revision': '2' * 40}
-        self.assertEqual(validate_configuration(config), config)
-
-    def test_pure_php_does_not_require_native_repository(self):
-        config = configuration('php')
-        self.assertEqual(validate_configuration(config), config)
-
-    def test_repository_cannot_skip_its_implementation(self):
-        config = configuration('javascript')
-        config['implementations'] = ['php']
-        with self.assertRaisesRegex(ValueError, 'all implementations owned'):
-            validate_configuration(config)
 
     def test_duplicate_repository_override_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'one --repository'):
