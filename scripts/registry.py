@@ -15,14 +15,14 @@ def load_registry(root=ROOT):
     repositories, implementations = registry['repositories'], registry['implementations']
     if not repositories or not implementations:
         raise ValueError('The registry requires repositories and implementations')
+    if not re.fullmatch(r'https://\S+\.git', registry.get('url', '')):
+        raise ValueError('The registry declares one repository URL for every package')
     for name, repository in repositories.items():
         if not re.fullmatch(r'[a-z][a-z0-9-]*', name):
             raise ValueError('Invalid repository name: ' + name)
         path = Path(repository['path'])
         if path.is_absolute() or '..' in path.parts or str(path) == '.':
             raise ValueError('Repository paths must be relative child directories')
-        if repository['url'] != 'https://github.com/polyspec/ordered-json.git':
-            raise ValueError('Package URLs must use the polyspec/ordered-json monorepo')
     for name, implementation in implementations.items():
         if not re.fullmatch(r'[a-z][a-z0-9-]*', name):
             raise ValueError('Invalid implementation name: ' + name)
