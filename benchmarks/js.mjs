@@ -5,13 +5,18 @@ import { parse, stringify } from '../js/index.js';
 
 const iterations = Number(process.env.OJ_BENCH_ITERATIONS ?? 1000);
 const warmup = Number(process.env.OJ_BENCH_WARMUP ?? 1000);
+const warmupMs = Number(process.env.OJ_BENCH_WARMUP_MS ?? 50);
 const samples = Number(process.env.OJ_BENCH_SAMPLES ?? 9);
 const files = process.argv.slice(2);
 let sink;
 const digest = value => createHash('sha256').update(value).digest('hex');
 const percentile = (values, p) => values[Math.min(values.length - 1, Math.ceil(values.length * p) - 1)];
 const measure = fn => {
-  for (let i = 0; i < warmup; i++) fn();
+  // A process runs below its steady speed until it has been busy for a while,
+  // and a warm-up counted in iterations ends in microseconds on a small input,
+  // so the count is a floor and the duration decides.
+  const warming = performance.now();
+  do { for (let i = 0; i < warmup; i++) fn(); } while (performance.now() - warming < warmupMs);
   const values = [];
   let result;
   for (let sample = 0; sample < samples; sample++) {

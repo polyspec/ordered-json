@@ -36,9 +36,18 @@ type stats struct {
 	Samples []float64 `json:"samples"`
 }
 
-func measure(fn func() []byte, iterations, warmup, samples int) (stats, []byte) {
-	for i := 0; i < warmup; i++ {
-		fn()
+func measure(fn func() []byte, iterations, warmup, warmupMs, samples int) (stats, []byte) {
+	// A process runs below its steady speed until it has been busy for a while,
+	// and a warm-up counted in iterations ends in microseconds on a small
+	// input, so the count is a floor and the duration decides.
+	warming := time.Now()
+	for {
+		for i := 0; i < warmup; i++ {
+			fn()
+		}
+		if time.Since(warming) >= time.Duration(warmupMs)*time.Millisecond {
+			break
+		}
 	}
 	values := make([]float64, 0, samples)
 	var out []byte
@@ -61,6 +70,7 @@ func minInt(a, b int) int {
 func main() {
 	n := iterations()
 	warmup, samples := setting("OJ_BENCH_WARMUP", 1000), setting("OJ_BENCH_SAMPLES", 9)
+	warmupMs := setting("OJ_BENCH_WARMUP_MS", 50)
 	var sink any
 	for _, file := range os.Args[1:] {
 		source, err := os.ReadFile(file)
@@ -74,7 +84,7 @@ func main() {
 			}
 			return v
 		}
-		parseStats, _ := measure(func() []byte { sink = parseOrdered(); runtime.KeepAlive(sink); return nil }, n, warmup, samples)
+		parseStats, _ := measure(func() []byte { sink = parseOrdered(); runtime.KeepAlive(sink); return nil }, n, warmup, warmupMs, samples)
 		value := parseOrdered()
 		stringifyStats, output := measure(func() []byte {
 			out, err := value.Compact()
@@ -82,14 +92,14 @@ func main() {
 				panic(err)
 			}
 			return []byte(out)
-		}, n, warmup, samples)
+		}, n, warmup, warmupMs, samples)
 		roundtripStats, _ := measure(func() []byte {
 			out, err := parseOrdered().Compact()
 			if err != nil {
 				panic(err)
 			}
 			return []byte(out)
-		}, n, warmup, samples)
+		}, n, warmup, warmupMs, samples)
 		var nativeValue any
 		nativeParseStats, _ := measure(func() []byte {
 			if err := json.Unmarshal(source, &nativeValue); err != nil {
@@ -97,7 +107,7 @@ func main() {
 			}
 			runtime.KeepAlive(nativeValue)
 			return nil
-		}, n, warmup, samples)
+		}, n, warmup, warmupMs, samples)
 		nativeValue, err = func() (any, error) { var value any; err := json.Unmarshal(source, &value); return value, err }()
 		if err != nil {
 			panic(err)
@@ -108,7 +118,7 @@ func main() {
 				panic(err)
 			}
 			return out
-		}, n, warmup, samples)
+		}, n, warmup, warmupMs, samples)
 		nativeRoundtripStats, _ := measure(func() []byte {
 			var value any
 			if err := json.Unmarshal(source, &value); err != nil {
@@ -119,7 +129,7 @@ func main() {
 				panic(err)
 			}
 			return out
-		}, n, warmup, samples)
+		}, n, warmup, warmupMs, samples)
 		statsJSON := func(p, s, r stats) string {
 			b, _ := json.Marshal(map[string]any{"parse": p.Samples, "stringify": s.Samples, "roundtrip": r.Samples})
 			return string(b)

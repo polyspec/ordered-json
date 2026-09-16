@@ -2,6 +2,7 @@
   "schema_version": 2,
   "benchmark": {
     "warmup": 1000,
+    "warmup_ms": 50,
     "iterations": 1000,
     "samples": 9,
     "median_tolerance": 0.10,
