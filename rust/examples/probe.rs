@@ -66,7 +66,10 @@ fn main() {
     for line in io::stdin().lock().lines() {
         let bytes = fs::read(line.unwrap()).expect("cannot read document");
         match parse_bytes(&bytes) {
-            Err(_) => println!("{{\"ok\":false}}"),
+            Err(error) => println!(
+                "{{\"ok\":false,\"offset\":{},\"unit\":\"byte\"}}",
+                error.offset
+            ),
             Ok(v) => {
                 let serialized = stringify(&v);
                 let roundtrip = parse_bytes(serialized.as_bytes()).unwrap();

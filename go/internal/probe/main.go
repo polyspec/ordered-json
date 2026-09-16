@@ -4,6 +4,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/polyspec/ordered-json/go"
 	"os"
@@ -117,7 +118,11 @@ func main() {
 		}
 		value, err := orderedjson.ParseBytes(source)
 		if err != nil {
-			fmt.Println(`{"ok":false}`)
+			var failure *orderedjson.ParseError
+			if !errors.As(err, &failure) {
+				panic(err)
+			}
+			fmt.Printf("{\"ok\":false,\"offset\":%d,\"unit\":\"byte\"}\n", failure.Offset)
 			continue
 		}
 		compact, err := value.Compact()
