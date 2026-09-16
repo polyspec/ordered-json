@@ -2,20 +2,20 @@
   "schema_version": 1,
   "scope": "pie-build",
   "status": "passed",
-  "checked_at": "2026-09-16T02:59:05+00:00",
+  "checked_at": "2026-09-16T03:01:54+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "64716a89ff544fc51fc6fbc8115a76964cf8300b9b0b078064ebed46a96b3403",
+    "sha256": "b52c8673273ba7a23bf13067d25b50595d14891118aace11e9ae730f4765fbd1",
     "files": {
-      "rust/tests/api.rs": "12b5f999a05c2a4be3d87f0702bc0d43a8d6b23377b2cb5a01651195858346a5",
+      "js/test/api.mjs": "b59b920f73f242f7fbf7ef252042e696f08c7774b699309b5b97a2b7895b913d",
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "633404e91a19e92ec2ee724932abd555e1abdac29b7e5fd67c534dd03da98ba9",
       "AGENTS.md": "fbe791c06fccf49768b31640bbaff710d8fc184a989d813fcbd377a3774a2160",
-      "CHANGELOG.ko.md": "19f094ce5db5e17fdb85a096b784fa98a001013ce5d677affcdaaad36c5ba12b",
-      "CHANGELOG.md": "041546b7e7a715c9fd9b5055f3a052dd63a0ef280319d6106ce0f6ebba27781f",
+      "CHANGELOG.ko.md": "a38276a14dcdb10ee15b6f19796086206cb458a65b7727dcce32b8e82d7cf6db",
+      "CHANGELOG.md": "ca399d12a778f6e436566e5036b073dd46204100cf25cdd5909d95eedf89192e",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
       "README.md": "8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75",
@@ -171,12 +171,12 @@
       "go/marshal_fuzz_test.go": "28989222139f7086f3d30aa843318ac0f5d20ea34e0c7c88618d86111d49c7db",
       "go/marshal_test.go": "bc096d58700355f42d472c20d6e75ad40dc311cac19bac17fff60490de32f2d5",
       "go/orderedjson.go": "d2e4403112cec0c8f4991838215a1025859f7236868b2f98bced42891d93900f",
-      "implementations.json": "4c88985db7f57fb96c2481974d5e052b3826ad726442f20a481139d7b32d0398",
+      "implementations.json": "200f13cc86141c91daf2e85053ee7357322cc38b118e38f99b325f382b87d8d5",
       "js/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "js/AGENTS.ko.md": "8d649fcf0107c94fd0c5fbcefd719f5b34456f4fe98c7fa642dd793795fcc4e4",
       "js/AGENTS.md": "07e4557cb5ec412b34e6a8bcc3e9dd5fd0ddb12bc1a52734abf203a7873c3560",
-      "js/CHANGELOG.ko.md": "4bd692647dcd3661b45c27d6d5ca6d41354ab01e7cf89c98647a6a23636d1c4e",
-      "js/CHANGELOG.md": "fd559ae9f711423792fc48b684611278ad6641b8dd0a115f9208bac0d225f606",
+      "js/CHANGELOG.ko.md": "2daacaa06366ebdf858d60d04e6a4ed464bd7c3cc4d610bb4ec26b35a1f8e9e5",
+      "js/CHANGELOG.md": "0242d3ce43ee61cba5a134309340f355d580dfb5d1cdd7a964290b1ec5bc6b95",
       "js/Makefile": "283f8460279d1378641fc986fd5663d04ce366b73681fc77259f6267c27bfef6",
       "js/README.ko.md": "2157b301dc6cfb7e9b7670fad423f9f6447d5fc9c9ce7161fe88b2b9bca35674",
       "js/README.md": "5271983a46de7fa75cfa6fa85a426383df94e4290b0929cf7fb142f8b3e397c5",
@@ -230,6 +230,7 @@
       "rust/examples/benchmark.rs": "8211cf4b20c73e48b1774d7128ce67deb79c4a3f0656f4a808f1b7efbe1dd578",
       "rust/examples/probe.rs": "e655d00000196925a77bfc4a2ead76072cce04973eba487f7086349265bee310",
       "rust/src/lib.rs": "e230494ffe7ef4a7f262220517088fa018f6eaf4593ee71b0d29bcab34fc1db5",
+      "rust/tests/api.rs": "12b5f999a05c2a4be3d87f0702bc0d43a8d6b23377b2cb5a01651195858346a5",
       "scripts/bootstrap.py": "ab6c627ec718fcafc44a5e63de00a37fd6b78093b4a223eb039423e74872a5a6",
       "scripts/check_pie.py": "3a89741d4582e7f3a49367978f89a0a5dd417a887aa8d561db67c8d710990639",
       "scripts/compare_ojson.py": "bd45cccfc0b64c45a262cde1c2e7509cd23a554040beee4cb598c957786fdef8",
@@ -248,8 +249,8 @@
   "packages": {
     "javascript": {
       "path": "js",
-      "sha256": "16bfb9a46bb7b6ffc5fc27ee88019ad2b03fa346d7a33da948fbe6776470c1d8",
-      "files": 13
+      "sha256": "712761880f62fff8ec17eea50dc244b482ba82568a865ca984d9de1318c2b16c",
+      "files": 14
     },
     "rust": {
       "path": "rust",
@@ -313,7 +314,7 @@
   "build_warnings": [],
   "artifact": {
     "path": "php-extension/src/modules/ordered_json.so",
-    "sha256": "f8b86a5387408ae17dda3dc068bc99ed9197c26c0454e403c48468d82d40a516"
+    "sha256": "4fbf77d1225a9ef2957f07e2d82ee0af9273f85172ef35a490ced4496d0db9e5"
   },
   "cases": {
     "official": 17,
