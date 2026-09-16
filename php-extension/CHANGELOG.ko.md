@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: ddd1caabf3aa57cc4f95520d90db5814c045f73c3ae891eea9e9785abada6119 -->
+<!-- source-sha256: e6a01d8964538159bf0ca6346bf0e69198a77018e74879a42f735a0cd678ba76 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- 이스케이프하지 않은 제어 문자를 한 칸 뒤가 아니라 그 문자의 위치로 보고합니다.
 - 디스크립터 API의 패키지 테스트를 추가하고 구현 등록 정보에 선언했습니다. 하이드레이션한 멤버와 항목, 반복·escape 멤버 이름, `ValueError`로 거부하는 잘못된 디스크립터, compact 토큰 복사, 지원하는 깊이 범위, 보고하는 파싱 오류 위치를 다룹니다. 공통 사례는 PHP Value API를 통해서만 확장에 닿으므로, 이 표면은 이 테스트로만 검증합니다.
 - `ordered_json_hydrate()`는 객체의 멤버만 반환하며 키 토큰용 값을 만들지 않습니다.
 - 디스크립터로 컨테이너의 자식 `OrderedJson\Value` 객체를 만들고 소스와 맞지 않는 디스크립터를 `ValueError`로 거부하는 `ordered_json_hydrate()`를 추가했습니다. 하이드레이션은 별도 파일 `hydrate.c`로 컴파일하며, 클래스 조회는 요청마다 한 번 캐시합니다.

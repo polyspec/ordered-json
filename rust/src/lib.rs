@@ -509,7 +509,11 @@ impl Parser<'_> {
                             self.pos += 1;
                         }
                     } else if !matches!(escape, b'"' | b'\\' | b'/' | b'b' | b'f' | b'n' | b'r' | b't') {
-                        return Err(self.error("invalid escape"));
+                        // The escape character has been consumed; the offset names it.
+                        return Err(Error {
+                            offset: self.pos - 1,
+                            message: "invalid escape",
+                        });
                     }
                 }
                 _ => self.pos += 1,
