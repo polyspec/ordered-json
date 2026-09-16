@@ -24,7 +24,12 @@ Parsed `Value` objects cannot be modified through the library API. Factories con
 
 JavaScript parse errors report UTF-16 offsets. Rust, Go, and PHP parse errors report UTF-8 byte offsets. The Go `Value` zero value is invalid. Empty `OrderedMap` values in Rust and Go are valid object inputs.
 
-The Go binding also provides `Marshal(value)`. It encodes exported struct fields in declaration order, contributes the fields of an anonymous field that has no `json` name, rejects a repeated field name and a value nested deeper than the parser allows, applies `json` field names and omission options, encodes byte slices as base64 strings, accepts types implementing the `MarshalJSON() ([]byte, error)` boundary, and validates custom output through the ordered-json parser. Go map keys are sorted because native map iteration has no defined order. The result is compact JSON and never delegates typed encoding to the host JSON encoder.
+<a id="bindings"></a>
+## Binding extensions
+
+A binding may add an API that only its language needs. A binding extension uses the shared parser and serializer, leaves parse results, errors, and offsets unchanged, and appears in this section instead of the shared operation tables. Its package declares its own tests in the implementation registry, and `make check` runs them; an API that no shared case can reach is verified only by those tests.
+
+The Go binding provides `Marshal(value)`. It encodes exported struct fields in declaration order, contributes the fields of an anonymous field that has no `json` name, rejects a repeated field name and a value nested deeper than the parser allows, applies `json` field names and omission options, encodes byte slices as base64 strings, accepts types implementing the `MarshalJSON() ([]byte, error)` boundary, and validates custom output through the ordered-json parser. Go map keys are sorted because native map iteration has no defined order. The result is compact JSON and never delegates typed encoding to the host JSON encoder.
 
 <a id="objects"></a>
 ## Associative objects
