@@ -26,6 +26,21 @@ fn bytes_input_is_validated() {
 }
 
 #[test]
+fn rejection_names_its_kind() {
+    // The wording is Rust's own; the kind is the shared contract.
+    for (document, kind) in [
+        ("[1,]", "expected_value"),
+        ("{1:2}", "expected_object_key"),
+        ("[1.]", "expected_digit"),
+        ("\"a\u{1}b\"", "unescaped_control_character"),
+        ("[1] x", "trailing_input"),
+    ] {
+        let error = parse(document).unwrap_err();
+        assert_eq!(error.kind(), kind, "{document}: {}", error.message);
+    }
+}
+
+#[test]
 fn invalid_utf8_reports_the_first_bad_byte() {
     // The bad byte sits at index 2 of ["<bad>"]; the error names that position.
     let error = parse_bytes(b"[\"\xff\"]").unwrap_err();

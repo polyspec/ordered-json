@@ -27,7 +27,7 @@ for await (const path of createInterface({input: process.stdin, crlfDelay: Infin
   try { value = parseBytes(bytes); }
   catch (error) {
     if (!(error instanceof ParseError)) throw error;
-    console.log(JSON.stringify({ok: false, offset: error.offset, unit: error.unit})); continue;
+    console.log(JSON.stringify({ok: false, offset: error.offset, unit: error.unit, kind: error.kind})); continue;
   }
   const serialized = stringify(value);
   const roundtrip = parseBytes(new TextEncoder().encode(serialized));

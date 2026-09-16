@@ -122,7 +122,8 @@ func main() {
 			if !errors.As(err, &failure) {
 				panic(err)
 			}
-			fmt.Printf("{\"ok\":false,\"offset\":%d,\"unit\":\"byte\"}\n", failure.Offset)
+			fmt.Printf("{\"ok\":false,\"offset\":%d,\"unit\":\"byte\",\"kind\":%s}\n",
+				failure.Offset, quote(failure.Kind()))
 			continue
 		}
 		compact, err := value.Compact()

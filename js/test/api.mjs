@@ -79,6 +79,22 @@ check('bytes_input_is_validated', () => {
   assert.equal(stringify(parseBytes(new TextEncoder().encode('{"a":1}'))), '{"a":1}');
 });
 
+check('rejection_names_its_kind', () => {
+  // The wording is JavaScript's own; the kind is the shared contract.
+  const kinds = new Map([
+    ['[1,]', 'expected_value'],
+    ['{1:2}', 'expected_object_key'],
+    ['[1.]', 'expected_digit'],
+    ['"a\u0000b"', 'unescaped_control_character'],
+    ['[1] x', 'trailing_input'],
+  ]);
+  for (const [document, kind] of kinds) {
+    const error = (() => { try { parse(document); } catch (failure) { return failure; } })();
+    assert.ok(error instanceof ParseError, `${document} was accepted`);
+    assert.equal(error.kind, kind, `${document}: ${error.message}`);
+  }
+});
+
 check('invalid_utf8_reports_the_first_bad_byte', () => {
   // The bad byte sits at index 2 of ["<bad>"]; the error names that position.
   const bad = new Uint8Array([0x5b, 0x22, 0xff, 0x22, 0x5d]);
