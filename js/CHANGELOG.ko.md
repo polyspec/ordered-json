@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 7c09f0debb805e6a99bb330046f1ed47ecc2d338fbd0739327b95a793b1243f7 -->
+<!-- source-sha256: 073cf4aba7a60b7300b976c2e5c49d478c4ab432f13d0064efcba59c9e9d1ef5 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- `ParseError`가 자체 메시지와 함께 공통 거부 목록의 `kind`를 전합니다.
 - 타입 선언에서 `StringifyOptions`와 `stringify`의 두 번째 인자를 제거했습니다. 이 함수는 인자를 하나만 받습니다. 패키지는 공통 커버리지 검사를 위해 공개 심볼을 보고합니다.
 - 이스케이프하지 않은 제어 문자를 한 칸 뒤가 아니라 그 문자의 위치로 보고하며, 어댑터는 공통 비교를 위해 거부 위치를 보고합니다.
 - `parseBytes`가 0 대신 첫 잘못된 바이트의 바이트 위치를 보고하며, 이 오류에는 UTF-16 위치가 없으므로 메시지에 단위를 함께 적습니다.
