@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The Rust package declares its own tests for the value API, which no shared case can reach.
 - Fixed the PHP unpaired-surrogate error, which raised a class-not-found error instead of `UnexpectedValueException` because the exception name was unqualified inside the namespace. The PHP package now declares its own tests, which found it.
 - The PHP extension package declares its own tests for the descriptor API, which no shared case can reach.
 - The API contract states the rule for an API that only one binding provides: it uses the shared parser and serializer, leaves results, errors, and offsets unchanged, appears in the binding extensions section, and is covered by its package's declared tests. Go `Marshal` is documented there.

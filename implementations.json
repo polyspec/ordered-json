@@ -17,6 +17,7 @@
       "repository": "rust",
       "prepare": [{"cwd": "{rust}", "command": ["{cargo}", "build", "--quiet", "--example", "probe"]}],
       "command": ["{rust}/target/debug/examples/probe"],
+      "tests": {"cwd": "{rust}", "command": ["{cargo}", "test", "--quiet"]},
       "runtime": {"rustc": ["{rustc}", "--version"]}
     },
     "go": {
