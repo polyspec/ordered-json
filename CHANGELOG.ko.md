@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 029c6f03cb88b8eb4cc1a1e7e39b7d224a9efd1c206c0fd49f0350e04a932cd8 -->
+<!-- source-sha256: 397bc1295d46762e5cceebd0577137a96bfbf99d030530a2f5b164eb956b07ca -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- JavaScript 패키지가 공통 사례로는 닿을 수 없는 값 API의 자체 테스트를 선언합니다. 이제 모든 구현 패키지가 패키지 테스트를 선언합니다.
 - Rust 패키지가 공통 사례로는 닿을 수 없는 값 API의 자체 테스트를 선언합니다.
 - PHP의 짝 없는 서로게이트 오류를 고쳤습니다. 네임스페이스 안에서 예외 이름을 수식하지 않아 `UnexpectedValueException` 대신 클래스를 찾을 수 없다는 오류가 났습니다. 이제 PHP 패키지가 자체 테스트를 선언하며, 그 테스트가 이 결함을 찾았습니다.
 - PHP 확장 패키지가 공통 사례로는 닿을 수 없는 디스크립터 API의 자체 테스트를 선언합니다.
