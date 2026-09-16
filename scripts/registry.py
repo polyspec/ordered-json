@@ -31,6 +31,11 @@ def load_registry(root=ROOT):
             raise ValueError('Implementation references an unknown repository: ' + name)
         commands = [implementation['command']] + list(implementation['runtime'].values())
         commands += [step['command'] for step in implementation.get('prepare', [])]
+        tests = implementation.get('tests')
+        if tests is not None:
+            if not isinstance(tests, dict) or set(tests) != {'cwd', 'command'} or not tests['cwd']:
+                raise ValueError('Package tests declare cwd and command: ' + name)
+            commands.append(tests['command'])
         if any(not command or not isinstance(command, list) or
                any(not isinstance(argument, str) for argument in command) for command in commands):
             raise ValueError('Commands must be nonempty argument lists: ' + name)
@@ -103,6 +108,18 @@ def adapter_commands(selected, paths, cache, registry=REGISTRY):
     variables = context(paths, cache)
     return {name: [expand(argument, variables) for argument in registry['implementations'][name]['command']]
             for name in selected}
+
+
+def test_commands(selected, paths, cache, registry=REGISTRY):
+    """Resolve the package test command of each implementation that declares one."""
+    variables = context(paths, cache)
+    result = {}
+    for name in selected:
+        tests = registry['implementations'][name].get('tests')
+        if tests is not None:
+            result[name] = (expand(tests['cwd'], variables),
+                            [expand(argument, variables) for argument in tests['command']])
+    return result
 
 
 def runtime_versions(selected, paths, cache, registry=REGISTRY):

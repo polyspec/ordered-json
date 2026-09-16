@@ -23,6 +23,7 @@
       "repository": "go",
       "prepare": [{"cwd": "{go}", "command": ["go", "build", "-o", "{cache}/go-probe", "./internal/probe"]}],
       "command": ["{cache}/go-probe"],
+      "tests": {"cwd": "{go}", "command": ["go", "test", "./..."]},
       "runtime": {"go": ["go", "version"]}
     },
     "php": {

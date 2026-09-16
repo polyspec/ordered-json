@@ -8,7 +8,7 @@ import subprocess
 import tempfile
 
 from registry import (IMPLEMENTATIONS, adapter_commands, parse_overrides, prepare,
-                      repository_paths)
+                      repository_paths, test_commands)
 
 ROOT = Path(__file__).resolve().parents[1]
 FACTORY_STRING = '"quote \\\" slash \\\\ line\\n \\ud55c \\ud83c\\udf0d"'
@@ -140,7 +140,22 @@ def verify(selected, suite=None, paths=None, cache=None, build_warnings=None):
     warnings = prepare(selected, paths, cache)
     if build_warnings is not None:
         build_warnings.extend(warnings)
-    return verify_adapters(adapter_commands(selected, paths, cache), suite)
+    package_tests = run_package_tests(test_commands(selected, paths, cache))
+    results, counts = verify_adapters(adapter_commands(selected, paths, cache), suite)
+    return results, counts, package_tests
+
+
+def run_package_tests(commands):
+    """Run each package's own tests. Shared cases cannot reach language-specific APIs."""
+    results = {}
+    for language, (cwd, command) in commands.items():
+        process = subprocess.run(command, cwd=cwd, text=True,
+                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        if process.returncode:
+            raise RuntimeError(f'{language} package tests failed:\n{process.stdout}')
+        print(f'{language}: package tests passed', flush=True)
+        results[language] = {'status': 'passed', 'command': command}
+    return results
 
 
 def verify_adapters(commands, suite=None):
@@ -198,7 +213,7 @@ def main():
     parser.add_argument('--repository', action='append', metavar='NAME=PATH', help='Use an independent repository checkout')
     args = parser.parse_args()
     verify(args.only or IMPLEMENTATIONS, args.suite.resolve() if args.suite else None,
-           repository_paths(ROOT, parse_overrides(args.repository)))
+           repository_paths(ROOT, parse_overrides(args.repository)))  # raises on any failure
 
 
 if __name__ == '__main__':

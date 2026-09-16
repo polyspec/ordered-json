@@ -9,7 +9,8 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from registry import (REGISTRY, adapter_commands, load_registry, parse_overrides, prepare,
-                      repository_paths, runtime_versions)
+                      repository_paths, runtime_versions, test_commands)
+from verify import run_package_tests
 from standalone import COMMON_URL, validate_configuration
 from verification_record import package_revisions
 
@@ -49,6 +50,29 @@ class RepositoryChecks(unittest.TestCase):
             self.assertEqual(runtime_versions(['future'], paths, root / 'cache', loaded), {'future': {'version': 'runtime'}})
             command = adapter_commands(['future'], paths, root / 'cache', loaded)['future']
             self.assertEqual(subprocess.check_output(command, text=True).strip(), 'adapter')
+
+    def test_package_tests_are_declared_and_resolved(self):
+        with tempfile.TemporaryDirectory() as folder:
+            paths = repository_paths()
+            commands = test_commands(['go'], paths, Path(folder) / 'cache')
+            self.assertEqual(commands['go'], (str(paths['go']), ['go', 'test', './...']))
+
+    def test_registry_rejects_an_incomplete_test_declaration(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            registry = copy.deepcopy(REGISTRY)
+            registry['implementations']['go']['tests'] = {'command': ['go', 'test', './...']}
+            (root / 'implementations.json').write_text(json.dumps(registry))
+            with self.assertRaisesRegex(ValueError, 'cwd and command'):
+                load_registry(root)
+
+    def test_failing_package_tests_stop_verification(self):
+        with tempfile.TemporaryDirectory() as folder:
+            failing = {'sample': (folder, [sys.executable, '-c', 'raise SystemExit(1)'])}
+            with self.assertRaisesRegex(RuntimeError, 'package tests failed'):
+                run_package_tests(failing)
+            passing = {'sample': (folder, [sys.executable, '-c', 'print("ok")'])}
+            self.assertEqual(run_package_tests(passing)['sample']['status'], 'passed')
 
     def test_moving_branch_is_not_a_conformance_pin(self):
         config = configuration('javascript')
