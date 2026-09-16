@@ -263,14 +263,15 @@ def byte_offset(document, offset, unit):
     return len(prefix.encode('utf-8'))
 
 
-def compare_error_positions(positions, documents):
+def compare_error_positions(rejections, documents):
     """Every implementation rejects the same input at the same place."""
     disagreements = []
-    for name, reported in sorted(positions.items()):
+    for name, reported in sorted(rejections.items()):
         if len(reported) < 2:
             continue
         resolved = {}
-        for language, (offset, unit) in reported.items():
+        for language, reply in reported.items():
+            offset, unit = reply.get('offset'), reply.get('unit')
             if not isinstance(offset, int):
                 raise AssertionError(f'{language} {name}: a rejection reports its offset')
             resolved[language] = byte_offset(documents[name], offset, unit)
@@ -280,8 +281,35 @@ def compare_error_positions(positions, documents):
     if disagreements:
         raise AssertionError('Implementations reject the same input at different positions:\n'
                              + '\n'.join(disagreements))
-    if positions:
+    if rejections:
         print('rejection positions agree across implementations', flush=True)
+
+
+def compare_rejection_kinds(rejections):
+    """Every implementation names the same reason for rejecting a document."""
+    known = set(STANDARD['rejection_kinds'])
+    missing, unknown, disagreements = set(), set(), []
+    for name, reported in sorted(rejections.items()):
+        seen = {}
+        for language, reply in reported.items():
+            kind = reply.get('kind')
+            if kind is None:
+                missing.add(language)
+                continue
+            if kind not in known:
+                unknown.add((language, kind))
+            seen.setdefault(kind, set()).add(language)
+        if len(seen) > 1:
+            detail = ', '.join(f'{kind}={",".join(sorted(languages))}' for kind, languages in sorted(seen.items()))
+            disagreements.append(f'{name}: {detail}')
+    problems = [f'{language}: rejections report no kind' for language in sorted(missing)]
+    problems += [f'{language}: unknown rejection kind {kind}' for language, kind in sorted(unknown)]
+    problems += disagreements
+    if problems:
+        raise AssertionError('Implementations name different reasons for rejecting a document:\n'
+                             + '\n'.join(problems[:20]))
+    if rejections:
+        print('rejection kinds agree across implementations', flush=True)
 
 
 def verify_adapters(commands, suite=None):
@@ -289,7 +317,7 @@ def verify_adapters(commands, suite=None):
     if not commands:
         raise ValueError('At least one adapter is required')
     results = {}
-    positions = {}
+    rejections = {}
     with tempfile.TemporaryDirectory(prefix='ordered-json-examples-') as folder:
         cases, official_count = prepare_cases(Path(folder), suite)
         documents = {name: path.read_bytes() for name, path, _ in cases}
@@ -312,7 +340,7 @@ def verify_adapters(commands, suite=None):
                 if not actual.get('ok'):
                     # A rejection also reports where it stopped; the unit is the
                     # one the binding documents, and the comparison converts it.
-                    positions.setdefault(name, {})[language] = (actual.get('offset'), actual.get('unit'))
+                    rejections.setdefault(name, {})[language] = actual
                     actual = {'ok': False}
                 if actual.get('ok'):
                     expected = dict(expected, roundtrip=expected['compact'],
@@ -335,7 +363,8 @@ def verify_adapters(commands, suite=None):
         counts = {'official': official_count,
                   'fixtures': sum(name.startswith('fixtures/') for name, _, _ in cases),
                   'supplementary': sum(name.startswith('JSONTestSuite/') for name, _, _ in cases)}
-        compare_error_positions(positions, documents)
+        compare_error_positions(rejections, documents)
+        compare_rejection_kinds(rejections)
     print('All selected implementations match the same expected results.', flush=True)
     return results, counts
 
