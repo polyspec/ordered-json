@@ -5,6 +5,7 @@ import io
 import json
 from pathlib import Path
 import re
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -151,7 +152,7 @@ class DocumentationChecks(unittest.TestCase):
 
     def test_verified_feature_requires_evidence(self):
         self.change('docs/features.md', '[result](verification.json)', 'none')
-        self.assert_failure('requires verification.json evidence')
+        self.assert_failure('names the record that backs it')
 
     def test_source_change_invalidates_old_result(self):
         self.write('js/index.js', 'export const fixture = false;\n')
@@ -294,6 +295,76 @@ class DocumentationChecks(unittest.TestCase):
         aggregate, pie = self.supplementary_records()
         self.assert_recorded_hashes_are_falsifiable(
             'docs/pie-verification.json', pie, ('docs/verification.json', aggregate))
+
+    def features_body(self, evidence='[result](../benchmarks/results.json)'):
+        return ('# Features\n\n<a id="state"></a>\n## State\n\n'
+                '| ID | Feature | Implementation | Verification | Evidence | Distribution | Specification |\n'
+                '| --- | --- | --- | --- | --- | --- | --- |\n'
+                '| F-ORDER | Order | implemented | shared-suite | [result](verification.json) | source-only | [contract](../README.md#contract) |\n'
+                f'| F-BENCH | Speed | implemented | benchmark | {evidence} | source-only | [contract](../README.md#contract) |\n')
+
+    def benchmark_repository(self):
+        """A committed repository whose benchmark record names the commit it measured."""
+        workload = {'schema_version': 2,
+                    'benchmark': {'warmup': 1, 'iterations': 1, 'samples': 1,
+                                  'median_tolerance': 0.1, 'p95_tolerance': 0.3},
+                    'fixtures': [{'file': 'empty-array.json', 'input_bytes': 3}]}
+        self.json('benchmarks/workload.json', workload)
+        self.pair('docs/features.md', 'features', self.features_body())
+        self.json('benchmarks/results.json', {})
+        for command in (['init', '--quiet'], ['add', '-A'],
+                        ['-c', 'user.email=fixture@example.invalid', '-c', 'user.name=fixture',
+                         'commit', '--quiet', '-m', 'fixture']):
+            subprocess.run(['git', *command], cwd=self.root, check=True,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=self.root, text=True).strip()
+        record = {'schema_version': 2, 'source': {'commit': commit, 'dirty': False},
+                  'protocol': dict(workload['benchmark']), 'environment': {'system': 'synthetic'},
+                  'fixtures': workload['fixtures'], 'results': [],
+                  'comparison': {'status': 'baseline-updated'}}
+        self.json('benchmarks/results.json', record)
+        self.json('docs/verification.json', create_record(
+            self.root, source_manifest(self.root), self.results,
+            {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions,
+            package_tests=self.package_tests))
+        # Without this the failures below could pass on an unrelated error.
+        self.assertEqual(check_repository(self.root)[0], [], 'The benchmark fixture must pass')
+        return record
+
+    def test_benchmark_evidence_must_name_the_benchmark_record(self):
+        self.benchmark_repository()
+        self.pair('docs/features.md', 'features', self.features_body('[result](verification.json)'))
+        self.assert_failure('names the record that backs it')
+
+    def test_benchmark_measured_from_a_dirty_tree_is_not_evidence(self):
+        record = self.benchmark_repository()
+        record['source']['dirty'] = True
+        self.json('benchmarks/results.json', record)
+        self.assert_failure('measured from a clean checkout')
+
+    def test_benchmark_commit_must_be_in_this_history(self):
+        record = self.benchmark_repository()
+        record['source']['commit'] = '0' * 40
+        self.json('benchmarks/results.json', record)
+        self.assert_failure('commit this repository contains')
+
+    def test_benchmark_protocol_must_match_the_workload(self):
+        record = self.benchmark_repository()
+        record['protocol']['samples'] = 2
+        self.json('benchmarks/results.json', record)
+        self.assert_failure('protocol the workload declares')
+
+    def test_benchmark_fixtures_must_match_the_workload(self):
+        record = self.benchmark_repository()
+        record['fixtures'] = [{'file': 'other.json', 'input_bytes': 3}]
+        self.json('benchmarks/results.json', record)
+        self.assert_failure('inputs the workload declares')
+
+    def test_failed_benchmark_comparison_is_not_evidence(self):
+        record = self.benchmark_repository()
+        record['comparison'] = {'status': 'failed'}
+        self.json('benchmarks/results.json', record)
+        self.assert_failure('failed benchmark comparison')
 
     def test_unreproducible_artifact_hash_cannot_be_recorded(self):
         aggregate, pie = self.supplementary_records()
