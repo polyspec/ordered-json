@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 7fd582d3a723723a7a78bb5d1eb1cff70b1a36d9bb7e9a9c8e444b3bf0eab148 -->
+<!-- source-sha256: 3c8ae165b10f8615a3e1b711d2ced79ca04ff29966c8740bb10c82abc9a6e8e3 -->
 # 검증
 
 [English](validation.md)
@@ -28,6 +28,8 @@ make check JSON_TEST_SUITE=.cache/JSONTestSuite
 
 추가 입력 사용 여부를 기록합니다. `i_` 사례에는 공통 UTF-8·깊이 정책을 적용합니다. 공식 입력과 기대값은 저장소 루트에만 있으며 어댑터에 독립 기대값을 추가하지 않습니다.
 
+[외부 입력](../../external-inputs.json)이 그 개정본과 사례 해시를 고정하며, 다른 체크아웃으로 측정한 기록은 문서 검사를 통과하지 못합니다.
+
 <a id="individual"></a>
 ## 개별 구현
 
@@ -55,7 +57,7 @@ make check
 <a id="pie"></a>
 ## PIE 산출물 검사
 
-[공식 릴리스](https://github.com/php/pie/releases)에서 PIE PHAR를 내려받고 `gh attestation verify --owner php /path/to/pie.phar`로 출처를 확인합니다. 공통 루트에서 실행합니다.
+[공식 릴리스](https://github.com/php/pie/releases)에서 고정된 PIE 릴리스를 내려받고, 그 버전과 내용 해시는 [외부 입력](../../external-inputs.json)이 명시하며, `gh attestation verify --owner php /path/to/pie.phar`로 출처를 확인합니다. 공통 루트에서 실행합니다.
 
 ~~~sh
 make pie-check PIE=/path/to/pie.phar JSON_TEST_SUITE=.cache/JSONTestSuite
@@ -63,7 +65,7 @@ make pie-check PIE=/path/to/pie.phar JSON_TEST_SUITE=.cache/JSONTestSuite
 
 [PIE 검사기](../../scripts/check_pie.py)는 `.cache/` 아래에 PIE 설정을 격리하고, 현재 확장 체크아웃을 경로 저장소로 등록하고, 패키지 인식을 확인하고, PIE로 빌드합니다. 같은 공통 어댑터와 기대값으로 해당 산출물을 직접 검사합니다. 중간에 일반 네이티브 빌드를 실행하지 않습니다.
 
-준비된 경우 `pie-verification.json`은 PIE 버전과 PHAR 해시, 확장 산출물 해시, 명령, 소스 해시, PHP·확장 버전, 사례 결과를 기록합니다. 빌드 오류, 빌드 도구 누락, 어댑터 경고, 검사 중 변경은 검증 실패로 처리합니다. 컴파일 경고는 기록에 유지합니다. 이 검사는 모듈을 설치하거나 패키지를 게시하지 않습니다. 기록된 입력이 변경되면 `make check`보다 먼저 다시 실행합니다. `make check`의 문서 검사는 오래된 PIE 기록을 거부합니다.
+준비된 경우 `pie-verification.json`은 PIE 버전과 PHAR 해시, 선언된 산출물 경로, 명령, 소스 해시, PHP·확장 버전, 사례 결과를 기록합니다. PHAR 해시와 추가 입력 개정본은 고정값과 일치해야 합니다. 빌드된 모듈은 경로로만 명시합니다. 링크 시점에 새 식별자와 서명이 들어가므로 그 해시는 한 번의 실행만 가리키며, 검사기는 해시를 담은 기록을 거부합니다. 빌드 오류, 빌드 도구 누락, 어댑터 경고, 검사 중 변경은 검증 실패로 처리합니다. 컴파일 경고는 기록에 유지합니다. 이 검사는 모듈을 설치하거나 패키지를 게시하지 않습니다. 기록된 입력이 변경되면 `make check`보다 먼저 다시 실행합니다. `make check`의 문서 검사는 오래된 PIE 기록을 거부합니다.
 
 <a id="documentation-checks"></a>
 ## 문서 검사
