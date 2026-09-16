@@ -148,13 +148,14 @@ def verify(selected, suite=None, paths=None, cache=None, build_warnings=None):
 def run_package_tests(commands):
     """Run each package's own tests. Shared cases cannot reach language-specific APIs."""
     results = {}
-    for language, (cwd, command) in commands.items():
-        process = subprocess.run(command, cwd=cwd, text=True,
+    for language, entry in commands.items():
+        process = subprocess.run(entry['command'], cwd=entry['cwd'], text=True,
                                  stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if process.returncode:
             raise RuntimeError(f'{language} package tests failed:\n{process.stdout}')
         print(f'{language}: package tests passed', flush=True)
-        results[language] = {'status': 'passed', 'command': command}
+        # Records keep the declared command; resolved paths belong to one checkout.
+        results[language] = {'status': 'passed', 'command': entry['declared']}
     return results
 
 

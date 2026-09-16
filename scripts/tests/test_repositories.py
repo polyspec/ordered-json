@@ -55,7 +55,12 @@ class RepositoryChecks(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             paths = repository_paths()
             commands = test_commands(['go'], paths, Path(folder) / 'cache')
-            self.assertEqual(commands['go'], (str(paths['go']), ['go', 'test', './...']))
+            self.assertEqual(commands['go'], {'cwd': str(paths['go']),
+                                              'command': ['go', 'test', './...'],
+                                              'declared': ['go', 'test', './...']})
+            extension = test_commands(['php-extension'], paths, Path(folder) / 'cache')['php-extension']
+            self.assertEqual(extension['declared'][-1], '{php}/src/OrderedJson.php')
+            self.assertTrue(extension['command'][-1].endswith('/php/src/OrderedJson.php'))
 
     def test_registry_rejects_an_incomplete_test_declaration(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -68,11 +73,15 @@ class RepositoryChecks(unittest.TestCase):
 
     def test_failing_package_tests_stop_verification(self):
         with tempfile.TemporaryDirectory() as folder:
-            failing = {'sample': (folder, [sys.executable, '-c', 'raise SystemExit(1)'])}
+            failing = {'sample': {'cwd': folder, 'command': [sys.executable, '-c', 'raise SystemExit(1)'],
+                                  'declared': ['{sample}/run']}}
             with self.assertRaisesRegex(RuntimeError, 'package tests failed'):
                 run_package_tests(failing)
-            passing = {'sample': (folder, [sys.executable, '-c', 'print("ok")'])}
-            self.assertEqual(run_package_tests(passing)['sample']['status'], 'passed')
+            passing = {'sample': {'cwd': folder, 'command': [sys.executable, '-c', 'print("ok")'],
+                                  'declared': ['{sample}/run']}}
+            # A record identifies the declared command, never a resolved local path.
+            self.assertEqual(run_package_tests(passing)['sample'],
+                             {'status': 'passed', 'command': ['{sample}/run']})
 
     def test_moving_branch_is_not_a_conformance_pin(self):
         config = configuration('javascript')
