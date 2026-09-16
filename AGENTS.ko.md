@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 6166e33df7097598d9ede0b392d2fc65d8159c9c335f28e1244f63e9f33a0207 -->
+<!-- source-sha256: e5eb7cef17eaf348a0b9b1da4256e55fb61d75ef0eb8efeab504daaca32a5c20 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -33,7 +33,7 @@ make check JSON_TEST_SUITE=.cache/JSONTestSuite
 
 문서만 검토할 때는 `make docs-check`를 실행합니다. 소스가 변경됐고 PIE 기록이 있으면 해당 추가 사례와 함께 `make pie-check PIE=/path/to/pie.phar`를 먼저 실행한 뒤 `make check`를 실행하여 현재 기록을 생성합니다. `make check`의 문서 검사는 오래된 PIE 기록을 거부합니다. 검사를 통과시키기 위해 검증 결과나 소스 해시를 직접 수정하지 않습니다.
 
-[구현 등록 정보](implementations.json)는 패키지 경로·빌드·어댑터·패키지 테스트·런타임 명령을 정의합니다. `make check`는 선언된 패키지 테스트 명령을 모두 실행합니다. 공통 사례는 JSON 계약만 검사하므로 한 패키지에만 있는 API에는 닿지 않으며, 그런 API는 해당 패키지의 테스트가 필요합니다. [package-tests.json](package-tests.json)은 모든 구현이 실행하는 케이스, 사유를 적은 면제, 패키지 고유 케이스를 정의합니다. `make check`는 이 표준과 각 스위트가 보고한 케이스를 대조해 누락되거나 선언되지 않은 케이스가 있으면 실패합니다. 공통 JSON 비교 알고리즘을 변경하지 않고 해당 등록 정보와 패키지 디렉터리로 새 언어를 추가합니다. 계약 변경은 같은 저장소 리비전에서 검증기와 관련 패키지를 갱신합니다. [저장소 계약](docs/spec/repositories.ko.md)을 참조합니다.
+[구현 등록 정보](implementations.json)는 패키지 경로·빌드·어댑터·패키지 테스트·런타임 명령을 정의합니다. `make check`는 선언된 패키지 테스트 명령을 모두 실행합니다. 공통 사례는 JSON 계약만 검사하므로 한 패키지에만 있는 API에는 닿지 않으며, 그런 API는 해당 패키지의 테스트가 필요합니다. [package-tests.json](package-tests.json)은 모든 구현이 실행하는 케이스, 사유를 적은 면제, 패키지 고유 케이스, 그리고 공개 심볼마다 그것을 검증하는 케이스를 정의합니다. `make check`는 이 표준과 각 패키지가 보고한 케이스·심볼을 대조해 누락된 케이스, 선언되지 않은 케이스, 검증되지 않는 심볼, 더 이상 내보내지 않는 심볼 선언이 있으면 실패합니다. 공통 JSON 비교 알고리즘을 변경하지 않고 해당 등록 정보와 패키지 디렉터리로 새 언어를 추가합니다. 계약 변경은 같은 저장소 리비전에서 검증기와 관련 패키지를 갱신합니다. [저장소 계약](docs/spec/repositories.ko.md)을 참조합니다.
 
 모든 언어 어댑터는 [official.json](examples/official.json)과 [scripts/verify.py](scripts/verify.py)를 사용합니다. 공통 사례는 해당 파일이나 `fixtures/`에 추가합니다. 언어별로 다른 예제나 기대 결과를 만들지 않습니다.
 
