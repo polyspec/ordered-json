@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Removed the `StringifyOptions` declaration and the second `stringify` parameter from the type declaration; the function takes one argument. The package reports its public symbols for the shared coverage check.
 - An unescaped control character is reported at its own offset instead of one past it, and the adapter reports the rejection position for the shared comparison.
 - `parseBytes` reports the byte offset of the first invalid byte instead of 0, and the message names the unit because this error has no UTF-16 position.
 - Added package tests for the value API and declared them in the implementation registry: construction guards, frozen item and key arrays, a fresh member map per access, wrong-kind access, key type checking, option validation, `parseBytes` input checks, UTF-16 parse offsets, code units for unpaired surrogates, and factory arguments. Shared cases reach this package through its adapter and do not cover that surface.

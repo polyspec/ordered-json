@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Added a package test for `ParseBytesBorrowed`: text handed back survives a change to the caller's bytes. The package reports its public symbols for the shared coverage check.
 - An unescaped control character is reported at its own offset instead of one past it, and the adapter reports the rejection position for the shared comparison.
 - Parsing reports the byte offset of the first invalid UTF-8 sequence instead of 0.
 - `Marshal` applies `omitempty` and `omitzero` as separate rules, matching the host encoder: a zero `time.Time` stays under `omitempty` and is dropped under `omitzero`. Non-finite floats report the field that holds them instead of failing later in the parser, and the unreachable `time.Time` branch is removed because `time.Time` carries its own `MarshalJSON`. A seeded randomized test compares decoded structures with the host encoder.

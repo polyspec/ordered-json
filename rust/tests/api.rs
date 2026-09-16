@@ -1,7 +1,7 @@
 //! Package tests for the Rust value API. The shared cases exercise the JSON
 //! contract through the adapter; constructor arguments, map building, UTF-16
 //! units and wrong-kind access are reachable only from here.
-use ordered_json::{parse, parse_bytes, parse_with_max_depth, Kind, OrderedMap, Value, MAX_DEPTH};
+use ordered_json::{parse, parse_bytes, parse_with_max_depth, stringify, Kind, OrderedMap, Value, MAX_DEPTH};
 
 #[test]
 fn depth_argument_is_bounded() {
@@ -56,6 +56,11 @@ fn repeated_key_keeps_first_position_and_last_value() {
     let replaced = members.insert(Value::string("a"), Value::number("3").unwrap()).unwrap();
     assert_eq!(replaced.map(|value| value.compact()), Some("1".to_owned()));
     assert_eq!(members.len(), 2);
+    let listed: Vec<String> = members
+        .iter()
+        .map(|(key, value)| format!("{}:{}", key.compact(), value.compact()))
+        .collect();
+    assert_eq!(listed, vec!["\"a\":3".to_owned(), "\"b\":2".to_owned()]);
     assert_eq!(Value::object(&members).unwrap().compact(), "{\"a\":3,\"b\":2}");
 }
 
@@ -110,5 +115,6 @@ fn root_keeps_surrounding_text() {
     let value = parse("  [1] \n").unwrap();
     assert_eq!(value.raw(), "  [1] \n");
     assert_eq!(value.compact(), "[1]");
+    assert_eq!(stringify(&value), value.compact());
     assert_eq!(value.items().unwrap()[0].raw(), "1");
 }
