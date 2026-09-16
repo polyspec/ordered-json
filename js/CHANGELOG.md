@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Added package tests for the value API and declared them in the implementation registry: construction guards, frozen item and key arrays, a fresh member map per access, wrong-kind access, key type checking, option validation, `parseBytes` input checks, UTF-16 parse offsets, code units for unpaired surrogates, and factory arguments. Shared cases reach this package through its adapter and do not cover that surface.
 - Stopped calling `Object.freeze` on each parsed `Value`; private fields keep values unmodifiable through the API, and `items` and `keys` arrays remain frozen.
 - Removed the unused `stringify()` options argument.
 - Reduced parser and serializer overhead: values use a private-field brand check instead of a `WeakSet` registry, unescaped strings are sliced from the source, object key tokens are created on access, and values without insignificant whitespace or duplicate keys serialize as their source token. Results, errors, and offsets are unchanged.
