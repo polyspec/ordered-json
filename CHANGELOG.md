@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The API contract states the rule for an API that only one binding provides: it uses the shared parser and serializer, leaves results, errors, and offsets unchanged, appears in the binding extensions section, and is covered by its package's declared tests. Go `Marshal` is documented there.
 - The implementation registry declares each package's own test command, `make check` runs the declared commands, and the verification record requires their results. Shared cases run through adapters and cannot reach a language-specific API, so a defect in one survived while every shared case passed.
 - Corrected Go `Marshal` omission rules and error reporting: `omitempty` and `omitzero` are separate rules, non-finite floats name the field that holds them, and the unreachable `time.Time` branch is removed. A seeded randomized test compares 20,000 values with the host encoder's decoded structures.
 - Fixed Go `Marshal`: anonymous struct fields contributed no fields, a repeated field name silently lost a field, and a cyclic value recursed until the process died. Promotion now matches Go field promotion, repeated names and values deeper than the parser's limit are errors.
