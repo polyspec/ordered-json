@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 86720668546bbc3ca01e49a525f6baba75ea8544e2969dfb7ee5008675b95ab4 -->
+<!-- source-sha256: 041546b7e7a715c9fd9b5055f3a052dd63a0ef280319d6106ce0f6ebba27781f -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- Rust 패키지가 공통 사례로는 닿을 수 없는 값 API의 자체 테스트를 선언합니다.
 - PHP의 짝 없는 서로게이트 오류를 고쳤습니다. 네임스페이스 안에서 예외 이름을 수식하지 않아 `UnexpectedValueException` 대신 클래스를 찾을 수 없다는 오류가 났습니다. 이제 PHP 패키지가 자체 테스트를 선언하며, 그 테스트가 이 결함을 찾았습니다.
 - PHP 확장 패키지가 공통 사례로는 닿을 수 없는 디스크립터 API의 자체 테스트를 선언합니다.
 - 한 바인딩에만 있는 API의 규칙을 API 계약에 적었습니다. 공유 parser와 serializer를 사용하고, 결과·오류·위치를 바꾸지 않으며, 바인딩 확장 절에 적고, 해당 패키지가 선언한 테스트로 검증합니다. Go `Marshal`을 그 절에 문서화했습니다.
