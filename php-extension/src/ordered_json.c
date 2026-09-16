@@ -33,6 +33,28 @@ typedef struct {
 
 static zend_class_entry *oj_error_ce;
 
+/* Why the document was rejected, named the same way by every implementation. */
+static const char *oj_kind(const char *message) {
+    static const char *const pairs[][2] = {
+        {"Expected JSON value", "expected_value"},
+        {"Expected digit", "expected_digit"},
+        {"Expected colon", "expected_colon"},
+        {"Expected comma or closing delimiter", "expected_delimiter"},
+        {"Expected string", "expected_object_key"},
+        {"Invalid escape", "invalid_escape"},
+        {"Invalid Unicode escape", "invalid_unicode_escape"},
+        {"Unfinished escape", "unfinished_escape"},
+        {"Unterminated string", "unterminated_string"},
+        {"Unescaped control character", "unescaped_control_character"},
+        {"Invalid UTF-8", "invalid_utf8"},
+        {"Maximum nesting depth exceeded", "maximum_depth_exceeded"},
+        {"Unexpected trailing input", "trailing_input"},
+    };
+    for (size_t i = 0; i < sizeof(pairs) / sizeof(pairs[0]); i++)
+        if (strcmp(pairs[i][0], message) == 0) return pairs[i][1];
+    return "";
+}
+
 static bool oj_fail(oj_parser *p, const char *message) {
     p->message = message;
     p->error_offset = p->pos;
@@ -312,6 +334,7 @@ fail:;
     p->tape = NULL;
     zend_object *exception = zend_throw_exception(oj_error_ce, p->message, 0);
     zend_update_property_long(oj_error_ce, exception, "offset", sizeof("offset") - 1, (zend_long)p->error_offset);
+    zend_update_property_string(oj_error_ce, exception, "kind", sizeof("kind") - 1, oj_kind(p->message));
     return false;
 }
 
@@ -453,6 +476,7 @@ PHP_MINIT_FUNCTION(ordered_json) {
     INIT_CLASS_ENTRY(ce, "OrderedJsonNativeParseError", NULL);
     oj_error_ce = zend_register_internal_class_ex(&ce, zend_ce_exception);
     zend_declare_property_long(oj_error_ce, "offset", sizeof("offset") - 1, 0, ZEND_ACC_PUBLIC);
+    zend_declare_property_string(oj_error_ce, "kind", sizeof("kind") - 1, "", ZEND_ACC_PUBLIC);
     REGISTER_STRING_CONSTANT("ORDERED_JSON_VERSION", ORDERED_JSON_VERSION, CONST_CS | CONST_PERSISTENT);
     return SUCCESS;
 }
