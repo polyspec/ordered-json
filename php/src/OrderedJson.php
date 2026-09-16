@@ -79,7 +79,7 @@ function utf8Units(string $text, bool $allowWtf8 = false): array
     return $units;
 }
 
-/** @return int|null First invalid UTF-8 byte offset, or null for valid text. */
+/** @internal First invalid UTF-8 byte offset, or null for valid text. */
 function invalidUtf8Offset(string $text): ?int
 {
     $length = strlen($text);

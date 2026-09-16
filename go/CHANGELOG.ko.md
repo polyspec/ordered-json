@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 2cf44eb7b458511e3406abf1c28e2fff807167cce46d662609aa98e830c86215 -->
+<!-- source-sha256: a034bffe0bec5c2ffa8a82bb532ecded9fa341c941f2a80f411f6c16383731c4 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- `ParseBytesBorrowed`의 패키지 테스트를 추가했습니다. 반환된 문자열은 호출자의 바이트가 바뀌어도 유지됩니다. 패키지는 공통 커버리지 검사를 위해 공개 심볼을 보고합니다.
 - 이스케이프하지 않은 제어 문자를 한 칸 뒤가 아니라 그 문자의 위치로 보고하며, 어댑터는 공통 비교를 위해 거부 위치를 보고합니다.
 - 파싱이 0 대신 첫 잘못된 UTF-8 시퀀스의 바이트 위치를 보고합니다.
 - `Marshal`이 `omitempty`와 `omitzero`를 각각의 규칙으로 적용해 host 인코더와 맞습니다. zero `time.Time`은 `omitempty`에서 유지되고 `omitzero`에서 빠집니다. 유한하지 않은 부동소수점은 파서에서 뒤늦게 실패하지 않고 해당 필드를 지목해 보고하며, `time.Time`이 자체 `MarshalJSON`을 가지므로 도달하지 않던 `time.Time` 분기를 제거했습니다. 시드 기반 무작위 테스트가 host 인코더와 해석된 구조를 비교합니다.

@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Package tests call `OrderedMap::iter` and `stringify`, and the package reports its public symbols for the shared coverage check.
 - An invalid escape is reported at the escape character instead of one byte past it, and the adapter reports the rejection position for the shared comparison.
 - Added package tests for the value API and declared them in the implementation registry: the depth argument bound, `parse_bytes` UTF-8 offsets, `OrderedMap` key validation and repeated keys, member lookup by decoded name, unpaired surrogate units, constructor arguments, and wrong-kind access. Shared cases reach this package through its adapter and do not cover that surface.
 - Root arrays take the pending item stack instead of copying every item; spare capacity above one quarter of the length is released.
