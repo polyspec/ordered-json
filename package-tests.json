@@ -1,6 +1,22 @@
 {
   "schema_version": 1,
   "description": "Package test cases. Shared cases reach an implementation through its adapter and cover the JSON contract only, so each package tests the API it exposes. Every implementation runs each case in `cases` unless it declares an exemption with a reason. A case a package runs beyond the standard belongs in `package_cases` for that implementation, so the listing and the standard always account for each other.",
+  "rejection_kinds": [
+    "expected_value",
+    "expected_digit",
+    "expected_colon",
+    "expected_delimiter",
+    "expected_object_key",
+    "invalid_escape",
+    "invalid_unicode_escape",
+    "unfinished_escape",
+    "unterminated_string",
+    "unescaped_control_character",
+    "unescaped_lone_surrogate",
+    "invalid_utf8",
+    "maximum_depth_exceeded",
+    "trailing_input"
+  ],
   "cases": [
     {
       "id": "depth_argument_is_bounded",
@@ -13,6 +29,10 @@
     {
       "id": "parse_errors_report_offsets",
       "description": "A parse error reports the documented offset unit."
+    },
+    {
+      "id": "rejection_names_its_kind",
+      "description": "A parse error carries the shared rejection kind beside its own wording."
     },
     {
       "id": "wrong_kind_access_is_reported",
@@ -208,7 +228,8 @@
       ],
       "ParseError": [
         "parse_errors_report_offsets",
-        "invalid_utf8_reports_the_first_bad_byte"
+        "invalid_utf8_reports_the_first_bad_byte",
+        "rejection_names_its_kind"
       ],
       "Value": [
         "values_come_only_from_the_library"
@@ -288,7 +309,8 @@
     },
     "rust": {
       "Error": [
-        "parse_errors_report_offsets"
+        "parse_errors_report_offsets",
+        "rejection_names_its_kind"
       ],
       "Kind": [
         "wrong_kind_access_is_reported"
@@ -396,6 +418,9 @@
       ],
       "stringify": [
         "root_keeps_surrounding_text"
+      ],
+      "Error.kind": [
+        "rejection_names_its_kind"
       ]
     },
     "go": {
@@ -452,7 +477,8 @@
       ],
       "ParseError": [
         "parse_errors_report_offsets",
-        "invalid_utf8_reports_the_first_bad_byte"
+        "invalid_utf8_reports_the_first_bad_byte",
+        "rejection_names_its_kind"
       ],
       "ParseError.Error": [
         "parse_errors_report_offsets"
@@ -546,6 +572,9 @@
       ],
       "ParseBytesBorrowed": [
         "borrowed_input_is_copied_on_access"
+      ],
+      "ParseError.Kind": [
+        "rejection_names_its_kind"
       ]
     },
     "php": {
@@ -635,6 +664,12 @@
       ],
       "stringify": [
         "values_come_only_from_the_library"
+      ],
+      "ParseError.kind": [
+        "rejection_names_its_kind"
+      ],
+      "ParseError.offset": [
+        "parse_errors_report_offsets"
       ]
     },
     "php-extension": {
@@ -657,7 +692,13 @@
       ],
       "ORDERED_JSON_VERSION": {
         "exempt": "the registry runtime command compares it with phpversion('ordered_json')"
-      }
+      },
+      "OrderedJsonNativeParseError.kind": [
+        "scan_reports_the_parse_error_offset"
+      ],
+      "OrderedJsonNativeParseError.offset": [
+        "scan_reports_the_parse_error_offset"
+      ]
     }
   }
 }
