@@ -1,20 +1,19 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-16T04:53:34+00:00",
+  "checked_at": "2026-09-16T05:05:22+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "b3c8c83cefbb3be4f521713fbabc7c38da7959b8e49b9a4326a9f566b8eb0a53",
+    "sha256": "a97808b96b1148d13b878c307d9d100581a1d49bfe594d7978f93dcc3d105e0a",
     "files": {
-      "external-inputs.json": "14adeda3b117be62de34a3f73f07b8ce4c4d6dc60aa527c0f5174d4b09446b13",
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "7df15e8297783132cc130064afe07173d10151335b9a87e22f1617ca51a33c39",
       "AGENTS.md": "e5eb7cef17eaf348a0b9b1da4256e55fb61d75ef0eb8efeab504daaca32a5c20",
-      "CHANGELOG.ko.md": "90dd751fe1a8bc5c021ed7f26079a5c53128381d210dee860f2c3fb8aafbe826",
-      "CHANGELOG.md": "98b1f336f3be1b5736c829963689dbf1543f495fc12cfa59e444f163d2319381",
+      "CHANGELOG.ko.md": "c9fd0d244b0d2b67e7f4f0318918b1ae6fbe0435c3502ac3d24b0a811636dc65",
+      "CHANGELOG.md": "ee4c268dc0360d8b0c4e47d32b8359780a4af7dfced1515239109d151ab8ce11",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
       "README.md": "8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75",
@@ -27,15 +26,14 @@
       "benchmarks/fixtures/nested-order.json": "ee4d0c53ac06ed42d611f115ec3935f672711c506547268fb1381e8d71d335a5",
       "benchmarks/js.mjs": "c4d244abc5bcff07d50f4f89d6756353d4aeaea3f988481523c450a37ffe5976",
       "benchmarks/php.php": "ff69c427d9de8e5bbfe933fe28b587706484856aaa6b8430cef0e03b2b6cdc30",
-      "benchmarks/results.json": "bffd914ed8a758c1c13cc2af7075df6b141f0a36447caa15311cefd475806362",
       "benchmarks/run.py": "04a31ea02032163b74b21cf943ac9863078611a98b139710ad9b78355a60fecc",
       "benchmarks/workload.json": "555599212bdaf5d7fe33d76416e962c59cb8f67834ed22d43e2a3f092e5f6cc2",
       "docs/distribution.json": "1ccded31251e48286d97c8df62bb87d70cf6eadba4f88cc99a146447fcb2eb8a",
       "docs/documentation-manifest.json": "4c119554db5cdc4aaf40fb17539c69934c49de532f175904dcc9c961af4e10c9",
       "docs/documentation-plan.ko.md": "1124d913a7068f671bd7fde8720406fb5a25e159a01071187b963ab1610dbc8d",
       "docs/documentation-plan.md": "dc46000de51d094f5add21baeef59ef7066e6c45e1d9c6663d221dd7fc341bbb",
-      "docs/features.ko.md": "f6ea2b52ddd584080546303e24b9c1dd8ddfcee0649ff0a98e4f47c030750492",
-      "docs/features.md": "1a892fc401ee1ad52a513e07e16e85b022423c64f376a9c18a510ff3aa2349aa",
+      "docs/features.ko.md": "01ee00fff3e6fcb4a56bfe6a103573c78f25f380a6f32c378cc55b6fd3be5d9b",
+      "docs/features.md": "4a14d6cd6bcfd043f097efd4deb423ddd18fa6b665e8f824ed99e682f69a84b3",
       "docs/operations/distribution.ko.md": "3b36dc47eea16e49720ba0f669511024af32e04276cc3b7476dac7ebaf7dfd26",
       "docs/operations/distribution.md": "c4f493d8b93e47f14bb7c17639a83b9b5f4f656c253df2fef77ee4c65dc9d2ef",
       "docs/operations/installation.ko.md": "e7a89afe9c690610202106b9bd748464b257e8111d8cba9744a327f8ab5293df",
@@ -56,6 +54,7 @@
       "examples/README.ko.md": "1b0d76bd6e4a892d4de2ce55cfbe3f4569aab94a0e94dde2f49c1ab5ac551d06",
       "examples/README.md": "eae1287a4345fe931f4cacd4766a04b5ef533f9e5664eb0c1e4fd32af811820d",
       "examples/official.json": "008b05fe07142d9dcad9edd90fe6606926ccb279461664c19af5a3d0eedac830",
+      "external-inputs.json": "14adeda3b117be62de34a3f73f07b8ce4c4d6dc60aa527c0f5174d4b09446b13",
       "fixtures/invalid/array-double-comma.json": "1b4a2022b0702d87a15a49f031e9795ab6824cb3945c106bcfa5ad55c2e945cc",
       "fixtures/invalid/array-leading-comma.json": "2b3646f1ef5cf8b30a71b9e140e89b77da7eb4354ddc1f346f57ffc66ad68cd0",
       "fixtures/invalid/array-trailing-comma.json": "886ad6246ed150b2930495926ba07d579307bc7fecaf4b391650dca8bae7bc66",
@@ -243,14 +242,14 @@
       "scripts/compare_ojson.py": "bd45cccfc0b64c45a262cde1c2e7509cd23a554040beee4cb598c957786fdef8",
       "scripts/comparison/ojson_comparison.erl": "d267254b5de99b8f3d815639a18dbc97d953be86dc1c28dabce6cbf9218cba9c",
       "scripts/comparison/python_ojson_probe.py": "7939ea89a8c481b4e466969977149d72a1689991cf1d84661ddcc64cbadcf202",
-      "scripts/docs_check.py": "c700a39a008f1bd9f5d58116d2b6cfdc8369b18d78f294c14edb265b6c193926",
+      "scripts/docs_check.py": "1adf5fd45accdfc6e5134168bd37c22ba03210504b8bcd8ccc7bdd921c9b4f4b",
       "scripts/registry.py": "12cff99fee4fa2522cfa134e827a90fdbf6cd14a48162b360f7a35081533cb16",
       "scripts/standalone.py": "bd203544b227dadbea8ec7a233262b6e4561dcb28c785706a05529ee8df0603c",
       "scripts/test.py": "fb53c3f6a7bf1d9190428e04ea1aee6bc0eb0fe515a0abafaa3f772d84372a52",
-      "scripts/tests/test_docs_check.py": "f108d7a8eba7c69e45f429bb0dc0ce470dc6b90b72f3e4f81af12676bdf761ae",
+      "scripts/tests/test_docs_check.py": "b2196ca6530ea7a24a6dc1c887dd8ae2d9261c106c8705def659f5f28560c3cd",
       "scripts/tests/test_package_conformance.py": "4c22f121615b51a3aaec63582ecb78780985be1d51710410f828dcd601f79ec0",
       "scripts/tests/test_repositories.py": "ee3d81f05f3d6cfea361a6eff01fbe12c8851344b1d065094637a85b3215d9fe",
-      "scripts/verification_record.py": "2f63ead8f4ae0379059df7bf9ebdc1ff57babc974b89257d9b1a9ee08d93a33e",
+      "scripts/verification_record.py": "a98f3550be435eb8b149ce19e4c3860e17ea0216c545fdabbf5fc7b762da6899",
       "scripts/verify.py": "cc73835f88d44d92b4d2159b0e8f9676062b3f44bc963e831c8507a155fff934"
     }
   },
@@ -342,7 +341,7 @@
   },
   "documentation_tests": {
     "status": "passed",
-    "count": 53
+    "count": 59
   },
   "supplementary": {
     "project": "nst/JSONTestSuite",
