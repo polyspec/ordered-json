@@ -25,10 +25,10 @@ function unitsToUtf8(array $units, bool $allowUnpaired = true): string
             if ($i + 1 < $n && is_int($units[$i + 1]) && $units[$i + 1] >= 0xdc00 && $units[$i + 1] <= 0xdfff) {
                 $point = 0x10000 + (($point - 0xd800) << 10) + $units[++$i] - 0xdc00;
             } elseif (!$allowUnpaired) {
-                throw new UnexpectedValueException('Unpaired surrogate; use stringUnits()');
+                throw new \UnexpectedValueException('Unpaired surrogate; use stringUnits()');
             }
         } elseif ($point >= 0xdc00 && $point <= 0xdfff && !$allowUnpaired) {
-            throw new UnexpectedValueException('Unpaired surrogate; use stringUnits()');
+            throw new \UnexpectedValueException('Unpaired surrogate; use stringUnits()');
         }
         if ($point < 0x80) $out .= chr($point);
         elseif ($point < 0x800) $out .= chr(0xc0 | ($point >> 6)) . chr(0x80 | ($point & 63));
@@ -136,7 +136,7 @@ function tokenText(string $content, bool $allowUnpaired): string
                 }
             }
             if ($point >= 0xd800 && $point <= 0xdfff && !$allowUnpaired)
-                throw new UnexpectedValueException('Unpaired surrogate; use stringUnits()');
+                throw new \UnexpectedValueException('Unpaired surrogate; use stringUnits()');
             if ($point < 0x80) $out .= chr($point);
             elseif ($point < 0x800) $out .= chr(0xc0 | $point >> 6) . chr(0x80 | $point & 63);
             elseif ($point < 0x10000) $out .= chr(0xe0 | $point >> 12) . chr(0x80 | $point >> 6 & 63) . chr(0x80 | $point & 63);
