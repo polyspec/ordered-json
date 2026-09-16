@@ -22,7 +22,7 @@ A JSON array stores values in input order. Arrays and objects remain distinct, i
 <a id="parsing"></a>
 ## Parsing
 
-A rejection reports the offset of the first byte that makes the document invalid: the unescaped control character itself, the first byte that is not the hex digit or escape the grammar requires, or the first invalid UTF-8 byte. Every implementation rejects the same input at the same position, and the shared check compares those positions.
+A rejection also names its kind, taken from one shared list, so the reason is the same everywhere while each binding keeps its own wording. A rejection reports the offset of the first byte that makes the document invalid: the unescaped control character itself, the first byte that is not the hex digit or escape the grammar requires, or the first invalid UTF-8 byte. Every implementation rejects the same input at the same position, and the shared check compares those positions.
 
 The parser accepts JSON objects, arrays, strings, numbers, booleans, and null at the root. Byte input must be UTF-8. The parser rejects comments, trailing commas, invalid number syntax, invalid escapes, unescaped control characters, invalid UTF-8, a byte order mark, and trailing input.
 
