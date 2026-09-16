@@ -61,7 +61,7 @@ static bool oj_escapes_complete(const unsigned char *s, size_t start, size_t end
     return true;
 }
 
-/* Child values of the container at index: the item list of an array, or [members, keys] of an
+/* Child values of the container at index: the item list of an array, or the members of an
  * object keyed by decoded member name, matching the pure PHP hydration. */
 PHP_FUNCTION(ordered_json_hydrate) {
     zend_string *source;
@@ -77,7 +77,7 @@ PHP_FUNCTION(ordered_json_hydrate) {
         zend_throw_error(NULL, "Class OrderedJson\\Value with source, tape and index properties is not loaded");
         RETURN_THROWS();
     }
-    zval source_value, item, members, keys;
+    zval source_value, item, members;
     ZVAL_STR(&source_value, source);
     oj_tape t = {NULL, Z_ARRVAL_P(node), zend_hash_num_elements(Z_ARRVAL_P(node))};
     const unsigned char *s = (const unsigned char *)ZSTR_VAL(source);
@@ -103,13 +103,8 @@ invalid_items:
         goto invalid;
     }
     if ((meta & OJ_KIND_MASK) != OJ_OBJECT) goto invalid;
-    if (limit == (size_t)index + 3) {
-        ZVAL_EMPTY_ARRAY(&members);
-        ZVAL_EMPTY_ARRAY(&keys);
-    } else {
-        array_init(&members);
-        array_init(&keys);
-    }
+    if (limit == (size_t)index + 3) RETURN_EMPTY_ARRAY();
+    array_init(&members);
     for (size_t i = (size_t)index + 3; i < limit;) {
         zend_long key_meta, key_start, key_end, value_meta;
         if (!oj_slot(&t, i, &key_meta) || !oj_slot(&t, i + 1, &key_start) || !oj_slot(&t, i + 2, &key_end)
@@ -129,21 +124,15 @@ invalid_items:
             } else {
                 name = zend_string_init((const char *)s + start, end - start, 0);
             }
-            oj_new_value(&item, vc, &source_value, node, (zend_long)i);
-            zend_symtable_update(Z_ARRVAL(keys), name, &item);
             oj_new_value(&item, vc, &source_value, node, (zend_long)target);
             zend_symtable_update(Z_ARRVAL(members), name, &item);
             zend_string_release(name);
         }
         i = next;
     }
-    array_init_size(return_value, 2);
-    add_next_index_zval(return_value, &members);
-    add_next_index_zval(return_value, &keys);
-    return;
+    RETURN_COPY_VALUE(&members);
 invalid_members:
     zval_ptr_dtor(&members);
-    zval_ptr_dtor(&keys);
 invalid:
     zend_argument_value_error(2, "must be a descriptor from ordered_json_scan() for argument #1 ($source)");
     RETURN_THROWS();
