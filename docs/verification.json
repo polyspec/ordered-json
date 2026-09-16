@@ -1,20 +1,20 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-16T02:56:23+00:00",
+  "checked_at": "2026-09-16T02:59:13+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "dcbf90c8a4096b8ea9a885fb102e42b8295db0de41771c7786fa14a4b3c7dc71",
+    "sha256": "64716a89ff544fc51fc6fbc8115a76964cf8300b9b0b078064ebed46a96b3403",
     "files": {
-      "php/tests/api.php": "eaef1e08a78d48c83dd4becdd11f7d7449042605dbaae53662c590eebc01550c",
+      "rust/tests/api.rs": "12b5f999a05c2a4be3d87f0702bc0d43a8d6b23377b2cb5a01651195858346a5",
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "9753f5b8913ca51cd893ccf2f916ae11832cb25f0e60295f35212aad412375ff",
       "AGENTS.md": "632a4dd8c3b603e5184c7c8db58d5b2a0de5a5370f98c556a01a33d55765c6dd",
-      "CHANGELOG.ko.md": "5b57e113e9842dd1bb5a0f1ae310b23e3e65246126058a634118d096e70ef01b",
-      "CHANGELOG.md": "e38941f3307111b5798fbe5c85a4ac08fb68cb2ca0d3d28a90a80c2f63490132",
+      "CHANGELOG.ko.md": "7b6d40cb48d256eed9ffde2e88dd43d3bc79818be7f2c6208ee7afb35a0b83b5",
+      "CHANGELOG.md": "c70480028765d5a599bcbc6cd449c4f3677d2e9baf8dccb8407671d69afb1784",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
       "README.md": "8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75",
@@ -170,7 +170,7 @@
       "go/marshal_fuzz_test.go": "28989222139f7086f3d30aa843318ac0f5d20ea34e0c7c88618d86111d49c7db",
       "go/marshal_test.go": "bc096d58700355f42d472c20d6e75ad40dc311cac19bac17fff60490de32f2d5",
       "go/orderedjson.go": "d2e4403112cec0c8f4991838215a1025859f7236868b2f98bced42891d93900f",
-      "implementations.json": "2f78f7fd1ea96b4b48d28c697e9ff0a31f0685a176898a70139cfb758671bb33",
+      "implementations.json": "4c88985db7f57fb96c2481974d5e052b3826ad726442f20a481139d7b32d0398",
       "js/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "js/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
       "js/AGENTS.md": "a8e43aea261abd8edd34b1495814884e55fcf6c17f24ad412ac708e9d55765b0",
@@ -213,12 +213,13 @@
       "php/composer.json": "25853cd81a924cb7966c61b7ddfd412bbfde9dac10bc7d978379a2591e663370",
       "php/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
       "php/src/OrderedJson.php": "77674bd8cf30d76b204670e72812a66ef5e3cdb8ea827321f7977c11e6e5854f",
+      "php/tests/api.php": "eaef1e08a78d48c83dd4becdd11f7d7449042605dbaae53662c590eebc01550c",
       "php/tests/probe.php": "ca18015b946b6142f4a3080e5f4c415af080cff14454a26b1c2cb4e1df1a9228",
       "rust/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "rust/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
       "rust/AGENTS.md": "a8e43aea261abd8edd34b1495814884e55fcf6c17f24ad412ac708e9d55765b0",
-      "rust/CHANGELOG.ko.md": "96d7cbed1d6b33c9e6f67ae27bb1b791ba8d893ea4b7b6f4f1424450e03f3519",
-      "rust/CHANGELOG.md": "45ae2f4c6b04bc705d7fcfd68396a7808cfb75eaa85669cdce8cf87967528d7c",
+      "rust/CHANGELOG.ko.md": "c66de5f3cf66bdd0aceea93f08148940dc651641f1b9703bf7b457fdf1fce015",
+      "rust/CHANGELOG.md": "d1d11d7835456936638e5d8513835dc2ab50a97926091dff5a83ff89f1e20970",
       "rust/Cargo.lock": "31d0fcae18d7184b3bd75ef91d38b3fac0d7ce8624d7e67fa83ef98b2f257b86",
       "rust/Cargo.toml": "f679f5669fd0665a5c28fc2c37a962456ae6c9bcd6fddc8964bc73899dbb3db5",
       "rust/Makefile": "834f720591ef8747ce5e53d25b83005bf802472404adba7f5e64dfdc8510ad88",
@@ -262,7 +263,14 @@
       "runtime": {
         "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)"
       },
-      "tests": null
+      "tests": {
+        "status": "passed",
+        "command": [
+          "{cargo}",
+          "test",
+          "--quiet"
+        ]
+      }
     },
     "go": {
       "status": "passed",
@@ -333,8 +341,8 @@
     },
     "rust": {
       "path": "rust",
-      "sha256": "978e82196767cf62304286bae0f7abc7b415691c0203fe97df9dfeb33e738514",
-      "files": 14
+      "sha256": "fa1a53463851458d1315634c045993b0a77a472d9c9abd3e8b99235abd654b31",
+      "files": 15
     },
     "go": {
       "path": "go",
