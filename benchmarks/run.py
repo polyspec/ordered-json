@@ -23,12 +23,38 @@ FIXTURES = [ROOT / "benchmarks/fixtures" / name for name in WORKLOADS]
 RESULTS = ROOT / "benchmarks/results.json"
 CURRENT = ROOT / ".cache/benchmark.current.json"
 
-def validate_workload():
-    actual = {path.name for path in (ROOT / "benchmarks/fixtures").glob("*.json")}
-    if actual != set(WORKLOADS):
-        raise SystemExit(f"Workload manifest does not match fixtures: {sorted(actual ^ set(WORKLOADS))}")
-    for name, item in WORKLOADS.items():
-        source = (ROOT / "benchmarks/fixtures" / name).read_bytes()
+COUNTS = ("objects", "arrays", "strings", "numbers", "booleans", "nulls", "nodes")
+
+def structure(node, depth=0):
+    """Count what a document contains. An object key is a string node of its own."""
+    result = {key: 0 for key in COUNTS} | {"nodes": 1, "max_depth": depth}
+    def merge(inner):
+        for key in COUNTS:
+            result[key] += inner[key]
+        result["max_depth"] = max(result["max_depth"], inner["max_depth"])
+    if isinstance(node, dict):
+        result["objects"] = 1
+        for key, value in node.items():
+            merge({**{name: 0 for name in COUNTS}, "strings": 1, "nodes": 1, "max_depth": depth + 1})
+            merge(structure(value, depth + 1))
+    elif isinstance(node, list):
+        result["arrays"] = 1
+        for value in node:
+            merge(structure(value, depth + 1))
+    elif isinstance(node, str): result["strings"] = 1
+    elif isinstance(node, bool): result["booleans"] = 1
+    elif node is None: result["nulls"] = 1
+    else: result["numbers"] = 1
+    return result
+
+def validate_workload(workloads=None, directory=None):
+    workloads = WORKLOADS if workloads is None else workloads
+    directory = (ROOT / "benchmarks/fixtures") if directory is None else directory
+    actual = {path.name for path in directory.glob("*.json")}
+    if actual != set(workloads):
+        raise SystemExit(f"Workload manifest does not match fixtures: {sorted(actual ^ set(workloads))}")
+    for name, item in workloads.items():
+        source = (directory / name).read_bytes()
         if len(source) != item["input_bytes"]:
             raise SystemExit(f"Input byte count changed for {name}")
         if hashlib.sha256(source).hexdigest() != item["sha256"]:
@@ -36,6 +62,8 @@ def validate_workload():
         required = {"input_bytes", "objects", "arrays", "strings", "numbers", "booleans", "nulls", "nodes", "max_depth", "sha256"}
         if set(item) != required | {"file"}:
             raise SystemExit(f"Invalid workload metadata for {name}")
+        if {key: item[key] for key in (*COUNTS, "max_depth")} != structure(json.loads(source)):
+            raise SystemExit(f"Workload metadata does not describe {name}")
 
 def command_version(command):
     try:
