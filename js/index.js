@@ -52,6 +52,8 @@ export class ParseError extends SyntaxError {
     super(`${message} at ${unit} ${offset}`);
     this.name = 'ParseError';
     this.offset = offset;
+    // 'utf16' for parse positions, 'byte' when the input never decoded.
+    this.unit = unit === 'byte' ? 'byte' : 'utf16';
   }
 }
 
@@ -163,6 +165,7 @@ function checkValue(value) {
 let src = '', pos = 0, depthLimit = MAX_DEPTH, whitespace = 0, duplicates = 0;
 
 function fail(message) { throw new ParseError(message, pos); }
+function failAt(message, at) { throw new ParseError(message, at); }
 
 function skipWhitespace() {
   let code = src.charCodeAt(pos);
@@ -173,7 +176,7 @@ function skipWhitespace() {
 }
 
 function checkUnit(code) {
-  if (code < 32) fail('Unescaped control character');
+  if (code < 32) failAt('Unescaped control character', pos - 1);
   if ((code & 0xf800) === 0xd800) {
     const low = src.charCodeAt(pos);
     if (code >= 0xdc00 || !(low >= 0xdc00 && low <= 0xdfff)) fail('Unescaped unpaired surrogate');
@@ -213,7 +216,7 @@ function scanEscapedString(text) {
     else if (escape === 110) text += '\n';
     else if (escape === 114) text += '\r';
     else if (escape === 116) text += '\t';
-    else fail('Invalid escape');
+    else failAt('Invalid escape', pos - 1);
     const chunk = pos;
     for (;;) {
       if (pos >= length) fail('Unterminated string');

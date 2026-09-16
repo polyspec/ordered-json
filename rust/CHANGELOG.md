@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- An invalid escape is reported at the escape character instead of one byte past it, and the adapter reports the rejection position for the shared comparison.
 - Added package tests for the value API and declared them in the implementation registry: the depth argument bound, `parse_bytes` UTF-8 offsets, `OrderedMap` key validation and repeated keys, member lookup by decoded name, unpaired surrogate units, constructor arguments, and wrong-kind access. Shared cases reach this package through its adapter and do not cover that surface.
 - Root arrays take the pending item stack instead of copying every item; spare capacity above one quarter of the length is released.
 - Reduced parser allocations: each value stores a kind-specific payload instead of an empty map, item vector, and unit vector; string units are decoded on first access; objects keep one entry list and build a hash index above eight members; values without insignificant whitespace or duplicate keys compact by copying their source token. Results, errors, and offsets are unchanged. The derived `Debug` output of `Value` and `OrderedMap` reflects the new internal fields.
