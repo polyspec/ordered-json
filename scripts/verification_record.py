@@ -26,7 +26,8 @@ def sha256(data):
 
 
 def source_manifest(root):
-    excluded = {'docs/verification.json', 'docs/pie-verification.json'}
+    # A record is evidence about the sources, not one of them.
+    excluded = {'docs/verification.json', 'docs/pie-verification.json', 'benchmarks/results.json'}
     files = {}
     if (root / '.git').exists():
         tracked = output(['git', 'ls-files', '--cached', '--others', '--exclude-standard', '-z'], cwd=root)
