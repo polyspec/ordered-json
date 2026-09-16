@@ -484,12 +484,26 @@ func ParseBytesBorrowed(source []byte) (*Value, error) {
 func ParseWithMaxDepth(source string, maxDepth int) (*Value, error) {
 	return parse(source, maxDepth, 0)
 }
+
+// utf8.ValidString reports only that an invalid sequence exists, so the error
+// position comes from the first one.
+func firstInvalidByte(source string) int {
+	for i := 0; i < len(source); {
+		r, size := utf8.DecodeRuneInString(source[i:])
+		if r == utf8.RuneError && size <= 1 {
+			return i
+		}
+		i += size
+	}
+	return len(source)
+}
+
 func parse(source string, maxDepth int, flags uint8) (*Value, error) {
 	if maxDepth < 0 || maxDepth > MaxDepth {
 		return nil, fmt.Errorf("maxDepth must be between 0 and 256")
 	}
 	if !utf8.ValidString(source) {
-		return nil, &ParseError{0, "invalid UTF-8"}
+		return nil, &ParseError{firstInvalidByte(source), "invalid UTF-8"}
 	}
 	p := parser{source: source, maxDepth: maxDepth, flags: flags, estimate: -1}
 	v, err := p.value(0)

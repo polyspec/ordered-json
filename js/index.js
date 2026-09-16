@@ -48,8 +48,8 @@ function stringEnd(source, start) {
 }
 
 export class ParseError extends SyntaxError {
-  constructor(message, offset) {
-    super(`${message} at UTF-16 offset ${offset}`);
+  constructor(message, offset, unit = 'UTF-16 offset') {
+    super(`${message} at ${unit} ${offset}`);
     this.name = 'ParseError';
     this.offset = offset;
   }
@@ -314,8 +314,32 @@ export function parseBytes(bytes, options) {
   if (!(bytes instanceof Uint8Array)) throw new TypeError('Expected Uint8Array');
   let source;
   try { source = utf8.decode(bytes); }
-  catch { throw new ParseError('Invalid UTF-8', 0); }
+  catch { throw new ParseError('Invalid UTF-8', firstInvalidByte(bytes), 'byte'); }
   return parse(source, options);
+}
+
+// The decoder reports no position, so the first invalid sequence is located here.
+function firstInvalidByte(bytes) {
+  for (let i = 0; i < bytes.length;) {
+    const lead = bytes[i];
+    let width = 0;
+    let point = 0;
+    if (lead < 0x80) { i++; continue; }
+    if (lead >= 0xc2 && lead <= 0xdf) { width = 2; point = lead & 31; }
+    else if (lead >= 0xe0 && lead <= 0xef) { width = 3; point = lead & 15; }
+    else if (lead >= 0xf0 && lead <= 0xf4) { width = 4; point = lead & 7; }
+    else return i;
+    if (i + width > bytes.length) return i;
+    for (let k = 1; k < width; k++) {
+      const continuation = bytes[i + k];
+      if ((continuation & 0xc0) !== 0x80) return i;
+      point = (point << 6) | (continuation & 63);
+    }
+    const minimum = width === 2 ? 0x80 : width === 3 ? 0x800 : 0x10000;
+    if (point < minimum || point > 0x10ffff || (point >= 0xd800 && point <= 0xdfff)) return i;
+    i += width;
+  }
+  return bytes.length;
 }
 
 export function stringify(value) {

@@ -17,7 +17,7 @@ SOURCE_PATTERNS = (
     'php/composer.json', 'php-extension/src/*.c', 'php-extension/src/*.h', 'php-extension/src/*.stub.php',
     'php-extension/src/config.m4', 'php-extension/src/config.w32', 'scripts/**/*.py', 'scripts/**/*.erl',
     'examples/official.json', 'examples/README*.md', 'fixtures/**/*.json', 'docs/spec/*.md',
-    'implementations.json',
+    'implementations.json', 'package-tests.json',
 )
 
 

@@ -1,56 +1,265 @@
 {
   "schema_version": 1,
   "repositories": {
-    "javascript": {"path": "js", "url": "https://github.com/polyspec/ordered-json.git"},
-    "rust": {"path": "rust", "url": "https://github.com/polyspec/ordered-json.git"},
-    "go": {"path": "go", "url": "https://github.com/polyspec/ordered-json.git"},
-    "php": {"path": "php", "url": "https://github.com/polyspec/ordered-json.git"},
-    "php-extension": {"path": "php-extension", "url": "https://github.com/polyspec/ordered-json.git"}
+    "javascript": {
+      "path": "js",
+      "url": "https://github.com/polyspec/ordered-json.git"
+    },
+    "rust": {
+      "path": "rust",
+      "url": "https://github.com/polyspec/ordered-json.git"
+    },
+    "go": {
+      "path": "go",
+      "url": "https://github.com/polyspec/ordered-json.git"
+    },
+    "php": {
+      "path": "php",
+      "url": "https://github.com/polyspec/ordered-json.git"
+    },
+    "php-extension": {
+      "path": "php-extension",
+      "url": "https://github.com/polyspec/ordered-json.git"
+    }
   },
   "implementations": {
     "js": {
       "repository": "javascript",
-      "command": ["node", "{javascript}/test/probe.mjs"],
-      "tests": {"cwd": "{javascript}", "command": ["node", "test/api.mjs"]},
-      "runtime": {"node": ["node", "--version"]}
+      "command": [
+        "node",
+        "{javascript}/test/probe.mjs"
+      ],
+      "tests": {
+        "cwd": "{javascript}",
+        "command": [
+          "node",
+          "test/api.mjs"
+        ]
+      },
+      "test_cases": {
+        "cwd": "{javascript}",
+        "command": [
+          "node",
+          "test/api.mjs",
+          "--cases"
+        ]
+      },
+      "runtime": {
+        "node": [
+          "node",
+          "--version"
+        ]
+      }
     },
     "rust": {
       "repository": "rust",
-      "prepare": [{"cwd": "{rust}", "command": ["{cargo}", "build", "--quiet", "--example", "probe"]}],
-      "command": ["{rust}/target/debug/examples/probe"],
-      "tests": {"cwd": "{rust}", "command": ["{cargo}", "test", "--quiet"]},
-      "runtime": {"rustc": ["{rustc}", "--version"]}
+      "prepare": [
+        {
+          "cwd": "{rust}",
+          "command": [
+            "{cargo}",
+            "build",
+            "--quiet",
+            "--example",
+            "probe"
+          ]
+        }
+      ],
+      "command": [
+        "{rust}/target/debug/examples/probe"
+      ],
+      "tests": {
+        "cwd": "{rust}",
+        "command": [
+          "{cargo}",
+          "test",
+          "--quiet"
+        ]
+      },
+      "test_cases": {
+        "cwd": "{rust}",
+        "command": [
+          "{cargo}",
+          "test",
+          "--quiet",
+          "--",
+          "--list"
+        ]
+      },
+      "runtime": {
+        "rustc": [
+          "{rustc}",
+          "--version"
+        ]
+      }
     },
     "go": {
       "repository": "go",
-      "prepare": [{"cwd": "{go}", "command": ["go", "build", "-o", "{cache}/go-probe", "./internal/probe"]}],
-      "command": ["{cache}/go-probe"],
-      "tests": {"cwd": "{go}", "command": ["go", "test", "./..."]},
-      "runtime": {"go": ["go", "version"]}
+      "prepare": [
+        {
+          "cwd": "{go}",
+          "command": [
+            "go",
+            "build",
+            "-o",
+            "{cache}/go-probe",
+            "./internal/probe"
+          ]
+        }
+      ],
+      "command": [
+        "{cache}/go-probe"
+      ],
+      "tests": {
+        "cwd": "{go}",
+        "command": [
+          "go",
+          "test",
+          "./..."
+        ]
+      },
+      "test_cases": {
+        "cwd": "{go}",
+        "command": [
+          "go",
+          "test",
+          "-list",
+          ".*",
+          "./..."
+        ]
+      },
+      "runtime": {
+        "go": [
+          "go",
+          "version"
+        ]
+      }
     },
     "php": {
       "repository": "php",
-      "command": ["php", "-n", "{php}/tests/probe.php"],
-      "tests": {"cwd": "{php}", "command": ["php", "-n", "tests/api.php"]},
-      "runtime": {"php": ["php", "-n", "-r", "echo PHP_VERSION;"]}
+      "command": [
+        "php",
+        "-n",
+        "{php}/tests/probe.php"
+      ],
+      "tests": {
+        "cwd": "{php}",
+        "command": [
+          "php",
+          "-n",
+          "tests/api.php"
+        ]
+      },
+      "test_cases": {
+        "cwd": "{php}",
+        "command": [
+          "php",
+          "-n",
+          "tests/api.php",
+          "--cases"
+        ]
+      },
+      "runtime": {
+        "php": [
+          "php",
+          "-n",
+          "-r",
+          "echo PHP_VERSION;"
+        ]
+      }
     },
     "php-extension": {
       "repository": "php-extension",
-      "dependencies": ["php"],
-      "prepare": [
-        {"cwd": "{php-extension}/src", "if_exists": "{php-extension}/src/Makefile", "command": ["make", "distclean"]},
-        {"cwd": "{php-extension}/src", "command": ["phpize", "--clean"]},
-        {"cwd": "{php-extension}/src", "command": ["phpize"]},
-        {"cwd": "{php-extension}/src", "command": ["./configure", "--enable-ordered-json"]},
-        {"cwd": "{php-extension}/src", "command": ["make", "-j2"]}
+      "dependencies": [
+        "php"
       ],
-      "command": ["php", "-n", "-d", "extension={php-extension}/src/modules/ordered_json.so", "{php}/tests/probe.php", "--native"],
-      "tests": {"cwd": "{php-extension}", "command": ["php", "-n", "-d", "extension={php-extension}/src/modules/ordered_json.so", "tests/descriptors.php", "{php}/src/OrderedJson.php"]},
-      "runtime": {
-        "php": ["php", "-n", "-r", "echo PHP_VERSION;"],
-        "extension_version": ["php", "-n", "-d", "extension={php-extension}/src/modules/ordered_json.so", "-r", "if (phpversion('ordered_json') !== ORDERED_JSON_VERSION) exit(1); echo ORDERED_JSON_VERSION;"]
+      "prepare": [
+        {
+          "cwd": "{php-extension}/src",
+          "if_exists": "{php-extension}/src/Makefile",
+          "command": [
+            "make",
+            "distclean"
+          ]
+        },
+        {
+          "cwd": "{php-extension}/src",
+          "command": [
+            "phpize",
+            "--clean"
+          ]
+        },
+        {
+          "cwd": "{php-extension}/src",
+          "command": [
+            "phpize"
+          ]
+        },
+        {
+          "cwd": "{php-extension}/src",
+          "command": [
+            "./configure",
+            "--enable-ordered-json"
+          ]
+        },
+        {
+          "cwd": "{php-extension}/src",
+          "command": [
+            "make",
+            "-j2"
+          ]
+        }
+      ],
+      "command": [
+        "php",
+        "-n",
+        "-d",
+        "extension={php-extension}/src/modules/ordered_json.so",
+        "{php}/tests/probe.php",
+        "--native"
+      ],
+      "tests": {
+        "cwd": "{php-extension}",
+        "command": [
+          "php",
+          "-n",
+          "-d",
+          "extension={php-extension}/src/modules/ordered_json.so",
+          "tests/descriptors.php",
+          "{php}/src/OrderedJson.php"
+        ]
       },
-      "artifacts": ["{php-extension}/src/modules/ordered_json.so"]
+      "test_cases": {
+        "cwd": "{php-extension}",
+        "command": [
+          "php",
+          "-n",
+          "-d",
+          "extension={php-extension}/src/modules/ordered_json.so",
+          "tests/descriptors.php",
+          "{php}/src/OrderedJson.php",
+          "--cases"
+        ]
+      },
+      "runtime": {
+        "php": [
+          "php",
+          "-n",
+          "-r",
+          "echo PHP_VERSION;"
+        ],
+        "extension_version": [
+          "php",
+          "-n",
+          "-d",
+          "extension={php-extension}/src/modules/ordered_json.so",
+          "-r",
+          "if (phpversion('ordered_json') !== ORDERED_JSON_VERSION) exit(1); echo ORDERED_JSON_VERSION;"
+        ]
+      },
+      "artifacts": [
+        "{php-extension}/src/modules/ordered_json.so"
+      ]
     }
   }
 }

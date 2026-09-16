@@ -22,7 +22,7 @@ Parsed `Value` objects cannot be modified through the library API. Factories con
 | Source inspection | `value.raw` | `value.raw()` | `value.Raw()` | `$value->raw()` |
 | Kind | `value.kind` | `value.kind()` | `value.Kind()` | `$value->kind()` |
 
-JavaScript parse errors report UTF-16 offsets. Rust, Go, and PHP parse errors report UTF-8 byte offsets. The Go `Value` zero value is invalid. Empty `OrderedMap` values in Rust and Go are valid object inputs.
+JavaScript parse errors report UTF-16 offsets. Rust, Go, and PHP parse errors report UTF-8 byte offsets. An invalid UTF-8 error reports the byte offset of the first invalid byte in every binding, including JavaScript, because the input has no decoded text at that point; the JavaScript message names that unit. The Go `Value` zero value is invalid. Empty `OrderedMap` values in Rust and Go are valid object inputs.
 
 <a id="bindings"></a>
 ## Binding extensions

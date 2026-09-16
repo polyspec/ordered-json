@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 51c4ba83fd52d744dd36519193b587cbeece715ddd21b793b0c5be281f42f4e3 -->
+<!-- source-sha256: 20d66c38b5885a6fd398892f0f18ad59d829b29e5ce6866a156d8a917c042de4 -->
 # API 계약
 
 [English](api.md)
@@ -23,7 +23,7 @@
 | 원문 조회 | `value.raw` | `value.raw()` | `value.Raw()` | `$value->raw()` |
 | 종류 | `value.kind` | `value.kind()` | `value.Kind()` | `$value->kind()` |
 
-JavaScript 파싱 오류는 UTF-16 위치를 반환합니다. Rust, Go, PHP 파싱 오류는 UTF-8 바이트 위치를 반환합니다. Go `Value`의 영값은 유효하지 않습니다. Rust와 Go의 빈 `OrderedMap`은 유효한 객체 입력입니다.
+JavaScript 파싱 오류는 UTF-16 위치를 반환합니다. Rust, Go, PHP 파싱 오류는 UTF-8 바이트 위치를 반환합니다. 잘못된 UTF-8 오류는 모든 바인딩에서 첫 잘못된 바이트의 바이트 위치를 반환합니다. 그 시점에는 해석된 텍스트가 없으므로 JavaScript도 같으며, JavaScript 메시지는 그 단위를 함께 적습니다. Go `Value`의 영값은 유효하지 않습니다. Rust와 Go의 빈 `OrderedMap`은 유효한 객체 입력입니다.
 
 <a id="bindings"></a>
 ## 바인딩 확장

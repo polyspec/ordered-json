@@ -79,6 +79,31 @@ function utf8Units(string $text, bool $allowWtf8 = false): array
     return $units;
 }
 
+/** @return int|null First invalid UTF-8 byte offset, or null for valid text. */
+function invalidUtf8Offset(string $text): ?int
+{
+    $length = strlen($text);
+    for ($i = 0; $i < $length;) {
+        $start = $i;
+        $first = ord($text[$i++]);
+        if ($first < 0x80) continue;
+        $need = $first >= 0xc2 && $first <= 0xdf ? 1
+            : ($first >= 0xe0 && $first <= 0xef ? 2
+            : ($first >= 0xf0 && $first <= 0xf4 ? 3 : -1));
+        if ($need < 0 || $i + $need > $length) return $start;
+        $point = $first & ((1 << (6 - $need)) - 1);
+        for ($j = 0; $j < $need; $j++) {
+            $next = ord($text[$i++]);
+            if (($next & 0xc0) !== 0x80) return $start;
+            $point = ($point << 6) | ($next & 0x3f);
+        }
+        if (($need === 1 && $point < 0x80) || ($need === 2 && $point < 0x800)
+            || ($need === 3 && $point < 0x10000) || $point > 0x10ffff
+            || ($point >= 0xd800 && $point <= 0xdfff)) return $start;
+    }
+    return null;
+}
+
 /** @internal Decode the contents of a validated string token into UTF-16 units. */
 function tokenUnits(string $content): array
 {
@@ -436,7 +461,8 @@ final class Parser
     {
         // PCRE validates UTF-8 before matching, so only a UTF-8 error means invalid input;
         // other errors come from the backtrack or recursion limits in php.ini.
-        if (preg_match('//u', $this->source) !== 1 && preg_last_error() === PREG_BAD_UTF8_ERROR) $this->fail('Invalid UTF-8', 0);
+        if (preg_match('//u', $this->source) !== 1 && preg_last_error() === PREG_BAD_UTF8_ERROR)
+            $this->fail('Invalid UTF-8', invalidUtf8Offset($this->source) ?? 0);
         $pos = $this->value(0, 0);
         $pos += strspn($this->source, self::WHITESPACE, $pos);
         if ($pos !== $this->length) $this->fail('Unexpected trailing input', $pos);
