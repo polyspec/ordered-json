@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- A parse error carries a rejection kind from one shared list, and the shared check requires every implementation to name the same kind for the same document. Message wording stays in each language's own style: Go and Rust keep lowercase sentences, and JavaScript keeps its finer wording for number errors.
 - Every package reports its public symbols, and the standard names the cases that cover each one. The comparison found four gaps: Go `ParseBytesBorrowed` had no test, Rust `OrderedMap::iter` and `stringify` were never called by a case, and the JavaScript type declaration described a `stringify` options argument the function does not take.
 - The shared check compares where each implementation rejects an input, and every implementation now reports the first byte that makes the document invalid. The comparison found five documents whose positions differed: JavaScript, Go and both PHP backends pointed one byte past an unescaped control character, and pure PHP pointed at the start of an invalid Unicode escape instead of the offending byte.
 - Added a package test standard and the check that enforces it. Each implementation reports the cases it runs, and `make check` fails when a required case is missing or a reported case is not declared, so cross-language coverage is decided by the tool rather than by review.
