@@ -177,7 +177,7 @@ class DocumentationChecks(unittest.TestCase):
         self.assert_failure('PHP runtime and extension versions')
 
     def test_private_paths_in_markdown_fail(self):
-        self.write('README.md', (self.root / 'README.md').read_text() + '\n/Users/example/project/\n')
+        self.write('README.md', (self.root / 'README.md').read_text() + '\n' + '/' + 'Users/example/project/\n')
         self.assert_failure('Public document contains a local home-directory path')
 
     def test_private_paths_in_reports_fail(self):
