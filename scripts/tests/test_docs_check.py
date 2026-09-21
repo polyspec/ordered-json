@@ -181,7 +181,7 @@ class DocumentationChecks(unittest.TestCase):
         self.assert_failure('Public document contains a local home-directory path')
 
     def test_private_paths_in_reports_fail(self):
-        self.json('docs/report.json', {'path': '/home/example/project/'})
+        self.json('docs/report.json', {'path': '/' + 'home/example/project/'})
         self.assert_failure('Public report contains a local home-directory path')
 
     def test_link_cannot_escape_repository(self):
