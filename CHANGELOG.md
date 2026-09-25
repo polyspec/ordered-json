@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Disable Cargo registry publication for the Rust package. The package has no declared Rust
+  license, and the source checkout is its confirmed distribution.
 - Fixed Go `Marshal` for a nil `*Value` field: it now writes `null`, as it does for other nil pointers, instead of returning `expected orderedjson Value`. The nil check runs before the `MarshalJSON` boundary, so any nil pointer whose type implements `MarshalJSON` is `null`, and an interface is encoded as the value it holds.
 - The benchmark runner now validates each fixture's declared object, array,
   scalar, node, and maximum-depth counts against the parsed input. Added

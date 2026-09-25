@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-25T02:08:27+00:00",
+  "checked_at": "2026-09-25T21:56:43+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "78e359f1fa8553bfcb934ff48e98e90ce61f1f35c55290ff7b8f27da5da343ab",
+    "sha256": "9dc7b2feb995068be9238f545c71d3cd1f18358a1b2a86e602d0d10d29515de0",
     "files": {
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "bc7ef1732cf5b4c6af762d2fb33b6873b03a23d4be078922ac822ec79ed52a1e",
       "AGENTS.md": "be12ce8b18ce5a9c0d7cb278f3d0a4d742c3f712713aaeeaac3902cddab4e36f",
-      "CHANGELOG.ko.md": "f7623aa67c52ca09c00da3e149931fee2081adb2067adb483d989f05c3a84ae3",
-      "CHANGELOG.md": "a3f49af78508a0f67e58eedf56c4ca6295c730d3213cdefb3e01b172fb1f8bfa",
+      "CHANGELOG.ko.md": "4ff2e695c694f1b488f65814a23f7cd7d90c1f03832f0c96f2332919853106ff",
+      "CHANGELOG.md": "042de5e6e73810e77a972d5f6da81a9d0f33060f6ca2878af0dc0186d05a663e",
       "Cargo.toml": "6e0e95bb71b0a05ea77c6db0f7d9aa0c7711f5a123aab1a5005e8262a913abc9",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
@@ -230,10 +230,10 @@
       "rust/CHANGELOG.ko.md": "28e844b497414af4cdd207ecbbb4d63ceab1f2760b9a693a2fd49e522e36ea49",
       "rust/CHANGELOG.md": "8f6d84114fd285858d229f871b5e006dbc426868066367464f59fdee532981e1",
       "rust/Cargo.lock": "31d0fcae18d7184b3bd75ef91d38b3fac0d7ce8624d7e67fa83ef98b2f257b86",
-      "rust/Cargo.toml": "f679f5669fd0665a5c28fc2c37a962456ae6c9bcd6fddc8964bc73899dbb3db5",
+      "rust/Cargo.toml": "8dc53940710739a4afe19696364619d9f48594a416989d440e3b13044021ffb8",
       "rust/Makefile": "834f720591ef8747ce5e53d25b83005bf802472404adba7f5e64dfdc8510ad88",
-      "rust/README.ko.md": "d5ac5e9857c793fb5dc17932207f12f80ea4ccb460653865a282d8a03eaeff7b",
-      "rust/README.md": "e3c04eba3326d309a6e793f57ac7979c1429fdb9e135e85d022adb573029c8e3",
+      "rust/README.ko.md": "cb30aaaea172e31552fe3e7e496ae017607682babd1baef4f3fe9e913a5746f8",
+      "rust/README.md": "b3697aaa68e8a5118d6b9504cdfeeab783906391f4639392d8bed54ec21641a4",
       "rust/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
       "rust/examples/api.rs": "ad8fba3fe24c08a86f5fc9bcc6faf74a583f634af95b4309ac9f514c385ce691",
       "rust/examples/benchmark.rs": "5bee752a544edc63573656d43c0f99c8bb2f6744f2a2d36bfd7227257459ce79",
@@ -351,7 +351,16 @@
     "cases": 318,
     "inputs_sha256": "dafa7facfed6700b0a2f16207fb1d3b557f9e45d3abd84f2dfb666538d10c332"
   },
-  "build_warnings": [],
+  "build_warnings": [
+    {
+      "implementation": "php-extension",
+      "message": "shtool:echo:Warning: unable to determine terminal sequence for bold mode"
+    },
+    {
+      "implementation": "php-extension",
+      "message": "shtool:echo:Warning: unable to determine terminal sequence for bold mode"
+    }
+  ],
   "packages": {
     "javascript": {
       "path": "js",
@@ -360,7 +369,7 @@
     },
     "rust": {
       "path": "rust",
-      "sha256": "51536496312a60838ecd0663f0d46c799321c6b9345c66ad4c795d3d7f082ee2",
+      "sha256": "a1c4b4966f4e8543edc009842d50cabe373f793e31c163dd0b0af1fd99517ecc",
       "files": 16
     },
     "go": {

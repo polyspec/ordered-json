@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 9cd4dae78ac491cd6e5d680180e6e0a922beacb1153825b033559d4749d5f27a -->
+<!-- source-sha256: a207b6bd8681b68ef6ad70a81720e63bbe65204f6b317e107bb64cc50c0ee2a1 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,8 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- Rust 패키지의 Cargo 레지스트리 게시를 비활성화합니다. Rust 패키지에 선언된 라이선스가
+  없고 소스 체크아웃만 배포가 확인되었습니다.
 - Go `Marshal`이 nil `*Value` 필드를 `expected orderedjson Value` 오류 대신 다른 nil 포인터와 같이 `null`로 기록하도록 수정했습니다. nil 검사가 `MarshalJSON` 경계보다 먼저 실행되므로 타입이 `MarshalJSON`을 구현하는 nil 포인터는 모두 `null`이며, 인터페이스는 그 안에 담긴 값으로 인코딩합니다.
 - 벤치마크 실행기가 각 fixture에 선언된 객체·배열·스칼라·노드·최대 깊이
   수를 파싱한 입력과 대조하도록 수정했습니다. 올바른 메타데이터, 노드
