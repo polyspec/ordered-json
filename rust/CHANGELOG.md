@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Add `parse_bytes_reject_duplicates` for callers that require every decoded object key to
+  occur once. It returns the second key's byte offset and keeps the normal parser unchanged.
 - `Error::kind` names the rejection with the shared identifier.
 - Package tests call `OrderedMap::iter` and `stringify`, and the package reports its public symbols for the shared coverage check.
 - An invalid escape is reported at the escape character instead of one byte past it, and the adapter reports the rejection position for the shared comparison.

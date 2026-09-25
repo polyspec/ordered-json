@@ -1,19 +1,20 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-09-25T21:56:43+00:00",
+  "checked_at": "2026-09-25T22:01:07+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "9dc7b2feb995068be9238f545c71d3cd1f18358a1b2a86e602d0d10d29515de0",
+    "sha256": "2f926a5334bff9202254d963d22e504152c5b1cfe8fbaef45fb37d128371c266",
     "files": {
+      "rust/tests/duplicate_keys.rs": "39775feea5ef79f374bf3115c9f72bc49d5e8af2826268401f093f7555acdbf0",
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "bc7ef1732cf5b4c6af762d2fb33b6873b03a23d4be078922ac822ec79ed52a1e",
       "AGENTS.md": "be12ce8b18ce5a9c0d7cb278f3d0a4d742c3f712713aaeeaac3902cddab4e36f",
-      "CHANGELOG.ko.md": "4ff2e695c694f1b488f65814a23f7cd7d90c1f03832f0c96f2332919853106ff",
-      "CHANGELOG.md": "042de5e6e73810e77a972d5f6da81a9d0f33060f6ca2878af0dc0186d05a663e",
+      "CHANGELOG.ko.md": "360bf017d530b9838a0159fd289228fe767ff835331a351cc7d050902212a4ac",
+      "CHANGELOG.md": "213e1ef85c35ac63e388133b8c322c30bda92dbdb1cc1ed6e7fb3ffc88712a8a",
       "Cargo.toml": "6e0e95bb71b0a05ea77c6db0f7d9aa0c7711f5a123aab1a5005e8262a913abc9",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
@@ -47,8 +48,8 @@
       "docs/reports/ojson-comparison.json": "4f6bc37d9fba4be253b8b11c3a813eec52d53d139ee202ca9693d8a17ecb5ba2",
       "docs/reports/ojson-comparison.ko.md": "4a8fdd346be00b60b020b79ea9cbd38fa6f73b7c9b468465361664e884b8cc7a",
       "docs/reports/ojson-comparison.md": "f51637e54cbf5e4fb650608261647ff4c7c508cb6e867c8d72f9a44db0a95373",
-      "docs/spec/api.ko.md": "9841a38af025b8788a1f2f2232a797bc5c38f94b3eaf77c71427ad945d83e002",
-      "docs/spec/api.md": "0c764794b92b21f639562301d70f8cb457b333469e6bf22ea35de977d863976b",
+      "docs/spec/api.ko.md": "0b21e9417847ff79c80febd4b4e1b659b4448894560c26fc1d83f4ee3b8bb0b5",
+      "docs/spec/api.md": "8253fe12d50b8ccd8b44202ff505ba7bc0453f47e316d59d066288c6025feb9d",
       "docs/spec/json-contract.ko.md": "3be0f1f604118a8f007a08099a705fac5c8bc0ee4755cb0083f3d63036b14ad0",
       "docs/spec/json-contract.md": "61d5d65fdd9ebfc1a9a6a91568e60ef9e0f59f2bdf61892335763d6f8932738a",
       "docs/spec/repositories.ko.md": "70c4cf7b75764cf939b1bc08c88fa744085423b4a7c8be81c6eefcf5cc009a23",
@@ -189,7 +190,7 @@
       "js/test/api.mjs": "d64003bf13787d508283b928d5cc122905360b96d4a57765183b1763d9aa5876",
       "js/test/api_symbols.mjs": "20c8637b2f8b7c37522f0cf15bdc18c321450a95186b70bb1400b6ca96e6a8e9",
       "js/test/probe.mjs": "e990bbcf97822ef349a6041284970f8b2b2615e5fe2608e0b48d01b6a8fe25b5",
-      "package-tests.json": "5aff65548d97f0cc5f6ba566844e2ef2b6d5ae0165ff41e6a6c2ddc2d33fd28e",
+      "package-tests.json": "7b37ffa9ae8bfdc643c154525d4affa2ebd5061c9657155de9c108e667f250ed",
       "package.json": "b470ca00fde3c1b4f5d97c455d2bce249656163ddec6bee4090b416016b4625c",
       "php-extension/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "php-extension/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
@@ -227,8 +228,8 @@
       "rust/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "rust/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
       "rust/AGENTS.md": "a8e43aea261abd8edd34b1495814884e55fcf6c17f24ad412ac708e9d55765b0",
-      "rust/CHANGELOG.ko.md": "28e844b497414af4cdd207ecbbb4d63ceab1f2760b9a693a2fd49e522e36ea49",
-      "rust/CHANGELOG.md": "8f6d84114fd285858d229f871b5e006dbc426868066367464f59fdee532981e1",
+      "rust/CHANGELOG.ko.md": "84da24845ed22b6fb45eaf57df1b4ac3af29635893a04adc3d51b20c4086f51a",
+      "rust/CHANGELOG.md": "c1bd2cf37f73a66a9b5c5295c9a29da46957d477bb2d0787125ef294c93fb1af",
       "rust/Cargo.lock": "31d0fcae18d7184b3bd75ef91d38b3fac0d7ce8624d7e67fa83ef98b2f257b86",
       "rust/Cargo.toml": "8dc53940710739a4afe19696364619d9f48594a416989d440e3b13044021ffb8",
       "rust/Makefile": "834f720591ef8747ce5e53d25b83005bf802472404adba7f5e64dfdc8510ad88",
@@ -238,7 +239,7 @@
       "rust/examples/api.rs": "ad8fba3fe24c08a86f5fc9bcc6faf74a583f634af95b4309ac9f514c385ce691",
       "rust/examples/benchmark.rs": "5bee752a544edc63573656d43c0f99c8bb2f6744f2a2d36bfd7227257459ce79",
       "rust/examples/probe.rs": "49a07332830df0f8703515285492af420666f3c441c5a794fbc7038eae92b43e",
-      "rust/src/lib.rs": "6f51d705d1d6e3f7a480dd0e3da0a8fcb9a8e9f6634d6c498dc5c15e52d009e7",
+      "rust/src/lib.rs": "0170a77e06909331c129bedfdc0808cc76b89007acb96059ab39607af637c34c",
       "rust/tests/api.rs": "d6484e6238e2ce246c4ba6b2e1e349dc3182bbc91c0ce4ccf4a2d1713b0967a1",
       "scripts/check_pie.py": "2856304f160123518f61ef907d92cc46b13a6b1e2d6f04b9e94496bc3b580bdc",
       "scripts/compare_ojson.py": "bd45cccfc0b64c45a262cde1c2e7509cd23a554040beee4cb598c957786fdef8",
@@ -369,8 +370,8 @@
     },
     "rust": {
       "path": "rust",
-      "sha256": "a1c4b4966f4e8543edc009842d50cabe373f793e31c163dd0b0af1fd99517ecc",
-      "files": 16
+      "sha256": "fc1465f01162b3efcd6fb2409b2db9df0925a0ae28eb32f3275ef1a2b1791830",
+      "files": 17
     },
     "go": {
       "path": "go",

@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 28b47070f7d24040f2d79dc4e3d04b1952bd2d8f78d6c26e9eab277899dc0898 -->
+<!-- source-sha256: da619ecbf4ccbd67189580725d5b30850edb92daeb679d699f7120a648026af3 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,8 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- 해석된 객체 키가 한 번만 나와야 하는 호출자를 위해 `parse_bytes_reject_duplicates`를
+  추가합니다. 두 번째 키의 바이트 위치를 반환하며 일반 파서는 바꾸지 않습니다.
 - `Error::kind`가 공통 식별자로 거부 이유를 알립니다.
 - 패키지 테스트가 `OrderedMap::iter`와 `stringify`를 호출하며, 패키지는 공통 커버리지 검사를 위해 공개 심볼을 보고합니다.
 - 잘못된 이스케이프를 한 바이트 뒤가 아니라 이스케이프 문자의 위치로 보고하며, 어댑터는 공통 비교를 위해 거부 위치를 보고합니다.
