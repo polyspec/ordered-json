@@ -126,6 +126,10 @@
         "description": "A non-string map key is an error."
       },
       {
+        "id": "marshal_writes_null_for_nil_value_pointer",
+        "description": "A nil Value pointer, directly or in an interface, is null, and omission options drop it."
+      },
+      {
         "id": "marshal_time_and_bytes_match_typed_values",
         "description": "Time and byte slices encode as documented."
       },
@@ -450,7 +454,8 @@
       ],
       "Marshal": [
         "marshal_preserves_typed_json_contract",
-        "marshal_matches_host_encoder_structures"
+        "marshal_matches_host_encoder_structures",
+        "marshal_writes_null_for_nil_value_pointer"
       ],
       "Marshaler": [
         "marshal_validates_custom_marshaler_through_ordered_parser"

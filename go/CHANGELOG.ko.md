@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: e0069dc7de225e62f8dc92a2c4f23de4cf4b308a8cd96ee26ff893b57531e7bb -->
+<!-- source-sha256: 36e9a587af32b8401f8051c578801cb2881da6b5bc498962f1373b2bd4f868ff -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- `Marshal`이 nil `*Value`와 타입이 `MarshalJSON`을 구현하는 다른 nil 포인터를 `null`로 기록하고, 인터페이스는 그 안에 담긴 값으로 인코딩합니다. 이전에는 nil 포인터의 `MarshalJSON`을 호출해 `expected orderedjson Value` 오류를 반환했습니다.
 - `ParseError.Kind`가 공통 식별자로 거부 이유를 알립니다.
 - `ParseBytesBorrowed`의 패키지 테스트를 추가했습니다. 반환된 문자열은 호출자의 바이트가 바뀌어도 유지됩니다. 패키지는 공통 커버리지 검사를 위해 공개 심볼을 보고합니다.
 - 이스케이프하지 않은 제어 문자를 한 칸 뒤가 아니라 그 문자의 위치로 보고하며, 어댑터는 공통 비교를 위해 거부 위치를 보고합니다.

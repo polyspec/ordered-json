@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: e2f70bff1320420c095ff8f30bf7ed31f4fc2ade0d81b3f931559be9159cfe2e -->
+<!-- source-sha256: bfe56a9cc04de832caff94d7f5d5a65ce6f1806cafc628ab683e512fad54e8ea -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- Go `Marshal`이 nil `*Value` 필드를 `expected orderedjson Value` 오류 대신 다른 nil 포인터와 같이 `null`로 기록하도록 수정했습니다. nil 검사가 `MarshalJSON` 경계보다 먼저 실행되므로 타입이 `MarshalJSON`을 구현하는 nil 포인터는 모두 `null`이며, 인터페이스는 그 안에 담긴 값으로 인코딩합니다.
 - 벤치마크 실행기가 각 fixture에 선언된 객체·배열·스칼라·노드·최대 깊이
   수를 파싱한 입력과 대조하도록 수정했습니다. 올바른 메타데이터, 노드
   계산, 깊이 불일치 거부를 검사하는 회귀 테스트를 추가했습니다.
