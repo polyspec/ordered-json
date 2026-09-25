@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- `Marshal` writes `null` for a nil `*Value` and for any other nil pointer whose type implements `MarshalJSON`, and encodes an interface as the value it holds. It previously called `MarshalJSON` on the nil pointer and returned `expected orderedjson Value`.
 - `ParseError.Kind` names the rejection with the shared identifier.
 - Added a package test for `ParseBytesBorrowed`: text handed back survives a change to the caller's bytes. The package reports its public symbols for the shared coverage check.
 - An unescaped control character is reported at its own offset instead of one past it, and the adapter reports the rejection position for the shared comparison.

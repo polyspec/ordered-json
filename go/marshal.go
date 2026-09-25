@@ -55,6 +55,16 @@ func marshalReflect(out *strings.Builder, value reflect.Value, path string, omit
 	if omit && isEmptyValue(value) {
 		return nil
 	}
+	// A nil pointer or interface is null before the Marshaler boundary, so a
+	// nil pointer whose type implements MarshalJSON, such as *Value, is null.
+	// An interface is encoded as the value it holds.
+	if (value.Kind() == reflect.Pointer || value.Kind() == reflect.Interface) && value.IsNil() {
+		out.WriteString("null")
+		return nil
+	}
+	if value.Kind() == reflect.Interface {
+		return marshalReflect(out, value.Elem(), path, false, depth+1)
+	}
 	if value.CanInterface() {
 		if marshaler, ok := value.Interface().(Marshaler); ok {
 			body, err := marshaler.MarshalJSON()
@@ -73,11 +83,7 @@ func marshalReflect(out *strings.Builder, value reflect.Value, path string, omit
 			return nil
 		}
 	}
-	if value.Kind() == reflect.Pointer || value.Kind() == reflect.Interface {
-		if value.IsNil() {
-			out.WriteString("null")
-			return nil
-		}
+	if value.Kind() == reflect.Pointer {
 		return marshalReflect(out, value.Elem(), path, false, depth+1)
 	}
 	switch value.Kind() {

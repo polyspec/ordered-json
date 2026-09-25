@@ -69,6 +69,41 @@ func TestMarshalValidatesCustomMarshalerThroughOrderedParser(t *testing.T) {
 	}
 }
 
+func TestMarshalWritesNullForNilValuePointer(t *testing.T) {
+	var nothing *Value
+	got, err := Marshal(struct {
+		Missing *Value `json:"missing"`
+		Present *Value `json:"present"`
+		Items   []*Value
+		Members map[string]*Value
+	}{Present: Null(), Items: []*Value{nil}, Members: map[string]*Value{"a": nil}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := `{"missing":null,"present":null,"Items":[null],"Members":{"a":null}}`
+	if string(got) != want {
+		t.Fatalf("Marshal() = %s, want %s", got, want)
+	}
+	got, err = Marshal(nothing)
+	if err != nil || string(got) != "null" {
+		t.Fatalf("Marshal(nil *Value) = %s, %v", got, err)
+	}
+	var marshaler Marshaler = nothing
+	got, err = Marshal(struct {
+		Custom Marshaler `json:"custom"`
+	}{Custom: marshaler})
+	if err != nil || string(got) != `{"custom":null}` {
+		t.Fatalf("Marshal(nil *Value in interface) = %s, %v", got, err)
+	}
+	got, err = Marshal(struct {
+		Missing *Value `json:"missing,omitempty"`
+		Zero    *Value `json:"zero,omitzero"`
+	}{})
+	if err != nil || string(got) != `{}` {
+		t.Fatalf("Marshal(omitted nil *Value) = %s, %v", got, err)
+	}
+}
+
 func TestMarshalRejectsUnsupportedMapKey(t *testing.T) {
 	if _, err := Marshal(map[int]string{1: "x"}); err == nil {
 		t.Fatal("Marshal() accepted non-string map key")
