@@ -107,7 +107,16 @@
   ],
   "package_cases": {
     "js": [],
-    "rust": [],
+    "rust": [
+      {
+        "id": "strict_parse_rejects_duplicate_keys",
+        "description": "The strict byte parser rejects repeated decoded object keys at every depth."
+      },
+      {
+        "id": "strict_parse_accepts_unique_keys",
+        "description": "The strict byte parser retains unique JSON values and reports invalid UTF-8."
+      }
+    ],
     "go": [
       {
         "id": "marshal_preserves_typed_json_contract",
@@ -412,6 +421,10 @@
       "parse_bytes": [
         "bytes_input_is_validated",
         "invalid_utf8_reports_the_first_bad_byte"
+      ],
+      "parse_bytes_reject_duplicates": [
+        "strict_parse_rejects_duplicate_keys",
+        "strict_parse_accepts_unique_keys"
       ],
       "parse_with_max_depth": [
         "depth_argument_is_bounded",

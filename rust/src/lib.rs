@@ -31,6 +31,7 @@ impl Error {
             "invalid UTF-8" => "invalid_utf8",
             "maximum nesting depth exceeded" => "maximum_depth_exceeded",
             "unexpected trailing input" => "trailing_input",
+            "duplicate object key" => "duplicate_object_key",
             _ => "",
         }
     }
@@ -436,13 +437,22 @@ pub fn parse(source: &str) -> Result<Value> {
     parse_with_max_depth(source, MAX_DEPTH)
 }
 pub fn parse_bytes(source: &[u8]) -> Result<Value> {
+    parse_bytes_internal(source, false)
+}
+pub fn parse_bytes_reject_duplicates(source: &[u8]) -> Result<Value> {
+    parse_bytes_internal(source, true)
+}
+fn parse_bytes_internal(source: &[u8], reject_duplicates: bool) -> Result<Value> {
     let text = std::str::from_utf8(source).map_err(|e| Error {
         offset: e.valid_up_to(),
         message: "invalid UTF-8",
     })?;
-    parse(text)
+    parse_internal(text, MAX_DEPTH, reject_duplicates)
 }
 pub fn parse_with_max_depth(source: &str, max_depth: usize) -> Result<Value> {
+    parse_internal(source, max_depth, false)
+}
+fn parse_internal(source: &str, max_depth: usize, reject_duplicates: bool) -> Result<Value> {
     if max_depth > MAX_DEPTH {
         return Err(error("max_depth exceeds 256"));
     }
@@ -453,6 +463,7 @@ pub fn parse_with_max_depth(source: &str, max_depth: usize) -> Result<Value> {
         max_depth,
         whitespace: 0,
         duplicates: 0,
+        reject_duplicates,
         items: Vec::new(),
     };
     let mut value = p.value(0)?;
@@ -471,6 +482,7 @@ struct Parser<'a> {
     max_depth: usize,
     whitespace: usize,
     duplicates: usize,
+    reject_duplicates: bool,
     /// Pending items of the open arrays.
     items: Vec<Value>,
 }
@@ -573,6 +585,14 @@ impl Parser<'_> {
                             let key_start = self.pos;
                             let flags = self.string()?;
                             let key = self.new_value(key_start, flags, Node::String(OnceLock::new()));
+                            if self.reject_duplicates
+                                && members.get_units(key.string_units().unwrap()).is_some()
+                            {
+                                return Err(Error {
+                                    offset: key_start,
+                                    message: "duplicate object key",
+                                });
+                            }
                             self.ws();
                             self.expect(b':', "expected colon")?;
                             let child = self.value(depth + 1)?;

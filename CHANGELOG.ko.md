@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: a207b6bd8681b68ef6ad70a81720e63bbe65204f6b317e107bb64cc50c0ee2a1 -->
+<!-- source-sha256: 58002e5cde7b4044c92f9f7b1ef923a8e65c188c98265cb6cf03e1a7dfd93d46 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,8 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 모든 깊이에서 해석된 객체 키의 반복을 거부하는 Rust 바이트 파서를 추가합니다. 모든 입력
+  멤버가 필요한 호출자는 이를 선택하고 일반 파서는 문서화된 결과를 유지합니다.
 - Rust 패키지의 Cargo 레지스트리 게시를 비활성화합니다. Rust 패키지에 선언된 라이선스가
   없고 소스 체크아웃만 배포가 확인되었습니다.
 - Go `Marshal`이 nil `*Value` 필드를 `expected orderedjson Value` 오류 대신 다른 nil 포인터와 같이 `null`로 기록하도록 수정했습니다. nil 검사가 `MarshalJSON` 경계보다 먼저 실행되므로 타입이 `MarshalJSON`을 구현하는 nil 포인터는 모두 `null`이며, 인터페이스는 그 안에 담긴 값으로 인코딩합니다.
