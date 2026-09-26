@@ -8,6 +8,8 @@ use std::{
 
 pub const MAX_DEPTH: usize = 256;
 
+pub mod serde;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Error {
     /// Byte offset into the UTF-8 input (zero for API/type errors).

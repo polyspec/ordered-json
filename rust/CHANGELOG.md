@@ -7,6 +7,9 @@
 ## Unreleased
 
 - Set Rust minimum to 1.71 to match the current JSON test dependency.
+- Add Serde typed encoding and decoding. Struct fields retain declaration order; wire and
+  manifest fixtures fix the bytes, embedded `Value` fields retain object order and number
+  tokens, and invalid or unconsumed input fails.
 - Add `parse_bytes_reject_duplicates` for callers that require every decoded object key to
   occur once. It returns the second key's byte offset and keeps the normal parser unchanged.
 - `Error::kind` names the rejection with the shared identifier.

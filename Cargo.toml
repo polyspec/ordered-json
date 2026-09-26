@@ -10,6 +10,11 @@ repository = "https://github.com/polyspec/ordered-json.git"
 [lib]
 path = "rust/src/lib.rs"
 
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_ignored = "0.1.14"
+serde_json = { version = "1", features = ["raw_value", "unbounded_depth"] }
+
 [dev-dependencies]
 sha2 = "0.10"
 serde_json = "1"

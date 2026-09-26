@@ -115,6 +115,34 @@
       {
         "id": "strict_parse_accepts_unique_keys",
         "description": "The strict byte parser retains unique JSON values and reports invalid UTF-8."
+      },
+      {
+        "id": "serde_wire_bytes_and_round_trip",
+        "description": "Typed wire fields retain declaration order, exact integer bytes and UTF-8 strings."
+      },
+      {
+        "id": "serde_manifest_bytes_and_round_trip",
+        "description": "Typed manifest fields match fixed JSON bytes, including empty collections and omitted optional fields."
+      },
+      {
+        "id": "serde_rejects_invalid_and_unconsumed_input",
+        "description": "Typed input rejects duplicates, unknown fields, type errors, trailing bytes and invalid UTF-8."
+      },
+      {
+        "id": "serde_rejects_duplicate_struct_fields",
+        "description": "Typed output rejects repeated structure field names."
+      },
+      {
+        "id": "serde_embedded_values_preserve_order_and_number_tokens",
+        "description": "Embedded Value fields retain object order and arbitrary number tokens through typed encoding and decoding."
+      },
+      {
+        "id": "serde_value_respects_container_depth",
+        "description": "Typed Value fields accept 256 containers and reject more."
+      },
+      {
+        "id": "serde_value_preserves_unpaired_surrogate_token",
+        "description": "Typed Value fields preserve escaped unpaired surrogate tokens."
       }
     ],
     "go": [

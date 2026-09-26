@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 8253fe12d50b8ccd8b44202ff505ba7bc0453f47e316d59d066288c6025feb9d -->
+<!-- source-sha256: 9edd973c3e17aad17114148911debf16625d9d54ebce991e4d895cd69d90fad6 -->
 # API 계약
 
 [English](api.md)
@@ -31,6 +31,8 @@ JavaScript 파싱 오류는 UTF-16 위치를 반환합니다. Rust, Go, PHP 파�
 바인딩은 해당 언어에만 필요한 API를 추가할 수 있습니다. 바인딩 확장은 공유 parser와 serializer를 사용하고, 허용한 입력의 결과와 오류 위치를 바꾸지 않으며, 추가로 거부하는 입력을 문서화합니다. 공유 동작 표가 아니라 이 절에 적습니다. 해당 패키지는 구현 등록 정보에 자체 테스트를 선언하고 `make check`가 이를 실행합니다. 공통 사례가 닿지 못하는 API는 그 테스트로만 검증됩니다.
 
 Rust 바인딩은 `parse_bytes_reject_duplicates(source)`를 제공합니다. 일반 문법과 깊이 한도로 UTF-8 바이트를 파싱하지만 어느 깊이든 해석된 객체 키가 반복되면 거부합니다. 이스케이프 표기가 같은 UTF-16 키를 만드는 경우를 포함하여 두 번째 키 토큰의 첫 바이트 위치에 `duplicate object key` 오류를 반환합니다. `parse_bytes`는 공통 중복 키 동작을 유지합니다. 그 밖의 유효한 값과 오류 및 위치는 바뀌지 않습니다.
+
+Rust `serde` 모듈은 Serde `Serialize`와 소유한 `Deserialize` 타입에 `to_string(&value)`, `from_str(text)`, `from_slice(bytes)`를 제공합니다. 인코딩은 구조체 필드를 선언 순서로 기록하고 Serde 필드 이름과 생략 속성을 적용하며 compact JSON을 기록합니다. `Value`는 두 Serde trait을 구현하여 포함된 JSON의 객체 순서와 숫자 토큰을 유지합니다. map 키는 문자열로 직렬화되어야 하며 반복 키, 유한하지 않은 숫자, 256개보다 깊은 컨테이너는 오류로 처리합니다. 디코딩은 라이브러리 파서로 UTF-8과 JSON을 검사하고 해석된 반복 키를 거부한 뒤 대상 Serde 타입을 적용합니다. 알 수 없는 필드와 뒤따르는 입력은 버리지 않고 오류로 처리합니다. 타입 오류도 오류로 유지합니다. wire와 manifest 패키지 fixture가 정확한 출력 바이트를 정합니다.
 
 Go 바인딩은 `Marshal(value)`을 제공합니다. 내보낸 구조체 필드를 선언 순서로 인코딩하고, `json` 이름이 없는 익명 필드는 그 필드들을 펼쳐 넣으며, 이름이 겹치는 필드와 파서 한도보다 깊은 값은 오류로 거부하고, `json` 필드 이름과 생략 옵션을 적용하며 바이트 슬라이스를 base64 문자열로 인코딩합니다. nil `*Value`와 타입이 `MarshalJSON`을 구현하는 다른 nil 포인터를 포함해 nil 포인터와 nil 인터페이스는 `null`로 기록하고, 인터페이스는 그 안에 담긴 값으로 인코딩합니다. `MarshalJSON() ([]byte, error)` 경계를 구현한 타입을 허용하고 사용자 정의 결과를 ordered-json parser로 검증합니다. 네이티브 map 순서가 정의되지 않았으므로 Go map 키는 정렬합니다. 결과는 compact JSON이며 typed 인코딩을 host JSON 인코더에 위임하지 않습니다.
 

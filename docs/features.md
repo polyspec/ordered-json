@@ -6,7 +6,7 @@
 <a id="state"></a>
 ## Current implementation
 
-`implemented` means the listed behavior exists. `shared-suite` refers to the common JSON tests; `docs-tests` refers to the documentation checker tests; `benchmark` refers to the repository benchmark protocol and committed result. Each state names the record that backs it: the [verification record](verification.json) for the shared suite and the checker tests, the [benchmark result](../benchmarks/results.json) for a benchmark. The verification record contains the actual versions, case counts, date, and source hashes. A benchmark result is evidence only when it was measured from a clean checkout, with the protocol and inputs the workload declares. `source-only` identifies the confirmed distribution; registry publication is not verified. Publication observations are maintained separately in [distribution.json](distribution.json).
+`implemented` means the listed behavior exists. `shared-suite` refers to the common JSON tests; `package-tests` refers to an implementation's own tests; `docs-tests` refers to the documentation checker tests; `benchmark` refers to the repository benchmark protocol and committed result. Each state names the record that backs it: the [verification record](verification.json) for the shared suite and the checker tests, the [benchmark result](../benchmarks/results.json) for a benchmark. The verification record contains the actual versions, case counts, date, and source hashes. A benchmark result is evidence only when it was measured from a clean checkout, with the protocol and inputs the workload declares. `source-only` identifies the confirmed distribution; registry publication is not verified. Publication observations are maintained separately in [distribution.json](distribution.json).
 
 | ID | Feature | Implementation | Verification | Evidence | Distribution | Specification |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -18,6 +18,7 @@
 | F-OUTPUT | Associative serialization and source inspection | implemented | shared-suite | [result](verification.json) | source-only | [serialization](spec/json-contract.md#serialization) |
 | F-IDEMPOTENT | Repeated parse and serialization preserve the same type tree and output | implemented | shared-suite | [result](verification.json) | source-only | [serialization](spec/json-contract.md#serialization) |
 | F-CONSTRUCT | Construction from ordered maps and arrays of Value objects | implemented | shared-suite | [result](verification.json) | source-only | [construction](spec/json-contract.md#construction) |
+| F-RUST-SERDE | Typed Rust encoding and decoding with declaration order and strict input | implemented | package-tests | [result](verification.json) | source-only | [binding](spec/api.md#bindings) |
 | F-PHP-NATIVE | PHP extension parser and serializer with the shared PHP API | implemented | shared-suite | [result](verification.json) | source-only | [PHP](spec/api.md#php) |
 | F-DOCS | Bilingual documents, link/status checks, verification freshness | implemented | docs-tests | [result](verification.json) | source-only | [procedure](documentation-plan.md#checks) |
 | F-REPOS | Single repository with independently buildable implementation packages and shared conformance | implemented | shared-suite | [result](verification.json) | source-only | [repositories](spec/repositories.md) |

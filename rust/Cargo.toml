@@ -8,6 +8,11 @@ readme = "README.md"
 repository = "https://github.com/polyspec/ordered-json.git"
 publish = false
 
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_ignored = "0.1.14"
+serde_json = { version = "1", features = ["raw_value", "unbounded_depth"] }
+
 [lib]
 path = "src/lib.rs"
 
