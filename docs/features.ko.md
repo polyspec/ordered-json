@@ -1,5 +1,5 @@
 <!-- doc-id: features -->
-<!-- source-sha256: d38ab523f92f1e6fd134a7ecd5411d4872803d98eb7489d8945185846e0824b3 -->
+<!-- source-sha256: 4ca5274bbae839c85f37ebb48221050645acbf5ad4c2b0d27b37ce405519f6e6 -->
 # 기능 상태
 
 [English](features.md)
@@ -7,7 +7,7 @@
 <a id="state"></a>
 ## 현재 구현
 
-`implemented`는 해당 동작이 구현됐다는 뜻입니다. `shared-suite`는 공통 JSON 테스트, `docs-tests`는 문서 검사기 테스트, `benchmark`는 저장소 벤치마크 프로토콜과 커밋된 결과를 뜻합니다. 각 상태는 자신을 뒷받침하는 기록을 가리킵니다. 공통 스위트와 검사기 테스트는 [검증 기록](verification.json)을, 벤치마크는 [벤치마크 결과](../benchmarks/results.json)를 가리킵니다. 검증 기록에는 실제 버전, 사례 수, 실행 시각, 소스 해시가 있습니다. 벤치마크 결과는 깨끗한 체크아웃에서 workload가 선언한 프로토콜과 입력으로 측정했을 때에만 근거가 됩니다. `source-only`는 확인된 배포 방식이며 레지스트리 게시는 검증되지 않았습니다. 게시 확인 결과는 [distribution.json](distribution.json)에서 별도로 관리합니다.
+`implemented`는 해당 동작이 구현됐다는 뜻입니다. `shared-suite`는 공통 JSON 테스트, `package-tests`는 구현 자체의 테스트, `docs-tests`는 문서 검사기 테스트, `benchmark`는 저장소 벤치마크 프로토콜과 커밋된 결과를 뜻합니다. 각 상태는 자신을 뒷받침하는 기록을 가리킵니다. 공통 스위트와 검사기 테스트는 [검증 기록](verification.json)을, 벤치마크는 [벤치마크 결과](../benchmarks/results.json)를 가리킵니다. 검증 기록에는 실제 버전, 사례 수, 실행 시각, 소스 해시가 있습니다. 벤치마크 결과는 깨끗한 체크아웃에서 workload가 선언한 프로토콜과 입력으로 측정했을 때에만 근거가 됩니다. `source-only`는 확인된 배포 방식이며 레지스트리 게시는 검증되지 않았습니다. 게시 확인 결과는 [distribution.json](distribution.json)에서 별도로 관리합니다.
 
 | ID | 기능 | 구현 | 검증 | 근거 | 배포 | 명세 |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -19,6 +19,7 @@
 | F-OUTPUT | 연관배열 직렬화와 원문 조회 | implemented | shared-suite | [결과](verification.json) | source-only | [직렬화](spec/json-contract.ko.md#serialization) |
 | F-IDEMPOTENT | 반복 파싱과 직렬화에서 같은 타입 트리와 출력을 유지 | implemented | shared-suite | [결과](verification.json) | source-only | [직렬화](spec/json-contract.ko.md#serialization) |
 | F-CONSTRUCT | 순서 있는 연관배열과 Value 객체 배열로 생성 | implemented | shared-suite | [결과](verification.json) | source-only | [생성](spec/json-contract.ko.md#construction) |
+| F-RUST-SERDE | 선언 순서와 엄격한 입력 검사를 갖춘 Rust 타입 인코딩·디코딩 | implemented | package-tests | [결과](verification.json) | source-only | [바인딩](spec/api.ko.md#bindings) |
 | F-PHP-NATIVE | 공통 PHP API를 사용하는 PHP 확장 파서와 직렬화 | implemented | shared-suite | [결과](verification.json) | source-only | [PHP](spec/api.ko.md#php) |
 | F-DOCS | 영한 문서, 링크·상태 검사, 검증 최신 여부 | implemented | docs-tests | [결과](verification.json) | source-only | [절차](documentation-plan.ko.md#checks) |
 | F-REPOS | 독립적으로 빌드할 수 있는 구현 패키지와 공통 적합성을 갖춘 단일 저장소 | implemented | shared-suite | [결과](verification.json) | source-only | [저장소](spec/repositories.ko.md) |

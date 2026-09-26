@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: 17405617fe0d6b5df3aaa6707f7d8b5108ea2d1f85ffac2a5e5df460686132cb -->
+<!-- source-sha256: 5279dd4e0b56e4d16bbc9a3051dffc97b9bfe215ea47e34c6d7e86aa63c1c49f -->
 # ordered-json for Rust
 
 [English](README.md)
@@ -18,6 +18,11 @@ use ordered_json::{parse, stringify};
 let value = parse(source)?;
 let output = stringify(&value);
 ~~~
+
+타입 값은 Serde `Serialize`와 소유한 `Deserialize`를 통해
+`ordered_json::serde::{to_string, from_str, from_slice}`를 사용합니다. 구조체 필드는
+선언 순서를 유지합니다. 반복 키, 알 수 없는 필드, 타입 오류와 유한하지 않은 숫자는 오류로 처리합니다.
+포함된 `Value` 필드는 객체 순서와 숫자 토큰을 유지합니다.
 
 
 동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. Cargo 패키지는 레지스트리 게시가 설정되지 않았습니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.

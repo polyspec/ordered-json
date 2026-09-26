@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 5f0ac0809bcd4893aec7aef06df8d7a117c7559d490eb1dc1f4757d7b2b3140b -->
+<!-- source-sha256: 0f100df8ccb11f5e5f1ce006d1b42405b26b29e47cd80cd4534a207a41346fee -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -8,6 +8,9 @@
 ## 미릴리스
 
 - 현재 JSON 테스트 의존성에 맞춰 Rust 최소 버전을 1.71로 설정합니다.
+- Serde 타입 인코딩·디코딩을 추가합니다. 구조체 필드는 선언 순서를 유지하고 wire·manifest
+  fixture가 바이트를 고정하고 포함된 `Value` 필드는 객체 순서와 숫자 토큰을 유지하며
+  잘못되거나 소비되지 않은 입력은 오류로 처리합니다.
 - 해석된 객체 키가 한 번만 나와야 하는 호출자를 위해 `parse_bytes_reject_duplicates`를
   추가합니다. 두 번째 키의 바이트 위치를 반환하며 일반 파서는 바꾸지 않습니다.
 - `Error::kind`가 공통 식별자로 거부 이유를 알립니다.

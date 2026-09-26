@@ -1,0 +1,1 @@
+{"id":"board","name":"Board","version":"0.1.0","runtimeDependencies":{},"provides":[],"views":[{"name":"list","pattern":"/","side":"front"}],"widgets":[],"themes":[{"id":"default","name":"Default"}],"forms":[],"commands":[]}
