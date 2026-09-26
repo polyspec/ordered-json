@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 1f98fb6de57abf56d6e5ff71b8d4fb45d5a83c13fa629bcf734d5cda5bea6cba -->
+<!-- source-sha256: fd25daeb89a99868b9f0f5dbe1aa9480253d6614172fb8e7d15af8f5ac6a36fd -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,8 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- Rust 타입 바인딩 의존성을 검증한 버전으로 고정합니다. 바인딩은 Serde JSON 토큰 프로토콜로
+  JSON 원문을 기록하므로 의존성 업데이트에는 해당 패키지 테스트가 필요합니다.
 - 검증 기록에 구현의 테스트 결과가 있을 때 `package-tests` 기능 검증 상태를 허용합니다.
   현재 테스트 의존성이 요구하므로 Rust 최소 버전은 1.71입니다.
 - Rust Serde 타입 인코딩·디코딩을 추가합니다. 구조체 필드는 선언 순서를 유지하고

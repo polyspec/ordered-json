@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 0f100df8ccb11f5e5f1ce006d1b42405b26b29e47cd80cd4534a207a41346fee -->
+<!-- source-sha256: a859b44bcf4bf240c674c37ead604a4d2f91350d3f4c7712faa5f798c96928f4 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,8 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- JSON 원문 값이 Serde JSON 토큰 프로토콜을 사용하므로 Serde 바인딩 의존성을 검증한 버전으로
+  고정합니다.
 - 현재 JSON 테스트 의존성에 맞춰 Rust 최소 버전을 1.71로 설정합니다.
 - Serde 타입 인코딩·디코딩을 추가합니다. 구조체 필드는 선언 순서를 유지하고 wire·manifest
   fixture가 바이트를 고정하고 포함된 `Value` 필드는 객체 순서와 숫자 토큰을 유지하며
