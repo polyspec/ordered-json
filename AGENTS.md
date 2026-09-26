@@ -16,9 +16,9 @@ English is canonical. Update the paired Korean document with the same informatio
 
 Do not infer authorization to send messages, publish artifacts, change access controls, or rewrite history. Follow authorization already provided for the task.
 
-After integrating a branch into `main`, verify its commits or equivalent changes are present, its worktree is clean, and needed ignored inputs exist elsewhere. Then remove the worktree and local branch immediately. Preserve unintegrated or active work.
+Name branches `{type}/{shortname}-{checklist ID}` and worktrees `{project}-{shortname}-{checklist ID}`. After integrating a branch into `main`, verify its commits or equivalent changes are present and its worktree is clean. Before removal, preserve any files excluded by `.gitignore` that exist only in that worktree and are still needed. Then remove the worktree and local branch immediately. Preserve unintegrated or active work.
 
-When a test-only branch has served its purpose, cherry-pick any useful changes into the owning branch and discard the rest. Then remove its worktree and local branch.
+Before committing the related feature, cherry-pick useful commits from a test-only branch that cannot be integrated into `main`, discard the remaining test-only changes, and remove its worktree and branch. If removal is impossible, first add a numbered sub-item to the owning checklist with the cause and exact removal condition.
 
 <a id="verification"></a>
 ## Required checks
