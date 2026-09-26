@@ -10,6 +10,8 @@ Read [documentation management](docs/documentation-plan.md), the relevant [speci
 
 Keep correct code and factual history. Explain actual causes directly. Include affected documentation, feature state, and changelog entries with code changes. Keep personal preferences, conversation context, credentials, and backup locations outside Git.
 
+Reproduce an observed defect with a tracked RED test. For a plausible defect not yet observed, first write a deterministic RED case whose input and required result would expose it. Confirm the intended failure before implementation, correct the cause, and run the same case and relevant package use tests to GREEN. Investigate a case that cannot expose the problem instead of weakening the criterion.
+
 English is canonical. Update the paired Korean document with the same information. Update its `source-sha256` only after comparing the complete translation. Use direct technical language with explicit subjects and operations in documentation, comments, commit messages, and translations.
 
 Do not infer authorization to send messages, publish artifacts, change access controls, or rewrite history. Follow authorization already provided for the task.
