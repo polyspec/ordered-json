@@ -115,7 +115,7 @@ def feature_rows(text):
             raise ValueError('Duplicate feature ID: ' + identifier)
         if not feature or implementation not in ('implemented', 'partial', 'planned'):
             raise ValueError('Invalid implementation state: ' + identifier)
-        if verification not in ('shared-suite', 'docs-tests', 'benchmark', 'not-verified'):
+        if verification not in ('shared-suite', 'package-tests', 'docs-tests', 'benchmark', 'not-verified'):
             raise ValueError('Invalid verification state: ' + identifier)
         if distribution not in ('source-only', 'not-distributed', 'published'):
             raise ValueError('Invalid distribution state: ' + identifier)
@@ -124,7 +124,8 @@ def feature_rows(text):
         evidence_links, specification_links = link_targets(evidence), link_targets(specification)
         if len(specification_links) != 1:
             raise ValueError('A feature requires one specification link: ' + identifier)
-        records = {'shared-suite': 'verification.json', 'docs-tests': 'verification.json',
+        records = {'shared-suite': 'verification.json', 'package-tests': 'verification.json',
+                   'docs-tests': 'verification.json',
                    'benchmark': '../benchmarks/results.json'}
         if verification != 'not-verified' and evidence_links != [records[verification]]:
             raise ValueError('A verified feature names the record that backs it: ' + identifier)

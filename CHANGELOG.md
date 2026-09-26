@@ -6,6 +6,9 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Accept `package-tests` as a feature verification state when the verification record contains
+  the implementation's test result. The Rust minimum is 1.71 because the current test dependency
+  requires it.
 - Add a Rust byte parser that rejects repeated decoded object keys at every depth. Callers that
   require every input member can select it while the normal parser retains its documented result.
 - Disable Cargo registry publication for the Rust package. The package has no declared Rust

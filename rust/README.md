@@ -8,7 +8,7 @@ Strict JSON with associative objects that preserve document key order recursivel
 <a id="usage"></a>
 ## Usage
 
-Rust >= 1.70; Cargo package `ordered-json`, import `ordered_json`.
+Rust >= 1.71; Cargo package `ordered-json`, import `ordered_json`.
 
 The usage fragment takes `source` (or `$source`) from an object case in the [common official examples](https://github.com/polyspec/ordered-json/blob/main/examples/official.json). Use the fragment inside a function that can return an error.
 
