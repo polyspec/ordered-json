@@ -12,10 +12,19 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from docs_check import check_repository
+from docs_check import check_repository, feature_rows
 from registry import REGISTRY
 from verification_record import IMPLEMENTATIONS, create_record, sha256, source_manifest, write_record
 from test import build_extension
+
+
+class FeatureStateChecks(unittest.TestCase):
+    def test_package_tests_require_verification_record(self):
+        row = ('| F-RUST-SERDE | Typed Rust values | implemented | package-tests | '
+               '[result](verification.json) | source-only | [contract](../README.md#contract) |')
+        self.assertIn('F-RUST-SERDE', feature_rows(row))
+        with self.assertRaisesRegex(ValueError, 'record that backs it'):
+            feature_rows(row.replace('verification.json', 'other.json'))
 
 
 class DocumentationChecks(unittest.TestCase):

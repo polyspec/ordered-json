@@ -9,7 +9,7 @@
 | Component | Declared requirement | Current identifier | Metadata |
 | --- | --- | --- | --- |
 | JavaScript | Node.js >= 20, ESM | `ordered-json`, 0.0.1 | [package.json](https://github.com/polyspec/ordered-json/blob/main/js/package.json) |
-| Rust | Rust >= 1.70, edition 2021 | `ordered-json`, 0.0.1 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/rust/Cargo.toml) |
+| Rust | Rust >= 1.71, edition 2021 | `ordered-json`, 0.0.1 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/rust/Cargo.toml) |
 | Go | Go >= 1.22 | `github.com/polyspec/ordered-json/go` module, `orderedjson` package | [go.mod](https://github.com/polyspec/ordered-json/blob/main/go/go.mod) |
 | PHP | PHP >= 8.2, JSON and PCRE extensions | `ordered-json/ordered-json`, `OrderedJson` namespace | [composer.json](https://github.com/polyspec/ordered-json/blob/main/php/composer.json) |
 | Native PHP | Matching PHP development headers, C compiler, phpize, make | `ordered_json` extension, 0.0.1 | [extension source](https://github.com/polyspec/ordered-json/blob/main/php-extension/src/ordered_json.c) |

@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: b66029fcbf129d0562339aa16d4242646fa8c65d1918fc6f0369504bb4da7234 -->
+<!-- source-sha256: 17405617fe0d6b5df3aaa6707f7d8b5108ea2d1f85ffac2a5e5df460686132cb -->
 # ordered-json for Rust
 
 [English](README.md)
@@ -9,7 +9,7 @@
 <a id="usage"></a>
 ## 사용
 
-Rust >= 1.70이며 Cargo 패키지는 `ordered-json`, 가져오기는 `ordered_json`입니다.
+Rust >= 1.71이며 Cargo 패키지는 `ordered-json`, 가져오기는 `ordered_json`입니다.
 
 사용 코드의 `source` 또는 `$source`는 [공통 공식 예제](https://github.com/polyspec/ordered-json/blob/main/examples/official.json)의 객체 사례에서 가져옵니다. 오류를 반환할 수 있는 함수 안에서 사용합니다.
 
