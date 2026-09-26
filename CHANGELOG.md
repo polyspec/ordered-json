@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Pin the typed Rust binding dependencies to the verified versions. The binding writes raw JSON
+  through the Serde JSON token protocol, so a dependency update requires its package tests.
 - Accept `package-tests` as a feature verification state when the verification record contains
   the implementation's test result. The Rust minimum is 1.71 because the current test dependency
   requires it.
