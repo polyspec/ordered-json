@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Declare `ParseError.kind` in the JavaScript type declaration. The parser sets the rejection kind
+  on every `ParseError`, but TypeScript callers could not read it without a cast.
 - Add the JavaScript `rejectDuplicates` parse option, which rejects repeated decoded object keys
   at every depth with the same offset rule in UTF-16 units. The default parse is unchanged.
 - Add a PHP parse that rejects repeated decoded object keys at every depth, with the same
