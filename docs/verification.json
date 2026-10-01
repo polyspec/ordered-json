@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-10-01T14:53:45+00:00",
+  "checked_at": "2026-10-01T22:22:54+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "08857c4d94ff17e73c5f01fb0d10b60bec634cf215d3a951b576f0fdda761942",
+    "sha256": "2d7bf12857dfccb11f005a6705dd29d2e62cf73a9a49b640f8956383e97ca562",
     "files": {
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "c3f634c16dceeb8aa7d109490da855a8b23efa3a17995a57f90672a019e125ba",
       "AGENTS.md": "69346a03d39ef7d6eb88bb471a95857b77c937bad6dd0fede3d529f121e677e1",
-      "CHANGELOG.ko.md": "5059d38a5e8b3e67c4b664c6c6e11253d0c1b0d88f7cd2eb019b5cb6a1f19883",
-      "CHANGELOG.md": "7e571912a5454b849be1e30cb9d31ac24f3966e82d6799128f11de20796d0551",
+      "CHANGELOG.ko.md": "0ffe3df0b061f1ed8ddcf040713f38468e237249c0ee43bd9872bb9587429d88",
+      "CHANGELOG.md": "67a327c237088a5bb6c60accfd2fbb151cccc694c8e90765478778c152e1151e",
       "Cargo.toml": "17441aea2651524ebd080a365970974d724e51d19574d71f3fa6a0dfe1fcee0b",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
@@ -183,13 +183,13 @@
       "js/README.ko.md": "24b406226d829169d0b76686eb5e1b0408f86bde1c1a70b96a664ea955a23ef4",
       "js/README.md": "75c7efe28928ff2e414a1bf85dd803260a07b5386cf8f9bb2728b495752b51e0",
       "js/docs/documentation-manifest.json": "6b9ece04a4a32c96e43c0d1c037bad2a18718dcd36683988240c875d7bd72240",
-      "js/index.d.ts": "679448c24bc7d910a05546c0c93e7426e07600456367da8b80965dfd8fd897d1",
+      "js/index.d.ts": "ed4cca918ebbc9db652668f582dcffafeb4163769badf7fadaf8a9b7fe35f32d",
       "js/index.js": "b5cd1b6d2cb307011f98136c7e85656f2864573116b9d260f7591e38e3f8bc74",
       "js/package.json": "866585f358b8714add2b21de1e3f462b284d27702dc9d8082d38a7da8c953317",
       "js/test/api.mjs": "ee4631e9bdb312c17fd2bf85ffe763030f9a7f9cb696af49e5f9bbea9e54daec",
       "js/test/api_symbols.mjs": "20c8637b2f8b7c37522f0cf15bdc18c321450a95186b70bb1400b6ca96e6a8e9",
       "js/test/probe.mjs": "e990bbcf97822ef349a6041284970f8b2b2615e5fe2608e0b48d01b6a8fe25b5",
-      "package-tests.json": "a9caf8bdbcdb55423defa3776c768177aa9f0f32af6273ada14f5f4338a4caa0",
+      "package-tests.json": "3704e6268f0480895d4f015a2d592e54e1ac3bc51a5ffb6e7a41c816a147cb40",
       "package.json": "b470ca00fde3c1b4f5d97c455d2bce249656163ddec6bee4090b416016b4625c",
       "php-extension/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "php-extension/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
@@ -360,7 +360,7 @@
   "packages": {
     "javascript": {
       "path": "js",
-      "sha256": "a8993986a50c758a486044e2595f678c3b91af0ea6f4ab78c134a969ec775a95",
+      "sha256": "090f20ae89a8151b866496f568d4af19d770b3f17c5f0583d8441f1486c5c813",
       "files": 15
     },
     "rust": {

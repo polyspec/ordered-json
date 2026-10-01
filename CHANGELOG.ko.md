@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: f1aa97a721e6fdfa0c8a387416b9253dd5465679eb73a15ca29bac21ce48bfba -->
+<!-- source-sha256: 25082adbd7fe9eeaeae632cf4e53de6d784c614f59078929413a1be67aaff985 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,8 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- JavaScript 타입 선언에 `ParseError.kind`를 선언합니다. 파서는 모든 `ParseError`에 거부 종류를
+  설정하지만, TypeScript 호출자는 형 변환 없이 그 값을 읽을 수 없었습니다.
 - 모든 깊이에서 해석된 객체 키의 반복을 같은 위치 규칙과 UTF-16 단위로 거부하는 JavaScript
   `rejectDuplicates` 파싱 옵션을 추가합니다. 기본 파싱은 바뀌지 않습니다.
 - 모든 깊이에서 해석된 객체 키의 반복을 거부하는 PHP 파싱을 Rust 엄격 바이트 파서와 같은

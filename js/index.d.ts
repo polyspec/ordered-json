@@ -4,7 +4,10 @@ export interface ParseOptions {
   rejectDuplicates?: boolean;
 }
 export declare const MAX_DEPTH: 256;
-export declare class ParseError extends SyntaxError { readonly offset: number }
+export declare class ParseError extends SyntaxError {
+  readonly offset: number;
+  readonly kind: string;
+}
 export declare class Value {
   private constructor();
   readonly kind: Kind;
