@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Add a PHP parse that rejects repeated decoded object keys at every depth, with the same
+  offset rule as the Rust strict byte parser. `Value::parse` retains its documented result.
 - Pin the typed Rust binding dependencies to the verified versions. The binding writes raw JSON
   through the Serde JSON token protocol, so a dependency update requires its package tests.
 - Accept `package-tests` as a feature verification state when the verification record contains

@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: f5d5f8bb894226d784ccc496947ee07deee97fec3b10fb6fc6436efb8fa9f5a0 -->
+<!-- source-sha256: dfda90c8ce8214d5e41f93cbd3a2739db6992ed0ec03d3636e1453fb6dcb84a4 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- 해석된 객체 키가 한 번씩만 나와야 하는 호출자를 위해 `Value::parseRejectDuplicates`를 추가합니다. 두 번째 키의 바이트 위치에 `duplicate_object_key` 종류의 `Duplicate object key` 오류를 보고하고, 두 backend 모두에서 PHP parser로 파싱하며, `Value::parse`는 바뀌지 않습니다.
 - `ParseError`가 자체 메시지와 함께 공통 거부 목록의 `kind`를 전합니다.
 - 패키지는 공통 커버리지 검사를 위해 공개 심볼을 보고하며, UTF-8 위치 헬퍼는 다른 헬퍼와 같이 내부용으로 표시했습니다.
 - 이스케이프하지 않은 제어 문자는 그 문자의 위치로, 잘못된 Unicode 이스케이프는 16진수가 아닌 첫 바이트의 위치로 보고하며, 어댑터는 공통 비교를 위해 거부 위치를 보고합니다.

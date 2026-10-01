@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 9edd973c3e17aad17114148911debf16625d9d54ebce991e4d895cd69d90fad6 -->
+<!-- source-sha256: 3a40ef0dac5a229243e754e224cbdc4c27fd6510e480d4939beb365a1709a255 -->
 # API 계약
 
 [English](api.md)
@@ -31,6 +31,8 @@ JavaScript 파싱 오류는 UTF-16 위치를 반환합니다. Rust, Go, PHP 파�
 바인딩은 해당 언어에만 필요한 API를 추가할 수 있습니다. 바인딩 확장은 공유 parser와 serializer를 사용하고, 허용한 입력의 결과와 오류 위치를 바꾸지 않으며, 추가로 거부하는 입력을 문서화합니다. 공유 동작 표가 아니라 이 절에 적습니다. 해당 패키지는 구현 등록 정보에 자체 테스트를 선언하고 `make check`가 이를 실행합니다. 공통 사례가 닿지 못하는 API는 그 테스트로만 검증됩니다.
 
 Rust 바인딩은 `parse_bytes_reject_duplicates(source)`를 제공합니다. 일반 문법과 깊이 한도로 UTF-8 바이트를 파싱하지만 어느 깊이든 해석된 객체 키가 반복되면 거부합니다. 이스케이프 표기가 같은 UTF-16 키를 만드는 경우를 포함하여 두 번째 키 토큰의 첫 바이트 위치에 `duplicate object key` 오류를 반환합니다. `parse_bytes`는 공통 중복 키 동작을 유지합니다. 그 밖의 유효한 값과 오류 및 위치는 바뀌지 않습니다.
+
+PHP 바인딩은 `Value::parseRejectDuplicates(source)`를 제공합니다. 일반 문법과 기본 깊이 한도로 UTF-8 텍스트를 파싱하지만 어느 깊이든 해석된 객체 키가 반복되면 거부합니다. 이스케이프 표기가 같은 UTF-16 키를 만드는 경우를 포함하여 `Duplicate object key at byte N` 메시지와 `duplicate_object_key` 종류의 `OrderedJson\ParseError`를 발생시키며, `N`은 두 번째 키 토큰의 첫 바이트 위치입니다. 네이티브 scanner는 공통 중복 키 동작을 유지하므로 `ordered_json` 확장이 로드되어 있어도 순수 PHP parser로 파싱합니다. 반환한 값은 조회와 직렬화에 로드된 backend를 사용합니다. `Value::parse`는 공통 중복 키 동작을 유지합니다. 그 밖의 유효한 값과 오류 및 위치는 바뀌지 않습니다.
 
 Rust `serde` 모듈은 Serde `Serialize`와 소유한 `Deserialize` 타입에 `to_string(&value)`, `from_str(text)`, `from_slice(bytes)`를 제공합니다. 인코딩은 구조체 필드를 선언 순서로 기록하고 Serde 필드 이름과 생략 속성을 적용하며 compact JSON을 기록합니다. `Value`는 두 Serde trait을 구현하여 포함된 JSON의 객체 순서와 숫자 토큰을 유지합니다. map 키는 문자열로 직렬화되어야 하며 반복 키, 유한하지 않은 숫자, 256개보다 깊은 컨테이너는 오류로 처리합니다. 디코딩은 라이브러리 파서로 UTF-8과 JSON을 검사하고 해석된 반복 키를 거부한 뒤 대상 Serde 타입을 적용합니다. 알 수 없는 필드와 뒤따르는 입력은 버리지 않고 오류로 처리합니다. 타입 오류도 오류로 유지합니다. wire와 manifest 패키지 fixture가 정확한 출력 바이트를 정합니다.
 

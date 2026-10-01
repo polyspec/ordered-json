@@ -207,6 +207,14 @@
       {
         "id": "utf8_validation_survives_low_pcre_limits",
         "description": "A backtrack or recursion limit is not reported as invalid UTF-8."
+      },
+      {
+        "id": "strict_parse_rejects_duplicate_keys",
+        "description": "Value::parseRejectDuplicates rejects repeated decoded object keys at every depth with the second key's byte offset."
+      },
+      {
+        "id": "strict_parse_accepts_unique_keys",
+        "description": "Value::parseRejectDuplicates retains unique JSON values and reports invalid UTF-8."
       }
     ],
     "php-extension": [
@@ -253,6 +261,14 @@
       {
         "id": "utf8_validation_survives_low_pcre_limits",
         "description": "The shared PHP check also runs against the native backend."
+      },
+      {
+        "id": "strict_parse_rejects_duplicate_keys",
+        "description": "The shared PHP strict parse check also runs with the extension loaded."
+      },
+      {
+        "id": "strict_parse_accepts_unique_keys",
+        "description": "The shared PHP strict parse check also runs with the extension loaded."
       }
     ]
   },
@@ -716,6 +732,10 @@
       ],
       "ParseError.offset": [
         "parse_errors_report_offsets"
+      ],
+      "Value.parseRejectDuplicates": [
+        "strict_parse_rejects_duplicate_keys",
+        "strict_parse_accepts_unique_keys"
       ]
     },
     "php-extension": {

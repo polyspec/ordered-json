@@ -21,6 +21,8 @@ $output = OrderedJson\stringify($value);
 
 The [native extension](https://github.com/polyspec/ordered-json/tree/main/php-extension) is a separate optional package. Pure PHP needs no extension checkout. `parse()` uses the extension when it is loaded and the pure PHP implementation otherwise. The pure test process uses `php -n`.
 
+`OrderedJson\Value::parseRejectDuplicates($source)` rejects a repeated decoded object key at any depth with `OrderedJson\ParseError` of kind `duplicate_object_key` instead of keeping the last value. It parses with the pure PHP parser even when the extension is loaded.
+
 The [JSON contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.md) and [API contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.md) define behavior. Source is provided by this repository. Registry publication and versioned releases are not verified; a source version string is not a release record.
 
 <a id="verification"></a>
