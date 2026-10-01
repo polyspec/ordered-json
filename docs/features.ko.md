@@ -1,5 +1,5 @@
 <!-- doc-id: features -->
-<!-- source-sha256: 11976a026fffb437e888b14f92e5f27dde7879470325407f82ea9fe0a7f17e37 -->
+<!-- source-sha256: 18a927f4604b7a8fb93492dfe6a563f690674799479301a80f18d01e7656378d -->
 # 기능 상태
 
 [English](features.md)
@@ -20,7 +20,7 @@
 | F-IDEMPOTENT | 반복 파싱과 직렬화에서 같은 타입 트리와 출력을 유지 | implemented | shared-suite | [결과](verification.json) | source-only | [직렬화](spec/json-contract.ko.md#serialization) |
 | F-CONSTRUCT | 순서 있는 연관배열과 Value 객체 배열로 생성 | implemented | shared-suite | [결과](verification.json) | source-only | [생성](spec/json-contract.ko.md#construction) |
 | F-RUST-SERDE | 선언 순서와 엄격한 입력 검사를 갖춘 Rust 타입 인코딩·디코딩 | implemented | package-tests | [결과](verification.json) | source-only | [바인딩](spec/api.ko.md#bindings) |
-| F-STRICT-KEYS | Rust와 PHP에서 해석된 객체 키의 반복을 거부하는 파싱 | implemented | package-tests | [결과](verification.json) | source-only | [바인딩](spec/api.ko.md#bindings) |
+| F-STRICT-KEYS | Rust, JavaScript, PHP에서 해석된 객체 키의 반복을 거부하는 파싱 | implemented | package-tests | [결과](verification.json) | source-only | [바인딩](spec/api.ko.md#bindings) |
 | F-PHP-NATIVE | 공통 PHP API를 사용하는 PHP 확장 파서와 직렬화 | implemented | shared-suite | [결과](verification.json) | source-only | [PHP](spec/api.ko.md#php) |
 | F-DOCS | 영한 문서, 링크·상태 검사, 검증 최신 여부 | implemented | docs-tests | [결과](verification.json) | source-only | [절차](documentation-plan.ko.md#checks) |
 | F-REPOS | 독립적으로 빌드할 수 있는 구현 패키지와 공통 적합성을 갖춘 단일 저장소 | implemented | shared-suite | [결과](verification.json) | source-only | [저장소](spec/repositories.ko.md) |

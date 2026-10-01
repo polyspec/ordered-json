@@ -1,5 +1,8 @@
 export type Kind = 'object' | 'array' | 'string' | 'number' | 'boolean' | 'null';
-export interface ParseOptions { maxDepth?: number }
+export interface ParseOptions {
+  maxDepth?: number;
+  rejectDuplicates?: boolean;
+}
 export declare const MAX_DEPTH: 256;
 export declare class ParseError extends SyntaxError { readonly offset: number }
 export declare class Value {

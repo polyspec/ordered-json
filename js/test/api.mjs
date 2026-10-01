@@ -136,6 +136,39 @@ check('factories_validate_arguments', () => {
   assert.throws(() => Value.object([['a', {}]]), {name: 'TypeError'});
 });
 
+check('strict_parse_rejects_duplicate_keys', () => {
+  const sources = [
+    '{"a":1,"a":2}',
+    String.raw`{"a":1,"a":2}`,
+    '{"nested":{"a":1,"a":2}}',
+    '[{"a":1,"a":2}]',
+    String.raw`{"\ud800":1,"\ud800":2}`,
+    '{"🌍":{"a":1,"a":2}}',
+  ];
+  for (const source of sources) {
+    parse(source);
+    const offset = source.lastIndexOf(',"') + 1;
+    const expected = {name: 'ParseError', kind: 'duplicate_object_key', offset, unit: 'utf16',
+      message: `Duplicate object key at UTF-16 offset ${offset}`};
+    assert.throws(() => parse(source, {rejectDuplicates: true}), expected, source);
+    assert.throws(() => parse(source, {rejectDuplicates: true, maxDepth: 2}), expected, source);
+    assert.throws(() => parseBytes(new TextEncoder().encode(source), {rejectDuplicates: true}), expected, source);
+  }
+});
+
+check('strict_parse_accepts_unique_keys', () => {
+  const source = '{"a":1,"nested":[{"b":2}],"state":null}';
+  assert.equal(stringify(parse(source, {rejectDuplicates: true})), source);
+  assert.equal(stringify(parseBytes(new TextEncoder().encode(source), {rejectDuplicates: true})), source);
+  assert.equal(parse('{"a":1,"a":2}', {rejectDuplicates: false}).get('a').numberLiteral(), '2');
+  assert.throws(() => parseBytes(new Uint8Array([0xff]), {rejectDuplicates: true}),
+    {name: 'ParseError', kind: 'invalid_utf8', offset: 0, unit: 'byte'});
+  for (const rejectDuplicates of [1, 'true', null]) {
+    assert.throws(() => parse('{}', {rejectDuplicates}),
+      {name: 'TypeError', message: 'rejectDuplicates must be a boolean'});
+  }
+});
+
 if (process.argv.includes('--cases')) {
   console.log([...cases.keys()].join('\n'));
   process.exit(0);
