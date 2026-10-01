@@ -19,6 +19,7 @@ const members = value.members;
 const output = stringify(value);
 ~~~
 
+`parse(source, {rejectDuplicates: true})` and `parseBytes(bytes, {rejectDuplicates: true})` reject a repeated decoded object key at any depth with a `ParseError` of kind `duplicate_object_key` instead of keeping the last value.
 
 The [JSON contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.md) and [API contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.md) define behavior. Source is provided by this repository. Registry publication and versioned releases are not verified; a source version string is not a release record.
 

@@ -64,6 +64,7 @@ const KINDS = {
   'Invalid UTF-8': 'invalid_utf8',
   'Maximum nesting depth exceeded': 'maximum_depth_exceeded',
   'Unexpected trailing input': 'trailing_input',
+  'Duplicate object key': 'duplicate_object_key',
 };
 
 export class ParseError extends SyntaxError {
@@ -183,7 +184,7 @@ function checkValue(value) {
 }
 
 // Parser state. Parsing never re-enters itself, so one module-level cursor suffices.
-let src = '', pos = 0, depthLimit = MAX_DEPTH, whitespace = 0, duplicates = 0;
+let src = '', pos = 0, depthLimit = MAX_DEPTH, whitespace = 0, duplicates = 0, rejectDuplicates = false;
 
 function fail(message) { throw new ParseError(message, pos); }
 function failAt(message, at) { throw new ParseError(message, at); }
@@ -269,6 +270,7 @@ function parseValue(depth) {
         if (object) {
           if (src.charCodeAt(pos) !== 34) fail('Expected object key');
           const keyStart = pos, name = scanString();
+          if (rejectDuplicates && members.has(name)) failAt('Duplicate object key', keyStart);
           skipWhitespace();
           if (src.charCodeAt(pos) !== 58) fail('Expected colon');
           pos++;
@@ -320,11 +322,13 @@ function parseValue(depth) {
   return new Value(internal, src, start, pos, kind, root | COMPACT);
 }
 
-export function parse(source, {maxDepth = MAX_DEPTH} = noOptions) {
+// rejectDuplicates rejects a repeated decoded object key at the second key token.
+export function parse(source, {maxDepth = MAX_DEPTH, rejectDuplicates: reject = false} = noOptions) {
   if (typeof source !== 'string') throw new TypeError('Expected JSON text');
   if (!Number.isInteger(maxDepth) || maxDepth < 0 || maxDepth > MAX_DEPTH)
     throw new RangeError(`maxDepth must be between 0 and ${MAX_DEPTH}`);
-  src = source; pos = 0; depthLimit = maxDepth; whitespace = 0; duplicates = 0;
+  if (typeof reject !== 'boolean') throw new TypeError('rejectDuplicates must be a boolean');
+  src = source; pos = 0; depthLimit = maxDepth; whitespace = 0; duplicates = 0; rejectDuplicates = reject;
   try {
     const result = parseValue(0);
     skipWhitespace();

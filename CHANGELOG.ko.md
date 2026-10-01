@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: d3c5e9a6f9e7acee0c14125d4c9e43f2e7cfc1ba3646c29706d6fb74d520e2ea -->
+<!-- source-sha256: f1aa97a721e6fdfa0c8a387416b9253dd5465679eb73a15ca29bac21ce48bfba -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,8 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 모든 깊이에서 해석된 객체 키의 반복을 같은 위치 규칙과 UTF-16 단위로 거부하는 JavaScript
+  `rejectDuplicates` 파싱 옵션을 추가합니다. 기본 파싱은 바뀌지 않습니다.
 - 모든 깊이에서 해석된 객체 키의 반복을 거부하는 PHP 파싱을 Rust 엄격 바이트 파서와 같은
   위치 규칙으로 추가합니다. `Value::parse`는 문서화된 결과를 유지합니다.
 - Rust 타입 바인딩 의존성을 검증한 버전으로 고정합니다. 바인딩은 Serde JSON 토큰 프로토콜로

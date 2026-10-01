@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Add the JavaScript `rejectDuplicates` parse option, which rejects repeated decoded object keys
+  at every depth with the same offset rule in UTF-16 units. The default parse is unchanged.
 - Add a PHP parse that rejects repeated decoded object keys at every depth, with the same
   offset rule as the Rust strict byte parser. `Value::parse` retains its documented result.
 - Pin the typed Rust binding dependencies to the verified versions. The binding writes raw JSON

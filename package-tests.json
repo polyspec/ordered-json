@@ -106,7 +106,16 @@
     }
   ],
   "package_cases": {
-    "js": [],
+    "js": [
+      {
+        "id": "strict_parse_rejects_duplicate_keys",
+        "description": "The rejectDuplicates option rejects repeated decoded object keys at every depth with the second key's UTF-16 offset."
+      },
+      {
+        "id": "strict_parse_accepts_unique_keys",
+        "description": "The rejectDuplicates option retains unique JSON values, reports invalid UTF-8 and requires a boolean."
+      }
+    ],
     "rust": [
       {
         "id": "strict_parse_rejects_duplicate_keys",
@@ -278,7 +287,7 @@
         "exempt": "a type alias with no runtime form"
       },
       "ParseOptions": {
-        "exempt": "an options type; its maxDepth field is covered by the depth cases"
+        "exempt": "an options type with no runtime form; its fields are covered separately"
       },
       "MAX_DEPTH": [
         "depth_argument_is_bounded"
@@ -362,6 +371,14 @@
       "stringify": [
         "host_serialization_boundary",
         "values_come_only_from_the_library"
+      ],
+      "ParseOptions.maxDepth": [
+        "depth_argument_is_bounded",
+        "depth_limit_is_enforced"
+      ],
+      "ParseOptions.rejectDuplicates": [
+        "strict_parse_rejects_duplicate_keys",
+        "strict_parse_accepts_unique_keys"
       ]
     },
     "rust": {

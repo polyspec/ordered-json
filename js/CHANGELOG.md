@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Add the `rejectDuplicates` parse option for callers that require every decoded object key to occur once. It reports `Duplicate object key` with kind `duplicate_object_key` at the second key's UTF-16 offset, requires a boolean, and keeps the default parse unchanged. `ParseOptions` lists each field on its own line so the package reports both fields for the coverage check.
 - `ParseError` carries a `kind` from the shared rejection list beside its own message.
 - Removed the `StringifyOptions` declaration and the second `stringify` parameter from the type declaration; the function takes one argument. The package reports its public symbols for the shared coverage check.
 - An unescaped control character is reported at its own offset instead of one past it, and the adapter reports the rejection position for the shared comparison.

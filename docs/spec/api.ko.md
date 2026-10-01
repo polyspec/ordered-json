@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 3a40ef0dac5a229243e754e224cbdc4c27fd6510e480d4939beb365a1709a255 -->
+<!-- source-sha256: 850a861ea57ff5e2071d595d03daa535cc0c25137ec74685fa483fc60bdc3d39 -->
 # API 계약
 
 [English](api.md)
@@ -31,6 +31,8 @@ JavaScript 파싱 오류는 UTF-16 위치를 반환합니다. Rust, Go, PHP 파�
 바인딩은 해당 언어에만 필요한 API를 추가할 수 있습니다. 바인딩 확장은 공유 parser와 serializer를 사용하고, 허용한 입력의 결과와 오류 위치를 바꾸지 않으며, 추가로 거부하는 입력을 문서화합니다. 공유 동작 표가 아니라 이 절에 적습니다. 해당 패키지는 구현 등록 정보에 자체 테스트를 선언하고 `make check`가 이를 실행합니다. 공통 사례가 닿지 못하는 API는 그 테스트로만 검증됩니다.
 
 Rust 바인딩은 `parse_bytes_reject_duplicates(source)`를 제공합니다. 일반 문법과 깊이 한도로 UTF-8 바이트를 파싱하지만 어느 깊이든 해석된 객체 키가 반복되면 거부합니다. 이스케이프 표기가 같은 UTF-16 키를 만드는 경우를 포함하여 두 번째 키 토큰의 첫 바이트 위치에 `duplicate object key` 오류를 반환합니다. `parse_bytes`는 공통 중복 키 동작을 유지합니다. 그 밖의 유효한 값과 오류 및 위치는 바뀌지 않습니다.
+
+JavaScript 바인딩은 `parse(source, options)`와 `parseBytes(bytes, options)`의 options에서 `rejectDuplicates: true`를 받습니다. 이 옵션이 있으면 이스케이프 표기가 같은 UTF-16 키를 만드는 경우를 포함하여 어느 깊이든 해석된 객체 키가 반복될 때 `Duplicate object key at UTF-16 offset N` 메시지와 `duplicate_object_key` `kind`의 `ParseError`로 거부하며, `N`은 두 번째 키 토큰의 UTF-16 위치입니다. `rejectDuplicates`는 boolean이어야 하며 기본값 `false`는 공통 중복 키 동작을 유지합니다. 이 옵션은 `maxDepth`와 함께 쓸 수 있습니다. 그 밖의 유효한 값과 오류 및 위치는 바뀌지 않습니다.
 
 PHP 바인딩은 `Value::parseRejectDuplicates(source)`를 제공합니다. 일반 문법과 기본 깊이 한도로 UTF-8 텍스트를 파싱하지만 어느 깊이든 해석된 객체 키가 반복되면 거부합니다. 이스케이프 표기가 같은 UTF-16 키를 만드는 경우를 포함하여 `Duplicate object key at byte N` 메시지와 `duplicate_object_key` 종류의 `OrderedJson\ParseError`를 발생시키며, `N`은 두 번째 키 토큰의 첫 바이트 위치입니다. 네이티브 scanner는 공통 중복 키 동작을 유지하므로 `ordered_json` 확장이 로드되어 있어도 순수 PHP parser로 파싱합니다. 반환한 값은 조회와 직렬화에 로드된 backend를 사용합니다. `Value::parse`는 공통 중복 키 동작을 유지합니다. 그 밖의 유효한 값과 오류 및 위치는 바뀌지 않습니다.
 
