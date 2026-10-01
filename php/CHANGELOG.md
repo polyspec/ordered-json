@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Add `Value::parseRejectDuplicates` for callers that require every decoded object key to occur once. It reports `Duplicate object key` with kind `duplicate_object_key` at the second key's byte offset, parses with the PHP parser in both backends, and keeps `Value::parse` unchanged.
 - `ParseError` carries a `kind` from the shared rejection list beside its own message.
 - The package reports its public symbols for the shared coverage check; the UTF-8 offset helper is marked internal like the other helpers.
 - An unescaped control character is reported at its own offset, an invalid Unicode escape at the first byte that is not a hex digit, and the adapter reports the rejection position for the shared comparison.

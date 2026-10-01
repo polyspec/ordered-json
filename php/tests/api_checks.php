@@ -161,6 +161,43 @@ function orderedJsonApiCases(): array
         throw new RuntimeException('expected ParseError');
     };
 
+    $cases['strict_parse_rejects_duplicate_keys'] = static function () {
+        $sources = [
+            '{"a":1,"a":2}',
+            '{"a":1,"\u0061":2}',
+            '{"nested":{"a":1,"a":2}}',
+            '[{"a":1,"a":2}]',
+            '{"\ud800":1,"\ud800":2}',
+        ];
+        foreach ($sources as $source) {
+            Value::parse($source);
+            $offset = strrpos($source, ',"') + 1;
+            try {
+                Value::parseRejectDuplicates($source);
+            } catch (ParseError $error) {
+                expectSame('Duplicate object key at byte ' . $offset, $error->getMessage());
+                expectSame('duplicate_object_key', $error->kind);
+                expectSame($offset, $error->offset);
+                continue;
+            }
+            throw new RuntimeException('accepted ' . $source);
+        }
+    };
+
+    $cases['strict_parse_accepts_unique_keys'] = static function () {
+        $source = '{"a":1,"nested":[{"b":2}],"state":null}';
+        expectSame($source, Value::parseRejectDuplicates($source)->compact());
+        expectSame('2', Value::parseRejectDuplicates($source)->get('nested')->items()[0]->get('b')->raw());
+        try {
+            Value::parseRejectDuplicates("\xff");
+        } catch (ParseError $error) {
+            expectSame('Invalid UTF-8 at byte 0', $error->getMessage());
+            expectSame(0, $error->offset);
+            return;
+        }
+        throw new RuntimeException('expected ParseError for invalid UTF-8');
+    };
+
     // A backtrack or recursion limit must not be read as invalid UTF-8; only a
     // UTF-8 error is one. Low limits are the configuration that caught this.
     $cases['utf8_validation_survives_low_pcre_limits'] = static function () {

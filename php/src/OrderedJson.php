@@ -22,6 +22,7 @@ final class ParseError extends \InvalidArgumentException
         'Invalid UTF-8' => 'invalid_utf8',
         'Maximum nesting depth exceeded' => 'maximum_depth_exceeded',
         'Unexpected trailing input' => 'trailing_input',
+        'Duplicate object key' => 'duplicate_object_key',
     ];
     public readonly string $kind;
     public function __construct(string $message, public readonly int $offset)
@@ -256,6 +257,22 @@ final class Value implements \JsonSerializable, \Stringable
         } else {
             $tape = (new Parser($source, $maxDepth))->parse();
         }
+        return self::root($source, $tape);
+    }
+
+    /**
+     * Parses like parse() with the default depth limit and rejects a repeated decoded object key
+     * at the first byte of the second key token. The native scanner keeps the last value of a
+     * repeated key, so this method always parses with the PHP parser.
+     */
+    public static function parseRejectDuplicates(string $source): self
+    {
+        return self::root($source, (new Parser($source, MAX_DEPTH, true))->parse());
+    }
+
+    /** @param list<int> $tape */
+    private static function root(string $source, array $tape): self
+    {
         $value = new self();
         $value->source = $source;
         $value->tape = $tape;
@@ -470,7 +487,7 @@ final class Parser
     private array $tape = [];
     private int $whitespace = 0;
     private int $duplicates = 0;
-    public function __construct(private string $source, private int $maxDepth)
+    public function __construct(private string $source, private int $maxDepth, private bool $rejectDuplicates = false)
     {
         $this->length = strlen($source);
     }
@@ -598,13 +615,14 @@ final class Parser
                     $this->tape[] = $keyStart;
                     $this->tape[] = $pos;
                     $name = substr($s, $keyStart + 1, $pos - $keyStart - 2);
+                    if ($result & 1) $name = tokenText($name, true);
+                    if ($this->rejectDuplicates && isset($names[$name])) $this->fail('Duplicate object key', $keyStart);
                     if (($skipped = strspn($s, self::WHITESPACE, $pos)) !== 0) {
                         $pos += $skipped;
                         $this->whitespace += $skipped;
                     }
                     if (($s[$pos] ?? '') !== ':') $this->fail('Expected colon', $pos);
                     $pos = $this->value($depth + 1, $pos + 1);
-                    if ($result & 1) $name = tokenText($name, true);
                     if (isset($names[$name])) {
                         $first = $names[$name];
                         $this->tape[$first] = $this->tape[$first] & 0xff | ($key + 3) << Tape::LINK;
