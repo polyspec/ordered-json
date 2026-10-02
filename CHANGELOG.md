@@ -6,6 +6,9 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Format the Rust sources with rustfmt and check the format before every Rust build of
+  `make check`. `rust/src/lib.rs` and `rust/tests/api.rs` were not in rustfmt form, and no check
+  caught it.
 - Declare `ParseError.kind` in the JavaScript type declaration. The parser sets the rejection kind
   on every `ParseError`, but TypeScript callers could not read it without a cast.
 - Add the JavaScript `rejectDuplicates` parse option, which rejects repeated decoded object keys

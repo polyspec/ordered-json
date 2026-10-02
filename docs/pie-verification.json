@@ -2,19 +2,19 @@
   "schema_version": 1,
   "scope": "pie-build",
   "status": "passed",
-  "checked_at": "2026-10-01T22:22:10+00:00",
+  "checked_at": "2026-10-02T02:50:54+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "2d7bf12857dfccb11f005a6705dd29d2e62cf73a9a49b640f8956383e97ca562",
+    "sha256": "28856b1f0b54d6acfc47315f63064c4a198b78a2f2a611fbd814277d6c337940",
     "files": {
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "c3f634c16dceeb8aa7d109490da855a8b23efa3a17995a57f90672a019e125ba",
       "AGENTS.md": "69346a03d39ef7d6eb88bb471a95857b77c937bad6dd0fede3d529f121e677e1",
-      "CHANGELOG.ko.md": "0ffe3df0b061f1ed8ddcf040713f38468e237249c0ee43bd9872bb9587429d88",
-      "CHANGELOG.md": "67a327c237088a5bb6c60accfd2fbb151cccc694c8e90765478778c152e1151e",
+      "CHANGELOG.ko.md": "f1110c032247219d4628b0017bd08ff4987382446d98a254614f439e79ffeea6",
+      "CHANGELOG.md": "bedf7fc0cc3d264046155c524426e1f2ee33f8ca89122eed2ecae0bafcadc30f",
       "Cargo.toml": "17441aea2651524ebd080a365970974d724e51d19574d71f3fa6a0dfe1fcee0b",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
@@ -174,7 +174,7 @@
       "go/marshal_fuzz_test.go": "28989222139f7086f3d30aa843318ac0f5d20ea34e0c7c88618d86111d49c7db",
       "go/marshal_test.go": "d6ece8aa9e997199e87fc8cc6f98e9caf48ff85215b3a9fa81f6a0a67f4f64a1",
       "go/orderedjson.go": "7626be7983d372110bb7e3badedddc53038340f749cc39e6226563f084089662",
-      "implementations.json": "790e8e952607774ea17501ed7819ee0cb9e1a312999685227b995bbfbd8adb31",
+      "implementations.json": "0a8e8fddc2dfeb5bfca97787ac6e5272f9467ad96b6f3feabbc1eb070d3eb1d7",
       "js/.gitignore": "f7c80f12d5b458d8db860b6d84b2fe6b579230a10323e3066a1b35b0464a4963",
       "js/AGENTS.ko.md": "e78d2272fb7c73c159348d5668a017c11f334c47696b006ecce7f36d5b1052ce",
       "js/AGENTS.md": "a8e43aea261abd8edd34b1495814884e55fcf6c17f24ad412ac708e9d55765b0",
@@ -239,9 +239,9 @@
       "rust/examples/api.rs": "ad8fba3fe24c08a86f5fc9bcc6faf74a583f634af95b4309ac9f514c385ce691",
       "rust/examples/benchmark.rs": "5bee752a544edc63573656d43c0f99c8bb2f6744f2a2d36bfd7227257459ce79",
       "rust/examples/probe.rs": "49a07332830df0f8703515285492af420666f3c441c5a794fbc7038eae92b43e",
-      "rust/src/lib.rs": "ca51094dafd0a1c4bb98dc219b62412f5b854eb202229a7237d8e18a14640508",
+      "rust/src/lib.rs": "48cf0535dfa96a05a048acb81c30cbca68a10860d1d7ca1e9991bf98d8f956bb",
       "rust/src/serde.rs": "1b8a70e512efb5ade1ea79d28daf0b0d92fa27f9944fd55e2d4fd4f1750df690",
-      "rust/tests/api.rs": "d6484e6238e2ce246c4ba6b2e1e349dc3182bbc91c0ce4ccf4a2d1713b0967a1",
+      "rust/tests/api.rs": "b976761300e22605a19ed898f6709e6ecf92e78173754a1da8bb9295f0bba25e",
       "rust/tests/duplicate_keys.rs": "39775feea5ef79f374bf3115c9f72bc49d5e8af2826268401f093f7555acdbf0",
       "rust/tests/fixtures/manifest.json": "9ecac51902494a768979bf3cfe3790bacee8b6afffcb0e2d109781728b214bfa",
       "rust/tests/fixtures/wire.json": "feea97e518f7a63239fac28eb32f2dbc0d691dac53ccbc777e30d43f8e672a3f",
@@ -269,7 +269,7 @@
     },
     "rust": {
       "path": "rust",
-      "sha256": "aaefa9611cecb203c336ea23c97314ef6841a1ce718c8a1fffbb4b510e0da970",
+      "sha256": "8eeacec023c9e8261ff4599b68920a2bb7e06a22ec3f89f9ef137487cb54e6ee",
       "files": 21
     },
     "go": {

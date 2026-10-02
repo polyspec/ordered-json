@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 25082adbd7fe9eeaeae632cf4e53de6d784c614f59078929413a1be67aaff985 -->
+<!-- source-sha256: c415e621832b146161aec119fbb336e4ce9b686cf884db01e0c2f616a2261a86 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,8 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- Rust 소스를 rustfmt로 정리하고 `make check`의 모든 Rust build 전에 형식을 확인합니다.
+  `rust/src/lib.rs`와 `rust/tests/api.rs`는 rustfmt 형식이 아니었고, 이를 잡는 확인이 없었습니다.
 - JavaScript 타입 선언에 `ParseError.kind`를 선언합니다. 파서는 모든 `ParseError`에 거부 종류를
   설정하지만, TypeScript 호출자는 형 변환 없이 그 값을 읽을 수 없었습니다.
 - 모든 깊이에서 해석된 객체 키의 반복을 같은 위치 규칙과 UTF-16 단위로 거부하는 JavaScript

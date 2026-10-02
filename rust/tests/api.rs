@@ -1,7 +1,9 @@
 //! Package tests for the Rust value API. The shared cases exercise the JSON
 //! contract through the adapter; constructor arguments, map building, UTF-16
 //! units and wrong-kind access are reachable only from here.
-use ordered_json::{parse, parse_bytes, parse_with_max_depth, stringify, Kind, OrderedMap, Value, MAX_DEPTH};
+use ordered_json::{
+    parse, parse_bytes, parse_with_max_depth, stringify, Kind, OrderedMap, Value, MAX_DEPTH,
+};
 
 #[test]
 fn depth_argument_is_bounded() {
@@ -22,7 +24,10 @@ fn bytes_input_is_validated() {
     let error = parse_bytes(b"[\"\xff\"]").unwrap_err();
     assert_eq!(error.message, "invalid UTF-8");
     assert_eq!(error.offset, 2);
-    assert_eq!(parse_bytes("[\"\u{d55c}\"]".as_bytes()).unwrap().compact(), "[\"한\"]");
+    assert_eq!(
+        parse_bytes("[\"\u{d55c}\"]".as_bytes()).unwrap().compact(),
+        "[\"한\"]"
+    );
 }
 
 #[test]
@@ -58,7 +63,9 @@ fn parse_errors_report_offsets() {
 #[test]
 fn ordered_map_rejects_non_string_key() {
     let mut members = OrderedMap::new();
-    let error = members.insert(Value::number("1").unwrap(), Value::null()).unwrap_err();
+    let error = members
+        .insert(Value::number("1").unwrap(), Value::null())
+        .unwrap_err();
     assert_eq!(error.message, "object key must be a string");
     assert!(members.is_empty());
 }
@@ -66,9 +73,15 @@ fn ordered_map_rejects_non_string_key() {
 #[test]
 fn repeated_key_keeps_first_position_and_last_value() {
     let mut members = OrderedMap::new();
-    members.insert(Value::string("a"), Value::number("1").unwrap()).unwrap();
-    members.insert(Value::string("b"), Value::number("2").unwrap()).unwrap();
-    let replaced = members.insert(Value::string("a"), Value::number("3").unwrap()).unwrap();
+    members
+        .insert(Value::string("a"), Value::number("1").unwrap())
+        .unwrap();
+    members
+        .insert(Value::string("b"), Value::number("2").unwrap())
+        .unwrap();
+    let replaced = members
+        .insert(Value::string("a"), Value::number("3").unwrap())
+        .unwrap();
     assert_eq!(replaced.map(|value| value.compact()), Some("1".to_owned()));
     assert_eq!(members.len(), 2);
     let listed: Vec<String> = members
@@ -76,15 +89,24 @@ fn repeated_key_keeps_first_position_and_last_value() {
         .map(|(key, value)| format!("{}:{}", key.compact(), value.compact()))
         .collect();
     assert_eq!(listed, vec!["\"a\":3".to_owned(), "\"b\":2".to_owned()]);
-    assert_eq!(Value::object(&members).unwrap().compact(), "{\"a\":3,\"b\":2}");
+    assert_eq!(
+        Value::object(&members).unwrap().compact(),
+        "{\"a\":3,\"b\":2}"
+    );
 }
 
 #[test]
 fn member_lookup_uses_decoded_names() {
     let value = parse("{\"a\\u00e9\":1,\"b\":2}").unwrap();
-    assert_eq!(value.get("aé").map(|child| child.compact()), Some("1".to_owned()));
+    assert_eq!(
+        value.get("aé").map(|child| child.compact()),
+        Some("1".to_owned())
+    );
     assert!(value.get("missing").is_none());
-    assert_eq!(value.get_units(&[0x62]).map(|child| child.compact()), Some("2".to_owned()));
+    assert_eq!(
+        value.get_units(&[0x62]).map(|child| child.compact()),
+        Some("2".to_owned())
+    );
     assert!(value.get_units(&[0x63]).is_none());
 }
 
@@ -93,7 +115,10 @@ fn unpaired_surrogate_stays_in_units() {
     let lone = Value::from_units(&[0x61, 0xd800]);
     assert_eq!(lone.compact(), "\"a\\ud800\"");
     assert_eq!(lone.string_units(), Some(&[0x61u16, 0xd800][..]));
-    assert_eq!(lone.string_value().unwrap_err().message, "unpaired surrogate; use string_units");
+    assert_eq!(
+        lone.string_value().unwrap_err().message,
+        "unpaired surrogate; use string_units"
+    );
 }
 
 #[test]
@@ -105,9 +130,20 @@ fn surrogate_pair_decodes() {
 
 #[test]
 fn factories_validate_arguments() {
-    assert_eq!(Value::number(" 1").unwrap_err().message, "expected a number literal without whitespace");
-    assert_eq!(Value::number("x").unwrap_err().message, "expected JSON value");
-    assert_eq!(Value::array(&[Value::boolean(true), Value::null()]).unwrap().compact(), "[true,null]");
+    assert_eq!(
+        Value::number(" 1").unwrap_err().message,
+        "expected a number literal without whitespace"
+    );
+    assert_eq!(
+        Value::number("x").unwrap_err().message,
+        "expected JSON value"
+    );
+    assert_eq!(
+        Value::array(&[Value::boolean(true), Value::null()])
+            .unwrap()
+            .compact(),
+        "[true,null]"
+    );
     assert_eq!(Value::string("\"q\"").compact(), "\"\\\"q\\\"\"");
     assert_eq!(Value::object(&OrderedMap::new()).unwrap().compact(), "{}");
 }
