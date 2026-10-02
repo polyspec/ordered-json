@@ -15,6 +15,23 @@ from verification_record import package_revisions
 
 
 class RepositoryChecks(unittest.TestCase):
+    def test_each_cargo_package_has_one_manifest(self):
+        # A Git dependency on this repository reads every tracked Cargo.toml; two manifests of
+        # one package make Cargo skip one with a duplicate package warning in every build that
+        # depends on this repository.
+        root = Path(__file__).resolve().parents[2]
+        tracked = subprocess.run(['git', 'ls-files', '-z', '--', '*Cargo.toml'], cwd=root,
+                                 check=True, capture_output=True, text=True).stdout
+        owners = {}
+        for name in filter(None, tracked.split('\0')):
+            lines = (root / name).read_text().splitlines()
+            if '[package]' not in lines:
+                continue
+            package = next(line.split('=', 1)[1].strip().strip('"') for line in
+                           lines[lines.index('[package]') + 1:] if line.startswith('name'))
+            owners.setdefault(package, []).append(name)
+        self.assertEqual({package: names for package, names in owners.items() if len(names) > 1}, {})
+
     def test_override_replaces_package_directory(self):
         with tempfile.TemporaryDirectory() as folder:
             candidate = Path(folder) / 'override with spaces'

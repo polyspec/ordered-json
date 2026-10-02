@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: c415e621832b146161aec119fbb336e4ce9b686cf884db01e0c2f616a2261a86 -->
+<!-- source-sha256: fbbe42e492441b9ca97718c4ff3895e6123bf2528f3cb147f42129c87c821d6d -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,10 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- root `Cargo.toml`을 제거합니다. 이 파일은 `rust/Cargo.toml` 옆에서 `ordered-json` 패키지를 한
+  번 더 정의해서, 이 저장소에 의존하는 모든 Cargo 빌드가 "skipping duplicate package"를 경고했습니다.
+  Cargo는 그 파일 없이도 Git 의존성에서 `rust/Cargo.toml`을 찾습니다. 저장소 테스트가 Cargo
+  패키지마다 manifest 하나를 요구합니다.
 - Rust 소스를 rustfmt로 정리하고 `make check`의 모든 Rust build 전에 형식을 확인합니다.
   `rust/src/lib.rs`와 `rust/tests/api.rs`는 rustfmt 형식이 아니었고, 이를 잡는 확인이 없었습니다.
 - JavaScript 타입 선언에 `ParseError.kind`를 선언합니다. 파서는 모든 `ParseError`에 거부 종류를

@@ -1,20 +1,19 @@
 {
   "schema_version": 1,
   "status": "passed",
-  "checked_at": "2026-10-02T02:51:08+00:00",
+  "checked_at": "2026-10-02T02:52:23+00:00",
   "platform": {
     "system": "Darwin",
     "machine": "arm64"
   },
   "sources": {
-    "sha256": "28856b1f0b54d6acfc47315f63064c4a198b78a2f2a611fbd814277d6c337940",
+    "sha256": "5760e47eb7d1d80130ec09ddb36dbce3accc18345383d58ec54f581b2f49f93e",
     "files": {
       ".gitignore": "5a1ad4bab0f77695e4788081dc82895c01e5dfc713942b644e048cf771c519d4",
       "AGENTS.ko.md": "c3f634c16dceeb8aa7d109490da855a8b23efa3a17995a57f90672a019e125ba",
       "AGENTS.md": "69346a03d39ef7d6eb88bb471a95857b77c937bad6dd0fede3d529f121e677e1",
-      "CHANGELOG.ko.md": "f1110c032247219d4628b0017bd08ff4987382446d98a254614f439e79ffeea6",
-      "CHANGELOG.md": "bedf7fc0cc3d264046155c524426e1f2ee33f8ca89122eed2ecae0bafcadc30f",
-      "Cargo.toml": "17441aea2651524ebd080a365970974d724e51d19574d71f3fa6a0dfe1fcee0b",
+      "CHANGELOG.ko.md": "d778ca8b4677c2712876a43f9cb48d863e1ab844c8f9f13138fe3d69980abc50",
+      "CHANGELOG.md": "5f7332d3c9457b7082f67e3e8be93513e3fb11ba99eea93e84850388d8882ee0",
       "Makefile": "e3438861bb96758c2c5b372289b5982e2dd4e1e6b0ced0e570114df7f8c6ab2f",
       "README.ko.md": "f4ca5faba42671b77d5a5af686f6b3a503e68d9e64cfbaff8c12b91098aca708",
       "README.md": "8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75",
@@ -255,7 +254,7 @@
       "scripts/tests/test_benchmark.py": "d92f5da2ddb84781ed926f61bb721342970dda080ba4405a1525b6447f6f6c28",
       "scripts/tests/test_docs_check.py": "76feab72c318ca022525b91472566f3a167a1e8ccaec7ec77d9f07b728637005",
       "scripts/tests/test_package_conformance.py": "4c22f121615b51a3aaec63582ecb78780985be1d51710410f828dcd601f79ec0",
-      "scripts/tests/test_repositories.py": "07063fc85a6e5ffeb560f1d74107d0b731eb3b05a6796b2dda96ea63ee810e94",
+      "scripts/tests/test_repositories.py": "b6f86af2a9ee0f85db19f77c05fcfb99b57faf31c0710ec8ce9b859425ac5b77",
       "scripts/verification_record.py": "c55f38571ab6dd0ac6fca9ea9422c6848366e9e53aee5372832dffd80f48aec9",
       "scripts/verify.py": "cc73835f88d44d92b4d2159b0e8f9676062b3f44bc963e831c8507a155fff934"
     }
@@ -348,7 +347,7 @@
   },
   "documentation_tests": {
     "status": "passed",
-    "count": 62
+    "count": 63
   },
   "supplementary": {
     "project": "nst/JSONTestSuite",

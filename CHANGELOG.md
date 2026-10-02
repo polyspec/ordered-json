@@ -6,6 +6,10 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Remove the root `Cargo.toml`. It defined the `ordered-json` package a second time beside
+  `rust/Cargo.toml`, so every Cargo build that depends on this repository warned "skipping duplicate
+  package"; Cargo finds `rust/Cargo.toml` in a Git dependency without it. A repository test
+  requires one manifest for each Cargo package.
 - Format the Rust sources with rustfmt and check the format before every Rust build of
   `make check`. `rust/src/lib.rs` and `rust/tests/api.rs` were not in rustfmt form, and no check
   caught it.
