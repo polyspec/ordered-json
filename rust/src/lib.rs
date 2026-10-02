@@ -108,7 +108,11 @@ fn hash_units(state: &RandomState, units: &[u16]) -> u64 {
             Ok(ch) => hasher.write(ch.encode_utf8(&mut buffer).as_bytes()),
             Err(lone) => {
                 let u = lone.unpaired_surrogate();
-                hasher.write(&[0xe0 | (u >> 12) as u8, 0x80 | ((u >> 6) & 0x3f) as u8, 0x80 | (u & 0x3f) as u8]);
+                hasher.write(&[
+                    0xe0 | (u >> 12) as u8,
+                    0x80 | ((u >> 6) & 0x3f) as u8,
+                    0x80 | (u & 0x3f) as u8,
+                ]);
             }
         }
     }
@@ -133,7 +137,10 @@ impl OrderedMap {
     }
     /// Inserts under a string key; a repeated key keeps its first token and position.
     fn set(&mut self, key: Value, value: Value) -> Option<Value> {
-        if let Some(position) = self.find(|state| key.key_hash(state), |existing| existing.same_key(&key)) {
+        if let Some(position) = self.find(
+            |state| key.key_hash(state),
+            |existing| existing.same_key(&key),
+        ) {
             return Some(std::mem::replace(&mut self.entries[position].1, value));
         }
         let position = self.entries.len();
@@ -152,7 +159,11 @@ impl OrderedMap {
         }
         None
     }
-    fn find(&self, hash: impl FnOnce(&RandomState) -> u64, matches: impl Fn(&Value) -> bool) -> Option<usize> {
+    fn find(
+        &self,
+        hash: impl FnOnce(&RandomState) -> u64,
+        matches: impl Fn(&Value) -> bool,
+    ) -> Option<usize> {
         if let Some(index) = &self.index {
             match index.slots.get(&hash(&index.state)) {
                 None => return None,
@@ -163,12 +174,18 @@ impl OrderedMap {
         self.entries.iter().position(|(key, _)| matches(key))
     }
     pub fn get(&self, key: &str) -> Option<&Value> {
-        self.find(|state| hash_bytes(state, key.as_bytes()), |existing| existing.key_is_str(key))
-            .map(|position| &self.entries[position].1)
+        self.find(
+            |state| hash_bytes(state, key.as_bytes()),
+            |existing| existing.key_is_str(key),
+        )
+        .map(|position| &self.entries[position].1)
     }
     pub fn get_units(&self, key: &[u16]) -> Option<&Value> {
-        self.find(|state| hash_units(state, key), |existing| existing.key_is_units(key))
-            .map(|position| &self.entries[position].1)
+        self.find(
+            |state| hash_units(state, key),
+            |existing| existing.key_is_units(key),
+        )
+        .map(|position| &self.entries[position].1)
     }
     pub fn iter(&self) -> impl DoubleEndedIterator<Item = (&Value, &Value)> {
         self.entries.iter().map(|(key, value)| (key, value))
@@ -289,7 +306,8 @@ impl Value {
         if self.flags & ESCAPED == 0 {
             return Ok(self.content().to_owned());
         }
-        String::from_utf16(self.string_units().unwrap()).map_err(|_| error("unpaired surrogate; use string_units"))
+        String::from_utf16(self.string_units().unwrap())
+            .map_err(|_| error("unpaired surrogate; use string_units"))
     }
     pub fn number_literal(&self) -> Option<&str> {
         matches!(self.node, Node::Number).then(|| self.raw().trim())
@@ -322,7 +340,11 @@ impl Value {
         if self.flags & ESCAPED == 0 {
             self.content() == key
         } else {
-            self.string_units().unwrap().iter().copied().eq(key.encode_utf16())
+            self.string_units()
+                .unwrap()
+                .iter()
+                .copied()
+                .eq(key.encode_utf16())
         }
     }
     fn key_is_units(&self, key: &[u16]) -> bool {
@@ -544,7 +566,10 @@ impl Parser<'_> {
                             }
                             self.pos += 1;
                         }
-                    } else if !matches!(escape, b'"' | b'\\' | b'/' | b'b' | b'f' | b'n' | b'r' | b't') {
+                    } else if !matches!(
+                        escape,
+                        b'"' | b'\\' | b'/' | b'b' | b'f' | b'n' | b'r' | b't'
+                    ) {
                         // The escape character has been consumed; the offset names it.
                         return Err(Error {
                             offset: self.pos - 1,
@@ -586,7 +611,8 @@ impl Parser<'_> {
                         if object {
                             let key_start = self.pos;
                             let flags = self.string()?;
-                            let key = self.new_value(key_start, flags, Node::String(OnceLock::new()));
+                            let key =
+                                self.new_value(key_start, flags, Node::String(OnceLock::new()));
                             if self.reject_duplicates
                                 && members.get_units(key.string_units().unwrap()).is_some()
                             {
