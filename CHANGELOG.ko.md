@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 2f4c7f1f1fe12abf7c0029dc7361011927e7880e492150814d2d539e740d0644 -->
+<!-- source-sha256: df6d9dcf8b9f0d1fc8577d7629e4c68ed11fcb9ea2c84c63583b4ad6a1afe6d4 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,11 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 개발 절차는 변경을 진행하는 동안 그 변경을 소유한 테스트만 실행하고(`scripts/verify.py
+  --only`, `scripts/test.py --unit`), `make check`는 활성 항목이 모두 끝난 뒤 한 번 실행합니다.
+  이전 절차는 변경마다 `make check`를 요구해서 수정할 때마다 모든 패키지와 공통 사례를 다시
+  실행했습니다. 기본적으로 `main`에서
+  작업하고, 에이전트나 상황이 필요로 하는 브랜치나 워크트리는 합친 즉시 제거합니다.
 - 검증기 unit test는 시작할 때 test 이름을 출력하고, 끝나면 상태와 경과 시간을 출력합니다. 각
   test에는 자기 deadline이 있으며, test가 따로 선언하지 않으면 60 s입니다. deadline을 넘긴
   test는 이름과 함께 실패합니다. 이전 runner는 test마다 점 하나만 출력해서, 멈춘 test는 아무것도

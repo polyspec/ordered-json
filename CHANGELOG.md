@@ -6,6 +6,11 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The development procedure runs only the tests that own a change while it is in progress
+  (`scripts/verify.py --only`, `scripts/test.py --unit`) and runs `make check` once, after every
+  active item is complete. It required `make check` for every change, which reruns every package
+  and the shared cases after each correction. Work happens on `main` by default, and a branch or worktree that an agent or the
+  situation needs is removed immediately after it is merged.
 - The verifier unit tests print each test by name as it starts, then its status and elapsed
   time, and each test has its own deadline, 60 s unless the test declares another; a test past
   its deadline fails by name. The runner printed one dot per test, so a hung test printed nothing
