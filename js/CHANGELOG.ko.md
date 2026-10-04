@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 40133bee78685a889234ee4fe9819ec046568f747ae1aad6b9c8e73229591abf -->
+<!-- source-sha256: c8624c3e1c17bb5e01fc015b69939e5a8e15d6c1f20a77e9483874de714f555f -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- 패키지 테스트 실행기는 케이스를 실행하기 전에 케이스 id를, 실행한 뒤 `ok` 또는 `FAIL`과 경과 밀리초를 동기 쓰기로 출력하므로, 검증기가 끝나지 않는 케이스의 이름을 보고할 수 있습니다. 실행 뒤에 케이스를 한 번 더 나열하던 도달할 수 없는 코드를 제거했습니다.
 - 해석된 객체 키가 한 번씩만 나와야 하는 호출자를 위해 `rejectDuplicates` 파싱 옵션을 추가합니다. 두 번째 키의 UTF-16 위치에 `duplicate_object_key` 종류의 `Duplicate object key` 오류를 보고하고, boolean만 받으며, 기본 파싱은 바뀌지 않습니다. 패키지가 커버리지 검사에 두 필드를 모두 보고하도록 `ParseOptions`의 각 필드를 한 줄씩 선언합니다.
 - `ParseError`가 자체 메시지와 함께 공통 거부 목록의 `kind`를 전합니다.
 - 타입 선언에서 `StringifyOptions`와 `stringify`의 두 번째 인자를 제거했습니다. 이 함수는 인자를 하나만 받습니다. 패키지는 공통 커버리지 검사를 위해 공개 심볼을 보고합니다.

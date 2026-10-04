@@ -92,17 +92,19 @@ if (!extension_loaded('ordered_json')) {
     exit(1);
 }
 
+// A case listing prints case ids only, so the checks run without result lines.
+$report = !in_array('--cases', $argv, true);
 $failures = [];
 // The class lookup happens before descriptor validation, so this runs first.
 check($failures, 'hydrate_without_the_value_class', static function () {
     expectThrows(Error::class, '', static fn() => ordered_json_hydrate('[1]', ordered_json_scan('[1]'), 0));
-});
+}, $report);
 
 require $library;
 
-foreach (descriptorCases() as $id => $body) check($failures, $id, $body);
+foreach (descriptorCases() as $id => $body) check($failures, $id, $body, $report);
 // The extension is a second backend for the same value API; both must answer identically.
-$failures = array_merge($failures, orderedJsonApiChecks());
+$failures = array_merge($failures, orderedJsonApiChecks($report));
 
 if ($failures) {
     fwrite(STDERR, implode(PHP_EOL, $failures) . PHP_EOL);

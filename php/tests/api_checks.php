@@ -6,12 +6,27 @@ declare(strict_types=1);
 use OrderedJson\ParseError;
 use OrderedJson\Value;
 
-function check(array &$failures, string $name, callable $body): void
+/**
+ * Run one case. With $report the case id is written before it runs and its
+ * result with elapsed time after, so the verifier can name a case that never ends.
+ */
+function check(array &$failures, string $name, callable $body, bool $report = true): void
 {
+    if ($report) {
+        fwrite(STDOUT, $name . ' ');
+        fflush(STDOUT);
+    }
+    $started = hrtime(true);
+    $result = 'ok';
     try {
         $body();
     } catch (Throwable $error) {
+        $result = 'FAIL';
         $failures[] = $name . ': ' . get_class($error) . ': ' . $error->getMessage();
+    }
+    if ($report) {
+        fwrite(STDOUT, $result . ' (' . intdiv(hrtime(true) - $started, 1000000) . ' ms)' . PHP_EOL);
+        fflush(STDOUT);
     }
 }
 
@@ -225,9 +240,9 @@ function orderedJsonApiCases(): array
 }
 
 /** @return list<string> Failure descriptions; empty when every case passes. */
-function orderedJsonApiChecks(): array
+function orderedJsonApiChecks(bool $report = true): array
 {
     $failures = [];
-    foreach (orderedJsonApiCases() as $id => $body) check($failures, $id, $body);
+    foreach (orderedJsonApiCases() as $id => $body) check($failures, $id, $body, $report);
     return $failures;
 }

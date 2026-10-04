@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: a79cb61712b7f3362690e8d23f5c70b7f86d7d9f70d5b88a363c93c9122cdb3b -->
+<!-- source-sha256: dbf60acc1926596e21ced8155676c474aea59b643487d745d55fb85b5a015ab6 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- 패키지 테스트 실행기는 케이스를 실행하기 전에 케이스 id를, 실행한 뒤 `ok` 또는 `FAIL`과 경과 밀리초를 출력하므로, 검증기가 끝나지 않는 케이스의 이름을 보고할 수 있습니다. `--cases` 목록은 그 줄 없이 검사를 실행하고 케이스 id만 출력합니다.
 - `OrderedJsonNativeParseError`가 공통 거부 목록의 `kind`를 전합니다.
 - 패키지는 공통 커버리지 검사를 위해 함수, 상수, 오류 클래스를 보고합니다.
 - 이스케이프하지 않은 제어 문자를 한 칸 뒤가 아니라 그 문자의 위치로 보고합니다.

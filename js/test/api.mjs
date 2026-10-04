@@ -2,6 +2,7 @@
 // JSON contract through the adapter; construction guards, frozen results,
 // wrong-kind access, option validation and UTF-16 offsets live only here.
 import assert from 'node:assert/strict';
+import {writeSync} from 'node:fs';
 import {MAX_DEPTH, ParseError, Value, parse, parseBytes, stringify} from '../index.js';
 
 const cases = new Map();
@@ -174,20 +175,22 @@ if (process.argv.includes('--cases')) {
   process.exit(0);
 }
 
+// Each case prints its id before it runs and its result after, with a
+// synchronous write, so the verifier can name a case that never ends.
 const failures = [];
 for (const [id, body] of cases) {
+  writeSync(1, `${id} `);
+  const started = performance.now();
+  let result = 'ok';
   try {
     body();
   } catch (error) {
+    result = 'FAIL';
     failures.push(`${id}: ${error.constructor.name}: ${error.message}`);
   }
+  writeSync(1, `${result} (${Math.round(performance.now() - started)} ms)\n`);
 }
 if (failures.length) {
   console.error(failures.join('\n'));
   process.exit(1);
 }
-
-// Report the cases that were registered and executed above. This must remain
-// independent of package-tests.json so removing a test cannot leave a false
-// positive listing.
-if (process.argv.includes('--cases')) console.log([...cases.keys()].join('\n'));

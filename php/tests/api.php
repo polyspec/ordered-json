@@ -10,7 +10,8 @@ if (extension_loaded('ordered_json')) {
     exit(1);
 }
 
-$failures = orderedJsonApiChecks();
+// A case listing prints case ids only, so the checks run without result lines.
+$failures = orderedJsonApiChecks(!in_array('--cases', $argv, true));
 if ($failures) {
     fwrite(STDERR, implode(PHP_EOL, $failures) . PHP_EOL);
     exit(1);

@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The package test runner writes each case id before the case runs and `ok` or `FAIL` with the elapsed milliseconds after it, so the verifier can name a case that does not end. The `--cases` listing runs the checks without those lines and prints case ids only.
 - `OrderedJsonNativeParseError` carries a `kind` from the shared rejection list.
 - The package reports its functions, constant and error class for the shared coverage check.
 - An unescaped control character is reported at its own offset instead of one past it.
