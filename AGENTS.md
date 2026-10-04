@@ -16,27 +16,32 @@ English is canonical. Update the paired Korean document with the same informatio
 
 Do not infer authorization to send messages, publish artifacts, change access controls, or rewrite history. Follow authorization already provided for the task.
 
-Name branches `{type}/{shortname}-{checklist ID}` and worktrees `{project}-{shortname}-{checklist ID}`. After integrating a branch into `main`, verify its commits or equivalent changes are present and its worktree is clean. Before removal, preserve any files excluded by `.gitignore` that exist only in that worktree and are still needed. Then remove the worktree and local branch immediately. Preserve unintegrated or active work.
+Work on `main` by default. When an agent does the work or the situation calls for a branch or worktree, name branches `{type}/{shortname}-{checklist ID}` and worktrees `{project}-{shortname}-{checklist ID}`, and remove both immediately after merging into `main`. After integrating a branch into `main`, verify its commits or equivalent changes are present and its worktree is clean. Before removal, preserve any files excluded by `.gitignore` that exist only in that worktree and are still needed. Then remove the worktree and local branch. Preserve unintegrated or active work.
 
 Before committing the related feature, cherry-pick useful commits from a test-only branch that cannot be integrated into `main`, discard the remaining test-only changes, and remove its worktree and branch. If removal is impossible, first add a numbered sub-item to the owning checklist with the cause and exact removal condition.
 
 <a id="verification"></a>
 ## Required checks
 
-Each implementation package owns its source and document manifest. Run these commands from the repository root:
+Each implementation package owns its source and document manifest. Run commands from the repository root.
+
+While a change is in progress, run only the tests that own it: the RED case and then the same case to GREEN, the checks of the changed implementation, and the verifier unit tests that cover a changed script. Do not rerun broader checks after each correction.
 
 ~~~sh
-make check
+python3 scripts/verify.py --only js
+python3 scripts/test.py --unit test_docs_check.DocumentationChecks.test_missing_anchor_fails
 git diff --check
 ~~~
 
-For full supplementary coverage:
+`scripts/verify.py --only` builds the selected implementation and runs its case and symbol listings, its declared package tests, and the shared cases; it writes no record. `scripts/test.py --unit` runs the named verifier unit tests and writes no record.
+
+Run `make check` once, after every active item is complete, and report the elapsed time of each step. With the supplementary suite, that run is:
 
 ~~~sh
 make check JSON_TEST_SUITE=.cache/JSONTestSuite
 ~~~
 
-Run `make docs-check` for documentation-only review. When sources change and a PIE record exists, run `make pie-check PIE=/path/to/pie.phar` with the applicable supplementary suite first, then run `make check` to generate a current record; the documentation check in `make check` rejects a stale PIE record. Do not edit verification results or source hashes to make checks pass.
+Run `make docs-check` for documentation-only review; it does not compare verification records with the sources. When sources change and a PIE record exists, run `make pie-check PIE=/path/to/pie.phar` with the applicable supplementary suite once before that `make check`, which generates a current record; the documentation check in `make check` rejects a stale PIE record. Do not edit verification results or source hashes to make checks pass.
 
 The [implementation registry](implementations.json) declares package paths, build, adapter, package test, and runtime commands. `make check` runs each declared package test command; shared cases exercise the JSON contract and cannot reach a language-specific API, so an API that only one package provides requires tests in that package. [package-tests.json](package-tests.json) lists the case every implementation runs, each exemption with its reason, each package's own cases, and the cases that cover each public symbol; `make check` compares that standard with the cases and symbols the packages report and fails on a missing case, an undeclared case, an uncovered symbol, or a declaration for a symbol the package no longer exports. Add new languages there and in a package directory without changing the shared JSON comparison algorithm. A contract change updates the verifier and affected packages in one repository revision. See the [repository contract](docs/spec/repositories.md).
 
