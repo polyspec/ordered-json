@@ -370,6 +370,79 @@ def compare_rejection_kinds(rejections):
         print('rejection kinds agree across implementations', flush=True)
 
 
+class Adapter:
+    """One adapter process: one request line in, one reply line out, each with a deadline.
+
+    Only LF delimits replies, because JSON strings may contain U+2028/U+2029.
+    Standard error is read alongside, so an adapter cannot block on a full pipe.
+    """
+
+    def __init__(self, language, command):
+        self.language = language
+        self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE, start_new_session=True)
+        self.open = [self.process.stdout, self.process.stderr]
+        self.stdout, self.stderr = b'', b''
+        self.started = time.monotonic()
+
+    def pump(self, until, done, missing):
+        """Read output until done(); at the deadline stop the adapter and report what is missing."""
+        while not done():
+            remaining = until - time.monotonic()
+            ready = select.select(self.open, [], [], remaining)[0] if remaining > 0 else []
+            if not ready:
+                self.stop()
+                raise RuntimeError(f'{self.language} {missing} within {CASE_SECONDS} s; '
+                                   f'stopped after {milliseconds(time.monotonic() - self.started)}')
+            for stream in ready:
+                chunk = os.read(stream.fileno(), 65536)
+                if not chunk:
+                    self.open.remove(stream)
+                elif stream is self.process.stdout:
+                    self.stdout += chunk
+                else:
+                    self.stderr += chunk
+
+    def failed(self, name):
+        self.stop()
+        return RuntimeError(f'{self.language} adapter failed at {name}:\n'
+                            + self.stderr.decode('utf-8', 'replace'))
+
+    def exchange(self, name, path):
+        sent = time.monotonic()
+        try:
+            self.process.stdin.write(str(path).encode('utf-8') + b'\n')
+            self.process.stdin.flush()
+        except BrokenPipeError:
+            raise self.failed(name) from None
+        self.pump(sent + CASE_SECONDS, lambda: b'\n' in self.stdout or self.process.stdout not in self.open,
+                  name + ': no reply')
+        if b'\n' not in self.stdout:
+            raise self.failed(name)
+        line, self.stdout = self.stdout.split(b'\n', 1)
+        return line.decode('utf-8'), time.monotonic() - sent
+
+    def finish(self, count):
+        self.process.stdin.close()
+        self.pump(time.monotonic() + CASE_SECONDS, lambda: not self.open, 'adapter: no exit after the last reply')
+        if self.process.wait():
+            raise RuntimeError(f'{self.language} adapter failed:\n' + self.stderr.decode('utf-8', 'replace'))
+        if self.stderr:
+            raise RuntimeError(f'{self.language} emitted warnings:\n' + self.stderr.decode('utf-8', 'replace'))
+        if self.stdout:
+            raise AssertionError(f'{self.language}: expected {count} responses, got more')
+
+    def stop(self):
+        if self.process.poll() is None:
+            os.killpg(self.process.pid, signal.SIGKILL)
+        self.process.wait()
+        for stream in (self.process.stdin, self.process.stdout, self.process.stderr):
+            try:
+                stream.close()
+            except BrokenPipeError:
+                pass
+
+
 def verify_adapters(commands, suite=None):
     """Compare prepared adapters, including externally built modules, with shared cases."""
     if not commands:
@@ -379,44 +452,39 @@ def verify_adapters(commands, suite=None):
     with tempfile.TemporaryDirectory(prefix='ordered-json-examples-') as folder:
         cases, official_count = prepare_cases(Path(folder), suite)
         documents = {name: path.read_bytes() for name, path, _ in cases}
-        requests = ''.join(str(path) + '\n' for _, path, _ in cases)
         for language, command in commands.items():
-            process = subprocess.run(command, input=requests, encoding='utf-8',
-                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
-            if process.returncode:
-                raise RuntimeError(f'{language} adapter failed:\n{process.stderr}')
-            if process.stderr:
-                raise RuntimeError(f'{language} emitted warnings:\n{process.stderr}')
-            # JSON strings may contain U+2028/U+2029. Only LF delimits replies.
-            lines = process.stdout.split('\n')
-            if lines and lines[-1] == '':
-                lines.pop()
-            if len(lines) != len(cases):
-                raise AssertionError(f'{language}: expected {len(cases)} responses, got {len(lines)}')
-            for (name, _, expected), line in zip(cases, lines):
-                actual = json.loads(line)
-                if not actual.get('ok'):
-                    # A rejection also reports where it stopped; the unit is the
-                    # one the binding documents, and the comparison converts it.
-                    rejections.setdefault(name, {})[language] = actual
-                    actual = {'ok': False}
-                if actual.get('ok'):
-                    expected = dict(expected, roundtrip=expected['compact'],
-                                    roundtrip_tree=expected['tree'], factory=FACTORY_STRING)
-                    # Constructors may quote keys differently; independently
-                    # validate their JSON, decoded keys, order and exact numbers.
-                    try:
-                        actual['rebuilt'] = reference(actual['rebuilt'].encode('utf-8'), require_unique=True)['tree']
-                    except (KeyError, ValueError, UnicodeError, RecursionError) as error:
-                        raise AssertionError(f'{language} {name}: invalid reconstructed JSON') from error
-                if actual != expected:
-                    for key in set(actual) | set(expected):
-                        if actual.get(key) != expected.get(key):
-                            raise AssertionError(f'{language} {name}: {key}\n'
-                                f'expected {ascii(expected.get(key))[:500]}\n'
-                                f'actual   {ascii(actual.get(key))[:500]}')
+            adapter = Adapter(language, command)
+            try:
+                for name, path, expected in cases:
+                    line, elapsed = adapter.exchange(name, path)
+                    actual = json.loads(line)
+                    if not actual.get('ok'):
+                        # A rejection also reports where it stopped; the unit is the
+                        # one the binding documents, and the comparison converts it.
+                        rejections.setdefault(name, {})[language] = actual
+                        actual = {'ok': False}
+                    if actual.get('ok'):
+                        expected = dict(expected, roundtrip=expected['compact'],
+                                        roundtrip_tree=expected['tree'], factory=FACTORY_STRING)
+                        # Constructors may quote keys differently; independently
+                        # validate their JSON, decoded keys, order and exact numbers.
+                        try:
+                            actual['rebuilt'] = reference(actual['rebuilt'].encode('utf-8'), require_unique=True)['tree']
+                        except (KeyError, ValueError, UnicodeError, RecursionError) as error:
+                            raise AssertionError(f'{language} {name}: invalid reconstructed JSON') from error
+                    if actual != expected:
+                        for key in set(actual) | set(expected):
+                            if actual.get(key) != expected.get(key):
+                                raise AssertionError(f'{language} {name}: {key}\n'
+                                    f'expected {ascii(expected.get(key))[:500]}\n'
+                                    f'actual   {ascii(actual.get(key))[:500]}')
+                    print(f'{language}: {name} ok ({milliseconds(elapsed)})', flush=True)
+                adapter.finish(len(cases))
+            finally:
+                adapter.stop()
             print(f'{language}: {official_count} official examples + '
-                  f'{len(cases)-official_count} shared cases passed', flush=True)
+                  f'{len(cases)-official_count} shared cases passed '
+                  f'({milliseconds(time.monotonic() - adapter.started)})', flush=True)
             results[language] = {'status': 'passed', 'cases': len(cases)}
         counts = {'official': official_count,
                   'fixtures': sum(name.startswith('fixtures/') for name, _, _ in cases),
