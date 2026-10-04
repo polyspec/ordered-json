@@ -1,6 +1,7 @@
 """Package tests and adapters report each case as it ends and fail by name at a deadline."""
 from contextlib import redirect_stdout
 import io
+import json
 import os
 from pathlib import Path
 import sys
@@ -11,7 +12,21 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from test import timeout
-from verify import run_package_tests
+from verify import ROOT, run_package_tests, verify_adapters
+
+# Replies to the first request like a correct adapter, then reads the next request
+# and never replies.
+SILENT_ADAPTER = '''import json, sys, time
+sys.path.insert(0, sys.argv[1])
+from verify import FACTORY_STRING, reference
+path = sys.stdin.readline().strip()
+reply = reference(open(path, 'rb').read())
+reply.update(roundtrip=reply['compact'], roundtrip_tree=reply['tree'], rebuilt=reply['compact'],
+             factory=FACTORY_STRING)
+print(json.dumps(reply), flush=True)
+sys.stdin.readline()
+time.sleep(3600)
+'''
 
 
 def gone(pid):
@@ -58,6 +73,19 @@ class PackageTestRuns(unittest.TestCase):
             self.assertRegex(output.getvalue(), r'sample: test sample \.\.\. ok \(\d+ ms\)\n')
             self.assertIn('sample: case ok (3 ms)\n', output.getvalue())
             self.assertRegex(output.getvalue(), r'sample: package tests passed \(\d+ ms\)')
+
+
+class AdapterRuns(unittest.TestCase):
+    @timeout(10)
+    def test_a_silent_adapter_fails_at_the_case_it_does_not_answer(self):
+        official = [case['id'] for case in json.loads((ROOT / 'examples/official.json').read_text())['cases']]
+        command = [sys.executable, '-c', SILENT_ADAPTER, str(ROOT / 'scripts')]
+        output = io.StringIO()
+        with patch('verify.CASE_SECONDS', 1, create=True), redirect_stdout(output):
+            with self.assertRaisesRegex(RuntimeError, rf'fake official/{official[1]}: no reply within 1 s; '
+                                                      r'stopped after \d+ ms'):
+                verify_adapters({'fake': command})
+        self.assertRegex(output.getvalue(), rf'fake: official/{official[0]} ok \(\d+ ms\)\n')
 
 
 if __name__ == '__main__':

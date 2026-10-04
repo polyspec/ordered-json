@@ -6,6 +6,11 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The verifier sends each adapter one shared case at a time and reads one reply with a deadline
+  of 60 s, printing each case with its elapsed time; an adapter that does not reply is killed and
+  the case is named. It sent every case at once with one 60 s limit for the whole adapter run,
+  so a slow or silent adapter failed without naming a case, and nothing was printed until the
+  adapter ended.
 - Package tests stream their output. Each case has a deadline of 60 s after the previous result
   line; a runner that passes it is killed with its process group and the verifier reports the
   case it was running, with the elapsed time. The verifier collected all output and printed it
