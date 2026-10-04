@@ -6,6 +6,12 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Build steps stream their output. Each `prepare` step and each PIE command prints a start line,
+  every output line as it arrives, and its exit status with the elapsed time, and has its own
+  deadline: 1500 s for a prepare step and 4200 s for a PIE command, about 100 times the measured
+  15 s extension build and 42 s PIE build. Past it the process group is killed and the error
+  names the step. Both collected the output and printed it after the command ended, with no
+  deadline, so the PIE build showed nothing for about 42 s and a hung build did not end.
 - The verifier sends each adapter one shared case at a time and reads one reply with a deadline
   of 60 s, printing each case with its elapsed time; an adapter that does not reply is killed and
   the case is named. It sent every case at once with one 60 s limit for the whole adapter run,
