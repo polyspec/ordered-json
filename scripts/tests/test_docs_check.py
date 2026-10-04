@@ -167,6 +167,20 @@ class DocumentationChecks(unittest.TestCase):
         self.write('js/index.js', 'export const fixture = false;\n')
         self.assert_failure('Verification is stale')
 
+    def test_documentation_check_leaves_record_freshness_to_make_check(self):
+        # A source edit must not force the full suite before a documentation review;
+        # make check runs the checker with --records and still rejects a stale record.
+        self.write('js/index.js', 'export const fixture = false;\n')
+        script = str(Path(__file__).resolve().parents[1] / 'docs_check.py')
+        alone = subprocess.run([sys.executable, script, '--root', str(self.root)],
+                               capture_output=True, text=True)
+        self.assertEqual(alone.returncode, 0, alone.stderr)
+        from test import DOCS_CHECK
+        self.assertEqual(DOCS_CHECK[1:], [script, '--records'])
+        recorded = subprocess.run(DOCS_CHECK + ['--root', str(self.root)], capture_output=True, text=True)
+        self.assertEqual(recorded.returncode, 1)
+        self.assertIn('Verification is stale', recorded.stderr)
+
     def test_source_addition_invalidates_old_result(self):
         self.write('js/new.js', 'export const added = true;\n')
         self.assert_failure('Verification is stale')

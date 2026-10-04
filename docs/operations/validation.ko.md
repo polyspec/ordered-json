@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 3c8ae165b10f8615a3e1b711d2ced79ca04ff29966c8740bb10c82abc9a6e8e3 -->
+<!-- source-sha256: ea2118c11d4ce8128fd7f02a5b3dd92d7fbabfd68e165701b72f31c8f9911271 -->
 # 검증
 
 [English](validation.md)
@@ -74,7 +74,7 @@ make pie-check PIE=/path/to/pie.phar JSON_TEST_SUITE=.cache/JSONTestSuite
 make docs-check
 ~~~
 
-[검사기](../../scripts/docs_check.py)는 각 문서 목록, 링크, 번역 쌍과 개정 해시, 절과 코드 블록 일치, 기능 상태, 현재 통합·PIE 근거를 검사합니다. 공통 목록에는 공통 문서만 등록합니다. 각 패키지 디렉터리는 자체 목록으로 검사합니다.
+[검사기](../../scripts/docs_check.py)는 각 문서 목록, 링크, 번역 쌍과 개정 해시, 절과 코드 블록 일치, 기능 상태를 검사합니다. `make check`가 통합 기록을 쓴 뒤 붙이는 `--records`가 있으면 통합·PIE 근거가 현재 소스와 일치하는지도 검사합니다. `make docs-check`는 그 비교를 생략합니다. 공통 목록에는 공통 문서만 등록합니다. 각 패키지 디렉터리는 자체 목록으로 검사합니다.
 
 한국어 `source-sha256`을 갱신하기 전에 코드·테스트와 영어·한국어 내용을 비교합니다. 해시 일치는 번역 정확성을 증명하지 않습니다. 외부 링크는 문법만 검사하며 접속하지 않습니다. 호스팅 CI는 설정되지 않았으며 PR 제출이나 소스 게시 전에 필수 후보 검사를 실행해야 합니다.
 

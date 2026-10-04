@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: fbbe42e492441b9ca97718c4ff3895e6123bf2528f3cb147f42129c87c821d6d -->
+<!-- source-sha256: 04bb6919e9321818f9a266bf44ab4528e522d4ae181005c62e8ac0164f4c584f -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,10 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- `make docs-check`는 문서만 검사합니다. 이 검사는 검증 기록을 현재 소스와 비교해서, 소스를
+  하나라도 바꾸면 전체 suite를 실행할 때까지 "Verification is stale"로 실패했습니다. `make
+  check`는 기록을 쓴 뒤 `--records`를 붙여 검사기를 실행하므로 오래된 검증 기록이나 PIE 기록은
+  그 단계에서 여전히 실패합니다.
 - root `Cargo.toml`을 제거합니다. 이 파일은 `rust/Cargo.toml` 옆에서 `ordered-json` 패키지를 한
   번 더 정의해서, 이 저장소에 의존하는 모든 Cargo 빌드가 "skipping duplicate package"를 경고했습니다.
   Cargo는 그 파일 없이도 Git 의존성에서 `rust/Cargo.toml`을 찾습니다. 저장소 테스트가 Cargo

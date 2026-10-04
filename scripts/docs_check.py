@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check bilingual documents, local links, feature state, and current evidence."""
+"""Check bilingual documents, local links, and feature state; with --records, current evidence."""
 import argparse
 from datetime import datetime
 import json
@@ -298,7 +298,8 @@ def check_pie_verification(root, record):
     check_supplementary(record, counts, pin)
 
 
-def check_repository(root, include_children=True):
+def check_repository(root, include_children=True, records=True):
+    """Check documents; with records, also check verification records against the sources."""
     root = root.resolve()
     errors, registered, identifiers, documents = [], set(), set(), {}
 
@@ -368,7 +369,7 @@ def check_repository(root, include_children=True):
             features = feature_rows(documents['docs/features.md'])
             if features != feature_rows(documents['docs/features.ko.md']):
                 raise ValueError('English and Korean feature states or references differ')
-            if any(row[1] != 'not-verified' for row in features.values()):
+            if records and any(row[1] != 'not-verified' for row in features.values()):
                 check_verification(root, read_json('docs/verification.json'))
             if any(row[1] == 'benchmark' for row in features.values()):
                 check_benchmark(root, read_json('benchmarks/results.json'))
@@ -378,7 +379,7 @@ def check_repository(root, include_children=True):
             check_distribution(read_json('docs/distribution.json'), features)
         except (ValueError, KeyError, TypeError, OSError) as issue:
             error('docs/distribution.json', str(issue))
-        if (root / 'docs/pie-verification.json').exists():
+        if records and (root / 'docs/pie-verification.json').exists():
             try:
                 check_pie_verification(root, read_json('docs/pie-verification.json'))
             except (ValueError, KeyError, TypeError, OSError) as issue:
@@ -387,7 +388,7 @@ def check_repository(root, include_children=True):
             for name, path in repository_paths(root).items():
                 manifest = path / 'docs/documentation-manifest.json'
                 if manifest.is_file():
-                    child_errors, count, _ = check_repository(path, include_children=False)
+                    child_errors, count, _ = check_repository(path, include_children=False, records=records)
                     errors.extend(name + '/' + issue for issue in child_errors)
 
     for path in (root / 'docs').rglob('*.json'):
@@ -401,11 +402,14 @@ def check_repository(root, include_children=True):
     return errors, len(identifiers), len(features)
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=ROOT)
-    args = parser.parse_args()
-    errors, documents, features = check_repository(args.root)
+    parser.add_argument('--records', action='store_true',
+                        help='Also require verification records that match the current sources; '
+                             'make check passes this after it writes a record')
+    args = parser.parse_args(argv)
+    errors, documents, features = check_repository(args.root, records=args.records)
     if errors:
         for issue in errors:
             print(issue, file=sys.stderr)

@@ -73,7 +73,7 @@ When available, `pie-verification.json` records the PIE version and PHAR hash, t
 make docs-check
 ~~~
 
-The [checker](../../scripts/docs_check.py) validates each document manifest, links, translation pairs and revision hashes, section and code-block parity, feature state, and current aggregate and PIE evidence. The common manifest registers only common documents. Each package directory is checked with its own manifest.
+The [checker](../../scripts/docs_check.py) validates each document manifest, links, translation pairs and revision hashes, section and code-block parity, and feature state. With `--records`, which `make check` passes after it writes the aggregate record, it also checks that the aggregate and PIE evidence match the current sources; `make docs-check` omits that comparison. The common manifest registers only common documents. Each package directory is checked with its own manifest.
 
 Review English and Korean prose against code and tests before updating a Korean `source-sha256` marker. Matching hashes do not prove translation accuracy. External links are syntax-checked, not fetched. Hosted CI is not configured; required candidate checks must run before PR submission or source publication.
 
