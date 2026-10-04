@@ -2,8 +2,10 @@
 """Build and verify all implementations, then check current documentation."""
 import argparse
 from pathlib import Path
+import signal
 import subprocess
 import sys
+import time
 import unittest
 
 from verification_record import (IMPLEMENTATIONS, create_record, runtimes, source_manifest,
@@ -15,6 +17,89 @@ from registry import prepare, repository_paths
 DOCS_CHECK = [sys.executable, str(ROOT / 'scripts/docs_check.py'), '--records']
 
 
+# Each unit test has its own deadline; there is no deadline for the whole run.
+TEST_SECONDS = 60
+
+
+def timeout(seconds):
+    """Give one test method a deadline other than TEST_SECONDS."""
+    def mark(method):
+        method.timeout_seconds = seconds
+        return method
+    return mark
+
+
+class TestTimeout(Exception):
+    pass
+
+
+class TimedResult(unittest.TextTestResult):
+    """Print each test as it starts and its status with elapsed time when it ends.
+
+    A test that runs past its deadline is interrupted with TestTimeout and
+    reported as an error by name. A deadline already running, as when this
+    runner tests itself, is restored with its remaining time.
+    """
+
+    def __init__(self, stream, descriptions, verbosity):
+        super().__init__(stream, descriptions, 0)
+
+    def startTest(self, test):
+        super().startTest(test)
+        method = getattr(test, getattr(test, '_testMethodName', ''), None)
+        seconds = getattr(method, 'timeout_seconds', TEST_SECONDS)
+
+        def expire(signum, frame):
+            raise TestTimeout(f'{test.id()} exceeded its {seconds} s timeout')
+
+        self.stream.write(test.id() + ' ... ')
+        self.stream.flush()
+        self.status = 'ok'
+        self.previous = signal.signal(signal.SIGALRM, expire)
+        self.started = time.monotonic()
+        self.outer = signal.setitimer(signal.ITIMER_REAL, seconds)[0]
+
+    def stopTest(self, test):
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        elapsed = time.monotonic() - self.started
+        signal.signal(signal.SIGALRM, self.previous)
+        if self.outer:
+            signal.setitimer(signal.ITIMER_REAL, max(self.outer - elapsed, 0.001))
+        self.stream.write(f'{self.status} ({elapsed * 1000:.0f} ms)\n')
+        self.stream.flush()
+        super().stopTest(test)
+
+    def addError(self, test, err):
+        self.status = 'ERROR'
+        super().addError(test, err)
+
+    def addFailure(self, test, err):
+        self.status = 'FAIL'
+        super().addFailure(test, err)
+
+    def addSubTest(self, test, subtest, err):
+        if err is not None:
+            self.status = 'FAIL' if issubclass(err[0], test.failureException) else 'ERROR'
+        super().addSubTest(test, subtest, err)
+
+    def addSkip(self, test, reason):
+        self.status = 'skipped'
+        super().addSkip(test, reason)
+
+    def addExpectedFailure(self, test, err):
+        self.status = 'expected failure'
+        super().addExpectedFailure(test, err)
+
+    def addUnexpectedSuccess(self, test):
+        self.status = 'unexpected success'
+        super().addUnexpectedSuccess(test)
+
+
+def run_unit_tests(tests, stream=None):
+    runner = unittest.TextTestRunner(stream=stream or sys.stderr, resultclass=TimedResult, verbosity=2)
+    return runner.run(tests)
+
+
 def build_extension():
     return prepare(['php-extension'], repository_paths(ROOT), ROOT / '.cache/probes')
 
@@ -23,7 +108,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--suite', type=Path, help='Optional checkout of nst/JSONTestSuite')
     parser.add_argument('--build-extension', action='store_true', help='Accepted for compatibility; builds always run')
+    parser.add_argument('--unit', nargs='+', metavar='TEST',
+                        help='Run only these verifier unit tests, such as '
+                             'test_docs_check.DocumentationChecks.test_missing_anchor_fails, and write no record')
     args = parser.parse_args()
+    if args.unit:
+        sys.path.insert(0, str(ROOT / 'scripts/tests'))
+        return 0 if run_unit_tests(unittest.defaultTestLoader.loadTestsFromNames(args.unit)).wasSuccessful() else 1
     suite = args.suite.resolve() if args.suite else None
     if suite and not (suite / 'test_parsing').is_dir():
         parser.error('--suite must contain test_parsing/')
@@ -32,7 +123,7 @@ def main():
     supplementary = supplementary_manifest(suite)
     warnings = []
     tests = unittest.defaultTestLoader.discover(str(ROOT / 'scripts/tests'))
-    test_result = unittest.TextTestRunner(verbosity=1).run(tests)
+    test_result = run_unit_tests(tests)
     if not test_result.wasSuccessful():
         return 1
     results, counts, package_tests = verify(IMPLEMENTATIONS, suite, build_warnings=warnings)

@@ -6,6 +6,11 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The verifier unit tests print each test by name as it starts, then its status and elapsed
+  time, and each test has its own deadline, 60 s unless the test declares another; a test past
+  its deadline fails by name. The runner printed one dot per test, so a hung test printed nothing
+  and the run did not end. `python3 scripts/test.py --unit TEST...` runs only the named
+  tests.
 - `make docs-check` checks documents only. It compared the verification records with the
   current sources, so after any source edit it failed with "Verification is stale" until the full
   suite ran. `make check` runs the checker with `--records` after it writes the record, so a stale
