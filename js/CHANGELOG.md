@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The package test runner writes each case id before the case runs and `ok` or `FAIL` with the elapsed milliseconds after it, with synchronous writes, so the verifier can name a case that does not end. Unreachable code after the run that listed the cases a second time is removed.
 - Add the `rejectDuplicates` parse option for callers that require every decoded object key to occur once. It reports `Duplicate object key` with kind `duplicate_object_key` at the second key's UTF-16 offset, requires a boolean, and keeps the default parse unchanged. `ParseOptions` lists each field on its own line so the package reports both fields for the coverage check.
 - `ParseError` carries a `kind` from the shared rejection list beside its own message.
 - Removed the `StringifyOptions` declaration and the second `stringify` parameter from the type declaration; the function takes one argument. The package reports its public symbols for the shared coverage check.

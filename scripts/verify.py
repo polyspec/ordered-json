@@ -2,15 +2,23 @@
 """Shared examples and expectations for all registered language adapters."""
 import argparse
 import json
+import os
 from pathlib import Path
 import re
+import select
+import signal
 import subprocess
 import tempfile
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 FACTORY_STRING = '"quote \\\" slash \\\\ line\\n \\ud55c \\ud83c\\udf0d"'
 STANDARD = json.loads((ROOT / 'package-tests.json').read_text(encoding='utf-8'))
 CASE_ID = re.compile(r'^[a-z][a-z0-9_]*$')
+# Each package test case and each adapter reply has this long after the previous
+# one ends; there is no limit for a whole run.
+CASE_SECONDS = 60
+TIMED_LINE = re.compile(r'\(\d+(?:\.\d+)?\s*m?s\)$')
 
 from registry import (IMPLEMENTATIONS, adapter_commands, api_commands, case_commands, parse_overrides,
                       prepare, repository_paths, test_commands)
@@ -232,15 +240,65 @@ def compare_api_coverage(commands, selected):
     print('every public symbol names the cases that cover it', flush=True)
 
 
+def milliseconds(seconds):
+    return f'{seconds * 1000:.0f} ms'
+
+
+def stream_package_tests(language, entry):
+    """Print each output line as it arrives and stop a case that passes its deadline.
+
+    Runners print a case name before running it and its result after, so text
+    after the last newline names the running case. The deadline restarts with
+    every complete line. On expiry the whole process group is killed.
+    """
+    process = subprocess.Popen(entry['command'], cwd=entry['cwd'], stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT, start_new_session=True)
+    started = last = time.monotonic()
+    pending, lines = b'', []
+    try:
+        while True:
+            remaining = last + CASE_SECONDS - time.monotonic()
+            if remaining <= 0 or not select.select([process.stdout], [], [], remaining)[0]:
+                os.killpg(process.pid, signal.SIGKILL)
+                process.wait()
+                running = pending.decode('utf-8', 'replace').strip() or (lines[-1] if lines else 'no output')
+                raise RuntimeError(f'{language}: no test result within {CASE_SECONDS} s; running: {running}; '
+                                   f'stopped after {milliseconds(time.monotonic() - started)}')
+            chunk = os.read(process.stdout.fileno(), 65536)
+            if not chunk:
+                break
+            pending += chunk
+            while b'\n' in pending:
+                line, pending = pending.split(b'\n', 1)
+                now = time.monotonic()
+                text = line.decode('utf-8', 'replace').rstrip('\r')
+                last, previous = now, last
+                if not text.strip():
+                    continue
+                suffix = '' if TIMED_LINE.search(text) else f' ({milliseconds(now - previous)})'
+                print(f'{language}: {text}{suffix}', flush=True)
+                lines.append(text)
+        if pending.strip():
+            lines.append(pending.decode('utf-8', 'replace'))
+            print(f'{language}: {lines[-1]}', flush=True)
+        returncode = process.wait()
+    finally:
+        if process.poll() is None:
+            os.killpg(process.pid, signal.SIGKILL)
+            process.wait()
+        process.stdout.close()
+    elapsed = milliseconds(time.monotonic() - started)
+    if returncode:
+        raise RuntimeError(f'{language} package tests failed after {elapsed}:\n' + '\n'.join(lines))
+    return elapsed
+
+
 def run_package_tests(commands):
     """Run each package's own tests. Shared cases cannot reach language-specific APIs."""
     results = {}
     for language, entry in commands.items():
-        process = subprocess.run(entry['command'], cwd=entry['cwd'], text=True,
-                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        if process.returncode:
-            raise RuntimeError(f'{language} package tests failed:\n{process.stdout}')
-        print(f'{language}: package tests passed', flush=True)
+        elapsed = stream_package_tests(language, entry)
+        print(f'{language}: package tests passed ({elapsed})', flush=True)
         # Records keep the declared command; resolved paths belong to one checkout.
         results[language] = {'status': 'passed', 'command': entry['declared']}
     return results

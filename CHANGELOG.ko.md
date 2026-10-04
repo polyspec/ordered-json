@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: df6d9dcf8b9f0d1fc8577d7629e4c68ed11fcb9ea2c84c63583b4ad6a1afe6d4 -->
+<!-- source-sha256: 814510c968a67998a9f46d2962c18235cb6b5fab79bc75a906370f23743c04b9 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,13 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 패키지 테스트 출력을 흘려 보냅니다. 각 케이스의 deadline은 직전 결과 줄 이후 60 s입니다.
+  이를 넘긴 실행기는 process group과 함께 종료되고, 검증기는 실행 중이던 케이스와 경과 시간을
+  보고합니다. 이전 검증기는 출력을 모두 모았다가 실행기가 끝난 뒤에만 보여 줘서, 멈춘 케이스는
+  아무것도 보이지 않았고 실행은 끝나지 않았습니다. JavaScript와 PHP 실행기는 케이스마다
+  `<id> ok|FAIL (<ms>)`를 출력합니다. Rust는 `--quiet` 없이 `--test-threads=1`로 실행해서 각
+  test 이름을 실행 전에 출력하고, Go는 `-v -p 1`로 실행합니다. `go test`는 여러 package를
+  병렬로 검사하면 package가 끝날 때까지 그 출력을 붙잡아 두기 때문입니다.
 - 개발 절차는 변경을 진행하는 동안 그 변경을 소유한 테스트만 실행하고(`scripts/verify.py
   --only`, `scripts/test.py --unit`), `make check`는 활성 항목이 모두 끝난 뒤 한 번 실행합니다.
   이전 절차는 변경마다 `make check`를 요구해서 수정할 때마다 모든 패키지와 공통 사례를 다시

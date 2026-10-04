@@ -84,7 +84,8 @@
         "command": [
           "{cargo}",
           "test",
-          "--quiet"
+          "--",
+          "--test-threads=1"
         ]
       },
       "test_cases": {
@@ -136,6 +137,9 @@
         "command": [
           "go",
           "test",
+          "-v",
+          "-p",
+          "1",
           "./..."
         ]
       },

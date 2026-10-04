@@ -6,6 +6,14 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Package tests stream their output. Each case has a deadline of 60 s after the previous result
+  line; a runner that passes it is killed with its process group and the verifier reports the
+  case it was running, with the elapsed time. The verifier collected all output and printed it
+  only when a runner ended, so a hung case showed nothing and the run did not end. The
+  JavaScript and PHP runners print `<id> ok|FAIL (<ms>)` for each case. Rust runs with
+  `--test-threads=1` and without `--quiet`, so each test name is printed before it runs, and Go
+  runs with `-v -p 1`, because `go test` holds the output of each package until it ends when it
+  tests several packages in parallel.
 - The development procedure runs only the tests that own a change while it is in progress
   (`scripts/verify.py --only`, `scripts/test.py --unit`) and runs `make check` once, after every
   active item is complete. It required `make check` for every change, which reruns every package

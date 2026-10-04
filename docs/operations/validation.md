@@ -14,6 +14,8 @@ make check
 
 The command runs the verification and documentation checker tests, builds the selected packages, tests every registered implementation against the common JSON cases, writes [verification.json](../verification.json), and checks common and package documentation. An aggregate record includes the source hash of every tracked package file.
 
+Package tests print each case as it ends, with its elapsed time. A case has 60 s after the previous result; when that passes, the verifier kills the test process group and fails with the name of the running case. No limit applies to the whole run.
+
 The record includes source hashes, package file records, actual runtime versions, case counts, results, checker test count, build warnings, and supplementary input revision. PHP and extension versions are separate fields. A changed input invalidates the record as current evidence. The verifier rejects changes during execution and incomplete implementation results. The record does not establish publication.
 
 <a id="supplementary"></a>

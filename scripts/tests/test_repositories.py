@@ -65,8 +65,8 @@ class RepositoryChecks(unittest.TestCase):
             paths = repository_paths()
             commands = test_commands(['go'], paths, Path(folder) / 'cache')
             self.assertEqual(commands['go'], {'cwd': str(paths['go']),
-                                              'command': ['go', 'test', './...'],
-                                              'declared': ['go', 'test', './...']})
+                                              'command': ['go', 'test', '-v', '-p', '1', './...'],
+                                              'declared': ['go', 'test', '-v', '-p', '1', './...']})
             extension = test_commands(['php-extension'], paths, Path(folder) / 'cache')['php-extension']
             self.assertEqual(extension['declared'][-1], '{php}/src/OrderedJson.php')
             self.assertTrue(extension['command'][-1].endswith('/php/src/OrderedJson.php'))
