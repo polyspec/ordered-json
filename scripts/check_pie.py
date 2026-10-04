@@ -8,10 +8,14 @@ import platform
 import re
 import subprocess
 
-from registry import ROOT, adapter_commands, artifact_paths, repository_paths, runtime_versions
+from registry import ROOT, adapter_commands, artifact_paths, repository_paths, run_streamed, runtime_versions
 from verification_record import (package_revisions, sha256, source_manifest,
                                  supplementary_manifest, write_record)
 from verify import verify_adapters
+
+# Each PIE command has this long to exit, about 100 times the measured build (42 s);
+# it detects a hang, not a slow build.
+PIE_SECONDS = 4200
 
 
 def main():
@@ -33,9 +37,7 @@ def main():
 
     def run(*arguments):
         command = ['php', str(pie), *arguments, '--no-interaction', '--no-ansi']
-        process = subprocess.run(command, cwd=paths['php-extension'], env=environment,
-                                 text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        print(process.stdout, end='', flush=True)
+        process = run_streamed('pie ' + arguments[0], command, paths['php-extension'], PIE_SECONDS, environment)
         (cache / (str(len(commands)) + '.log')).write_text(process.stdout)
         if process.returncode:
             raise subprocess.CalledProcessError(process.returncode, command)

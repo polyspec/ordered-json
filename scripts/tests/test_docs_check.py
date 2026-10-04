@@ -411,7 +411,7 @@ class DocumentationChecks(unittest.TestCase):
     def test_native_build_rejects_copy_error_with_zero_exit_status(self):
         from subprocess import CompletedProcess
         result = CompletedProcess(['phpize'], 0, stdout='cp: generated-file: Permission denied\n')
-        with patch('registry.subprocess.run', return_value=result), redirect_stdout(io.StringIO()):
+        with patch('registry.run_streamed', return_value=result), redirect_stdout(io.StringIO()):
             with self.assertRaisesRegex(RuntimeError, 'Build reported an error'):
                 build_extension()
 

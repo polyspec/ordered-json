@@ -1,11 +1,18 @@
 """Load implementation commands and resolve monorepo package paths."""
 import json
+import os
 from pathlib import Path
 import re
+import select
 import shutil
+import signal
 import subprocess
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
+# Each prepare step has this long to exit, about 100 times the slowest measured
+# step (the PHP extension build, 15 s); it detects a hang, not a slow build.
+BUILD_SECONDS = 1500
 
 
 def load_registry(root=ROOT):
@@ -90,6 +97,48 @@ def artifact_paths(name, paths, registry=REGISTRY):
             for value in registry['implementations'][name].get('artifacts', [])]
 
 
+def run_streamed(label, command, cwd, seconds, env=None):
+    """Run a build command, printing a start line, each output line as it arrives, and the
+    exit status with the elapsed time. Past the deadline the process group is killed and the
+    error names the step."""
+    print(f'{label}: start', flush=True)
+    started = time.monotonic()
+    process = subprocess.Popen(command, cwd=cwd, env=env, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT, start_new_session=True)
+    pending, lines = b'', []
+
+    def emit(raw):
+        text = raw.decode('utf-8', 'replace').rstrip('\r')
+        lines.append(text)
+        print(f'{label}: {text}', flush=True)
+
+    try:
+        while True:
+            remaining = started + seconds - time.monotonic()
+            if remaining <= 0 or not select.select([process.stdout], [], [], remaining)[0]:
+                os.killpg(process.pid, signal.SIGKILL)
+                process.wait()
+                raise RuntimeError(f'{label}: no exit within {seconds} s; stopped after '
+                                   f'{(time.monotonic() - started) * 1000:.0f} ms')
+            chunk = os.read(process.stdout.fileno(), 65536)
+            if not chunk:
+                break
+            pending += chunk
+            while b'\n' in pending:
+                line, pending = pending.split(b'\n', 1)
+                emit(line)
+        if pending:
+            emit(pending)
+        returncode = process.wait()
+    finally:
+        if process.poll() is None:
+            os.killpg(process.pid, signal.SIGKILL)
+            process.wait()
+        process.stdout.close()
+    print(f'{label}: exit {returncode} after {(time.monotonic() - started) * 1000:.0f} ms', flush=True)
+    return subprocess.CompletedProcess(command, returncode, stdout=''.join(line + '\n' for line in lines))
+
+
 def prepare(selected, paths, cache, registry=REGISTRY):
     variables = context(paths, cache)
     warnings = []
@@ -97,13 +146,13 @@ def prepare(selected, paths, cache, registry=REGISTRY):
         if not paths[name].is_dir():
             raise ValueError('Missing package directory: ' + name)
     for name in selected:
-        for step in registry['implementations'][name].get('prepare', []):
+        steps = registry['implementations'][name].get('prepare', [])
+        for index, step in enumerate(steps, 1):
             if 'if_exists' in step and not Path(expand(step['if_exists'], variables)).is_file():
                 continue
             command = [expand(argument, variables) for argument in step['command']]
-            process = subprocess.run(command, cwd=expand(step['cwd'], variables), text=True,
-                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            print(process.stdout, end='', flush=True)
+            label = f'{name} prepare {index}/{len(steps)} ({Path(command[0]).name})'
+            process = run_streamed(label, command, expand(step['cwd'], variables), BUILD_SECONDS)
             if process.returncode:
                 raise subprocess.CalledProcessError(process.returncode, command)
             for line in process.stdout.splitlines():
