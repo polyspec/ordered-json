@@ -39,11 +39,11 @@ After a proposal is approved, update the specification and remove the proposal d
 <a id="checks"></a>
 ## Documentation checks
 
-`make docs-check` checks registered document pairs, local link targets and anchors, matching section identifiers and executable code blocks, Korean translation revision hashes, required feature fields, evidence references, and current verification source hashes. It also rejects local home-directory paths in public documents and reports.
+`make docs-check` checks registered document pairs, local link targets and anchors, matching section identifiers and executable code blocks, Korean translation revision hashes, required feature fields, and evidence references. It also rejects local home-directory paths in public documents and reports. It does not compare verification records with the current sources, so a documentation review does not require a full verification run.
 
 The Korean file's `source-sha256` comment records the English revision reviewed for that translation. Update it only after reviewing the translation. Matching hashes do not prove translation accuracy. The checker does not verify external website availability or prose meaning; those require review against code and test results.
 
-`make check` runs the verifier and documentation checker tests, every registered JSON implementation, and `make docs-check`. [PIE verification](operations/validation.md#pie) records a separate build and shared case result. Hosted CI is not configured. Developers must run the required commands before committing.
+`make check` runs the verifier and documentation checker tests, every registered JSON implementation, and the documentation checker with `--records`, which also rejects a verification or PIE record whose source hashes differ from the current sources. [PIE verification](operations/validation.md#pie) records a separate build and shared case result. Hosted CI is not configured. Developers must run the required commands before committing.
 
 <a id="records"></a>
 ## Technical records

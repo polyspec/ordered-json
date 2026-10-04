@@ -6,6 +6,10 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- `make docs-check` checks documents only. It compared the verification records with the
+  current sources, so after any source edit it failed with "Verification is stale" until the full
+  suite ran. `make check` runs the checker with `--records` after it writes the record, so a stale
+  verification or PIE record still fails there.
 - Remove the root `Cargo.toml`. It defined the `ordered-json` package a second time beside
   `rust/Cargo.toml`, so every Cargo build that depends on this repository warned "skipping duplicate
   package"; Cargo finds `rust/Cargo.toml` in a Git dependency without it. A repository test

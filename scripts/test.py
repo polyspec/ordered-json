@@ -11,6 +11,9 @@ from verification_record import (IMPLEMENTATIONS, create_record, runtimes, sourc
 from verify import ROOT, verify
 from registry import prepare, repository_paths
 
+# Only this path checks record freshness: it runs right after the record is written.
+DOCS_CHECK = [sys.executable, str(ROOT / 'scripts/docs_check.py'), '--records']
+
 
 def build_extension():
     return prepare(['php-extension'], repository_paths(ROOT), ROOT / '.cache/probes')
@@ -40,7 +43,7 @@ def main():
                            supplementary, warnings, package_tests)
     write_record(ROOT / 'docs/verification.json', record)
     print('Saved docs/verification.json', flush=True)
-    subprocess.run([sys.executable, str(ROOT / 'scripts/docs_check.py')], cwd=ROOT, check=True)
+    subprocess.run(DOCS_CHECK, cwd=ROOT, check=True)
     return 0
 
 
