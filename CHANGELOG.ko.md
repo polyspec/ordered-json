@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 04bb6919e9321818f9a266bf44ab4528e522d4ae181005c62e8ac0164f4c584f -->
+<!-- source-sha256: 2f4c7f1f1fe12abf7c0029dc7361011927e7880e492150814d2d539e740d0644 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,11 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 검증기 unit test는 시작할 때 test 이름을 출력하고, 끝나면 상태와 경과 시간을 출력합니다. 각
+  test에는 자기 deadline이 있으며, test가 따로 선언하지 않으면 60 s입니다. deadline을 넘긴
+  test는 이름과 함께 실패합니다. 이전 runner는 test마다 점 하나만 출력해서, 멈춘 test는 아무것도
+  출력하지 않았고 실행은 끝나지 않았습니다. `python3 scripts/test.py --unit TEST...`는
+  지정한 test만 실행합니다.
 - `make docs-check`는 문서만 검사합니다. 이 검사는 검증 기록을 현재 소스와 비교해서, 소스를
   하나라도 바꾸면 전체 suite를 실행할 때까지 "Verification is stale"로 실패했습니다. `make
   check`는 기록을 쓴 뒤 `--records`를 붙여 검사기를 실행하므로 오래된 검증 기록이나 PIE 기록은
