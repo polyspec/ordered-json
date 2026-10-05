@@ -20,7 +20,7 @@
     {"paths": ["benchmarks/run.py"], "tests": ["test_benchmark", "test_run_isolation", "test_atomic_publish", "test_failure_messages", "test_toolchains"], "checks": ["benchmark"]},
     {"paths": ["benchmarks/*.{mjs,php,json}", "benchmarks/fixtures/*.json", "rust/examples/benchmark.rs", "go/internal/benchmark/*.go"], "checks": ["benchmark"]},
     {"paths": ["Makefile"], "tests": ["test_full_run", "test_push_gate", "test_toolchains", "test_owner_check", "test_ci_run"]},
-    {"paths": [".github/workflows/*.yml"], "tests": ["test_push_gate", "test_toolchains", "test_ci_run"]},
+    {"paths": [".github/workflows/*.yml"], "tests": ["test_push_gate", "test_toolchains", "test_ci_run", "test_workflow_rules"]},
     {"paths": [".gitignore"], "tests": ["test_tracked_inputs", "test_full_run"]},
     {"paths": ["implementations.json"], "tests": ["test_repositories", "test_run_isolation", "test_toolchains", "test_case_listings", "test_failure_messages", "test_package_conformance"], "languages": ["*"]},
     {"paths": ["package-tests.json"], "tests": ["test_package_conformance", "test_case_listings"], "languages": ["*"]},
