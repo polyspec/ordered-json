@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 6a0c1d33ce845450ffeaf678c2744e4b4dea0788a18749fbc0f8b578f8e6b8df -->
+<!-- source-sha256: d0a1cf6784d33c8e6d9caeea03696b4a312a27855a4f88cdc4ddcffd7b89f7c0 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,11 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- AGENTS.md에 멱등성 절이 있습니다. 같은 tree는 언제 어느 기계에서든 같은 결과를 내고, 한 polyspec 저장소에서 찾은 결함은 모든
+  저장소에서 고치는 부류이며, 부류마다 규칙 하나가 이 저장소가 그것을 지키는 방법을 밝힙니다. registry 질의나 필요할 때의 설치 없이
+  추적되는 버전의 도구, 자기 출력과 추적 파일만 읽는 test, 원자적 게시, 모으는 실패, 기대값, 실제값, 도구 오류를 담은 실패, 실패하는 빈
+  선택, process group 회수와 `finally`의 디렉터리 제거, 사람이 읽는 도구 출력에 대한 단언 금지, 바뀐 모든 파일의 소유자, 공유 상태를 위한
+  lease나 실행별 디렉터리입니다.
 - PHP 확장의 build 사본은 Git이 추적하는 파일만 담습니다. `scripts/registry.py`는
   `git ls-files --cached --others --exclude-standard`를 복사했으므로, `php-extension/`의 추적되지 않은 파일이 어떤 기록에도 밝혀지지
   않은 채 `scripts/verify.py`, `make pie-check`, benchmark의 build에 들어갔습니다. 사본은 source manifest의 추적 목록을 사용하고, Git
