@@ -6,6 +6,10 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Development runs unit tests only (T1.12). AGENTS and the validation procedure state that `make pie-check`,
+  `make check`, `make owner-check`, adapter suites and supplementary suite runs are end-to-end checks that hosted CI
+  runs after the push, that no rule requires a local run before a commit or a push, and that the pre-push hook stays a
+  fast gate.
 - setup-node runs without its npm cache (T1.10). In CI it failed with `Dependencies lock file is
   not found`, because it caches the dependencies of the `packageManager` of `package.json` by default and the
   repository has no lock file. The step sets `package-manager-cache: false`; `test_workflow_rules` fails without it.

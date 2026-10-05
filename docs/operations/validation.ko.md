@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: f96c9f66e546bc2626076321224b7c24471b98f80421f1d2f0b788635d844be9 -->
+<!-- source-sha256: 937ffd897dfbf1c9c1ef4ff76d0e0b8f9469aa0793f627418b4f8bf847f530b1 -->
 # 검증
 
 [English](validation.md)
@@ -7,7 +7,7 @@
 <a id="repository-check"></a>
 ## 통합 검사
 
-[필수 도구](installation.ko.md#requirements)를 설치하고 저장소 루트에서 실행합니다.
+개발 중에는 unit test만 실행합니다(`python3 scripts/test.py --unit`). 통합 검사, PIE 산출물 검사, owner 검사는 [hosted CI](#ci)가 push마다 실행하는 end-to-end 검사입니다. 어떤 규칙도 commit이나 push 전에 로컬 실행을 요구하지 않으며, pre-push hook은 tracker와 체크리스트만 읽습니다. 그래도 로컬에서 통합 검사를 실행하려면 [필수 도구](installation.ko.md#requirements)를 설치하고 저장소 루트에서 실행합니다.
 
 ~~~sh
 make tools
