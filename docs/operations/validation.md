@@ -6,7 +6,7 @@
 <a id="repository-check"></a>
 ## Aggregate check
 
-Install the [required tools](installation.md#requirements) and run from the repository root:
+Development runs unit tests only (`python3 scripts/test.py --unit`). The aggregate check, the PIE artifact check and the owner checks are end-to-end checks that [hosted CI](#ci) runs after every push; no rule requires a local run before a commit or a push, and the pre-push hook only reads the tracker and the checklist. To run the aggregate check locally anyway, install the [required tools](installation.md#requirements) and run from the repository root:
 
 ~~~sh
 make tools

@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 9930a1753f1e4e5a94171237d41b14c6b97b512ad17e8ed41abfaee2ea416b6b -->
+<!-- source-sha256: 57245daa5f6f62599f2c2793a603f34d0aaf7eadc4a7dc7614d8e2383415b67e -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,9 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 개발 중에는 unit test만 실행합니다(T1.12). AGENTS와 검증 절차는 `make pie-check`, `make check`, `make owner-check`,
+  어댑터 suite, 추가 사례 실행이 hosted CI가 push 뒤에 실행하는 end-to-end 검사이고, 어떤 규칙도 commit이나 push 전에
+  로컬 실행을 요구하지 않으며, pre-push hook은 빠른 gate로 남는다고 명시합니다.
 - setup-node는 npm cache 없이 실행합니다(T1.10). CI에서 `Dependencies lock file is not found`로
   실패했습니다. 기본으로 `package.json`의 `packageManager` 의존성을 cache하는데 저장소에 lock file이 없기 때문입니다.
   step은 `package-manager-cache: false`를 설정하고, `test_workflow_rules`는 이것이 없으면 실패합니다.

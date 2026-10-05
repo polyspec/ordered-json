@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: 41bdc095e4d6d4a985a1707d1f9ddef16f530d1c12e8eebff86e40e4b1f58195 -->
+<!-- source-sha256: 9c91bec02233eb9444f76c910e684ece3ad69c7aa79b816d7a209283a7280c3f -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
@@ -17,3 +17,4 @@
 | T1.9 | `make ci`와 `make ci-summary`의 job을 해석: CI에서 두 job의 두 step이 모두 `ci_run.py: error: the following arguments are required: --job`로 실패했다. target의 remainder 인수가 `--job`까지 가져갔기 때문이며, 보고서는 쓰이지도 upload되지도 않았다. `scripts/ci_run.py`는 mode와 `--job`을 해석하기 전에 `--`에서 target을 떼어 낸다 | `scripts/ci_run.py`, `scripts/tests/test_ci_run.py` | `python3 scripts/test.py --unit test_ci_run` | [o] |
 | T1.10 | setup-node의 npm cache를 끔: CI에서 setup-node는 `Dependencies lock file is not found`로 실패했다. 기본으로 `package.json`의 `packageManager` 의존성을 cache하는데, 저장소는 npm package를 설치하지 않고 lock file도 없기 때문이다. step은 `package-manager-cache: false`를 설정하고, `test_workflow_rules`는 이것이 없는 setup-node step에서 실패한다 | `.github/workflows/ci.yml`, `scripts/tests/test_workflow_rules.py` | `python3 scripts/test.py --unit test_workflow_rules` | [o] |
 | T1.11 | 전체 suite에서 clippy와 go vet 실행: AGENTS는 해당 코드가 바뀌면 `rust/`에서 `cargo clippy --all-targets -- -D warnings`, `go/`에서 `go vet ./...`을 요구하지만, `make check`, `implementations.json`, Makefile, `.github/workflows`의 어떤 명령도 둘 다 실행하지 않으므로(`git grep`은 clippy를 `rust-toolchain.toml`과 AGENTS에서만 찾는다) hosted CI도 실행하지 않는다 | `implementations.json` 또는 `Makefile`, `.github/workflows/ci.yml` | `python3 scripts/test.py --unit test_repositories` | [ ] |
+| T1.12 | 개발 중에는 unit test만 실행한다고 명시: AGENTS는 변경의 소유 검사와 모든 작업 뒤 한 번의 `make check`를 요구했으므로, push 전에 로컬 기계에서 전체 또는 end-to-end 실행이 필요했다. AGENTS와 검증 절차는 개발 중 RED와 GREEN 사례를 unit test로 실행하고, `make pie-check`, `make check`, `make owner-check`, 어댑터 suite, 추가 사례 실행은 hosted CI가 push 뒤에 실행하는 end-to-end 검사이며, 어떤 규칙도 commit이나 push 전에 로컬 실행을 요구하지 않고, pre-push hook은 빠른 gate로 남는다고 명시한다 | `AGENTS.md`(.ko), `docs/operations/validation.md`(.ko) | `make docs-check` | [o] |

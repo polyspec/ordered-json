@@ -37,7 +37,7 @@ The [execution checklist](docs/plans/execution-checklist.md) tracks the tasks of
 
 Each implementation package owns its source and document manifest. Run commands from the repository root.
 
-While a change is in progress, run only the tests that own it: the RED case and then the same case to GREEN, the checks of the changed implementation, and the verifier unit tests that cover a changed script. Do not rerun broader checks after each correction. [scripts/owner-checks.json](scripts/owner-checks.json) maps every tracked path to the verifier unit test modules, implementations and checks that own it; `make owner-check` runs the owners of the uncommitted changes, of `PATHS`, or of the paths changed since `BASE`, each to its end, and the pre-commit hook `.githooks/pre-commit` refuses a commit while a tracked path matches no rule, a glob matches no path or an owner does not exist. A new file is mapped in the same commit.
+Development runs unit tests only: while a change is in progress, run the RED case and then the same case to GREEN, as verifier unit tests (`python3 scripts/test.py --unit`). `make pie-check`, `make check`, `make owner-check`, adapter suites and supplementary suite runs are end-to-end checks; hosted CI runs them after the push ([hosted CI](docs/operations/validation.md#ci)), and no rule requires a local run before a commit or a push. The pre-push hook stays a fast gate that reads only the tracker and the checklist. Do not rerun broader checks after each correction. [scripts/owner-checks.json](scripts/owner-checks.json) maps every tracked path to the verifier unit test modules, implementations and checks that own it; `make owner-check` runs the owners of the uncommitted changes, of `PATHS`, or of the paths changed since `BASE`, each to its end, and the pre-commit hook `.githooks/pre-commit` refuses a commit while a tracked path matches no rule, a glob matches no path or an owner does not exist. A new file is mapped in the same commit.
 
 ~~~sh
 python3 scripts/verify.py --only js
@@ -47,7 +47,7 @@ git diff --check
 
 `scripts/verify.py --only` builds the selected implementation and runs its case and symbol listings, its declared package tests, and the shared cases; it writes no record. `scripts/test.py --unit` runs the named verifier unit tests and writes no record; a name that selects no test, such as a module without tests, fails with `selected 0 tests` and the name before any test runs.
 
-Run `make check` once, after every active item is complete, and report the elapsed time of each step. With the supplementary suite, that run is:
+`make check` is the full suite that hosted CI runs on every pushed commit; a local run is optional and happens at most once per tree, after every active item is complete. With the supplementary suite, that run is:
 
 ~~~sh
 make check JSON_TEST_SUITE=.cache/JSONTestSuite

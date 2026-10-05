@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 3a7ac2ec4eccc9131d276bb82e9dfc43b8ce9eb92d7beb45a222812e313b817e -->
+<!-- source-sha256: e519771fd98c5f5518bfac142e066b3307ac71d42d0ca54f6e9c6f17cc7d3965 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -38,7 +38,7 @@
 
 각 구현 패키지는 자체 소스와 문서 목록을 관리합니다. 명령은 저장소 루트에서 실행합니다.
 
-변경을 진행하는 동안에는 그 변경을 소유한 테스트만 실행합니다. RED 사례와 같은 사례의 GREEN, 변경한 구현의 검사, 변경한 스크립트를 다루는 검증기 unit test입니다. 수정할 때마다 더 넓은 검사를 다시 실행하지 않습니다. [scripts/owner-checks.json](scripts/owner-checks.json)은 모든 추적 경로를 그것을 소유한 검증기 unit test module, 구현, 검사에 대응시킵니다. `make owner-check`는 커밋되지 않은 변경, `PATHS`, 또는 `BASE` 이후 바뀐 경로의 소유자를 각각 끝까지 실행하고, pre-commit hook `.githooks/pre-commit`은 추적 경로가 어떤 규칙에도 맞지 않거나, glob이 어떤 경로에도 맞지 않거나, 소유자가 존재하지 않으면 commit을 거부합니다. 새 파일은 같은 commit에서 대응시킵니다.
+개발 중에는 unit test만 실행합니다. 변경을 진행하는 동안 RED 사례와 같은 사례의 GREEN을 검증기 unit test(`python3 scripts/test.py --unit`)로 실행합니다. `make pie-check`, `make check`, `make owner-check`, 어댑터 suite, 추가 사례 실행은 end-to-end 검사이며 hosted CI가 push 뒤에 실행합니다([hosted CI](docs/operations/validation.ko.md#ci)). 어떤 규칙도 commit이나 push 전에 로컬 실행을 요구하지 않습니다. pre-push hook은 tracker와 체크리스트만 읽는 빠른 gate로 남습니다. 수정할 때마다 더 넓은 검사를 다시 실행하지 않습니다. [scripts/owner-checks.json](scripts/owner-checks.json)은 모든 추적 경로를 그것을 소유한 검증기 unit test module, 구현, 검사에 대응시킵니다. `make owner-check`는 커밋되지 않은 변경, `PATHS`, 또는 `BASE` 이후 바뀐 경로의 소유자를 각각 끝까지 실행하고, pre-commit hook `.githooks/pre-commit`은 추적 경로가 어떤 규칙에도 맞지 않거나, glob이 어떤 경로에도 맞지 않거나, 소유자가 존재하지 않으면 commit을 거부합니다. 새 파일은 같은 commit에서 대응시킵니다.
 
 ~~~sh
 python3 scripts/verify.py --only js
@@ -48,7 +48,7 @@ git diff --check
 
 `scripts/verify.py --only`는 선택한 구현을 빌드하고 그 구현의 케이스·심볼 목록, 선언된 패키지 테스트, 공통 사례를 실행하며 기록을 쓰지 않습니다. `scripts/test.py --unit`은 지정한 검증기 unit test를 실행하며 기록을 쓰지 않습니다. test가 없는 module처럼 test를 하나도 고르지 않는 이름은 어떤 test도 실행하기 전에 `selected 0 tests`와 그 이름을 출력하며 실패합니다.
 
-`make check`는 활성 항목이 모두 끝난 뒤 한 번 실행하고 단계별 경과 시간을 보고합니다. 추가 사례를 포함하면 그 실행은 다음과 같습니다.
+`make check`는 hosted CI가 push된 모든 commit에서 실행하는 전체 suite입니다. 로컬 실행은 선택이며, 활성 항목이 모두 끝난 뒤 tree마다 많아야 한 번 합니다. 추가 사례를 포함하면 그 실행은 다음과 같습니다.
 
 ~~~sh
 make check JSON_TEST_SUITE=.cache/JSONTestSuite
