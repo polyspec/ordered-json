@@ -60,8 +60,9 @@ class Checkout:
         subprocess.run(['git', 'init', '--quiet', '--bare', str(self.remote)], check=True, env=environment())
         self.git('remote', 'add', 'origin', str(self.remote))
 
-    def run(self, *command, **extra):
-        return subprocess.run(command, cwd=self.root, capture_output=True, text=True, env=environment(**extra))
+    def run(self, *command, input=None, **extra):
+        return subprocess.run(command, cwd=self.root, capture_output=True, text=True, input=input,
+                              env=environment(**extra))
 
     def git(self, *args):
         result = self.run('git', *args)
@@ -86,8 +87,8 @@ class Checkout:
                                 capture_output=True, text=True, env=environment())
         return result.stdout.strip() or None
 
-    def gate(self, *args, **extra):
-        return self.run(sys.executable, 'scripts/push_gate.py', *args, **extra)
+    def gate(self, *args, input=None, **extra):
+        return self.run(sys.executable, 'scripts/push_gate.py', *args, input=input, **extra)
 
 
 class PushGateChecks(unittest.TestCase):
@@ -159,6 +160,29 @@ class PushGateChecks(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0, result.stderr)
         self.assertIn(f'push refused: cannot read docs/features.md of refs/heads/main {removed[:12]}', result.stderr)
         self.assertIsNone(checkout.remote_main())
+
+    def test_r5_a_tracker_without_feature_rows_or_with_another_row_is_refused(self):
+        # A push gate that reads no rows passes every push: the tracker must hold its table, and every
+        # row of the table must be a feature row.
+        cases = {'no table': '# Feature state\n\nThe table moved elsewhere.\n',
+                 'no rows': '\n'.join(DONE.splitlines()[:4]) + '\n',
+                 'another row': DONE.replace('| F-STREAM |', '| STREAM |')}
+        for name, features in cases.items():
+            with self.subTest(case=name):
+                checkout = self.checkout()
+                self.assertEqual(checkout.push().returncode, 0)
+                before = checkout.remote_main()
+                broken = checkout.commit('docs/features.md', features)
+                hook = checkout.gate('hook', input=f'refs/heads/main {broken} refs/heads/main {before}\n')
+                self.assertEqual(hook.returncode, 1, hook.stdout + hook.stderr)
+                self.assertIn('push refused: ', hook.stderr)
+                self.assertIn('feature table', hook.stderr)
+                result = checkout.push()
+                self.assertNotEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(checkout.remote_main(), before)
+                ci = checkout.gate('commit', broken)
+                self.assertEqual(ci.returncode, 1, ci.stdout)
+                self.assertIn('feature table', ci.stdout)
 
     def test_the_ci_command_fails_for_a_partial_feature_or_an_untracked_hook_and_passes_otherwise(self):
         checkout = self.checkout()

@@ -6,6 +6,15 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The push gate and the guard refuse a tracker that yields no feature row. Both read only lines that
+  start with `| F-`, so a `docs/features.md` without the feature table, with an empty table or with
+  a row whose ID is not `F-...` had no `partial` row, and `scripts/push_gate.py hook` returned no
+  refusal. `scripts/docs_check.py` reads the feature table with the new `feature_table`, which
+  raises on a missing table, a table without rows and a row that is not a feature, and
+  `scripts/full_run.py` and `scripts/push_gate.py` read the rows with it; the push gate refuses the
+  push and the guard refuses the run with the reason. The new cases of
+  `scripts/tests/test_push_gate.py` and `scripts/tests/test_full_run.py` failed before the change,
+  because the hook, the CI command and the guard passed such a tracker, and pass after it.
 - Every run checks its tools against tracked pins before any work. Nothing pinned them: a run used
   whatever Node.js, Rust, Go, Python and npm the machine had, go could download the toolchain of
   `go.mod`, rustup could install a toolchain on the first cargo, cargo could rewrite `Cargo.lock`,

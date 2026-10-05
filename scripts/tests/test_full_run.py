@@ -157,6 +157,12 @@ class FullRunChecks(unittest.TestCase):
         self.assertRegex(output, r'^\[full-run\] refuse: 1 active feature')
         self.assertIn('F-STREAM Streaming \\| incremental parsing', output)
 
+    def test_a_tracker_without_feature_rows_is_refused(self):
+        checkout = self.checkout('# Feature state\n\nThe table moved elsewhere.\n')
+        status, output, ran = checkout.guard('run', stub('a'))
+        self.assertEqual((status, ran), (1, []), output)
+        self.assertRegex(output, r'^\[full-run\] refuse: docs/features.md cannot be read as the tracker: .*feature table')
+
     def test_a_checkout_without_the_pre_push_hook_is_refused(self):
         checkout = self.checkout(DONE)
         git(checkout.root, 'config', '--unset', 'core.hooksPath')

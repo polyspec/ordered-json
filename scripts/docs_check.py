@@ -115,12 +115,37 @@ def report_paths(root):
     return files_under(root, 'docs', '.json', recursive=True)
 
 
+FEATURE_HEADER = '| ID |'
+
+
+def feature_table(text):
+    """The cells of each row of the feature table, the table whose header starts with `| ID |`.
+
+    The tracker readers (this check, scripts/full_run.py and scripts/push_gate.py) all read the
+    rows here, so a tracker that reads no row cannot pass: ValueError names a missing table, a table
+    without rows and a row whose ID is not a feature ID. A cell may contain an escaped `\\|`."""
+    lines = text.splitlines()
+    header = next((index for index, line in enumerate(lines) if line.startswith(FEATURE_HEADER)), None)
+    if header is None:
+        raise ValueError(f'the feature table is missing: no line starts with {FEATURE_HEADER!r}')
+    if header + 1 >= len(lines) or not re.fullmatch(r'\|(?: *-{3,} *\|)+', lines[header + 1].strip()):
+        raise ValueError(f'the feature table header on line {header + 1} has no separator line')
+    rows = []
+    for number, line in enumerate(lines[header + 2:], header + 3):
+        if not line.startswith('|'):
+            break
+        cells = [cell.strip() for cell in re.split(r'(?<!\\)\|', line.strip().strip('|'))]
+        if not re.fullmatch(r'F-[A-Z0-9-]+', cells[0]):
+            raise ValueError(f'line {number} of the feature table is not a feature row: {cells[0]!r} is not an ID F-...')
+        rows.append(cells)
+    if not rows:
+        raise ValueError(f'the feature table on line {header + 1} has no feature rows')
+    return rows
+
+
 def feature_rows(text):
     rows = {}
-    for line in text.splitlines():
-        if not re.match(r'^\|\s*F-', line):
-            continue
-        cells = [cell.strip() for cell in line.strip().strip('|').split('|')]
+    for cells in feature_table(text):
         if len(cells) != 7 or not re.fullmatch(r'F-[A-Z0-9-]+', cells[0]):
             raise ValueError('Feature rows require ID, feature, implementation, verification, evidence, distribution, specification')
         identifier, feature, implementation, verification, evidence, distribution, specification = cells
@@ -144,8 +169,6 @@ def feature_rows(text):
             raise ValueError('A verified feature names the record that backs it: ' + identifier)
         rows[identifier] = (implementation, verification, distribution,
                             tuple(evidence_links), tuple(link.replace('.ko.md', '.md') for link in specification_links))
-    if not rows:
-        raise ValueError('No feature status rows found')
     return rows
 
 

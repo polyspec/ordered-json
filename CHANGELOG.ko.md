@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 5abf16af6b0045bffadc768d567077fd59c16adabf8143e06052f736ce71ae9d -->
+<!-- source-sha256: 3a17d25eea642dcf480ad08505262c9326412bd27bed14b96eb12353e4d6729d -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,12 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- push gate와 guard는 기능 행을 내지 않는 tracker를 거부합니다. 둘 다 `| F-`로 시작하는 줄만 읽었으므로, 기능 표가 없거나, 표가
+  비었거나, ID가 `F-...`가 아닌 행이 있는 `docs/features.md`에는 `partial` 행이 없었고 `scripts/push_gate.py hook`은 거부하지
+  않았습니다. `scripts/docs_check.py`는 새 `feature_table`로 기능 표를 읽고, 이 함수는 표가 없거나, 행이 없거나, 기능이 아닌 행이
+  있으면 예외를 던집니다. `scripts/full_run.py`와 `scripts/push_gate.py`도 이 함수로 행을 읽으며, push gate는 push를, guard는
+  실행을 이유와 함께 거부합니다. `scripts/tests/test_push_gate.py`와 `scripts/tests/test_full_run.py`의 새 case는 hook, CI 명령,
+  guard가 그런 tracker를 통과시켰으므로 변경 전에 실패했고, 변경 후에는 통과합니다.
 - 모든 실행은 어떤 작업보다 먼저 도구를 추적되는 고정값과 비교합니다. 고정한 것이 없었습니다. 실행은 기계에 있는 Node.js, Rust, Go,
   Python, npm을 그대로 사용했고, go는 `go.mod`의 toolchain을 내려받을 수 있었고, rustup은 첫 cargo에서 toolchain을 설치할 수
   있었고, cargo는 `Cargo.lock`을 다시 쓸 수 있었으며, CI는 `ubuntu-latest`에서 움직이는 tag의 action으로 실행했습니다.
