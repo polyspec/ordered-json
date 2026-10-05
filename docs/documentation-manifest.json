@@ -26,6 +26,12 @@
       "ko": "docs/plans/README.ko.md"
     },
     {
+      "id": "execution-checklist",
+      "kind": "procedure",
+      "en": "docs/plans/execution-checklist.md",
+      "ko": "docs/plans/execution-checklist.ko.md"
+    },
+    {
       "id": "overview",
       "kind": "overview",
       "en": "README.md",

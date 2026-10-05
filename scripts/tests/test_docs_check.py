@@ -179,6 +179,42 @@ class DocumentationChecks(unittest.TestCase):
             self.assertIn(f'{name}:{7 + offset}:1: state `implemented` stands outside the Implementation cell of a feature row', errors)
         self.assertEqual(len(errors), 4, errors)
 
+    def checklist(self, rows, korean_rows=None):
+        """Register an execution checklist with the task rows `rows`; `korean_rows` replaces them in the translation."""
+        self.manifest['documents'].append({'id': 'execution-checklist', 'kind': 'procedure',
+                                           'en': 'docs/plans/execution-checklist.md',
+                                           'ko': 'docs/plans/execution-checklist.ko.md'})
+        self.json('docs/documentation-manifest.json', self.manifest)
+        table = '| ID | Task | Deliverables | Verification | Done |\n| --- | --- | --- | --- | --- |\n'
+        self.pair('docs/plans/execution-checklist.md', 'execution-checklist',
+                  '# Execution checklist\n\n## Wave 1\n\n' + table + rows)
+        if korean_rows is not None:
+            self.change('docs/plans/execution-checklist.ko.md', rows, korean_rows)
+
+    def test_checklist_task_states_are_the_four_states(self):
+        self.checklist('| T1.1 | Task | File | `make docs-check` | [o] |\n'
+                       '| T1.2 | Task | File | `make docs-check` | [~] |\n'
+                       '| T1.3 | Task | File | `make docs-check` | [ ] |\n'
+                       '| T1.4 | Task | File | `make docs-check` | [!] cause: no runner; retry: a runner exists |\n')
+        self.assertEqual(check_repository(self.root), ([], 3, 1))
+        self.checklist('| T1.1 | Task | File | `make docs-check` | [x] |\n')
+        self.assert_failure("docs/plans/execution-checklist.md: line 8 of the checklist: '[x]' is not a task state")
+
+    def test_checklist_rows_need_task_ids_and_one_row_each(self):
+        self.checklist('| W1 | Task | File | `make docs-check` | [o] |\n')
+        self.assert_failure("'W1' is not a task ID")
+        self.checklist('| T1.1 | Task | File | `make docs-check` | [o] |\n| T1.1 | Task | File | `make docs-check` | [o] |\n')
+        self.assert_failure('T1.1 has more than one row')
+
+    def test_checklist_without_task_rows_fails(self):
+        self.checklist('')
+        self.assert_failure('the checklist has no task rows')
+
+    def test_translated_checklist_states_must_match(self):
+        self.checklist('| T1.1 | Task | File | `make docs-check` | [o] |\n',
+                       '| T1.1 | 작업 | 파일 | `make docs-check` | [~] |\n')
+        self.assert_failure('English and Korean task IDs or states differ')
+
     def test_planned_feature_cannot_claim_passed_tests(self):
         self.change('docs/features.md', '| implemented |', '| planned |')
         self.assert_failure('Incomplete features cannot claim')

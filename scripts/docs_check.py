@@ -173,6 +173,46 @@ def feature_rows(text):
     return rows
 
 
+CHECKLIST = 'docs/plans/execution-checklist.md'
+TASK_ID = re.compile(r'T\d+(?:\.\d+)*(?:-\d+)?')
+# The four task states (AGENTS): waiting, in progress, done, and bypassed with its cause and its retry condition.
+TASK_STATE = re.compile(r'\[ \]|\[~\]|\[o\]|\[!\] cause: \S.*; retry: \S.*')
+
+
+def checklist_rows(text):
+    """The cells of each task row of the execution checklist, the rows of every table whose header starts with
+    `| ID |`. The last cell is the state of the task.
+
+    The guards (scripts/full_run.py and scripts/push_gate.py) read the tasks in progress here, so a checklist
+    that reads no row cannot pass: ValueError names a checklist without task rows, a row whose ID is not a task
+    ID, a row whose last cell is not a task state and an ID with more than one row."""
+    lines = text.splitlines()
+    rows, seen, index = [], set(), 0
+    while index < len(lines):
+        if not lines[index].startswith(FEATURE_HEADER):
+            index += 1
+            continue
+        if index + 1 >= len(lines) or not re.fullmatch(r'\|(?: *-{3,} *\|)+', lines[index + 1].strip()):
+            raise ValueError(f'line {index + 1} of the checklist: the table header has no separator line')
+        index += 2
+        while index < len(lines) and lines[index].startswith('|'):
+            cells = [cell.strip() for cell in re.split(r'(?<!\\)\|', lines[index].strip().strip('|'))]
+            if not TASK_ID.fullmatch(cells[0]):
+                raise ValueError(f'line {index + 1} of the checklist: {cells[0]!r} is not a task ID T<wave>.<task>')
+            if not TASK_STATE.fullmatch(cells[-1]):
+                raise ValueError(f'line {index + 1} of the checklist: {cells[-1]!r} is not a task state; the states '
+                                 'are [ ], [~], [o] and [!] cause: <cause>; retry: <condition>')
+            if cells[0] in seen:
+                raise ValueError(f'line {index + 1} of the checklist: {cells[0]} has more than one row')
+            seen.add(cells[0])
+            rows.append(cells)
+            index += 1
+    if not rows:
+        raise ValueError('the checklist has no task rows: no table whose header starts with '
+                         f'{FEATURE_HEADER!r} holds a row')
+    return rows
+
+
 STATES = ('implemented', 'partial', 'planned')
 STATE_SPAN = re.compile(r'(`+) ?(' + '|'.join(STATES) + r') ?\1')
 STATE_CELL = re.compile(r'\|\s*(' + '|'.join(STATES) + r')\s*(?=\|)')
@@ -442,6 +482,20 @@ def check_repository(root, include_children=True, records=True):
                 check_benchmark(root, read_json('benchmarks/results.json'))
         except (ValueError, KeyError, TypeError, OSError) as issue:
             error('docs/features.md', str(issue))
+        if (root / CHECKLIST).is_file():
+            korean = CHECKLIST.replace('.md', '.ko.md')
+            try:
+                english_tasks = [(cells[0], cells[-1]) for cells in checklist_rows((root / CHECKLIST).read_text(encoding='utf-8'))]
+            except ValueError as issue:
+                error(CHECKLIST, str(issue))
+            else:
+                try:
+                    korean_tasks = [(cells[0], cells[-1]) for cells in
+                                    checklist_rows((root / korean).read_text(encoding='utf-8'))]
+                    if korean_tasks != english_tasks:
+                        raise ValueError('English and Korean task IDs or states differ')
+                except (ValueError, OSError) as issue:
+                    error(korean, str(issue))
         try:
             check_distribution(read_json('docs/distribution.json'), features)
         except (ValueError, KeyError, TypeError, OSError) as issue:

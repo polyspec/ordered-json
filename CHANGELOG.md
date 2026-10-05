@@ -6,6 +6,14 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Tasks that are not product features are tracked in the execution checklist
+  `docs/plans/execution-checklist.md` (T1.1). The guard of `make check`, the pre-push hook and the push gate read
+  only the `partial` features of `docs/features.md`, so such work had no state that stopped a full run or a push.
+  Each task has one of the states `[ ]`, `[~]`, `[o]` and `[!] cause: <cause>; retry: <condition>`;
+  `scripts/docs_check.py` rejects another state, a row without a task ID, a repeated ID, a checklist without rows
+  and a translation whose IDs or states differ, and `scripts/full_run.py` and `scripts/push_gate.py` refuse while a
+  task is `[~]` or the checklist cannot be read. The new cases of `test_docs_check`, `test_full_run` and
+  `test_push_gate` failed before the change and pass after it.
 - Python is pinned by its minor release. `.python-version` named 3.9.6 and `scripts/toolchains.py`
   required that exact release, while CI runs 3.9.25, because `actions/python-versions` builds no
   3.9.6 for `ubuntu-24.04`; local runs and CI followed different rules. An interpreter whose patch

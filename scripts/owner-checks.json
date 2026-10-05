@@ -3,6 +3,7 @@
   "owners": [
     {"paths": ["**/*.md", "**/docs/documentation-manifest.json", "docs/*.json", "docs/reports/*.json"], "checks": ["docs"]},
     {"paths": ["docs/features.md", "docs/features.ko.md"], "tests": ["test_docs_check", "test_full_run", "test_push_gate"]},
+    {"paths": ["docs/plans/execution-checklist.md", "docs/plans/execution-checklist.ko.md"], "tests": ["test_docs_check", "test_full_run", "test_push_gate"]},
     {"paths": ["scripts/tests/test_*.py"], "tests": ["$module"]},
     {"paths": ["scripts/registry.py"], "tests": ["test_repositories", "test_run_isolation", "test_build_runs", "test_failure_collection", "test_tracked_inputs", "test_case_listings", "test_failure_messages", "test_process_groups", "test_verify_runs"], "languages": ["*"]},
     {"paths": ["scripts/verify.py"], "tests": ["test_verify_runs", "test_failure_collection", "test_case_listings", "test_run_isolation", "test_repositories", "test_process_groups", "test_package_conformance"], "languages": ["*"]},
