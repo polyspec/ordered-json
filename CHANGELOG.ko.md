@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 71947b2b007a41e28cc9c9d0bb9f1aa28b11337f9e54c483759bbada0f599226 -->
+<!-- source-sha256: f4507d89a019854e3b0446f772da2a7b3d89aaceb704f972e1036fa3b4fcfa82 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,11 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- test가 모든 workflow의 규칙을 검사합니다(T1.8). `scripts/tests/test_workflow_rules.py`는 step이 make target 하나가 아닌
+  것을 실행할 때, `make ci`를 실행하는 job에 `if: ${{ !cancelled() }}`인 summary나 report step이 없거나 실패 뒤에 실행되지
+  않는 step이 있을 때, matrix에 `fail-fast: false`가 없을 때, `timeout-minutes`가 있을 때 file, job, step을 밝히며
+  실패합니다. T1.4 이전의 `push-gate.yml`에 적용하면 `python3 scripts/push_gate.py`를 직접 실행한 step을 밝히고, 현재
+  workflow는 통과합니다.
 - hosted CI가 전체 suite를 실행합니다(T1.7). hosted CI는 push gate만 실행했으므로 commit의 전체 suite는 로컬 기계에서만
   실행됐습니다. `.github/workflows/ci.yml`은 `main`에 push된 모든 commit과 모든 pull request에서 Python 3.9가 있는
   `ubuntu-24.04`로 실행하며, job `suite`(`make pie-check`, `make check`)와 `docs`를 `fail-fast: false`인 matrix로

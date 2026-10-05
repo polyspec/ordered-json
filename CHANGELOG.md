@@ -6,6 +6,11 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- A test checks the rules of every workflow (T1.8). `scripts/tests/test_workflow_rules.py` fails, naming the file,
+  the job and the step, when a step runs anything but one make target, when a job that runs `make ci` lacks its
+  summary or report step under `if: ${{ !cancelled() }}` or has a step that does not run after a failure, when a
+  matrix lacks `fail-fast: false`, and on `timeout-minutes`. Applied to `push-gate.yml` before T1.4 it names the
+  step that ran `python3 scripts/push_gate.py` directly; the current workflows pass.
 - Hosted CI runs the full suite (T1.7). Hosted CI ran only the push gate, so the full suite of a commit ran only on
   a local machine. `.github/workflows/ci.yml` runs on every pushed commit of `main` and every pull request on
   `ubuntu-24.04`, where Python 3.9 exists, with the jobs `suite` (`make pie-check`, `make check`) and `docs` in a
