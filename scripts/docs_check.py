@@ -9,7 +9,8 @@ import re
 import sys
 from urllib.parse import unquote, urlsplit
 
-from verification_record import IMPLEMENTATIONS, external_inputs, package_revisions, sha256, source_manifest
+from verification_record import (IMPLEMENTATIONS, external_inputs, manifest_differences, package_revisions, sha256,
+                                 source_manifest)
 from registry import REGISTRY, artifact_paths, files_under, fixture_paths, repository_paths, tracked_files
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -248,8 +249,10 @@ def check_verification(root, record):
     if record.get('schema_version') != 1 or record.get('status') != 'passed':
         raise ValueError('Verification record is not passed schema version 1')
     datetime.fromisoformat(record['checked_at'])
-    if record.get('sources') != source_manifest(root):
-        raise ValueError('Verification is stale: checked sources differ; run make check')
+    current = source_manifest(root)
+    if record.get('sources') != current:
+        raise ValueError('Verification is stale: checked sources differ; run make check:\n'
+                         + '\n'.join(manifest_differences(record.get('sources'), current)))
     counts = record['cases']
     if set(counts) != {'official', 'fixtures', 'supplementary', 'total'}:
         raise ValueError('Verification case counts are incomplete')
@@ -318,8 +321,10 @@ def check_pie_verification(root, record):
     if record.get('schema_version') != 1 or record.get('scope') != 'pie-build' or record.get('status') != 'passed':
         raise ValueError('Invalid PIE verification record')
     datetime.fromisoformat(record['checked_at'])
-    if record.get('sources') != source_manifest(root):
-        raise ValueError('PIE verification is stale; run scripts/check_pie.py')
+    current = source_manifest(root)
+    if record.get('sources') != current:
+        raise ValueError('PIE verification is stale; run scripts/check_pie.py:\n'
+                         + '\n'.join(manifest_differences(record.get('sources'), current)))
     if record.get('packages') != package_revisions(root):
         raise ValueError('PIE verification package records differ from the current source')
     if record.get('package') != 'ordered-json/ordered-json-extension:*@dev':

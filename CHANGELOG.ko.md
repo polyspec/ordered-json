@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: f7d7737b40461ca74232de0422bb12ba3674b6c1b8415434d0b90b58615f2aad -->
+<!-- source-sha256: a4b67e0e1cb143607996175220c04e6b7381283338fa19a2d1812bbab47f3343 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,15 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 실패는 무엇이 다른지 밝힙니다. PIE build나 도구 오류는 "위의 PIE 출력을 보라"고만 했고, 이제 일치한 줄을 나열합니다. 오래된 통합
+  기록이나 PIE 기록, 실행 중에 바뀐 소스는 소스가 다르다고만 했고, 이제 바뀐 파일, 추가된 파일, 제거된 파일을 모두 나열합니다. 실패한
+  runtime version 명령과 benchmark 명령은 도구의 standard error를 잃었고, 이제 둘 다 종료 상태와 그 오류를 포함합니다.
+  `implementations.json`의 `extension_version` runtime 명령은 `phpversion('ordered_json')`이 `ORDERED_JSON_VERSION`과 다르면 메시지
+  없이 status 1로 끝났고, 이제 두 값을 출력합니다. 거부된 push가 출력하는 규칙은 CI가 전체 검증을 실행한다고 적었지만 CI는 이를 실행하지
+  않으며, 이제 CI가 검증을 실행하지 않는다고 적습니다. `js/package.json`과 `php/composer.json`의 `test` script는 존재하지 않는
+  `scripts/check.py`를 실행했고, 이제 `../scripts/verify.py --only js`와 `--only php`를 실행합니다. 새
+  `scripts/tests/test_failure_messages.py`의 case는 각 메시지에 해당 줄, 파일, 값, 오류가 없었으므로 변경 전에 실패했고, 변경 후에는
+  통과합니다.
 - `benchmarks/run.py`와 `scripts/compare_ojson.py`는 완성된 파일을 결과 위로 이름을 바꾸는 `write_record`로 결과를 게시합니다.
   두 script는 `benchmarks/results.json`, 검토용 사본 `.cache/benchmark.current.json`, `docs/reports/ojson-comparison.json`을
   제자리에서 썼으므로, 파일을 연 직후 멈춘 process는 잘린 파일을 남겼고 읽는 쪽은 파일의 일부를 볼 수 있었습니다. `write_record`는

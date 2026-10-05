@@ -14,7 +14,8 @@ import sys
 
 from registry import (ROOT, adapter_commands, artifact_paths, repository_paths, run_directory, run_streamed,
                       runtime_versions)
-from verification_record import (external_inputs, input_issues, package_revisions, report_input_issues, sha256,
+from verification_record import (external_inputs, input_issues, manifest_differences, package_revisions,
+                                 report_input_issues, sha256,
                                  source_manifest, supplementary_manifest, write_record)
 from toolchains import require
 from verify import verify_adapters
@@ -34,8 +35,11 @@ def build_and_verify(run, pie, suite):
         process = run_streamed('pie ' + arguments[0], command, paths['php-extension'], env=environment)
         if process.returncode:
             raise subprocess.CalledProcessError(process.returncode, command)
-        if re.search(r'Permission denied|error:|build tools are missing', process.stdout, re.IGNORECASE):
-            raise RuntimeError('PIE reported a build or tool error; see the PIE output above')
+        matched = [line for line in process.stdout.splitlines()
+                   if re.search(r'Permission denied|error:|build tools are missing', line, re.IGNORECASE)]
+        if matched:
+            raise RuntimeError(f'pie {arguments[0]} reported a build or tool error in {len(matched)} lines:\n'
+                               + '\n'.join(matched))
         for line in process.stdout.splitlines():
             if re.search(r'warning:', line, re.IGNORECASE):
                 warnings.append(line.replace(str(run.root) + '/', ''))
@@ -57,7 +61,10 @@ def build_and_verify(run, pie, suite):
     selected = ['php-extension']
     results, counts = verify_adapters(adapter_commands(selected, paths, cache), suite)
     versions = runtime_versions(selected, paths, cache)
-    if (sources != source_manifest(ROOT) or packages != package_revisions(ROOT)
+    if sources != source_manifest(ROOT):
+        raise ValueError('PIE verification sources changed during verification:\n'
+                         + '\n'.join(manifest_differences(sources, source_manifest(ROOT))))
+    if (packages != package_revisions(ROOT)
             or supplementary != supplementary_manifest(suite) or pie_hash != sha256(pie.read_bytes())
             or artifact_hash != sha256(module.read_bytes())):
         raise ValueError('PIE verification inputs or artifact changed during verification')

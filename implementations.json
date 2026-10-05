@@ -319,7 +319,7 @@
           "-d",
           "extension={php-extension}/src/modules/ordered_json.so",
           "-r",
-          "if (phpversion('ordered_json') !== ORDERED_JSON_VERSION) exit(1); echo ORDERED_JSON_VERSION;"
+          "$native = phpversion('ordered_json'); if ($native !== ORDERED_JSON_VERSION) { fwrite(STDERR, \"phpversion('ordered_json') \" . var_export($native, true) . \" differs from ORDERED_JSON_VERSION \" . ORDERED_JSON_VERSION . \"\\n\"); exit(1); } echo ORDERED_JSON_VERSION;"
         ]
       },
       "artifacts": [

@@ -331,8 +331,13 @@ def runtime_versions(selected, paths, cache, registry=REGISTRY):
             try:
                 value = subprocess.check_output(resolved, cwd=repository, text=True, stderr=subprocess.PIPE,
                                                 env=command_environment(name, variables, registry)).strip()
-            except (OSError, subprocess.CalledProcessError) as error:
-                failures.append(f'{name}/{key}: {" ".join(resolved)}: {error}')
+            except subprocess.CalledProcessError as error:
+                failures.append(f'{name}/{key}: {" ".join(resolved)} failed with exit {error.returncode}: '
+                                f'{(error.stderr or "").strip() or (error.stdout or "").strip() or "no output"}')
+                failed.add(name)
+                continue
+            except OSError as error:
+                failures.append(f'{name}/{key}: {" ".join(resolved)} failed: {error}')
                 failed.add(name)
                 continue
             if not value:
