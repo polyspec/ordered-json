@@ -4,6 +4,7 @@ import io
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -32,16 +33,18 @@ class BuildRuns(unittest.TestCase):
         return repository_paths(root, registry=loaded), loaded
 
     def test_a_silent_prepare_step_runs_past_any_limit_to_its_exit(self):
-        # BUILD_SECONDS is the limit a prepare step had; a build has no limit.
+        # A build has no time limit: a step silent for 2 s ends with its own exit status.
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             paths, loaded = self.registry(root, SLOW)
             output = io.StringIO()
-            with patch('registry.BUILD_SECONDS', 1, create=True), redirect_stdout(output):
+            with redirect_stdout(output):
                 prepare(['future'], paths, root / 'cache', loaded)
-            self.assertRegex(output.getvalue(), r'future prepare 1/1 \(python\S*\): start\n'
-                                                r'future prepare 1/1 \(python\S*\): linked\n'
-                                                r'future prepare 1/1 \(python\S*\): exit 0 after \d+ ms\n')
+            match = re.search(r'future prepare 1/1 \(python\S*\): start\n'
+                              r'future prepare 1/1 \(python\S*\): linked\n'
+                              r'future prepare 1/1 \(python\S*\): exit 0 after (\d+) ms\n', output.getvalue())
+            self.assertIsNotNone(match, output.getvalue())
+            self.assertGreaterEqual(int(match[1]), 2000)
 
     def test_a_prepare_step_streams_lines_and_reports_its_time(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -55,21 +58,22 @@ class BuildRuns(unittest.TestCase):
                                                 r'future prepare 1/1 \(python\S*\): exit 0 after \d+ ms\n')
 
     def test_a_silent_pie_command_is_judged_by_its_own_exit(self):
-        # PIE_SECONDS is the limit a PIE command had; the command's exit status decides.
+        # A PIE command has no time limit: one silent for 2 s is judged by its own exit status.
         with tempfile.TemporaryDirectory() as folder:
             pie = Path(folder) / 'pie.phar'
             pie.write_text('<?php sleep(2); echo "PIE fixture\\n"; exit(3);\n')
             output = io.StringIO()
-            with patch('check_pie.PIE_SECONDS', 1, create=True), redirect_stdout(output), \
-                    patch('toolchains.problems', return_value=[]), patch.dict(os.environ), \
+            with redirect_stdout(output), patch('toolchains.problems', return_value=[]), patch.dict(os.environ), \
                     patch('check_pie.input_issues', return_value=[]), \
                     patch.object(sys, 'argv', ['check_pie.py', '--pie', str(pie)]):
                 with self.assertRaises(subprocess.CalledProcessError) as raised:
                     check_pie.main()
             self.assertEqual(raised.exception.returncode, 3)
-            self.assertRegex(output.getvalue(), r'pie --version: start\n'
-                                                r'pie --version: PIE fixture\n'
-                                                r'pie --version: exit 3 after \d+ ms\n')
+            match = re.search(r'pie --version: start\n'
+                              r'pie --version: PIE fixture\n'
+                              r'pie --version: exit 3 after (\d+) ms\n', output.getvalue())
+            self.assertIsNotNone(match, output.getvalue())
+            self.assertGreaterEqual(int(match[1]), 2000)
 
 
 if __name__ == '__main__':

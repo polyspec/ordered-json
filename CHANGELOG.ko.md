@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: aaa40632701c591a3c29305280c012e7f146bf5a8fb65a1200bd5ad99e04b845 -->
+<!-- source-sha256: 0cc2fd9a36448762fa3f2b87c32efffa4719b783d2111a209a5d68c380629a94 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,14 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 빌드 단계, 패키지 테스트 명령, 어댑터는 손자 process를 포함한 process group 전체와 함께 끝납니다. group은 직접 자식이 실행 중일
+  때만 종료되었고 읽는 쪽은 end of file을 기다렸으므로, 명령이 background에서 시작한 process는 명령이 끝난 뒤에도 실행되었고, 빌드
+  단계는 그 process를 제한 없이 기다렸으며, 패키지 테스트 실행은 케이스 기한에서 실패했습니다. `scripts/registry.py`는 명령이 끝나면
+  group을 종료하는 `next_chunk`로 출력을 읽고, `end_group`은 모든 `finally`에서 group을 종료합니다.
+  `scripts/tests/test_build_runs.py`와 `scripts/tests/test_comparison_runs.py`의 case는 어떤 코드에도 없는 `BUILD_SECONDS`,
+  `PIE_SECONDS`, `timeout` 인자를 patch했으므로 patch가 아무것도 바꾸지 않았고, 이제 조용한 단계가 2 s 이상 실행되어 자기 종료로
+  끝났다고 단언합니다. 새 `scripts/tests/test_process_groups.py`의 case는 빌드 단계가 test 기한까지 기다렸고, 패키지 테스트가 케이스
+  기한에서 실패했고, 멈춘 어댑터의 손자 process가 살아남았으므로 변경 전에 실패했고, 변경 후에는 통과합니다.
 - 케이스 목록은 선언된 기계 형식으로 읽습니다. 목록 parser는 모든 언어에서 사람이 읽는 text(`ok`, `?`, `running`, `test result:`,
   `FAIL`)로 줄을 건너뛰었으므로, 패키지 자신의 목록에서 `ok`로 시작하는 줄은 빠졌고, standard error의 어떤 알림이든 성공한 목록을
   실패시켰습니다. `implementations.json`의 `test_cases`는 `format`을 선언합니다. JavaScript, PHP, PHP 확장의 목록은 `lines`,
