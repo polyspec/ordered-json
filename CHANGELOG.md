@@ -6,6 +6,14 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- `benchmarks/run.py` and `scripts/compare_ojson.py` publish their results through `write_record`,
+  which renames a complete file over the result. They wrote `benchmarks/results.json`, the review
+  copy `.cache/benchmark.current.json` and `docs/reports/ojson-comparison.json` in place, so a
+  process that stopped after opening the file left it truncated, and a reader could see part of it.
+  `write_record` stages a file inside the repository in `var/`, which Git ignores and no manifest
+  reads, instead of a hidden file next to the record in `docs/`. The two interruption cases of the
+  new `scripts/tests/test_atomic_publish.py` failed before the change, because a stop right after
+  the open left an empty file, and pass after it.
 - `make pie-check` compares the hash of the PHAR and the JSONTestSuite checkout with the pins of
   `external-inputs.json` before PIE runs, and `make check` compares the suite before the unit tests.
   Only the documentation check at the end compared them, so a PHAR or a suite checkout other than

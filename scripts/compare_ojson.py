@@ -11,6 +11,7 @@ import sys
 import tempfile
 
 from registry import run_streamed
+from verification_record import write_record
 from verify import ROOT, Adapter, milliseconds, prepare_cases, reference
 
 
@@ -144,8 +145,7 @@ def main():
             }
             report['projects'][project] = {'summary': summary, 'cases': results}
             print(project + ': ' + json.dumps(summary), flush=True)
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=True, indent=2) + '\n')
+    write_record(args.output, report)
     print('Saved ' + str(args.output))
 
 
