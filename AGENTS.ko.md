@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 1f5157c6b4b6ba38ccff1bca0cc753494c088666c4f65d2600512a2c8ed9d4c5 -->
+<!-- source-sha256: 52067e381998f5c833733a2a0d896661da18d2b83a821e787c2b72703ea0b50a -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -41,6 +41,8 @@ git diff --check
 ~~~sh
 make check JSON_TEST_SUITE=.cache/JSONTestSuite
 ~~~
+
+`make check`는 검증보다 먼저 guard `scripts/full_run.py`를 시작합니다. 이 저장소의 활성 작업은 [기능 상태](docs/features.ko.md)에서 구현 상태가 `partial`인 기능 행입니다. guard는 판단을 이유와 함께 출력하고, 그런 행이 있으면 각 ID를 기능과 함께 나열하며 거부하고, 추적 파일의 변경이 커밋되지 않았으면 거부합니다. 전체 실행은 커밋된 tree를 검증하기 때문입니다. `var/full-run.json`이 현재 tree(`git rev-parse HEAD^{tree}`)의 전체 실행을 기록하고 있으면 그 실행을 commit, 시작 시각, 결과와 함께 밝히며 거부하고, `incomplete` record의 process가 아직 실행 중이면 거부합니다. 검증 명령을 시간 제한 없이 끝까지 실행하고 그 앞뒤에 record를 쓰므로, 멈춘 실행은 `incomplete`로 기록되어 남습니다. `make rerun-failed`는 현재 tree의 전체 실행이 실패했거나 끝나지 않았을 때만 검증을 다시 실행하고, 그 밖에는 거부됩니다. 검증은 target 하나이므로 전체가 다시 실행됩니다. `var/`는 Git이 무시하므로 checkout과 worktree마다 자기 record를 가집니다. 이 저장소에는 CI workflow가 없습니다. 새 checkout에는 record가 없으므로, 그곳에서 `make check`는 `partial` 기능이 없고 tree가 깨끗하면 실행됩니다.
 
 문서만 검토할 때는 `make docs-check`를 실행합니다. 이 검사는 검증 기록을 소스와 비교하지 않습니다. 소스가 변경됐고 PIE 기록이 있으면 해당 추가 사례와 함께 `make pie-check PIE=/path/to/pie.phar`를 그 `make check` 전에 한 번 실행합니다. 그 `make check`가 현재 기록을 생성합니다. `make check`의 문서 검사는 오래된 PIE 기록을 거부합니다. 검사를 통과시키기 위해 검증 결과나 소스 해시를 직접 수정하지 않습니다.
 

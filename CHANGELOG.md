@@ -6,6 +6,19 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- `make check` starts the guard `scripts/full_run.py` before the verification. The development
+  procedure runs `make check` once, after every active item is complete, and nothing enforced it:
+  `make check` started the verification while work was in progress, with uncommitted changes and
+  on a tree it had already verified. The guard prints its decision with the reason and refuses
+  while a feature of `docs/features.md` is `partial`, listing each ID with its feature, while
+  tracked changes are uncommitted, and when `var/full-run.json` records a full run of the current
+  tree, naming that run. It runs the verification to its end and writes the record before and
+  after it, so a stopped run stays `incomplete`. `make rerun-failed` runs the verification again
+  only when the full run of the current tree failed or did not finish. `docs/features.md` defines
+  `partial` as work in progress and `planned` as work not started.
+  `scripts/tests/test_full_run.py` failed with `No module named 'full_run'` before the change,
+  while `make -n check` printed `scripts/test.py` alone; its 10 cases pass with stub targets after
+  it.
 - Each verification run builds in its own temporary run directory and removes it at the end.
   `make check`, `scripts/verify.py`, the PIE check and the benchmark build the PHP extension
   from a copy of the `php-extension/` source files there, the Go probe is written there, PIE
