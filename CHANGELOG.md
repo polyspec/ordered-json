@@ -6,6 +6,13 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The checks run offline and only `make tools` downloads (T1.2). cargo, go, npm and Composer ran online in every
+  check, so `cargo build --locked` downloaded the crates of `rust/Cargo.lock` on demand, and the PIE PHAR and the
+  supplementary suite were downloaded by hand. The Makefile exports `CARGO_NET_OFFLINE=true`, `GOPROXY=off`,
+  `npm_config_offline=true` and `COMPOSER_DISABLE_NETWORK=1`, `scripts/toolchains.py` sets them for every entry
+  point, and `make tools` runs with them removed: it installs the Rust toolchain, npm, the crates, the PIE PHAR
+  into `.cache/pie/pie.phar` and the supplementary suite into `.cache/JSONTestSuite`, each checked against
+  `external-inputs.json`. The new cases of `test_toolchains` failed before the change and pass after it.
 - Tasks that are not product features are tracked in the execution checklist
   `docs/plans/execution-checklist.md` (T1.1). The guard of `make check`, the pre-push hook and the push gate read
   only the `partial` features of `docs/features.md`, so such work had no state that stopped a full run or a push.

@@ -81,12 +81,51 @@ class Pins(unittest.TestCase):
         self.assertEqual(pins['rust'][0], '1.98.1')
 
     def test_no_command_installs_or_selects_another_toolchain(self):
-        self.assertEqual(toolchains.ENVIRONMENT, {'GOTOOLCHAIN': 'local', 'RUSTUP_AUTO_INSTALL': '0'})
+        self.assertEqual(toolchains.ENVIRONMENT, {'GOTOOLCHAIN': 'local', 'RUSTUP_AUTO_INSTALL': '0',
+                                                  **toolchains.OFFLINE})
         makefile = (ROOT / 'Makefile').read_text()
         self.assertRegex(makefile, r'(?m)^export GOTOOLCHAIN := local$')
         self.assertRegex(makefile, r'(?m)^export RUSTUP_AUTO_INSTALL := 0$')
         self.assertEqual(REGISTRY['implementations']['go']['env'].get('GOTOOLCHAIN'), 'local')
         self.assertEqual(REGISTRY['implementations']['rust']['env'].get('RUSTUP_AUTO_INSTALL'), '0')
+
+    def test_every_check_runs_offline_and_only_make_tools_downloads(self):
+        # A check reads no network: make tools downloads what the checks read, and cargo, go, npm and Composer run
+        # offline in every other command, so a missing download fails at once instead of reaching a registry.
+        self.assertEqual(toolchains.OFFLINE, {'CARGO_NET_OFFLINE': 'true', 'GOPROXY': 'off',
+                                              'npm_config_offline': 'true', 'COMPOSER_DISABLE_NETWORK': '1'})
+        self.assertEqual({name: value for name, value in toolchains.environment(ROOT, {}).items() if name in
+                          toolchains.OFFLINE}, toolchains.OFFLINE, 'every entry point runs with the offline settings')
+        online = toolchains.environment(ROOT, {}, online=True)
+        self.assertFalse(set(online) & set(toolchains.OFFLINE), 'make tools downloads with the offline settings removed')
+        makefile = (ROOT / 'Makefile').read_text()
+        for name, value in toolchains.OFFLINE.items():
+            with self.subTest(variable=name):
+                self.assertRegex(makefile, rf'(?m)^export {name} := {value}$')
+        self.assertRegex(makefile, r'(?m)^ONLINE := env' + ''.join(rf' -u {name}' for name in toolchains.OFFLINE) + '$')
+        recipes = re.findall(r'(?m)^tools:\n((?:\t.*\n)+)', makefile)
+        self.assertEqual(recipes, ['\t$(ONLINE) $(PYTHON) scripts/toolchains.py install\n'])
+        downloads = [line for line in makefile.splitlines() if '$(ONLINE)' in line and line.startswith('\t')]
+        self.assertEqual(downloads, ['\t$(ONLINE) $(PYTHON) scripts/toolchains.py install'],
+                         'make tools is the only recipe that downloads')
+
+    def test_make_tools_installs_every_download_of_the_checks(self):
+        # The Rust toolchain, npm, the crates of rust/Cargo.lock, the PIE PHAR and the supplementary suite.
+        ran = []
+
+        def run(command, cwd=None, env=None, check=False, **kwargs):
+            ran.append((command, Path(cwd).relative_to(ROOT).as_posix(), set(env) & set(toolchains.OFFLINE)))
+            return subprocess.CompletedProcess(command, 0)
+
+        with patch('toolchains.subprocess.run', side_effect=run), \
+                patch('toolchains.install_npm') as npm, patch('toolchains.install_pie') as pie, \
+                patch('toolchains.install_suite') as suite, patch('toolchains.require', return_value=True), \
+                redirect_stdout(io.StringIO()):
+            self.assertTrue(toolchains.install(ROOT))
+        self.assertEqual(ran, [(['rustup', 'toolchain', 'install', '--no-self-update'], '.', set()),
+                               (['cargo', 'fetch', '--locked'], 'rust', set())])
+        for step in (npm, pie, suite):
+            self.assertEqual(step.call_count, 1)
 
     def test_no_recipe_runs_a_pinned_tool_by_name(self):
         # GNU Make 3.81 looks a simple recipe command up on its own PATH, not the exported PATH, so a
@@ -268,6 +307,95 @@ class NpmInstall(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'link or a special file: package/bin/npm'), redirect_stdout(io.StringIO()):
             toolchains.install_npm(root, lambda url: data)
         self.assertEqual(list(toolchains.npm_directory(root).parents[1].iterdir()), [], 'the staging directory is removed')
+
+
+def external_root(folder, phar=b'pie tool', suite=None):
+    """A checkout with external-inputs.json that pins the PHAR `phar` and the suite checkout `suite`."""
+    root = Path(folder) / 'checkout'
+    root.mkdir(parents=True)
+    supplementary = {'project': 'nst/JSONTestSuite', 'url': 'https://example.invalid/suite', 'revision': 'a' * 40,
+                     'cases': 1, 'inputs_sha256': '0' * 64}
+    if suite is not None:
+        from verification_record import supplementary_manifest
+        supplementary = {**supplementary_manifest(suite), 'url': suite.as_uri()}
+    (root / 'external-inputs.json').write_text(json.dumps({
+        'schema_version': 1,
+        'pie': {'release': '1.4.10', 'url': 'https://github.com/php/pie/releases',
+                'phar_sha256': hashlib.sha256(phar).hexdigest()},
+        'supplementary': supplementary}))
+    return root
+
+
+class ExternalInputs(unittest.TestCase):
+    """make tools downloads the PIE PHAR and the supplementary suite that external-inputs.json pins."""
+
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.folder = Path(directory.name)
+
+    def test_the_pinned_phar_is_installed_once(self):
+        root = external_root(self.folder)
+        fetched = []
+
+        def fetch(url):
+            fetched.append(url)
+            return b'pie tool'
+
+        with redirect_stdout(io.StringIO()):
+            toolchains.install_pie(root, fetch)
+            toolchains.install_pie(root, fetch)
+        self.assertEqual(fetched, ['https://github.com/php/pie/releases/download/1.4.10/pie.phar'],
+                         'the second install is a no-op')
+        self.assertEqual((root / '.cache/pie/pie.phar').read_bytes(), b'pie tool')
+        self.assertEqual(sorted(path.name for path in (root / '.cache/pie').iterdir()), ['pie.phar'])
+
+    def test_a_phar_with_another_hash_is_refused_with_both_hashes(self):
+        root = external_root(self.folder, phar=b'the reviewed phar')
+        with self.assertRaises(ValueError) as raised, redirect_stdout(io.StringIO()):
+            toolchains.install_pie(root, lambda url: b'another phar')
+        self.assertIn(f'expected sha256 {hashlib.sha256(b"the reviewed phar").hexdigest()} (external-inputs.json)',
+                      str(raised.exception))
+        self.assertIn(f'actual {hashlib.sha256(b"another phar").hexdigest()}', str(raised.exception))
+        self.assertFalse((root / '.cache/pie/pie.phar').exists())
+
+    def suite(self, cases):
+        """A Git repository with the cases {name: text} in test_parsing, one commit."""
+        source = self.folder / 'suite'
+        (source / 'test_parsing').mkdir(parents=True, exist_ok=True)
+        for name, text in cases.items():
+            (source / 'test_parsing' / name).write_text(text)
+        git = ['git', '-c', 'user.name=test', '-c', 'user.email=test@example.com', '-c', 'init.defaultBranch=main']
+        subprocess.run(git + ['init', '--quiet'], cwd=source, check=True)
+        subprocess.run(git + ['add', '.'], cwd=source, check=True)
+        subprocess.run(git + ['commit', '--quiet', '-m', 'cases'], cwd=source, check=True)
+        return source
+
+    def test_the_pinned_suite_revision_is_installed_once(self):
+        source = self.suite({'y_object.json': '{}', 'n_array.json': '['})
+        root = external_root(self.folder, suite=source)
+        with redirect_stdout(io.StringIO()) as printed:
+            toolchains.install_suite(root)
+            toolchains.install_suite(root)
+        target = root / '.cache/JSONTestSuite'
+        self.assertEqual(sorted(path.name for path in (target / 'test_parsing').iterdir()), ['n_array.json', 'y_object.json'])
+        revision = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=target, check=True, capture_output=True,
+                                  text=True).stdout.strip()
+        self.assertEqual(revision, json.loads((root / 'external-inputs.json').read_text())['supplementary']['revision'])
+        self.assertIn('installed in', printed.getvalue().splitlines()[-1], 'the second install is a no-op')
+        self.assertEqual(sorted(path.name for path in target.parent.iterdir()), ['JSONTestSuite'])
+
+    def test_a_suite_with_other_inputs_is_refused_with_both_values(self):
+        source = self.suite({'y_object.json': '{}'})
+        root = external_root(self.folder, suite=source)
+        pin = json.loads((root / 'external-inputs.json').read_text())
+        pin['supplementary']['inputs_sha256'] = 'f' * 64
+        (root / 'external-inputs.json').write_text(json.dumps(pin))
+        with self.assertRaises(ValueError) as raised, redirect_stdout(io.StringIO()):
+            toolchains.install_suite(root)
+        self.assertIn(f'JSONTestSuite inputs_sha256: expected {"f" * 64}, actual ', str(raised.exception))
+        self.assertFalse((root / '.cache/JSONTestSuite').exists())
+        self.assertEqual(list((root / '.cache').iterdir()), [], 'the staging checkout is removed')
 
 
 class PythonPin(unittest.TestCase):

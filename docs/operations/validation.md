@@ -23,10 +23,11 @@ The record includes source hashes, package file records, actual runtime versions
 ## Supplementary inputs
 
 ~~~sh
-git clone https://github.com/nst/JSONTestSuite.git .cache/JSONTestSuite
-git -C .cache/JSONTestSuite checkout 1ef36fa01286573e846ac449e8683f8833c5b26a
+make tools
 make check JSON_TEST_SUITE=.cache/JSONTestSuite
 ~~~
+
+`make tools` fetches the revision of nst/JSONTestSuite that [external inputs](../../external-inputs.json) pins into `.cache/JSONTestSuite` and refuses a checkout whose revision, case count or inputs hash differs from the pin, naming the expected and the actual value of each field.
 
 The record states whether supplementary inputs were used. `i_` cases use the shared UTF-8 and depth policy. Official inputs and expectations exist only at the repository root; adapters contain no separate goldens.
 
@@ -59,10 +60,10 @@ Run `make check JSON_TEST_SUITE=/path/to/JSONTestSuite` for supplementary inputs
 <a id="pie"></a>
 ## PIE artifact check
 
-Download the pinned PIE release from the [official releases](https://github.com/php/pie/releases), whose version and content hash [external inputs](../../external-inputs.json) names, and verify its provenance with `gh attestation verify --owner php /path/to/pie.phar`. From the common root:
+`make tools` downloads the PIE release that [external inputs](../../external-inputs.json) pins from the [official releases](https://github.com/php/pie/releases) into `.cache/pie/pie.phar`, the default `PIE` of `make pie-check`, and refuses a file whose SHA-256 differs from the pin, naming both hashes. Its provenance can be verified with `gh attestation verify --owner php .cache/pie/pie.phar`. From the common root:
 
 ~~~sh
-make pie-check PIE=/path/to/pie.phar JSON_TEST_SUITE=.cache/JSONTestSuite
+make pie-check JSON_TEST_SUITE=.cache/JSONTestSuite
 ~~~
 
 The [PIE checker](../../scripts/check_pie.py) copies the extension's tracked source files into a temporary run directory, isolates PIE configuration in that directory, registers the copy as a path repository, validates package recognition, and builds it with PIE. It tests that artifact directly with the same shared adapter and expectations. It does not run the ordinary native build in between.

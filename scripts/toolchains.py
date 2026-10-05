@@ -37,7 +37,11 @@ import tempfile
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
-ENVIRONMENT = {'GOTOOLCHAIN': 'local', 'RUSTUP_AUTO_INSTALL': '0'}
+# A check reads no network: cargo, go, npm and Composer run offline in every command of a run, so a missing download
+# fails at once instead of reaching a registry in one run and not in another. make tools, the only step that
+# downloads, runs without these settings (environment(online=True) and $(ONLINE) of the Makefile).
+OFFLINE = {'CARGO_NET_OFFLINE': 'true', 'GOPROXY': 'off', 'npm_config_offline': 'true', 'COMPOSER_DISABLE_NETWORK': '1'}
+ENVIRONMENT = {'GOTOOLCHAIN': 'local', 'RUSTUP_AUTO_INSTALL': '0', **OFFLINE}
 FIX = 'run make tools'
 
 
@@ -86,11 +90,16 @@ def pins(root=ROOT):
     }
 
 
-def environment(root=ROOT, base=None):
-    """The environment of every command of a run: no toolchain download or install, and the npm of
-    the checkout first on PATH."""
+def environment(root=ROOT, base=None, online=False):
+    """The environment of every command of a run: no toolchain download or install, no registry access, and
+    the npm of the checkout first on PATH. With online, the environment of make tools: the offline settings are
+    removed so the install can download."""
     base = dict(os.environ if base is None else base)
-    return {**base, **ENVIRONMENT, 'PATH': str(npm_directory(root)) + os.pathsep + base.get('PATH', '')}
+    result = {**base, **ENVIRONMENT, 'PATH': str(npm_directory(root)) + os.pathsep + base.get('PATH', '')}
+    if online:
+        for name in OFFLINE:
+            result.pop(name, None)
+    return result
 
 
 def run_version(command, cwd, env):
@@ -203,11 +212,91 @@ def install_npm(root=ROOT, fetch=download):
     print(f'npm {version}: installed {url} into {tool}')
 
 
+PIE_PHAR = '.cache/pie/pie.phar'
+PIE_DOWNLOAD = 'https://github.com/php/pie/releases/download/{release}/pie.phar'
+SUITE = '.cache/JSONTestSuite'
+
+
+def external_pins(root=ROOT):
+    return json.loads((Path(root) / 'external-inputs.json').read_text(encoding='utf-8'))
+
+
+def install_pie(root=ROOT, fetch=download):
+    """Install the PIE PHAR that external-inputs.json pins into .cache/pie/pie.phar, the default PIE of make
+    pie-check, unless that exact file is there."""
+    pin = external_pins(root)['pie']
+    target = Path(root) / PIE_PHAR
+    if target.is_file() and hashlib.sha256(target.read_bytes()).hexdigest() == pin['phar_sha256']:
+        print(f"PIE {pin['release']}: installed in {target}")
+        return
+    url = PIE_DOWNLOAD.format(release=pin['release'])
+    data = fetch(url)
+    actual = hashlib.sha256(data).hexdigest()
+    if actual != pin['phar_sha256']:
+        raise ValueError(f"PIE {pin['release']} {url}: expected sha256 {pin['phar_sha256']} (external-inputs.json), "
+                         f'actual {actual}')
+    target.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary = tempfile.mkstemp(prefix='.pie.phar.', dir=target.parent)
+    try:
+        with os.fdopen(descriptor, 'wb') as stream:
+            stream.write(data)
+        os.replace(temporary, target)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+    print(f"PIE {pin['release']}: installed {url} into {target}")
+
+
+def git_output(*arguments, cwd):
+    return subprocess.run(['git', *arguments], cwd=cwd, check=True, capture_output=True, text=True).stdout.strip()
+
+
+def suite_issues(pin, suite):
+    """How the checkout `suite` differs from the supplementary pin, one message per field."""
+    from verification_record import input_issues, supplementary_manifest  # It imports the registry.
+    return input_issues({'supplementary': pin}, supplementary=supplementary_manifest(suite))
+
+
+def install_suite(root=ROOT):
+    """Install the supplementary suite that external-inputs.json pins into .cache/JSONTestSuite, the revision
+    with its inputs hash, unless that revision with those inputs is there."""
+    pin = external_pins(root)['supplementary']
+    target = Path(root) / SUITE
+    if (target / '.git').exists() and not suite_issues(pin, target):
+        print(f"JSONTestSuite {pin['revision']}: installed in {target}")
+        return
+    target.parent.mkdir(parents=True, exist_ok=True)
+    staging = Path(tempfile.mkdtemp(prefix='JSONTestSuite-', dir=target.parent))
+    retired = None
+    try:
+        git_output('init', '--quiet', cwd=staging)
+        git_output('fetch', '--quiet', '--depth', '1', pin['url'], pin['revision'], cwd=staging)
+        git_output('-c', 'advice.detachedHead=false', 'checkout', '--quiet', 'FETCH_HEAD', cwd=staging)
+        issues = suite_issues(pin, staging)
+        if issues:
+            raise ValueError(f"JSONTestSuite {pin['url']} {pin['revision']} differs from external-inputs.json: "
+                             + '; '.join(issues))
+        if target.exists():
+            retired = Path(tempfile.mkdtemp(prefix='JSONTestSuite-retired-', dir=target.parent))
+            os.replace(target, retired / 'JSONTestSuite')
+        os.replace(staging, target)
+    finally:
+        for leftover in (staging, retired):
+            if leftover is not None and leftover.exists():
+                shutil.rmtree(leftover)
+    print(f"JSONTestSuite {pin['revision']}: installed {pin['url']} into {target}")
+
+
 def install(root=ROOT):
-    """make tools: the Rust toolchain of rust-toolchain.toml and the pinned npm, then the check."""
-    subprocess.run(['rustup', 'toolchain', 'install', '--no-self-update'], cwd=root, check=True,
-                   env=environment(root))
+    """make tools: the Rust toolchain of rust-toolchain.toml, the pinned npm, the crates of rust/Cargo.lock, the
+    PIE PHAR and the supplementary suite of external-inputs.json, then the check. This is the only step that
+    downloads; it runs without the offline settings."""
+    online = environment(root, online=True)
+    subprocess.run(['rustup', 'toolchain', 'install', '--no-self-update'], cwd=root, check=True, env=online)
     install_npm(root)
+    subprocess.run(['cargo', 'fetch', '--locked'], cwd=Path(root) / 'rust', check=True, env=online)
+    install_pie(root)
+    install_suite(root)
     return require(root)
 
 

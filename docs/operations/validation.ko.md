@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 428233cd94e055cf46871bb0b99cbf72bcac8a60f70b8d36c856f10c006f37cf -->
+<!-- source-sha256: 4f8c7b9dabbe3610db50f2925e82b7388b6a4523383889bba657a28d0e53a2b4 -->
 # 검증
 
 [English](validation.md)
@@ -24,10 +24,11 @@ make check
 ## 추가 입력
 
 ~~~sh
-git clone https://github.com/nst/JSONTestSuite.git .cache/JSONTestSuite
-git -C .cache/JSONTestSuite checkout 1ef36fa01286573e846ac449e8683f8833c5b26a
+make tools
 make check JSON_TEST_SUITE=.cache/JSONTestSuite
 ~~~
+
+`make tools`는 [외부 입력](../../external-inputs.json)이 고정한 nst/JSONTestSuite 개정본을 `.cache/JSONTestSuite`로 가져오고, 개정본, 사례 수, 입력 해시가 고정값과 다른 체크아웃은 각 필드의 기대값과 실제값을 밝히며 거부합니다.
 
 추가 입력 사용 여부를 기록합니다. `i_` 사례에는 공통 UTF-8·깊이 정책을 적용합니다. 공식 입력과 기대값은 저장소 루트에만 있으며 어댑터에 독립 기대값을 추가하지 않습니다.
 
@@ -60,10 +61,10 @@ make check
 <a id="pie"></a>
 ## PIE 산출물 검사
 
-[공식 릴리스](https://github.com/php/pie/releases)에서 고정된 PIE 릴리스를 내려받고, 그 버전과 내용 해시는 [외부 입력](../../external-inputs.json)이 명시하며, `gh attestation verify --owner php /path/to/pie.phar`로 출처를 확인합니다. 공통 루트에서 실행합니다.
+`make tools`는 [외부 입력](../../external-inputs.json)이 고정한 PIE 릴리스를 [공식 릴리스](https://github.com/php/pie/releases)에서 `make pie-check`의 기본 `PIE`인 `.cache/pie/pie.phar`로 내려받고, SHA-256이 고정값과 다른 파일은 두 해시를 밝히며 거부합니다. 출처는 `gh attestation verify --owner php .cache/pie/pie.phar`로 확인할 수 있습니다. 공통 루트에서 실행합니다.
 
 ~~~sh
-make pie-check PIE=/path/to/pie.phar JSON_TEST_SUITE=.cache/JSONTestSuite
+make pie-check JSON_TEST_SUITE=.cache/JSONTestSuite
 ~~~
 
 [PIE 검사기](../../scripts/check_pie.py)는 확장의 추적 소스 파일을 임시 실행 디렉터리에 복사하고, 그 디렉터리에 PIE 설정을 격리하고, 복사본을 경로 저장소로 등록하고, 패키지 인식을 확인하고, PIE로 빌드합니다. 같은 공통 어댑터와 기대값으로 해당 산출물을 직접 검사합니다. 중간에 일반 네이티브 빌드를 실행하지 않습니다.
