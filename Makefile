@@ -3,7 +3,7 @@ JSON_TEST_SUITE ?=
 PIE ?= .cache/pie/pie.phar
 
 # The tools of every run are the releases that the tracked pin files name (scripts/toolchains.py):
-# .node-version, rust-toolchain.toml, the toolchain line of go/go.mod, .python-version and the
+# .node-version, rust-toolchain.toml, the toolchain line of go/go.mod, .python-version, .php-version and the
 # packageManager field of package.json. No command installs or selects a toolchain on demand; make
 # tools installs the Rust toolchain and npm once, npm into .cache/tools/npm of this checkout, which
 # comes first on PATH, so no npm of the machine is used or changed.

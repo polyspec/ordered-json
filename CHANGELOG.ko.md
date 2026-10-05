@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 101e565fc814a79a8e0293cbf78d7bf9ddc4f77b745974b5a6c747a7e61dd7e1 -->
+<!-- source-sha256: b94ee1c136cbf7f173a6e7efb9c9c63f24ff50fce819d75995beea928eaee1fd -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,10 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- PHP는 minor release로 고정합니다(T1.5). 검사의 PHP를 적은 추적 파일이 없었으므로 다른 PHP에서의 실행은 어떤 고정값도
+  적지 않은 PHP로 tree를 검증했습니다. `.php-version`은 8.5를 적고, `scripts/toolchains.py`는
+  `php -n -r 'echo PHP_VERSION;'`의 major.minor를 그것과 비교해 기대값과 실제값을 출력하며, 기록은 실행 중인 patch
+  release를 적습니다. `test_toolchains`의 바뀐 사례는 변경 전에 실패했고 변경 후 통과합니다.
 - CI의 push gate는 make target으로 실행합니다(T1.4). `.github/workflows/push-gate.yml`의 step은
   `python3 scripts/push_gate.py commit`을 직접 실행했으므로 Makefile의 환경과 사전 검사가 적용되지 않았습니다.
   `make push-gate COMMIT=<commit>`이 gate를 실행하고 `COMMIT`이 없으면 실패하며, step은 이 target을 실행합니다.
