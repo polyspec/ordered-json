@@ -56,7 +56,14 @@ def violations(name, text):
     found = []
     if re.search(r'(?m)^\s*timeout-minutes:', text):
         found.append(f'{name}: timeout-minutes gives a long operation a deadline; the log shows its progress instead')
-    for job, body in jobs(text).items():
+    parsed = jobs(text)
+    # Runners are few, so a new push of the same ref cancels the run of the previous one; the push gate keeps every run.
+    if any(step.get('run', '').startswith('make ci ') for body in parsed.values() for step in body['steps']) and not re.search(
+            r'(?m)^concurrency:\n  group: \$\{\{ github\.workflow \}\}-\$\{\{ github\.ref \}\}\n  cancel-in-progress: true$', text):
+        found.append(f'{name}: a workflow that runs make ci lacks concurrency with group '
+                     '${{ github.workflow }}-${{ github.ref }} and cancel-in-progress: true; a new push must cancel the '
+                     'previous run')
+    for job, body in parsed.items():
         steps = body['steps']
         if not steps:
             found.append(f'{name}: job {job} has no steps')
@@ -141,6 +148,15 @@ class WorkflowRules(unittest.TestCase):
         broken = text.replace('          package-manager-cache: false\n', '')
         self.assertIn('ci.yml: job ci step 3 (setup-node) lacks package-manager-cache: false; the repository has no npm '
                       'lock file to cache', violations('ci.yml', broken))
+
+    def test_a_new_push_cancels_the_previous_run_of_ci_only(self):
+        text = (WORKFLOWS / 'ci.yml').read_text()
+        alone = re.sub(r'\nconcurrency:\n(?:  .*\n)+', '\n', text)
+        self.assertNotIn('cancel-in-progress', alone)
+        self.assertIn('ci.yml: a workflow that runs make ci lacks concurrency with group ${{ github.workflow }}-${{ github.ref }} '
+                      'and cancel-in-progress: true; a new push must cancel the previous run', violations('ci.yml', alone))
+        self.assertNotIn('concurrency', (WORKFLOWS / 'push-gate.yml').read_text(),
+                         'the push gate of every pushed commit runs to its end')
 
     def test_a_step_that_does_not_run_after_a_failure_fails(self):
         text = (WORKFLOWS / 'ci.yml').read_text()

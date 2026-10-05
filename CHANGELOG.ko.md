@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 90601779c9c222aae5e0c2d135886399717d8ab6212f2f7176dcc78077cf7ab7 -->
+<!-- source-sha256: cd9a02d61c2917495fc2fea94e1592aed28840174d933aae8c440bdce838064c -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,9 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 새 push는 같은 ref의 이전 CI run을 취소합니다(T1.15). runner가 적으므로 `ci.yml`은 group
+  `${{ github.workflow }}-${{ github.ref }}`와 `cancel-in-progress: true`인 `concurrency`를 선언하고, `push-gate.yml`은
+  선언하지 않습니다. `test_workflow_rules`는 이것 없이 `make ci`를 실행하는 workflow에서 실패합니다.
 - `make check`가 clippy와 go vet을 실행합니다(T1.11). AGENTS는 `cargo clippy --all-targets -- -D warnings`와
   `go vet ./...`을 요구했지만 전체 suite의 어떤 명령도 이를 실행하지 않았습니다. `make check`는 검증 뒤에
   `scripts/lint.py clippy`와 `scripts/lint.py go-vet`을 각각의 guard target으로 실행하고, `make clippy`와 `make go-vet`은

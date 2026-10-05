@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: eff9fdaf96f0d95859c2c33b4ce46524b92441ce5ba951a55043189b43efc438 -->
+<!-- source-sha256: 8a0e08392080b82fea2714ead836a5ac2bccd66bae4dd328578d5f3d56913568 -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
@@ -20,3 +20,4 @@
 | T1.12 | 개발 중에는 unit test만 실행한다고 명시: AGENTS는 변경의 소유 검사와 모든 작업 뒤 한 번의 `make check`를 요구했으므로, push 전에 로컬 기계에서 전체 또는 end-to-end 실행이 필요했다. AGENTS와 검증 절차는 개발 중 RED와 GREEN 사례를 unit test로 실행하고, `make pie-check`, `make check`, `make owner-check`, 어댑터 suite, 추가 사례 실행은 hosted CI가 push 뒤에 실행하는 end-to-end 검사이며, 어떤 규칙도 commit이나 push 전에 로컬 실행을 요구하지 않고, pre-push hook은 빠른 gate로 남는다고 명시한다 | `AGENTS.md`(.ko), `docs/operations/validation.md`(.ko) | `make docs-check` | [o] |
 | T1.13 | CI summary test를 make의 문구가 아니라 log와 비교: CI에서 `test_ci_run`이 실패했다. GNU Make 3.81의 문구인 `make: *** [third-fails] Error 1`을 기대했는데 runner의 GNU Make 4는 `make: *** [Makefile:11: third-fails] Error 1`을 쓰기 때문이다. 사례는 target log의 마지막 줄을 읽어 summary에 있는지 요구한다 | `scripts/tests/test_ci_run.py` | `python3 scripts/test.py --unit test_ci_run` | [o] |
 | T1.14 | 첫 실패 줄에 검사기 error를 표시: `docs-check`의 summary는 make의 줄만 보여 주고 file을 밝히는 검사기의 줄은 보여 주지 않았으며, `check`의 summary는 이름에 `missing`이나 `error`가 든 통과 사례 줄을 보여 줬다. `scripts/ci_run.py`는 file을 밝히는 줄(`<path>: <message>`)을 고르고, 통과 사례 줄(`ok (N ms)`, `test result: ok.`)과 make의 directory 줄은 건너뛴다 | `scripts/ci_run.py`, `scripts/tests/test_ci_run.py` | `python3 scripts/test.py --unit test_ci_run` | [o] |
+| T1.15 | 새 push에서 같은 ref의 이전 CI run을 취소: runner가 적은데, 같은 ref의 이전 push run이 아직 도는 동안 push마다 `ci.yml`의 전체 run이 시작됐다. `ci.yml`은 group `${{ github.workflow }}-${{ github.ref }}`와 `cancel-in-progress: true`인 `concurrency`를 선언하고, `push-gate.yml`은 선언하지 않아 push된 모든 commit의 gate가 끝까지 실행되며, `test_workflow_rules`는 이것 없이 `make ci`를 실행하는 workflow에서 실패한다 | `.github/workflows/ci.yml`, `scripts/tests/test_workflow_rules.py` | `python3 scripts/test.py --unit test_workflow_rules` | [o] |

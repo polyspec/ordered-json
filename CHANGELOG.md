@@ -6,6 +6,9 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- A new push cancels the previous CI run of the same ref (T1.15). `ci.yml` declares `concurrency` with group
+  `${{ github.workflow }}-${{ github.ref }}` and `cancel-in-progress: true`, because runners are few; `push-gate.yml`
+  declares none. `test_workflow_rules` fails on a workflow that runs `make ci` without it.
 - `make check` runs clippy and go vet (T1.11). AGENTS required `cargo clippy --all-targets -- -D warnings` and
   `go vet ./...`, but no command of the full suite ran them. `make check` runs `scripts/lint.py clippy` and
   `scripts/lint.py go-vet` as guard targets of their own after the verification, and `make clippy` and `make go-vet`
