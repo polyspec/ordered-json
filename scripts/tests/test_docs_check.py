@@ -151,6 +151,32 @@ class DocumentationChecks(unittest.TestCase):
         self.change('docs/features.md', '| implemented |', '| complete |')
         self.assert_failure('Invalid implementation state')
 
+    def features_with(self, before_table='', after=''):
+        self.pair('docs/features.md', 'features',
+            '# Features\n\n<a id="state"></a>\n## State\n\n' + before_table +
+            '| ID | Feature | Implementation | Verification | Evidence | Distribution | Specification |\n'
+            '| --- | --- | --- | --- | --- | --- | --- |\n'
+            '| F-ORDER | Order | implemented | shared-suite | [result](verification.json) | source-only | [contract](../README.md#contract) |\n'
+            + after)
+
+    def test_state_word_outside_implementation_cell_fails(self):
+        self.features_with(after='\n<a id="limits"></a>\n## Limits\n\n`partial` marks work in progress.\n'
+                                 '\n| Kind | State |\n| --- | --- |\n| work | planned |\n')
+        errors, _, _ = check_repository(self.root)
+        # The Korean file starts with its source-sha256 line, so its lines are one further.
+        for name, offset in (('docs/features.md', 0), ('docs/features.ko.md', 1)):
+            self.assertIn(f'{name}:{14 + offset}:1: state `partial` stands outside the Implementation cell of a feature row', errors)
+            self.assertIn(f'{name}:{18 + offset}:10: state `planned` stands outside the Implementation cell of a feature row', errors)
+        self.assertEqual(len(errors), 4, errors)
+
+    def test_paragraph_in_tracker_section_fails(self):
+        self.features_with(before_table='`implemented` means the behavior exists.\n\n')
+        errors, _, _ = check_repository(self.root)
+        for name, offset in (('docs/features.md', 0), ('docs/features.ko.md', 1)):
+            self.assertIn(f'{name}:{7 + offset}:1: the line is not a row of the feature table; the section of the feature table holds only the table', errors)
+            self.assertIn(f'{name}:{7 + offset}:1: state `implemented` stands outside the Implementation cell of a feature row', errors)
+        self.assertEqual(len(errors), 4, errors)
+
     def test_planned_feature_cannot_claim_passed_tests(self):
         self.change('docs/features.md', '| implemented |', '| planned |')
         self.assert_failure('Incomplete features cannot claim')

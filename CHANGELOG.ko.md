@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 36b7539c44ab30d3918cb9e36c345c4ce3ef65bc8090507a3299adedddc1baf1 -->
+<!-- source-sha256: f9fc86e2dccc4413981e222fac4e34012e592ba3d62434f617b1475fb27bdd9a -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,12 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- `scripts/docs_check.py`는 `docs/features.md`나 그 번역에서 기능 행의 구현 칸이 아닌 곳에 code span이나 표 칸으로 적힌 구현
+  상태(`implemented`, `partial`, `planned`)와, 기능 표의 절에서 표가 아닌 줄에서 file, 줄, 열을 적으며 실패합니다.
+  `docs/features.md`는 `scripts/full_run.py`가 읽는 tracker이고, 그 범례 문단이 각 상태를 그 절 안에 code span으로 적었으므로
+  상태를 읽는 도구가 기능 행 밖의 상태를 보았습니다. 범례는 상태를 정의하는 AGENTS.md의 새 절 기능 상태로 옮겼습니다. 문장 속 상태 단어는 일반 영어이므로 검사하지
+  않습니다. `scripts/tests/test_docs_check.py`의 새 case 두 개는 변경 전에 code span, 표 칸, 표 절의 문단이 검사를 통과했으므로
+  실패했고, 변경 후에는 통과합니다. 범례를 옮기기 전에 검사는 `docs/features.md`의 9번째 줄과 번역의 10번째 줄을 보고했습니다.
 - `make check`는 검증보다 먼저 guard `scripts/full_run.py`를 시작합니다. 개발 절차는 `make check`를 모든 활성 항목이 완료된 뒤 한
   번 실행하도록 하지만 이를 강제하는 것이 없었습니다. `make check`는 작업이 진행 중일 때, 커밋되지 않은 변경이 있을 때, 이미 검증한 tree에서도 검증을
   시작했습니다. guard는 판단을 이유와 함께 출력하고, `docs/features.md`의 기능이 `partial`이면 각 ID를 기능과 함께 나열하며 거부하고, 추적

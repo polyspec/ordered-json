@@ -20,6 +20,13 @@ Work on `main` by default. When an agent does the work or the situation calls fo
 
 Before committing the related feature, cherry-pick useful commits from a test-only branch that cannot be integrated into `main`, discard the remaining test-only changes, and remove its worktree and branch. If removal is impossible, first add a numbered sub-item to the owning checklist with the cause and exact removal condition.
 
+<a id="feature-state"></a>
+## Feature state
+
+[Feature state](docs/features.md) is the tracker of this repository: `scripts/full_run.py` reads the Implementation cell of each feature row. A state stands only in that cell; the section of the feature table holds only the table, and `scripts/docs_check.py` fails on a state written as a code span or a table cell anywhere else in `docs/features.md` and its translation, and on any other line in that section, with the file, line and column. This section defines the states.
+
+`implemented` means the listed behavior exists. `partial` marks a feature whose implementation is in progress; it is the active work of this repository, and `make check` refuses to run while a row is `partial`. `planned` marks a feature whose implementation has not started. `shared-suite` refers to the common JSON tests; `package-tests` refers to an implementation's own tests; `docs-tests` refers to the documentation checker tests; `benchmark` refers to the repository benchmark protocol and committed result. Each state names the record that backs it: the [verification record](docs/verification.json) for the shared suite and the checker tests, the [benchmark result](benchmarks/results.json) for a benchmark. The verification record contains the actual versions, case counts, date, and source hashes. A benchmark result is evidence only when it was measured from a clean checkout, with the protocol and inputs the workload declares. `source-only` identifies the confirmed distribution; registry publication is not verified. Publication observations are maintained separately in [distribution.json](docs/distribution.json).
+
 <a id="verification"></a>
 ## Required checks
 
