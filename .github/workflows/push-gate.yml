@@ -1,8 +1,10 @@
 # The push gate in CI. The pre-push hook .githooks/pre-push refuses a push while a feature of
 # docs/features.md is partial, but a push from a checkout without the hook does not run it. This job
-# runs the same gate, scripts/push_gate.py, on the pushed commit of every branch and on the head
-# commit of every pull request: it fails while a feature is partial, naming each one, and when
-# .githooks/pre-push or .githooks/pre-commit is not tracked with mode 100755. The full verification is not run here. The
+# runs the same gate, make push-gate (scripts/push_gate.py), on the pushed commit of every branch and on the
+# head commit of every pull request: it fails while a feature is partial or a task of
+# docs/plans/execution-checklist.md is [~], naming each one, and when .githooks/pre-push or
+# .githooks/pre-commit is not tracked with mode 100755. A step runs its make target, never a script
+# directly, so the environment and the prechecks of the Makefile apply. The full verification is not run here. The
 # runner image, each action and Python are exact releases, so the job does not change with a new
 # release of any of them.
 name: push-gate
@@ -28,4 +30,4 @@ jobs:
         with:
           python-version: '3.9.25'
       - name: push gate
-        run: python3 scripts/push_gate.py commit "${{ github.event.pull_request.head.sha || github.sha }}"
+        run: make push-gate COMMIT="${{ github.event.pull_request.head.sha || github.sha }}"

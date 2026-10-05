@@ -5,6 +5,7 @@ Git checkout with a temporary bare remote, so a push reaches no real remote.
 """
 import os
 from pathlib import Path
+import re
 import shutil
 import stat
 import subprocess
@@ -269,8 +270,26 @@ class PushGateChecks(unittest.TestCase):
         text = WORKFLOW.read_text()
         self.assertIn('on:\n  push:\n  pull_request:\n', text, 'every branch: no branch filter')
         self.assertIn('\n  push-gate:\n', text)
-        self.assertIn('python3 scripts/push_gate.py commit "${{ github.event.pull_request.head.sha || github.sha }}"', text)
+        # A step runs its make target, never a script directly, so the environment and the prechecks of the
+        # Makefile apply.
+        self.assertIn('run: make push-gate COMMIT="${{ github.event.pull_request.head.sha || github.sha }}"', text)
+        self.assertEqual(re.findall(r'(?m)^\s*run: (.*)$', text),
+                         ['make push-gate COMMIT="${{ github.event.pull_request.head.sha || github.sha }}"'])
         self.assertNotIn('timeout-minutes', text)
+
+    def test_make_push_gate_runs_the_gate_on_one_commit(self):
+        checkout = self.checkout()
+        clean = checkout.git('rev-parse', 'HEAD')
+        result = checkout.run('make', 'push-gate', f'COMMIT={clean}', f'PYTHON={sys.executable}')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn(f'push gate: no feature is partial and no task is [~] in {clean[:12]}', result.stdout)
+        active = checkout.commit('docs/plans/execution-checklist.md', TASK_ACTIVE)
+        result = checkout.run('make', 'push-gate', f'COMMIT={active}', f'PYTHON={sys.executable}')
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn(f'::error::  {active[:12]}: T1.1 Hosted CI', result.stdout)
+        missing = checkout.run('make', 'push-gate', f'PYTHON={sys.executable}')
+        self.assertNotEqual(missing.returncode, 0, missing.stdout + missing.stderr)
+        self.assertIn('make push-gate needs COMMIT=<commit>', missing.stdout + missing.stderr)
 
 
 if __name__ == '__main__':

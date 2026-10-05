@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 4a3534569d84bfabe8adb896d152daab4e4de188d276c1775e1170110061335a -->
+<!-- source-sha256: 101e565fc814a79a8e0293cbf78d7bf9ddc4f77b745974b5a6c747a7e61dd7e1 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,10 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- CI의 push gate는 make target으로 실행합니다(T1.4). `.github/workflows/push-gate.yml`의 step은
+  `python3 scripts/push_gate.py commit`을 직접 실행했으므로 Makefile의 환경과 사전 검사가 적용되지 않았습니다.
+  `make push-gate COMMIT=<commit>`이 gate를 실행하고 `COMMIT`이 없으면 실패하며, step은 이 target을 실행합니다.
+  `test_push_gate`의 바뀐 사례와 새 사례는 변경 전에 실패했고 변경 후 통과합니다.
 - 내려받지 않은 입력은 `make tools`를 안내합니다(T1.3). 검사가 offline이 되자 `make tools`가 내려받지 않은 crate는
   `--offline` 없이 다시 시도하라는 cargo의 안내로, 없는 PIE PHAR는 `make pie-check`의 `FileNotFoundError` traceback으로,
   없는 추가 사례는 `--suite must contain test_parsing/`나 `Supplementary suite is empty`로 실패했습니다. 모든 진입점은

@@ -6,6 +6,10 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The push gate of CI runs through its make target (T1.4). The step of `.github/workflows/push-gate.yml` ran
+  `python3 scripts/push_gate.py commit` directly, so the environment and the prechecks of the Makefile did not apply.
+  `make push-gate COMMIT=<commit>` runs the gate and fails without `COMMIT`, and the step runs it. The changed and new
+  cases of `test_push_gate` failed before the change and pass after it.
 - A missing download names `make tools` (T1.3). With the checks offline, a crate that `make tools` did not
   download failed with cargo's advice to retry without `--offline`, a missing PIE PHAR failed `make pie-check` with a
   `FileNotFoundError` traceback, and a missing supplementary suite failed with `--suite must contain test_parsing/`
