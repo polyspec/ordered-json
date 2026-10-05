@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 57245daa5f6f62599f2c2793a603f34d0aaf7eadc4a7dc7614d8e2383415b67e -->
+<!-- source-sha256: c80c1d7f1528187bb5cd0115e44da34de71ee20092c0f26a4606938fbefe29f2 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,8 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- CI summary test는 summary를 target log와 비교합니다(T1.13). CI에서 GNU Make 3.81의 문구를 기대했는데
+  runner의 GNU Make 4는 Makefile 줄을 밝히므로 실패했습니다.
 - 개발 중에는 unit test만 실행합니다(T1.12). AGENTS와 검증 절차는 `make pie-check`, `make check`, `make owner-check`,
   어댑터 suite, 추가 사례 실행이 hosted CI가 push 뒤에 실행하는 end-to-end 검사이고, 어떤 규칙도 commit이나 push 전에
   로컬 실행을 요구하지 않으며, pre-push hook은 빠른 gate로 남는다고 명시합니다.

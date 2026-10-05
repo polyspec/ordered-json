@@ -86,7 +86,10 @@ class CiRun(unittest.TestCase):
         self.assertIn('error: the first stub failed with the expected value 1', text)
         self.assertNotIn('building first', text, 'only the failure lines of a log that names a failure')
         self.assertIn("### `third-fails` failed", text)
-        self.assertIn('make: *** [third-fails] Error 1', text)
+        # The last line of the log is make's own message, whose wording differs between GNU Make 3.81 and 4; the
+        # summary is compared with the log, not with that wording.
+        last = (self.root / 'var/ci/unit/logs/third-fails.log').read_text().splitlines()[-1]
+        self.assertIn(last, text)
         log = self.root / 'quiet.log'
         log.write_text(''.join(f'line {number}\n' for number in range(30)))
         self.assertEqual(ci_run.failure_lines(log), [f'line {number}' for number in range(10, 30)],
