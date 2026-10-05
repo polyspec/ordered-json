@@ -44,11 +44,13 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           python-version-file: .python-version
-      # actions/setup-node v6.5.0
+      # actions/setup-node v6.5.0. The repository installs no npm package and has no lock file, so the cache of the
+      # packageManager of package.json, which setup-node enables by default, is off.
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         if: ${{ !cancelled() && matrix.toolchains }}
         with:
           node-version-file: .node-version
+          package-manager-cache: false
       # actions/setup-go v6.5.0: the toolchain line of go/go.mod.
       - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
         if: ${{ !cancelled() && matrix.toolchains }}

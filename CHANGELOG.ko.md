@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 4cbd686d1b76155d92b8735fe15bfd88590056d8e9b3eeb62c40e0b728229d4e -->
+<!-- source-sha256: 9930a1753f1e4e5a94171237d41b14c6b97b512ad17e8ed41abfaee2ea416b6b -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,9 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- setup-node는 npm cache 없이 실행합니다(T1.10). CI에서 `Dependencies lock file is not found`로
+  실패했습니다. 기본으로 `package.json`의 `packageManager` 의존성을 cache하는데 저장소에 lock file이 없기 때문입니다.
+  step은 `package-manager-cache: false`를 설정하고, `test_workflow_rules`는 이것이 없으면 실패합니다.
 - `make ci`와 `make ci-summary`가 job을 해석합니다(T1.9). CI에서 두 step은
   `the following arguments are required: --job`로 실패했습니다. target의 remainder 인수가 `--job`까지 가져갔기 때문이며,
   보고서는 쓰이지 않았습니다. `scripts/ci_run.py`는 해석하기 전에 `--`에서 target을 떼어 냅니다. `test_ci_run`의 새 사례는

@@ -6,6 +6,9 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- setup-node runs without its npm cache (T1.10). In CI it failed with `Dependencies lock file is
+  not found`, because it caches the dependencies of the `packageManager` of `package.json` by default and the
+  repository has no lock file. The step sets `package-manager-cache: false`; `test_workflow_rules` fails without it.
 - `make ci` and `make ci-summary` parse their job (T1.9). In CI both steps failed with
   `the following arguments are required: --job`, because the remainder argument of the targets also took `--job`, so
   no report was written. `scripts/ci_run.py` splits the targets off at `--` before it parses. The new case of
