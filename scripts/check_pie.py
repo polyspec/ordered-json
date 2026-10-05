@@ -13,10 +13,6 @@ from verification_record import (package_revisions, sha256, source_manifest,
                                  supplementary_manifest, write_record)
 from verify import verify_adapters
 
-# Each PIE command has this long to exit, about 100 times the measured build (42 s);
-# it detects a hang, not a slow build.
-PIE_SECONDS = 4200
-
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -37,7 +33,7 @@ def main():
 
     def run(*arguments):
         command = ['php', str(pie), *arguments, '--no-interaction', '--no-ansi']
-        process = run_streamed('pie ' + arguments[0], command, paths['php-extension'], PIE_SECONDS, environment)
+        process = run_streamed('pie ' + arguments[0], command, paths['php-extension'], env=environment)
         (cache / (str(len(commands)) + '.log')).write_text(process.stdout)
         if process.returncode:
             raise subprocess.CalledProcessError(process.returncode, command)
