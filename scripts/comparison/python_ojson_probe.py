@@ -27,7 +27,7 @@ for line in sys.stdin:
     try:
         value = ojson.loads(source)
     except (ValueError, UnicodeError, RecursionError, OverflowError) as error:
-        print(json.dumps({'ok': False, 'decode_error': type(error).__name__}))
+        print(json.dumps({'ok': False, 'decode_error': type(error).__name__}), flush=True)
         continue
     result = {'ok': True}
     try:
@@ -38,4 +38,4 @@ for line in sys.stdin:
         result['output'] = ojson.dumps(value)
     except (ValueError, UnicodeError, RecursionError, OverflowError) as error:
         result['encode_error'] = type(error).__name__
-    print(json.dumps(result, ensure_ascii=True, allow_nan=False))
+    print(json.dumps(result, ensure_ascii=True, allow_nan=False), flush=True)
