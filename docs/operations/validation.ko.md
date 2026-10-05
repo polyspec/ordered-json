@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: ae0ea26c982b2aebe21c95452642ff7e6aa5f30a2baee8c6f8247fcead394a33 -->
+<!-- source-sha256: 428233cd94e055cf46871bb0b99cbf72bcac8a60f70b8d36c856f10c006f37cf -->
 # 검증
 
 [English](validation.md)
@@ -53,7 +53,7 @@ cd ordered-json
 make check
 ~~~
 
-각 패키지는 독립 빌드 대상으로 유지하지만 공유 검사 명령은 루트 registry와 검증기가 정의합니다. 네이티브 확장은 실행의 임시 디렉터리에 복사한 `php-extension/` 소스 파일로 빌드하며 같은 체크아웃의 형제 PHP 패키지와 함께 검사합니다. 각 실행은 실행 디렉터리를 출력하고 끝날 때 제거하므로, 한 체크아웃의 실행들은 빌드 출력을 공유하지 않습니다. 실행의 모든 cargo 명령과 benchmark의 `cargo run`은 `CARGO_TARGET_DIR`를 그 실행 안의 디렉터리로 설정하므로, 환경이 지정하거나 다른 체크아웃이 채운 target 디렉터리가 Rust probe, package test, benchmark binary를 제공하지 않습니다.
+각 패키지는 독립 빌드 대상으로 유지하지만 공유 검사 명령은 루트 registry와 검증기가 정의합니다. 네이티브 확장은 `php-extension/`에서 Git이 추적하는 소스 파일을 실행의 임시 디렉터리에 복사해 빌드하며 같은 체크아웃의 형제 PHP 패키지와 함께 검사합니다. 각 실행은 실행 디렉터리를 출력하고 끝날 때 제거하므로, 한 체크아웃의 실행들은 빌드 출력을 공유하지 않습니다. 실행의 모든 cargo 명령과 benchmark의 `cargo run`은 `CARGO_TARGET_DIR`를 그 실행 안의 디렉터리로 설정하므로, 환경이 지정하거나 다른 체크아웃이 채운 target 디렉터리가 Rust probe, package test, benchmark binary를 제공하지 않습니다.
 
 추가 입력은 `make check JSON_TEST_SUITE=/path/to/JSONTestSuite`로 검사합니다.
 
@@ -66,7 +66,7 @@ make check
 make pie-check PIE=/path/to/pie.phar JSON_TEST_SUITE=.cache/JSONTestSuite
 ~~~
 
-[PIE 검사기](../../scripts/check_pie.py)는 확장 소스 파일을 임시 실행 디렉터리에 복사하고, 그 디렉터리에 PIE 설정을 격리하고, 복사본을 경로 저장소로 등록하고, 패키지 인식을 확인하고, PIE로 빌드합니다. 같은 공통 어댑터와 기대값으로 해당 산출물을 직접 검사합니다. 중간에 일반 네이티브 빌드를 실행하지 않습니다.
+[PIE 검사기](../../scripts/check_pie.py)는 확장의 추적 소스 파일을 임시 실행 디렉터리에 복사하고, 그 디렉터리에 PIE 설정을 격리하고, 복사본을 경로 저장소로 등록하고, 패키지 인식을 확인하고, PIE로 빌드합니다. 같은 공통 어댑터와 기대값으로 해당 산출물을 직접 검사합니다. 중간에 일반 네이티브 빌드를 실행하지 않습니다.
 
 준비된 경우 `pie-verification.json`은 PIE 버전과 PHAR 해시, 실행 디렉터리 기준의 선언된 산출물 경로, 명령, 소스 해시, PHP·확장 버전, 사례 결과를 기록합니다. PHAR 해시와 추가 입력 개정본은 고정값과 일치해야 합니다. 빌드된 모듈은 경로로만 명시합니다. 링크 시점에 새 식별자와 서명이 들어가므로 그 해시는 한 번의 실행만 가리키며, 검사기는 해시를 담은 기록을 거부합니다. 빌드 오류, 빌드 도구 누락, 어댑터 경고, 검사 중 변경은 검증 실패로 처리합니다. 컴파일 경고는 기록에 유지합니다. 이 검사는 모듈을 설치하거나 패키지를 게시하지 않습니다. 기록은 검증 기록을 뺀 모든 추적 파일을 해시하므로, 어떤 변경이든 커밋되면 기록은 오래된 기록이 됩니다. `make check`의 문서 검사는 오래된 PIE 기록을 거부하고, `make check`의 guard는 PIE 기록이 오래됐거나 커밋되지 않았으면 시작을 거부합니다. 그때 전체 실행은 다음 순서를 따릅니다. `make pie-check`를 한 번 실행하고, `docs/pie-verification.json`만 커밋하고, `make check`를 한 번 실행하고, 그것이 쓴 `docs/verification.json`만 커밋합니다. [개발 절차](../../AGENTS.ko.md)도 같은 순서를 명시합니다.
 

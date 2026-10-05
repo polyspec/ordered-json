@@ -136,13 +136,16 @@ class Run:
 
 
 def copy_sources(source, target):
-    """Copy the files Git tracks or would track under source, without ignored build output.
+    """Copy the files Git tracks under source, without untracked files or ignored build output; a tree
+    without Git metadata is copied whole.
 
     A symbolic link is rejected, because the copy must hold the bytes the checkout holds."""
-    listing = subprocess.run(['git', 'ls-files', '--cached', '--others', '--exclude-standard', '-z'],
-                             cwd=source, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+    names = tracked_files(source)
+    if names is None:
+        names = sorted(path.relative_to(source).as_posix() for path in Path(source).rglob('*')
+                       if path.is_file() or path.is_symlink())
     count = 0
-    for name in sorted(filter(None, listing.stdout.decode('utf-8').split('\0'))):
+    for name in names:
         path = source / name
         if path.is_symlink():
             raise ValueError('A build source is a symbolic link: ' + str(path))

@@ -74,7 +74,8 @@ class RunIsolation(unittest.TestCase):
             with redirect_stdout(io.StringIO()):
                 registry.copy_sources(source, target)
             copied = sorted(path.relative_to(target).as_posix() for path in target.rglob('*') if path.is_file())
-            self.assertEqual(copied, ['.gitignore', 'src/tracked.c', 'src/untracked.c'])
+            # An untracked file is not part of the tree that a record names, so no build reads it.
+            self.assertEqual(copied, ['.gitignore', 'src/tracked.c'])
 
     def test_the_copy_rejects_a_symbolic_link(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -83,6 +84,7 @@ class RunIsolation(unittest.TestCase):
             subprocess.run(['git', 'init', '-q', str(source)], check=True)
             (source / 'real.c').write_text('real')
             (source / 'link.c').symlink_to(source / 'real.c')
+            subprocess.run(['git', 'add', 'real.c', 'link.c'], cwd=source, check=True)
             with self.assertRaisesRegex(ValueError, 'symbolic link'), redirect_stdout(io.StringIO()):
                 registry.copy_sources(source, Path(folder) / 'copy')
 
