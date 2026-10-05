@@ -4,6 +4,7 @@
 no test runs the verification.
 """
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -14,6 +15,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from full_run import RECORD, active_items, decide, full_run
 
 ROOT = Path(__file__).resolve().parents[2]
+# The variables of the Makefile and the variables through which make passes its own to a nested make.
+MAKE_INPUTS = {'MAKEFLAGS', 'MFLAGS', 'MAKELEVEL', 'PYTHON', 'JSON_TEST_SUITE', 'PIE'}
 
 FEATURES = """# Feature state
 
@@ -77,12 +80,28 @@ class FullRunChecks(unittest.TestCase):
         return checkout
 
     def test_make_check_starts_the_guard_before_any_step(self):
-        commands = subprocess.run(['make', '-n', 'check', 'PYTHON=python3'], cwd=ROOT, check=True,
-                                  capture_output=True, text=True).stdout.splitlines()
-        self.assertEqual(commands, ['python3 scripts/full_run.py run -- python3 scripts/test.py'])
-        commands = subprocess.run(['make', '-n', 'rerun-failed', 'PYTHON=python3'], cwd=ROOT, check=True,
-                                  capture_output=True, text=True).stdout.splitlines()
-        self.assertEqual(commands, ['python3 scripts/full_run.py rerun-failed'])
+        # This test runs inside `make check`, whose command-line variables reach a nested make
+        # through MAKEFLAGS; the nested make gets only the variables each case names.
+        environment = {name: value for name, value in os.environ.items() if name not in MAKE_INPUTS}
+        cases = [
+            (['check', 'JSON_TEST_SUITE='], 'python3 scripts/full_run.py run -- python3 scripts/test.py',
+             'without a supplementary suite the verification command is scripts/test.py alone'),
+            (['check', 'JSON_TEST_SUITE=.cache/JSONTestSuite'],
+             'python3 scripts/full_run.py run -- python3 scripts/test.py --suite ".cache/JSONTestSuite"',
+             'JSON_TEST_SUITE becomes the --suite argument of scripts/test.py, as in the run AGENTS.md prescribes'),
+            (['rerun-failed'], 'python3 scripts/full_run.py rerun-failed',
+             'rerun-failed takes its targets from the record of the guard, so it carries no command'),
+        ]
+        for arguments, expected, why in cases:
+            with self.subTest(make=arguments):
+                command = ['make', '-n', *arguments, 'PYTHON=python3']
+                commands = subprocess.run(command, cwd=ROOT, env=environment, check=True,
+                                          capture_output=True, text=True).stdout.splitlines()
+                self.assertEqual(commands, [expected],
+                                 f'`{" ".join(command)}` must print one command that starts the guard '
+                                 f'scripts/full_run.py before any step; {why}. The nested make ran without '
+                                 f'{", ".join(sorted(MAKE_INPUTS))} from the environment (the caller had '
+                                 f'MAKEFLAGS={os.environ.get("MAKEFLAGS", "")!r}).')
 
     def test_active_items_are_the_partial_features(self):
         self.assertEqual(active_items(FEATURES), [{'id': 'F-STREAM', 'title': 'Streaming \\| incremental parsing'}])
