@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: d22008a1cc4baeba6bf6d5826dc002899f9ac3fa8737745d9c6e9377529957d8 -->
+<!-- source-sha256: 41bdc095e4d6d4a985a1707d1f9ddef16f530d1c12e8eebff86e40e4b1f58195 -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
@@ -16,3 +16,4 @@
 | T1.8 | 모든 workflow의 규칙을 test: T1.4 이전의 push gate처럼 step이 script나 도구를 직접 실행하거나, `ci.yml`의 job에 summary나 report step이 없어도 아무것도 실패하지 않았다. `scripts/tests/test_workflow_rules.py`는 `.github/workflows`의 모든 file을 읽고, step이 make target 하나가 아닌 것을 실행할 때, `make ci`를 실행하는 job에 `if: ${{ !cancelled() }}`인 `make ci-summary`나 `var/ci/<job>/` upload가 없거나 실패 뒤에 실행되지 않는 step이 있을 때, matrix에 `fail-fast: false`가 없을 때, `timeout-minutes`가 있을 때 file, job, step을 밝히며 실패한다 | `scripts/tests/test_workflow_rules.py` | `python3 scripts/test.py --unit test_workflow_rules` | [o] |
 | T1.9 | `make ci`와 `make ci-summary`의 job을 해석: CI에서 두 job의 두 step이 모두 `ci_run.py: error: the following arguments are required: --job`로 실패했다. target의 remainder 인수가 `--job`까지 가져갔기 때문이며, 보고서는 쓰이지도 upload되지도 않았다. `scripts/ci_run.py`는 mode와 `--job`을 해석하기 전에 `--`에서 target을 떼어 낸다 | `scripts/ci_run.py`, `scripts/tests/test_ci_run.py` | `python3 scripts/test.py --unit test_ci_run` | [o] |
 | T1.10 | setup-node의 npm cache를 끔: CI에서 setup-node는 `Dependencies lock file is not found`로 실패했다. 기본으로 `package.json`의 `packageManager` 의존성을 cache하는데, 저장소는 npm package를 설치하지 않고 lock file도 없기 때문이다. step은 `package-manager-cache: false`를 설정하고, `test_workflow_rules`는 이것이 없는 setup-node step에서 실패한다 | `.github/workflows/ci.yml`, `scripts/tests/test_workflow_rules.py` | `python3 scripts/test.py --unit test_workflow_rules` | [o] |
+| T1.11 | 전체 suite에서 clippy와 go vet 실행: AGENTS는 해당 코드가 바뀌면 `rust/`에서 `cargo clippy --all-targets -- -D warnings`, `go/`에서 `go vet ./...`을 요구하지만, `make check`, `implementations.json`, Makefile, `.github/workflows`의 어떤 명령도 둘 다 실행하지 않으므로(`git grep`은 clippy를 `rust-toolchain.toml`과 AGENTS에서만 찾는다) hosted CI도 실행하지 않는다 | `implementations.json` 또는 `Makefile`, `.github/workflows/ci.yml` | `python3 scripts/test.py --unit test_repositories` | [ ] |
