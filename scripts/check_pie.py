@@ -14,7 +14,7 @@ import sys
 
 from registry import (ROOT, adapter_commands, artifact_paths, repository_paths, run_directory, run_streamed,
                       runtime_versions)
-from verification_record import (external_inputs, input_issues, manifest_differences, package_revisions,
+from verification_record import (PIE_RECORD, external_inputs, input_issues, manifest_differences, package_revisions,
                                  report_input_issues, sha256,
                                  source_manifest, supplementary_manifest, write_record)
 from toolchains import PIE_FIX, SUITE_FIX, require
@@ -106,8 +106,8 @@ def main():
         return 1
     with run_directory(['php-extension'], repository_paths(ROOT)) as run:
         record = build_and_verify(run, pie, suite)
-    write_record(ROOT / 'docs/pie-verification.json', record)
-    print('Saved docs/pie-verification.json', flush=True)
+    write_record(ROOT / PIE_RECORD, record)
+    print(f'Saved {PIE_RECORD}', flush=True)
     return 0
 
 

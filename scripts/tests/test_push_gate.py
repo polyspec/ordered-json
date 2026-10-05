@@ -23,7 +23,7 @@ FEATURES = """# Feature state
 
 | ID | Feature | Implementation | Verification | Evidence | Distribution | Specification |
 | --- | --- | --- | --- | --- | --- | --- |
-| F-ORDER | Recursive associative objects | implemented | shared-suite | [result](verification.json) | source-only | [objects](spec/json-contract.md#objects) |
+| F-ORDER | Recursive associative objects | implemented | shared-suite | [result](operations/validation.md#records) | source-only | [objects](spec/json-contract.md#objects) |
 | F-STREAM | Streaming parsing | {state} | not-verified | | not-distributed | [parsing](spec/json-contract.md#parsing) |
 """
 DONE = FEATURES.format(state='implemented')

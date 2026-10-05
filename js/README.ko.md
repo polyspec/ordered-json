@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: ad88df39c25792e631c6a979d010cd045aa0a9ac5f3dd69f8245970581d2a968 -->
+<!-- source-sha256: ec36cadab7469bbb7602475f5fca5d5cc2015810c358aa3d847863114039e0a6 -->
 # ordered-json for JavaScript
 
 [English](README.md)
@@ -33,6 +33,6 @@ Python >= 3.9, Git, make, 해당 구현의 런타임·빌드 도구를 설치하
 make check
 ~~~
 
-루트 검증기를 호출하여 이 패키지를 검사합니다. 루트 통합 검사는 같은 소스 리비전의 모든 패키지를 검사하고 현재 결과를 `docs/verification.json`에 기록합니다.
+루트 검증기를 호출하여 이 패키지를 검사합니다. 루트 통합 검사는 같은 소스 리비전의 모든 패키지를 검사하고 현재 결과를 그 실행의 기록인 `var/records/verification.json`에 기록합니다.
 
 추가 사례는 `make check JSON_TEST_SUITE=/path/to/JSONTestSuite`로 검사합니다. [개발 절차](AGENTS.ko.md)와 [변경 기록](CHANGELOG.ko.md)에 필수 검사와 변경 사항이 있습니다.

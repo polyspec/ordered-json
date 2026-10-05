@@ -17,7 +17,7 @@
 
 The repository checks run with the exact releases that tracked files pin: Node.js in `.node-version`, Rust in `rust-toolchain.toml`, Go in the `toolchain` line of `go/go.mod`, Python by its minor release in `.python-version`, PHP by its minor release in `.php-version`, and npm with the SHA-512 of its registry tarball in the `packageManager` field of `package.json`. `make tools` installs that Rust toolchain with rustup and that npm into `.cache/tools/npm` of the checkout, which Git ignores; no npm of the machine is used or changed. `make toolchains-check` compares every tool with its pin, and each entry point of the checks does the same before its first step and fails with the expected and the actual version, or the error of the command, of each tool that differs. `GOTOOLCHAIN=local` and `RUSTUP_AUTO_INSTALL=0` keep go and rustup from downloading or installing another toolchain during a run, and every cargo command uses `--locked`.
 
-The table lists declared minimum versions, not a claim that every minimum version was tested. Actual versions are recorded in [verification.json](../verification.json). JavaScript, Rust, and Go have no external runtime library dependencies.
+The table lists declared minimum versions, not a claim that every minimum version was tested. Actual versions are recorded in the [records](validation.md#records) of the run that verifies a commit. JavaScript, Rust, and Go have no external runtime library dependencies.
 
 <a id="checkout"></a>
 ## Source checkout

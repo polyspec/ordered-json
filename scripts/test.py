@@ -8,7 +8,7 @@ import sys
 import time
 import unittest
 
-from verification_record import (IMPLEMENTATIONS, create_record, external_inputs, input_issues, report_input_issues,
+from verification_record import (AGGREGATE_RECORD, IMPLEMENTATIONS, create_record, external_inputs, input_issues, report_input_issues,
                                  source_manifest, supplementary_manifest, write_record)
 from verify import ROOT, verify
 from registry import prepare, repository_paths, run_directory, runtime_versions
@@ -160,8 +160,8 @@ def main():
         return 1
     record = create_record(ROOT, before, results, counts, test_result.testsRun, versions,
                            supplementary, warnings, package_tests)
-    write_record(ROOT / 'docs/verification.json', record)
-    print('Saved docs/verification.json', flush=True)
+    write_record(ROOT / AGGREGATE_RECORD, record)
+    print(f'Saved {AGGREGATE_RECORD}', flush=True)
     subprocess.run(DOCS_CHECK, cwd=ROOT, check=True)
     return 0
 

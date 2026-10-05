@@ -6,6 +6,14 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The run of a commit is its evidence; no record is committed (T1.6). `docs/pie-verification.json` and
+  `docs/verification.json` hashed every tracked file, so each commit made them stale, the guard of `make check`
+  refused until a local `make pie-check` and `make check` regenerated and committed them, and a hosted CI that runs
+  the full suite would fail after every commit. `make pie-check` and `make check` write
+  `var/records/pie-verification.json` and `var/records/verification.json`, which Git ignores, and the committed
+  records are removed. `scripts/docs_check.py --records` checks the records of the checkout, the guard reads no
+  record, and a feature names the records section of the validation procedure as its evidence. The changed and new
+  cases of `test_docs_check` and `test_full_run` failed before the change and pass after it.
 - PHP is pinned by its minor release (T1.5). No tracked file named the PHP of the checks, so a run on another PHP
   verified the tree with a PHP that no pin named. `.php-version` names 8.5, `scripts/toolchains.py` compares the
   major.minor of `php -n -r 'echo PHP_VERSION;'` with it and prints the expected and the actual version, and the
@@ -379,4 +387,4 @@
 - Centralized official inputs and expected results in [official.json](examples/official.json), with shared grammar fixtures and optional supplementary inputs.
 - Verified every implementation with 433 shared cases. The PIE-built artifact also passed all 433 cases; 42 checker tests passed. That earlier run recorded two PHP build-tool linker deprecation warnings in its verification record.
 
-The current [verification record](docs/verification.json) identifies the tested source and results for all five implementations and the documentation checker tests. [Distribution observations](docs/distribution.json) are separate. This entry records development changes and does not declare a package release.
+The current verification record identifies the tested source and results for all five implementations and the documentation checker tests. [Distribution observations](docs/distribution.json) are separate. This entry records development changes and does not declare a package release.
