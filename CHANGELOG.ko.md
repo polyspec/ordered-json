@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: f4507d89a019854e3b0446f772da2a7b3d89aaceb704f972e1036fa3b4fcfa82 -->
+<!-- source-sha256: 4cbd686d1b76155d92b8735fe15bfd88590056d8e9b3eeb62c40e0b728229d4e -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,10 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- `make ci`와 `make ci-summary`가 job을 해석합니다(T1.9). CI에서 두 step은
+  `the following arguments are required: --job`로 실패했습니다. target의 remainder 인수가 `--job`까지 가져갔기 때문이며,
+  보고서는 쓰이지 않았습니다. `scripts/ci_run.py`는 해석하기 전에 `--`에서 target을 떼어 냅니다. `test_ci_run`의 새 사례는
+  변경 전에 그 error로 실패했고 변경 후 통과합니다.
 - test가 모든 workflow의 규칙을 검사합니다(T1.8). `scripts/tests/test_workflow_rules.py`는 step이 make target 하나가 아닌
   것을 실행할 때, `make ci`를 실행하는 job에 `if: ${{ !cancelled() }}`인 summary나 report step이 없거나 실패 뒤에 실행되지
   않는 step이 있을 때, matrix에 `fail-fast: false`가 없을 때, `timeout-minutes`가 있을 때 file, job, step을 밝히며

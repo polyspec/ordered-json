@@ -6,6 +6,10 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- `make ci` and `make ci-summary` parse their job (T1.9). In CI both steps failed with
+  `the following arguments are required: --job`, because the remainder argument of the targets also took `--job`, so
+  no report was written. `scripts/ci_run.py` splits the targets off at `--` before it parses. The new case of
+  `test_ci_run` failed with that error before the change and passes after it.
 - A test checks the rules of every workflow (T1.8). `scripts/tests/test_workflow_rules.py` fails, naming the file,
   the job and the step, when a step runs anything but one make target, when a job that runs `make ci` lacks its
   summary or report step under `if: ${{ !cancelled() }}` or has a step that does not run after a failure, when a

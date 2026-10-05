@@ -177,9 +177,11 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('mode', choices=['run', 'summary'])
     parser.add_argument('--job', required=True)
-    parser.add_argument('targets', nargs=argparse.REMAINDER, help='after --: the make targets of run')
-    args = parser.parse_args(argv)
-    targets = args.targets[1:] if args.targets[:1] == ['--'] else args.targets
+    # The targets follow `--`; they are split off before parsing, because a remainder argument after the mode would
+    # also take --job.
+    argv = list(sys.argv[1:] if argv is None else argv)
+    targets = argv[argv.index('--') + 1:] if '--' in argv else []
+    args = parser.parse_args(argv[:argv.index('--')] if '--' in argv else argv)
     if not re.fullmatch(r'[a-z][a-z0-9-]*', args.job):
         parser.error(f'--job {args.job!r} is not a job name [a-z][a-z0-9-]*')
     if args.mode == 'run':
