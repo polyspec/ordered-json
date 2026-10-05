@@ -13,6 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 from registry import artifact_paths, prepare, repository_paths, run_directory
+from verification_record import write_record
 from toolchains import require
 
 WORKLOAD = json.loads((ROOT / "benchmarks/workload.json").read_text())
@@ -206,11 +207,10 @@ def main():
     if args.update_baseline:
         record["comparison"] = {"status": "baseline-updated"}
     if record["comparison"]["status"] == "failed" and not args.update_baseline:
-        CURRENT.parent.mkdir(exist_ok=True)
-        CURRENT.write_text(json.dumps(record, indent=2) + "\n")
+        write_record(CURRENT, record)
         print(f"Saved failed measurement for review at {CURRENT}")
     elif not args.check:
-        RESULTS.write_text(json.dumps(record, indent=2) + "\n")
+        write_record(RESULTS, record)
     for row in rows: print(f"{row['file']:24} {row['implementation']:14} parse={row['parse_ns']:.0f}ns stringify={row['stringify_ns']:.0f}ns")
     print(f"Comparison: {json.dumps(record['comparison'], sort_keys=True)}")
     kept = record["comparison"]["status"] == "failed" and not args.update_baseline

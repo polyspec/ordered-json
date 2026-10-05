@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 2a01cffe8c4b2d73074530f08c65b7992bd09e1cf4264475f5d33b9456ebec6e -->
+<!-- source-sha256: f7d7737b40461ca74232de0422bb12ba3674b6c1b8415434d0b90b58615f2aad -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,12 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- `benchmarks/run.py`와 `scripts/compare_ojson.py`는 완성된 파일을 결과 위로 이름을 바꾸는 `write_record`로 결과를 게시합니다.
+  두 script는 `benchmarks/results.json`, 검토용 사본 `.cache/benchmark.current.json`, `docs/reports/ojson-comparison.json`을
+  제자리에서 썼으므로, 파일을 연 직후 멈춘 process는 잘린 파일을 남겼고 읽는 쪽은 파일의 일부를 볼 수 있었습니다. `write_record`는
+  저장소 안의 파일을 `docs/`의 기록 옆 숨은 파일 대신 Git이 무시하고 어떤 manifest도 읽지 않는 `var/`에서 준비합니다. 새
+  `scripts/tests/test_atomic_publish.py`의 중단 case 두 개는 연 직후 멈추면 빈 파일이 남았으므로 변경 전에 실패했고, 변경 후에는
+  통과합니다.
 - `make pie-check`는 PIE를 실행하기 전에 PHAR의 해시와 JSONTestSuite checkout을 `external-inputs.json`의 고정값과 비교하고,
   `make check`는 단위 테스트 전에 추가 사례를 비교합니다. 마지막의 문서 검사만 이를 비교했으므로, 고정값과 다른 PHAR나 추가 사례
   checkout은 검사가 결국 거부하는 기록을 위해 build와 실행 전체를 소모했습니다. 다른 필드마다 기대값과 실제값을 밝히며 명령이 실패합니다.

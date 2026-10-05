@@ -10,7 +10,7 @@ import subprocess
 import sys
 import tempfile
 
-from registry import IMPLEMENTATIONS, REGISTRY, tracked_files
+from registry import IMPLEMENTATIONS, REGISTRY, ROOT, tracked_files
 
 SOURCE_PATTERNS = (
     'Makefile', 'js/*.js', 'js/*.ts', 'js/test/**/*.mjs', 'js/package.json',
@@ -158,10 +158,19 @@ def supplementary_manifest(suite):
             'inputs_sha256': sha256(json.dumps(files, sort_keys=True, separators=(',', ':')).encode())}
 
 
-def write_record(path, record):
-    """Replace a report only after complete verification, without partial JSON."""
+def write_record(path, record, root=ROOT):
+    """Publish a record or report by renaming a complete file over path, so a reader sees the previous
+    file or the new one, never part of one. A path inside the repository root is staged in var/ of
+    that root, which Git ignores and no manifest reads; another path is staged next to it."""
+    path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    descriptor, temporary = tempfile.mkstemp(prefix='.verification-', suffix='.json', dir=path.parent)
+    try:
+        path.resolve().relative_to(Path(root).resolve())
+        staging = Path(root) / 'var'
+    except ValueError:
+        staging = path.parent
+    staging.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary = tempfile.mkstemp(prefix=f'.{path.name}.', suffix='.tmp', dir=staging)
     try:
         with os.fdopen(descriptor, 'w', encoding='utf-8') as stream:
             json.dump(record, stream, indent=2, ensure_ascii=True)
