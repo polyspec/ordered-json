@@ -180,7 +180,7 @@ def compare_package_cases(commands, selected):
         if entry is None:
             problems.append(f'{language}: declares no package test case listing')
             continue
-        process = subprocess.run(entry['command'], cwd=entry['cwd'], text=True,
+        process = subprocess.run(entry['command'], cwd=entry['cwd'], env=entry.get('env'), text=True,
                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if process.returncode or process.stderr:
             raise RuntimeError(f'{language} case listing failed:\n{process.stdout}{process.stderr}')
@@ -209,7 +209,7 @@ def compare_package_cases(commands, selected):
 
 def reported_lines(language, entry, what):
     """Run a declared listing command and return its non-empty lines."""
-    process = subprocess.run(entry['command'], cwd=entry['cwd'], text=True,
+    process = subprocess.run(entry['command'], cwd=entry['cwd'], env=entry.get('env'), text=True,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if process.returncode or process.stderr:
         raise RuntimeError(f'{language} {what} failed:\n{process.stdout}{process.stderr}')
@@ -258,7 +258,7 @@ def stream_package_tests(language, entry):
     after the last newline names the running case. The deadline restarts with
     every complete line. On expiry the whole process group is killed.
     """
-    process = subprocess.Popen(entry['command'], cwd=entry['cwd'], stdout=subprocess.PIPE,
+    process = subprocess.Popen(entry['command'], cwd=entry['cwd'], env=entry.get('env'), stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT, start_new_session=True)
     started = last = time.monotonic()
     pending, lines = b'', []

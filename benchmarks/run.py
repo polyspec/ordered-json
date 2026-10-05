@@ -165,12 +165,15 @@ def main():
         prepare(["php-extension"], build.paths, build.cache)
         [extension] = artifact_paths("php-extension", build.paths)
         if not extension.is_file(): raise SystemExit("PHP extension benchmark artifact was not built")
+        # cargo builds the Rust benchmark into the run directory, never into a target directory that
+        # another checkout or an earlier tree filled.
+        rust_env = dict(env, CARGO_TARGET_DIR=str(build.cache / "rust-target"))
         commands.extend([
             ("php-extension", ROOT, ["php", "-n", "-d", f"extension={extension}", "benchmarks/php.php", "extension", *files]),
             ("rust", ROOT, ["cargo", "run", "--release", "--quiet", "--manifest-path", "rust/Cargo.toml", "--example", "benchmark", "--", *files]),
         ])
         for label, cwd, argv in commands:
-            rows.extend(run(argv, env, cwd, label))
+            rows.extend(run(argv, rust_env if label == "rust" else env, cwd, label))
     ordered = {}
     for row in rows:
         if row["implementation"].endswith(":ordered-json") or row["implementation"] in {"php:custom", "php-extension:extension"}:

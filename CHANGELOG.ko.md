@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 2e66264fbda74877bd67bb10c671bb7d6b93e5c8ca35f834fd4a62d35f49664a -->
+<!-- source-sha256: c8165aa229042065fcd7571c41cd2d74a06ec6bff6e93ac6f5e9b23d14597ad7 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,13 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 검증 실행의 모든 cargo 명령은 그 실행 안의 `CARGO_TARGET_DIR`에 빌드합니다. Rust probe는
+  `rust/target/debug/examples/probe`였고 cargo는 환경이 지정한 target 디렉터리를 사용했으므로, 다른 체크아웃이나 이전 tree가
+  빌드한 probe, test binary, API listing이 현재 소스를 대신해 답할 수 있었습니다. `implementations.json`은 `rust`에
+  `"env": {"CARGO_TARGET_DIR": "{cache}/rust-target"}`를 선언하고, `scripts/registry.py`는 이를 그 구현의 모든 prepare 단계,
+  listing, test, runtime 명령에 전달하며, probe는 `{cache}/rust-target/debug/examples/probe`입니다. `benchmarks/run.py`는 Rust
+  benchmark의 `cargo run`을 실행 디렉터리 안의 `CARGO_TARGET_DIR`로 실행합니다. `scripts/tests/test_run_isolation.py`의 새 case
+  두 개는 명령이 상속된 `CARGO_TARGET_DIR=/shared/target`을 유지했으므로 변경 전에 실패했고, 변경 후에는 통과합니다.
 - push는 `docs/features.md`에 `partial` 기능이 없을 때만 합니다. pre-push hook `.githooks/pre-push`는
   `scripts/push_gate.py hook`을 실행하고, 이 명령은 push되는 commit이나 working tree에 `partial` 행이 있으면 각 ref, commit, ID,
   기능을 밝히며 push를 거부하고, push되는 commit의 `docs/features.md`를 읽을 수 없으면 거부합니다. 모든 `make` 실행은 Makefile을
