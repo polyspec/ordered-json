@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 695c1b42dd70c48b664b17081cbfbea23acf06622beac066355be698651349d0 -->
+<!-- source-sha256: f8812712013c97135dcf920dd13fdc7daaf030cf631f78191a2d8291e8e6d0f1 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -49,9 +49,9 @@ git diff --check
 make check JSON_TEST_SUITE=.cache/JSONTestSuite
 ~~~
 
-`make check`는 검증보다 먼저 guard `scripts/full_run.py`를 시작합니다. 이 저장소의 활성 작업은 [기능 상태](docs/features.ko.md)에서 구현 상태가 `partial`인 기능 행입니다. guard는 판단을 이유와 함께 출력하고, 그런 행이 있으면 각 ID를 기능과 함께 나열하며 거부하고, 추적 파일의 변경이 커밋되지 않았으면 거부합니다. 전체 실행은 커밋된 tree를 검증하기 때문입니다. `var/full-run.json`이 현재 tree(`git rev-parse HEAD^{tree}`)의 전체 실행을 기록하고 있으면 그 실행을 commit, 시작 시각, 결과와 함께 밝히며 거부하고, `incomplete` record의 process가 아직 실행 중이면 거부합니다. 검증 명령을 시간 제한 없이 끝까지 실행하고 그 앞뒤에 record를 쓰므로, 멈춘 실행은 `incomplete`로 기록되어 남습니다. `make rerun-failed`는 현재 tree의 전체 실행이 실패했거나 끝나지 않았을 때만 검증을 다시 실행하고, 그 밖에는 거부됩니다. 검증은 target 하나이므로 전체가 다시 실행됩니다. `var/`는 Git이 무시하므로 checkout과 worktree마다 자기 record를 가집니다. 이 저장소에는 CI workflow가 없습니다. 새 checkout에는 record가 없으므로, 그곳에서 `make check`는 `partial` 기능이 없고 tree가 깨끗하면 실행됩니다.
+`make check`는 검증보다 먼저 guard `scripts/full_run.py`를 시작합니다. 이 저장소의 활성 작업은 [기능 상태](docs/features.ko.md)에서 구현 상태가 `partial`인 기능 행입니다. guard는 판단을 이유와 함께 출력하고, 그런 행이 있으면 각 ID를 기능과 함께 나열하며 거부하고, 추적 파일의 변경이 커밋되지 않았으면 거부합니다. 전체 실행은 커밋된 tree를 검증하기 때문입니다. 검증 마지막의 문서 검사가 `docs/pie-verification.json`에 적용하는 검사를 그 기록이 통과하지 못하면 거부합니다. 오래된 PIE 기록 때문에 tree의 전체 실행을 소모하지 않기 위해서입니다. `var/full-run.json`이 현재 tree(`git rev-parse HEAD^{tree}`)의 전체 실행을 기록하고 있으면 그 실행을 commit, 시작 시각, 결과와 함께 밝히며 거부하고, `incomplete` record의 process가 아직 실행 중이면 거부합니다. 검증 명령을 시간 제한 없이 끝까지 실행하고 그 앞뒤에 record를 쓰므로, 멈춘 실행은 `incomplete`로 기록되어 남습니다. `make rerun-failed`는 현재 tree의 전체 실행이 실패했거나 끝나지 않았을 때만 검증을 다시 실행하고, 그 밖에는 거부됩니다. 검증은 target 하나이므로 전체가 다시 실행됩니다. `var/`는 Git이 무시하므로 checkout과 worktree마다 자기 record를 가집니다. 이 저장소에는 CI workflow가 없습니다. 새 checkout에는 record가 없으므로, 그곳에서 `make check`는 `partial` 기능이 없고 tree가 깨끗하면 실행됩니다.
 
-문서만 검토할 때는 `make docs-check`를 실행합니다. 이 검사는 검증 기록을 소스와 비교하지 않습니다. 소스가 변경됐고 PIE 기록이 있으면 해당 추가 사례와 함께 `make pie-check PIE=/path/to/pie.phar`를 그 `make check` 전에 한 번 실행합니다. 그 `make check`가 현재 기록을 생성합니다. `make check`의 문서 검사는 오래된 PIE 기록을 거부합니다. 검사를 통과시키기 위해 검증 결과나 소스 해시를 직접 수정하지 않습니다.
+문서만 검토할 때는 `make docs-check`를 실행합니다. 이 검사는 검증 기록을 소스와 비교하지 않습니다. PIE 기록과 통합 기록은 기록 자신을 뺀 모든 추적 파일을 해시하므로, 어떤 변경이든 커밋되면 기존 PIE 기록은 오래된 기록이 됩니다. 그때 전체 실행은 다음 순서를 따릅니다. 해당 추가 사례와 함께 `make pie-check PIE=/path/to/pie.phar`를 한 번 실행하고, `docs/pie-verification.json`만 커밋하고, `make check`를 한 번 실행하고, 그것이 쓴 `docs/verification.json`만 커밋합니다. guard는 PIE 기록이 오래됐거나 커밋되지 않았으면 `make check`를 거부하고 이 절차를 알려 줍니다. 검사를 통과시키기 위해 검증 결과나 소스 해시를 직접 수정하지 않습니다.
 
 [구현 등록 정보](implementations.json)는 패키지 경로·빌드·어댑터·패키지 테스트·런타임 명령을 정의합니다. `make check`는 선언된 패키지 테스트 명령을 모두 실행합니다. 공통 사례는 JSON 계약만 검사하므로 한 패키지에만 있는 API에는 닿지 않으며, 그런 API는 해당 패키지의 테스트가 필요합니다. [package-tests.json](package-tests.json)은 모든 구현이 실행하는 케이스, 사유를 적은 면제, 패키지 고유 케이스, 그리고 공개 심볼마다 그것을 검증하는 케이스를 정의합니다. `make check`는 이 표준과 각 패키지가 보고한 케이스·심볼을 대조해 누락된 케이스, 선언되지 않은 케이스, 검증되지 않는 심볼, 더 이상 내보내지 않는 심볼 선언이 있으면 실패합니다. 공통 JSON 비교 알고리즘을 변경하지 않고 해당 등록 정보와 패키지 디렉터리로 새 언어를 추가합니다. 계약 변경은 같은 저장소 리비전에서 검증기와 관련 패키지를 갱신합니다. [저장소 계약](docs/spec/repositories.ko.md)을 참조합니다.
 
