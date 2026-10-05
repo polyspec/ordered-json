@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The CI summary test compares the summary with the log of the target (T1.13). In CI it failed,
+  because it expected the wording of GNU Make 3.81 and the runner's GNU Make 4 names the Makefile line.
 - Development runs unit tests only (T1.12). AGENTS and the validation procedure state that `make pie-check`,
   `make check`, `make owner-check`, adapter suites and supplementary suite runs are end-to-end checks that hosted CI
   runs after the push, that no rule requires a local run before a commit or a push, and that the pre-push hook stays a
