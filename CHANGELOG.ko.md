@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: c4ec1dcff0fd995fb1c156a00c94d3924b47b17ce81b2bde8817e3da4eae52cd -->
+<!-- source-sha256: 71947b2b007a41e28cc9c9d0bb9f1aa28b11337f9e54c483759bbada0f599226 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,12 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- hosted CI가 전체 suite를 실행합니다(T1.7). hosted CI는 push gate만 실행했으므로 commit의 전체 suite는 로컬 기계에서만
+  실행됐습니다. `.github/workflows/ci.yml`은 `main`에 push된 모든 commit과 모든 pull request에서 Python 3.9가 있는
+  `ubuntu-24.04`로 실행하며, job `suite`(`make pie-check`, `make check`)와 `docs`를 `fail-fast: false`인 matrix로
+  실행합니다. 모든 step은 실패 뒤에도 make target을 실행하고, `make ci`(`scripts/ci_run.py`)는 target마다 log를 남기며
+  모든 target을 끝까지 실행하고, `make ci-summary`는 상태, 시간, 실패한 target마다 첫 실패 줄을 담은 job summary를 쓰고
+  기록을 복사하며, 보고서 `var/ci/<job>/`를 upload합니다. `test_ci_run`의 사례는 runner가 없을 때 실패했고 그 뒤 통과합니다.
 - commit의 근거는 그 실행이며, 어떤 기록도 커밋하지 않습니다(T1.6). `docs/pie-verification.json`과
   `docs/verification.json`은 모든 추적 파일을 해시했으므로 commit마다 오래된 기록이 됐고, `make check`의 guard는 로컬의
   `make pie-check`와 `make check`가 이를 다시 만들어 커밋할 때까지 거부했으며, 전체 suite를 실행하는 hosted CI는 commit마다

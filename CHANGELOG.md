@@ -6,6 +6,13 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Hosted CI runs the full suite (T1.7). Hosted CI ran only the push gate, so the full suite of a commit ran only on
+  a local machine. `.github/workflows/ci.yml` runs on every pushed commit of `main` and every pull request on
+  `ubuntu-24.04`, where Python 3.9 exists, with the jobs `suite` (`make pie-check`, `make check`) and `docs` in a
+  matrix with `fail-fast: false`. Every step runs a make target, also after a failure; `make ci`
+  (`scripts/ci_run.py`) runs every target to its end with a log per target, `make ci-summary` writes the job summary
+  with the status, the time and the first failure lines of each failed target and copies the records, and the
+  report `var/ci/<job>/` is uploaded. The cases of `test_ci_run` failed before the runner existed and pass after it.
 - The run of a commit is its evidence; no record is committed (T1.6). `docs/pie-verification.json` and
   `docs/verification.json` hashed every tracked file, so each commit made them stale, the guard of `make check`
   refused until a local `make pie-check` and `make check` regenerated and committed them, and a hosted CI that runs

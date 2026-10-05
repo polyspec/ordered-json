@@ -1,5 +1,5 @@
 <!-- doc-id: distribution -->
-<!-- source-sha256: d25b8facbfbdab8e16fe3110c750ab6988a984b31add9f4001c75c35503b1a3b -->
+<!-- source-sha256: 364c12c41f25721d525e892116f565e0c7227ccff0e85d768685070c988d991b -->
 # 배포
 
 [English](distribution.md)
@@ -11,7 +11,7 @@
 
 npm, crates.io, Packagist, Go, PHP 확장의 레지스트리 게시는 검증되지 않았습니다. 확인된 로컬 배포는 소스 체크아웃입니다. PIE 메타데이터와 성공한 PIE 빌드는 로컬 빌드 호환성을 확인하며 Packagist 게시 근거는 아닙니다. 확장 패키지는 `ordered-json/ordered-json-extension`, PHP 라이브러리는 `ordered-json/ordered-json`입니다.
 
-소스 버전 문자열은 릴리스된 산출물의 근거가 아닙니다. 레지스트리 게시 워크플로는 설정되지 않았고, 호스팅 CI는 push gate `.github/workflows/push-gate.yml`만 실행합니다. LICENSE 파일은 없습니다.
+소스 버전 문자열은 릴리스된 산출물의 근거가 아닙니다. 레지스트리 게시 워크플로는 설정되지 않았고, 호스팅 CI는 전체 suite와 push gate를 실행합니다([호스팅 CI](validation.ko.md#ci)). LICENSE 파일은 없습니다.
 
 <a id="source-publication"></a>
 ## 소스 게시

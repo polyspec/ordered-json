@@ -21,7 +21,8 @@ export COMPOSER_DISABLE_NETWORK := 1
 ONLINE := env -u CARGO_NET_OFFLINE -u GOPROXY -u npm_config_offline -u COMPOSER_DISABLE_NETWORK
 export PATH := $(NPM_DIRECTORY)/bin:$(PATH)
 
-.PHONY: check rerun-failed test docs-check pie-check benchmark hooks hooks-check push-gate tools toolchains-check owner-check
+.PHONY: check rerun-failed test docs-check pie-check benchmark hooks hooks-check push-gate tools toolchains-check owner-check \
+	owner-validate ci ci-summary
 
 # scripts/full_run.py runs the full verification once per committed tree, when no feature of
 # docs/features.md is partial, and records its result in var/full-run.json.
@@ -40,6 +41,28 @@ docs-check:
 # since BASE, or the uncommitted changes and untracked files.
 owner-check:
 	$(PYTHON) scripts/owner_check.py $(if $(PATHS),--paths "$(PATHS)") $(if $(BASE),--base "$(BASE)")
+
+# The jobs of .github/workflows/ci.yml and their targets. The suite job runs the full suite: make pie-check writes
+# the PIE record and make check the aggregate record into var/records, and the documentation check at the end of
+# make check checks both. The docs job runs the checks that need only Python.
+CI_TARGETS_suite := hooks pie-check check
+CI_TARGETS_docs := docs-check owner-validate
+
+# ci runs every target of the job CI_JOB to its end, past failures, with a log per target and var/ci/$(CI_JOB)/summary.json
+# (scripts/ci_run.py); ci-summary writes the summary of the job with the first failure lines of each failed target and
+# copies the records into the report var/ci/$(CI_JOB), which the workflow uploads. Variables such as JSON_TEST_SUITE
+# reach the targets through MAKEFLAGS.
+ci:
+	$(if $(CI_TARGETS_$(CI_JOB)),,$(error make ci needs CI_JOB=suite or CI_JOB=docs; CI_JOB is '$(CI_JOB)'))
+	$(PYTHON) scripts/ci_run.py run --job $(CI_JOB) -- $(CI_TARGETS_$(CI_JOB))
+
+ci-summary:
+	$(if $(CI_TARGETS_$(CI_JOB)),,$(error make ci-summary needs CI_JOB=suite or CI_JOB=docs; CI_JOB is '$(CI_JOB)'))
+	$(PYTHON) scripts/ci_run.py summary --job $(CI_JOB)
+
+# owner-validate checks only the map of scripts/owner-checks.json, as the pre-commit hook does.
+owner-validate:
+	$(PYTHON) scripts/owner_check.py --validate
 
 pie-check:
 	$(PYTHON) scripts/check_pie.py --pie "$(PIE)" $(if $(JSON_TEST_SUITE),--suite "$(JSON_TEST_SUITE)")

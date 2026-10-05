@@ -75,6 +75,20 @@ The [PIE checker](../../scripts/check_pie.py) copies the extension's tracked sou
 
 The PIE record `var/records/pie-verification.json` records the PIE version and PHAR hash, the declared artifact path relative to the run directory, commands, source hashes, PHP and extension versions, and case results. The PHAR hash and the supplementary revision must match their pins. The built module is named by path alone: a fresh identifier and signature enter it at link time, so its hash identifies one run, and the checker rejects a record that carries one. Build errors, missing build tools, adapter warnings, or changes during the check fail verification. Compilation warnings remain in the record. This check does not install the module or publish a package. The record hashes every tracked file except `benchmarks/results.json`; the documentation check of a `make check` that runs after `make pie-check` in the same checkout rejects the PIE record when it does not match the current sources.
 
+<a id="ci"></a>
+## Hosted CI
+
+`.github/workflows/ci.yml` runs the full suite on every pushed commit of `main` and every pull request, in two jobs of one matrix with `fail-fast: false`, so one job does not cancel the other:
+
+~~~sh
+make tools
+make ci CI_JOB=suite JSON_TEST_SUITE=.cache/JSONTestSuite
+make ci CI_JOB=docs
+make ci-summary CI_JOB=suite
+~~~
+
+The job `suite` installs Python, Node.js, Go and PHP from the pin files, runs `make tools`, the only step that downloads, and runs the targets `hooks`, `pie-check` and `check`: `make pie-check` writes the PIE record, `make check` writes the aggregate record and its documentation check checks both. The job `docs` installs only Python and runs `docs-check` and `owner-validate`. Every step runs a make target and runs after a failed step (`if: !cancelled()`); `make ci` (`scripts/ci_run.py`) runs every target of the job to its end, prints its output as it arrives, writes it to `var/ci/<job>/logs/<target>.log` and records the status, the exit status and the time of each target in `var/ci/<job>/summary.json`. `make ci-summary` writes `var/ci/<job>/summary.md` with each target, its status and its time and the first failure lines of each failed target, copies the records of `var/records` into `var/ci/<job>/records`, appends the summary to the job summary of GitHub and never fails. The step `report` uploads `var/ci/<job>/` as the artifact `ci-<job>-<run id>-<attempt>`, also after a failure. No step has a time limit. The jobs run on `ubuntu-24.04`, as the push gate does, because `actions/python-versions` builds no Python 3.9 for `ubuntu-26.04`; the records name the Python and PHP patch releases that ran.
+
 <a id="documentation-checks"></a>
 ## Documentation checks
 
@@ -84,7 +98,7 @@ make docs-check
 
 The [checker](../../scripts/docs_check.py) validates each document manifest, links, translation pairs and revision hashes, section and code-block parity, and feature state. With `--records`, which `make check` passes after it writes the aggregate record, it also checks that the [records](#records) of the checkout match the current sources; `make docs-check` omits that comparison. The common manifest registers only common documents. Each package directory is checked with its own manifest.
 
-Review English and Korean prose against code and tests before updating a Korean `source-sha256` marker. Matching hashes do not prove translation accuracy. External links are syntax-checked, not fetched. Hosted CI runs only the push gate `.github/workflows/push-gate.yml`, not these checks; required candidate checks must run before PR submission or source publication.
+Review English and Korean prose against code and tests before updating a Korean `source-sha256` marker. Matching hashes do not prove translation accuracy. External links are syntax-checked, not fetched. [Hosted CI](#ci) runs these checks on every pushed commit of `main` and every pull request.
 
 <a id="limits"></a>
 ## Limits

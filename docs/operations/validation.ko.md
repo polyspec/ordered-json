@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: f5456ce484e8ea1b949a0b33731999746ad96696f53709603368cd01405774f5 -->
+<!-- source-sha256: f96c9f66e546bc2626076321224b7c24471b98f80421f1d2f0b788635d844be9 -->
 # 검증
 
 [English](validation.md)
@@ -76,6 +76,20 @@ make pie-check JSON_TEST_SUITE=.cache/JSONTestSuite
 
 PIE 기록 `var/records/pie-verification.json`은 PIE 버전과 PHAR 해시, 실행 디렉터리 기준의 선언된 산출물 경로, 명령, 소스 해시, PHP·확장 버전, 사례 결과를 기록합니다. PHAR 해시와 추가 입력 개정본은 고정값과 일치해야 합니다. 빌드된 모듈은 경로로만 명시합니다. 링크 시점에 새 식별자와 서명이 들어가므로 그 해시는 한 번의 실행만 가리키며, 검사기는 해시를 담은 기록을 거부합니다. 빌드 오류, 빌드 도구 누락, 어댑터 경고, 검사 중 변경은 검증 실패로 처리합니다. 컴파일 경고는 기록에 유지합니다. 이 검사는 모듈을 설치하거나 패키지를 게시하지 않습니다. 기록은 `benchmarks/results.json`을 뺀 모든 추적 파일을 해시하며, 같은 체크아웃에서 `make pie-check` 뒤에 실행하는 `make check`의 문서 검사는 PIE 기록이 현재 소스와 맞지 않으면 거부합니다.
 
+<a id="ci"></a>
+## Hosted CI
+
+`.github/workflows/ci.yml`은 `main`에 push된 모든 commit과 모든 pull request에서 전체 suite를 실행합니다. 하나의 matrix에 두 job이 있고 `fail-fast: false`이므로 한 job이 다른 job을 취소하지 않습니다.
+
+~~~sh
+make tools
+make ci CI_JOB=suite JSON_TEST_SUITE=.cache/JSONTestSuite
+make ci CI_JOB=docs
+make ci-summary CI_JOB=suite
+~~~
+
+job `suite`는 고정 파일에서 Python, Node.js, Go, PHP를 설치하고, 내려받는 유일한 단계인 `make tools`를 실행한 뒤 target `hooks`, `pie-check`, `check`를 실행합니다. `make pie-check`는 PIE 기록을, `make check`는 통합 기록을 쓰고 그 문서 검사가 두 기록을 검사합니다. job `docs`는 Python만 설치하고 `docs-check`와 `owner-validate`를 실행합니다. 모든 step은 make target을 실행하고 실패한 step 뒤에도 실행됩니다(`if: !cancelled()`). `make ci`(`scripts/ci_run.py`)는 job의 모든 target을 끝까지 실행하고, 출력을 도착하는 대로 출력하며 `var/ci/<job>/logs/<target>.log`에 쓰고, 각 target의 상태, 종료 상태, 시간을 `var/ci/<job>/summary.json`에 기록합니다. `make ci-summary`는 각 target과 그 상태와 시간, 실패한 target마다 첫 실패 줄을 담은 `var/ci/<job>/summary.md`를 쓰고, `var/records`의 기록을 `var/ci/<job>/records`로 복사하고, 요약을 GitHub의 job summary에 덧붙이며 실패하지 않습니다. step `report`는 실패 뒤에도 `var/ci/<job>/`를 artifact `ci-<job>-<run id>-<attempt>`로 upload합니다. 어떤 step에도 시간 한도가 없습니다. `actions/python-versions`가 `ubuntu-26.04`용 Python 3.9를 build하지 않으므로 job은 push gate처럼 `ubuntu-24.04`에서 실행하며, 기록은 실행한 Python과 PHP의 patch release를 적습니다.
+
 <a id="documentation-checks"></a>
 ## 문서 검사
 
@@ -85,7 +99,7 @@ make docs-check
 
 [검사기](../../scripts/docs_check.py)는 각 문서 목록, 링크, 번역 쌍과 개정 해시, 절과 코드 블록 일치, 기능 상태를 검사합니다. `make check`가 통합 기록을 쓴 뒤 붙이는 `--records`가 있으면 체크아웃의 [기록](#records)이 현재 소스와 일치하는지도 검사합니다. `make docs-check`는 그 비교를 생략합니다. 공통 목록에는 공통 문서만 등록합니다. 각 패키지 디렉터리는 자체 목록으로 검사합니다.
 
-한국어 `source-sha256`을 갱신하기 전에 코드·테스트와 영어·한국어 내용을 비교합니다. 해시 일치는 번역 정확성을 증명하지 않습니다. 외부 링크는 문법만 검사하며 접속하지 않습니다. 호스팅 CI는 push gate `.github/workflows/push-gate.yml`만 실행하고 이 검사들은 실행하지 않으므로, PR 제출이나 소스 게시 전에 필수 후보 검사를 실행해야 합니다.
+한국어 `source-sha256`을 갱신하기 전에 코드·테스트와 영어·한국어 내용을 비교합니다. 해시 일치는 번역 정확성을 증명하지 않습니다. 외부 링크는 문법만 검사하며 접속하지 않습니다. [hosted CI](#ci)가 `main`에 push된 모든 commit과 모든 pull request에서 이 검사들을 실행합니다.
 
 <a id="limits"></a>
 ## 한계

@@ -10,7 +10,7 @@
 
 Registry publication for npm, crates.io, Packagist, Go, and the PHP extension is not verified. Source checkout is the confirmed local distribution. PIE metadata and a passing PIE build establish local build compatibility, not Packagist publication. The extension package is `ordered-json/ordered-json-extension`; the PHP library is `ordered-json/ordered-json`.
 
-Source version strings do not establish a released artifact. Registry publishing workflows are not configured; hosted CI runs only the push gate `.github/workflows/push-gate.yml`. LICENSE files are not present.
+Source version strings do not establish a released artifact. Registry publishing workflows are not configured; hosted CI runs the full suite and the push gate ([hosted CI](validation.md#ci)). LICENSE files are not present.
 
 <a id="source-publication"></a>
 ## Source publication

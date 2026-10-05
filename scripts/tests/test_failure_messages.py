@@ -96,9 +96,9 @@ class FailureMessages(unittest.TestCase):
         self.assertIn("phpversion('ordered_json') false", process.stderr)
         self.assertIn('ORDERED_JSON_VERSION 9.9.9', process.stderr)
 
-    def test_the_push_rule_states_that_ci_does_not_run_the_verification(self):
-        self.assertNotIn('CI runs the full verification', push_gate.RULE)
-        self.assertIn('CI does not run the verification', push_gate.RULE)
+    def test_the_push_rule_states_that_ci_runs_the_full_suite(self):
+        self.assertNotIn('CI does not run the verification', push_gate.RULE)
+        self.assertIn('hosted CI runs the full suite on every pushed commit of main and every pull request', push_gate.RULE)
 
     def test_each_package_script_runs_a_file_that_exists(self):
         for manifest in ('package.json', 'js/package.json', 'php/composer.json'):
