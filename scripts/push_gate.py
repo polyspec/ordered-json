@@ -4,12 +4,13 @@
     python3 scripts/push_gate.py hook           the pre-push hook: the pushed commits and the working tree
     python3 scripts/push_gate.py commit <rev>   CI: one commit and its tracked pre-push hook
     python3 scripts/push_gate.py hooks-check    the pre-push hook is installed in this checkout
+    python3 scripts/push_gate.py hooks-install  make hooks: set core.hooksPath when it differs, then hooks-check
 
 A push happens only when no feature is partial (AGENTS). The pre-push hook .githooks/pre-push runs the
 `hook` mode with the lines that Git writes to it, `<local ref> <local sha> <remote ref> <remote sha>`,
 and refuses the push when the docs/features.md of a pushed commit or of the working tree has a
-partial feature, naming each one. Every make run sets core.hooksPath to .githooks, and `hooks-check`
-fails when it is not set or the hook is not executable. The workflow .github/workflows/push-gate.yml
+partial feature, naming each one. `make hooks` runs `hooks-install`, which sets core.hooksPath to
+.githooks when it differs, and `hooks-check` fails when it is not set or the hook is not executable. The workflow .github/workflows/push-gate.yml
 runs the `commit` mode on every pushed commit and pull request, because a push from a checkout
 without the hook does not run it. The partial features are those of the guard scripts/full_run.py.
 Every mode refuses when it cannot read what it checks.
@@ -71,7 +72,7 @@ def hooks_issue(root):
     configured = result.stdout.strip()
     if configured != HOOKS_PATH:
         shown = configured or 'unset'
-        return f'core.hooksPath is {shown}, not {HOOKS_PATH}; run make hooks (every make run sets it)'
+        return f'core.hooksPath is {shown}, not {HOOKS_PATH}; run make hooks'
     hook = Path(root) / HOOK
     if not (hook.is_file() and os.access(hook, os.X_OK)):
         return f'{HOOK} is missing or not executable; restore it with git checkout -- {HOOK}'
@@ -139,6 +140,16 @@ def main(argv):
             report_ci(lines)
         else:
             print(f'push gate: no feature is {ACTIVE_STATE} in {sha[:SHORT]}; {HOOK} is tracked with mode 100755')
+    elif argv == ['hooks-install']:
+        configured = subprocess.run(['git', 'config', 'core.hooksPath'], cwd=root, capture_output=True,
+                                    text=True).stdout.strip()
+        if configured != HOOKS_PATH:
+            git(root, 'config', 'core.hooksPath', HOOKS_PATH)
+            print(f'hooks-install: core.hooksPath set to {HOOKS_PATH} (was {configured or "unset"})')
+        issue = hooks_issue(root)
+        lines = [f'the pre-push hook is not installed: {issue}'] if issue else []
+        if not lines:
+            print(f'hooks-check: core.hooksPath is {HOOKS_PATH} and {HOOK} is executable')
     elif argv == ['hooks-check']:
         issue = hooks_issue(root)
         lines = [f'the pre-push hook is not installed: {issue}'] if issue else []

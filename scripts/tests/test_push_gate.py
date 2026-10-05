@@ -139,15 +139,22 @@ class PushGateChecks(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn('core.hooksPath is unset, not .githooks', result.stderr)
         self.assertIn('make hooks', result.stderr)
+        # Reading the Makefile writes nothing: make -n and every other target leave the configuration.
+        listed = checkout.run('make', '-n', 'docs-check', f'PYTHON={sys.executable}')
+        self.assertEqual(listed.returncode, 0, listed.stderr)
+        self.assertEqual(checkout.run('git', 'config', 'core.hooksPath').stdout, '')
         installed = checkout.run('make', 'hooks', f'PYTHON={sys.executable}')
         self.assertEqual(installed.returncode, 0, installed.stdout + installed.stderr)
         self.assertEqual(checkout.git('config', 'core.hooksPath'), '.githooks')
         self.assertEqual(checkout.gate('hooks-check').returncode, 0)
-        # Any make run sets it while the Makefile is read, before a recipe runs.
-        checkout.git('config', 'core.hooksPath', 'elsewhere')
-        listed = checkout.run('make', '-n', 'docs-check', f'PYTHON={sys.executable}')
-        self.assertEqual(listed.returncode, 0, listed.stderr)
-        self.assertEqual(checkout.git('config', 'core.hooksPath'), '.githooks')
+        # make hooks writes the configuration only when the value differs.
+        config = Path(checkout.git('rev-parse', '--git-path', 'config'))
+        config = config if config.is_absolute() else checkout.root / config
+        before = config.stat().st_mtime_ns
+        os.utime(config, ns=(before - 10 ** 9, before - 10 ** 9))
+        again = checkout.run('make', 'hooks', f'PYTHON={sys.executable}')
+        self.assertEqual(again.returncode, 0, again.stdout + again.stderr)
+        self.assertEqual(config.stat().st_mtime_ns, before - 10 ** 9, 'an unchanged value is not written again')
         (checkout.root / '.githooks/pre-push').chmod(0o644)
         result = checkout.gate('hooks-check')
         self.assertEqual(result.returncode, 1)
