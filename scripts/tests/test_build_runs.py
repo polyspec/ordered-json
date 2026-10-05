@@ -2,6 +2,7 @@
 from contextlib import redirect_stdout
 import io
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -60,6 +61,8 @@ class BuildRuns(unittest.TestCase):
             pie.write_text('<?php sleep(2); echo "PIE fixture\\n"; exit(3);\n')
             output = io.StringIO()
             with patch('check_pie.PIE_SECONDS', 1, create=True), redirect_stdout(output), \
+                    patch('toolchains.problems', return_value=[]), patch.dict(os.environ), \
+                    patch('check_pie.input_issues', return_value=[]), \
                     patch.object(sys, 'argv', ['check_pie.py', '--pie', str(pie)]):
                 with self.assertRaises(subprocess.CalledProcessError) as raised:
                     check_pie.main()

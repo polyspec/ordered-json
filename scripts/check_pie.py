@@ -14,8 +14,8 @@ import sys
 
 from registry import (ROOT, adapter_commands, artifact_paths, repository_paths, run_directory, run_streamed,
                       runtime_versions)
-from verification_record import (package_revisions, sha256, source_manifest,
-                                 supplementary_manifest, write_record)
+from verification_record import (external_inputs, input_issues, package_revisions, report_input_issues, sha256,
+                                 source_manifest, supplementary_manifest, write_record)
 from toolchains import require
 from verify import verify_adapters
 
@@ -85,6 +85,10 @@ def main():
         return 1
     pie = args.pie.resolve()
     suite = args.suite.resolve() if args.suite else None
+    # The PHAR and the suite are the pinned ones, or the record of this run would be rejected.
+    if not report_input_issues(input_issues(external_inputs(ROOT), sha256(pie.read_bytes()),
+                                            supplementary_manifest(suite))):
+        return 1
     with run_directory(['php-extension'], repository_paths(ROOT)) as run:
         record = build_and_verify(run, pie, suite)
     write_record(ROOT / 'docs/pie-verification.json', record)

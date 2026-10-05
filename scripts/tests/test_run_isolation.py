@@ -131,6 +131,8 @@ class RunIsolation(unittest.TestCase):
             pie = Path(folder) / 'pie.phar'
             pie.write_text('<?php\n')
             with patch('check_pie.run_streamed', side_effect=capture), redirect_stdout(io.StringIO()), \
+                    patch('toolchains.problems', return_value=[]), patch.dict(os.environ), \
+                    patch('check_pie.input_issues', return_value=[]), \
                     patch.object(sys, 'argv', ['check_pie.py', '--pie', str(pie)]):
                 with self.assertRaises(Stop):
                     check_pie.main()

@@ -8,8 +8,8 @@ import sys
 import time
 import unittest
 
-from verification_record import (IMPLEMENTATIONS, create_record, source_manifest,
-                                 supplementary_manifest, write_record)
+from verification_record import (IMPLEMENTATIONS, create_record, external_inputs, input_issues, report_input_issues,
+                                 source_manifest, supplementary_manifest, write_record)
 from verify import ROOT, verify
 from registry import prepare, repository_paths, run_directory, runtime_versions
 from toolchains import require
@@ -131,6 +131,8 @@ def main():
 
     before = source_manifest(ROOT)
     supplementary = supplementary_manifest(suite)
+    if not report_input_issues(input_issues(external_inputs(ROOT), supplementary=supplementary)):
+        return 1
     warnings, failures = [], []
     tests = unittest.defaultTestLoader.discover(str(ROOT / 'scripts/tests'))
     test_result = run_unit_tests(tests)

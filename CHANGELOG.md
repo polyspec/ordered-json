@@ -6,6 +6,15 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- `make pie-check` compares the hash of the PHAR and the JSONTestSuite checkout with the pins of
+  `external-inputs.json` before PIE runs, and `make check` compares the suite before the unit tests.
+  Only the documentation check at the end compared them, so a PHAR or a suite checkout other than
+  the pinned one spent a whole build and run on a record that the check then rejected. Each field
+  that differs fails the command with the expected and the actual value. The pin loader moved from
+  `scripts/docs_check.py` to `scripts/verification_record.py`, next to the new `input_issues`. The
+  cases of the new `scripts/tests/test_external_pins.py` failed before the change, because PIE ran
+  with an unpinned PHAR and suite and the full run started its unit tests with an unpinned suite,
+  and pass after it.
 - `scripts/test.py --unit` fails with `selected 0 tests` and the name when a name selects no test,
   before any test runs, and the full run fails when it discovers no unit test. `--unit registry`
   loaded the module `scripts/registry.py`, which has no tests, ran 0 tests and exited with status 0,

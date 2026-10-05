@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 26f840623b3d8e656b6f7d847441af3c87f7fa2fb423ff27958f921959b0feed -->
+<!-- source-sha256: 5842f15029d1626465389e7d7932caaaeef6d9e24a08d3defb9ebb597fff2da1 -->
 # 검증
 
 [English](validation.md)
@@ -31,7 +31,7 @@ make check JSON_TEST_SUITE=.cache/JSONTestSuite
 
 추가 입력 사용 여부를 기록합니다. `i_` 사례에는 공통 UTF-8·깊이 정책을 적용합니다. 공식 입력과 기대값은 저장소 루트에만 있으며 어댑터에 독립 기대값을 추가하지 않습니다.
 
-[외부 입력](../../external-inputs.json)이 그 개정본과 사례 해시를 고정하며, 다른 체크아웃으로 측정한 기록은 문서 검사를 통과하지 못합니다.
+[외부 입력](../../external-inputs.json)이 그 개정본과 사례 해시를 고정하며, 다른 체크아웃으로 측정한 기록은 문서 검사를 통과하지 못합니다. `make check`와 `make pie-check`는 어떤 작업보다 먼저 추가 사례를 그 고정값과 비교하고, `make pie-check`는 PHAR의 해시도 PIE 고정값과 비교합니다. 다른 필드마다 빌드를 시작하기 전에 기대값과 실제값을 밝히며 명령이 실패합니다.
 
 <a id="individual"></a>
 ## 개별 구현

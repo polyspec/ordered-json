@@ -30,7 +30,7 @@ make check JSON_TEST_SUITE=.cache/JSONTestSuite
 
 The record states whether supplementary inputs were used. `i_` cases use the shared UTF-8 and depth policy. Official inputs and expectations exist only at the repository root; adapters contain no separate goldens.
 
-[External inputs](../../external-inputs.json) pins that revision and the hash of its cases, and a record measured against a different checkout fails the documentation check.
+[External inputs](../../external-inputs.json) pins that revision and the hash of its cases, and a record measured against a different checkout fails the documentation check. `make check` and `make pie-check` compare the suite with that pin before any work, and `make pie-check` also compares the hash of the PHAR with the PIE pin; each field that differs fails the command with the expected and the actual value before a build starts.
 
 <a id="individual"></a>
 ## Individual implementations
