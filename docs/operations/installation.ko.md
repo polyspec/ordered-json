@@ -1,5 +1,5 @@
 <!-- doc-id: installation -->
-<!-- source-sha256: e9e9528423f1e61cb58ca61091f11deee873f05c9f3679eed507cf928670bd5c -->
+<!-- source-sha256: 81bc51a965f43bb74ea88c43bd5cfa23261eec75ccb4bc0ce92ca3023965bcf0 -->
 # 설치와 실행
 
 [English](installation.md)
@@ -16,7 +16,7 @@
 | 네이티브 PHP | 일치하는 PHP 개발 헤더, C 컴파일러, phpize, make | `ordered_json` 확장, 0.0.1 | [확장 소스](https://github.com/polyspec/ordered-json/blob/main/php-extension/src/ordered_json.c) |
 | 저장소 검사 | 고정된 Python, Node.js, Rust, Go, npm release, Git, make, 위 PHP | `make tools`, `make check` | [검증](validation.ko.md) |
 
-저장소 검사는 추적 파일이 고정한 정확한 release로 실행합니다. Node.js는 `.node-version`, Rust는 `rust-toolchain.toml`, Go는 `go/go.mod`의 `toolchain` 줄, Python은 `.python-version`, npm은 `package.json`의 `packageManager` 필드에 registry tarball의 SHA-512와 함께 고정합니다. `make tools`는 그 Rust toolchain을 rustup으로 설치하고, 그 npm을 Git이 무시하는 checkout의 `.cache/tools/npm`에 설치합니다. 기계의 npm은 사용하지도 바꾸지도 않습니다. `make toolchains-check`는 모든 도구를 고정값과 비교하고, 검사의 각 진입점도 첫 단계 전에 같은 비교를 하며, 다른 도구마다 기대 버전과 실제 버전 또는 명령의 오류를 밝히며 실패합니다. `GOTOOLCHAIN=local`과 `RUSTUP_AUTO_INSTALL=0`은 실행 중에 go와 rustup이 다른 toolchain을 내려받거나 설치하지 못하게 하고, 모든 cargo 명령은 `--locked`를 사용합니다.
+저장소 검사는 추적 파일이 고정한 정확한 release로 실행합니다. Node.js는 `.node-version`, Rust는 `rust-toolchain.toml`, Go는 `go/go.mod`의 `toolchain` 줄, Python은 `.python-version`에 minor release로, npm은 `package.json`의 `packageManager` 필드에 registry tarball의 SHA-512와 함께 고정합니다. `make tools`는 그 Rust toolchain을 rustup으로 설치하고, 그 npm을 Git이 무시하는 checkout의 `.cache/tools/npm`에 설치합니다. 기계의 npm은 사용하지도 바꾸지도 않습니다. `make toolchains-check`는 모든 도구를 고정값과 비교하고, 검사의 각 진입점도 첫 단계 전에 같은 비교를 하며, 다른 도구마다 기대 버전과 실제 버전 또는 명령의 오류를 밝히며 실패합니다. `GOTOOLCHAIN=local`과 `RUSTUP_AUTO_INSTALL=0`은 실행 중에 go와 rustup이 다른 toolchain을 내려받거나 설치하지 못하게 하고, 모든 cargo 명령은 `--locked`를 사용합니다.
 
 표는 선언된 최소 버전이며 모든 최소 버전에서 테스트했다는 의미는 아닙니다. 실제 버전은 [verification.json](../verification.json)에 기록합니다. JavaScript, Rust, Go는 외부 런타임 라이브러리에 의존하지 않습니다.
 

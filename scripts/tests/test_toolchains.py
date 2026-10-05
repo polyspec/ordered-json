@@ -33,7 +33,7 @@ WORKFLOW = ROOT / '.github/workflows/push-gate.yml'
 SHA = re.compile(r'[0-9a-f]{40}')
 
 
-def pinned_root(folder, node='26.8.1', rust='1.98.1', go='go1.27.0', python='3.9.6', npm='12.2.0',
+def pinned_root(folder, node='26.8.1', rust='1.98.1', go='go1.27.0', python='3.9', npm='12.2.0',
                 digest='0' * 128):
     """A checkout layout with only the pin files."""
     root = Path(folder)
@@ -73,7 +73,9 @@ class Pins(unittest.TestCase):
         self.assertEqual(set(pins), {'node', 'rust', 'go', 'python', 'npm'})
         for tool, (version, source) in pins.items():
             with self.subTest(tool=tool):
-                self.assertRegex(version, r'^(go)?\d+\.\d+\.\d+$', f'{source} pins an exact release')
+                # Python is pinned by minor release; every other tool by exact release.
+                pattern = r'^\d+\.\d+$' if tool == 'python' else r'^(go)?\d+\.\d+\.\d+$'
+                self.assertRegex(version, pattern, f'{source} pins its release')
         self.assertEqual(pins['npm'][0], '12.2.0')
         self.assertRegex(toolchains.npm_pin(ROOT)[1], r'^[0-9a-f]{128}$', 'npm is pinned with the hash of its tarball')
         self.assertEqual(pins['rust'][0], '1.98.1')
@@ -105,7 +107,8 @@ class Pins(unittest.TestCase):
             for name, text in {**versions, 'npm': '12.2.0'}.items():
                 (bin_directory / name).write_text(f'#!/bin/sh\necho machine-{name} >> "{log}"\necho "{text}"\n')
                 (bin_directory / name).chmod(0o755)
-            root = pinned_root(Path(folder) / 'checkout', python=__import__('platform').python_version())
+            minor = '.'.join(__import__('platform').python_version().split('.')[:2])
+            root = pinned_root(Path(folder) / 'checkout', python=minor)
             (root / 'scripts').mkdir()
             shutil.copy2(ROOT / 'Makefile', root / 'Makefile')
             shutil.copy2(ROOT / 'scripts/toolchains.py', root / 'scripts/toolchains.py')
@@ -183,7 +186,7 @@ class Check(unittest.TestCase):
         self.assertEqual(len(problems), 4, problems)
         self.assertIn('node: expected 26.8.1 (.node-version), actual 20.11.0', problems)
         self.assertIn('go: expected go1.27.0 (go/go.mod toolchain), actual go1.26.3', problems)
-        self.assertTrue(any(problem.startswith('python: expected 3.9.6 (.python-version), actual 3.12.1 (')
+        self.assertTrue(any(problem.startswith('python: expected 3.9 (.python-version, major.minor), actual 3.12.1 (')
                             for problem in problems), problems)
         rust = next(problem for problem in problems if problem.startswith('rust:'))
         self.assertIn('rust: expected 1.98.1 (rust-toolchain.toml), actual: rustc --version failed with exit 1', rust)
@@ -265,6 +268,37 @@ class NpmInstall(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'link or a special file: package/bin/npm'), redirect_stdout(io.StringIO()):
             toolchains.install_npm(root, lambda url: data)
         self.assertEqual(list(toolchains.npm_directory(root).parents[1].iterdir()), [], 'the staging directory is removed')
+
+
+class PythonPin(unittest.TestCase):
+    """Python is pinned by minor release: the same patch release is not available both locally and on CI."""
+
+    def problems(self, interpreter):
+        with tempfile.TemporaryDirectory() as folder:
+            root = pinned_root(folder, python=(ROOT / '.python-version').read_text().strip())
+            npm = toolchains.npm_directory(root)
+            npm.mkdir(parents=True)
+            (npm / 'npm').write_text('#!/bin/sh\n')
+            (npm / 'npm').chmod(0o755)
+            versions = {'node': 'v26.8.1\n', 'rustc': 'rustc 1.98.1 (x 2026-09-01)\n', 'go': 'go1.27.0\n',
+                        'npm': '12.2.0\n'}
+            with patch('toolchains.run_version', side_effect=Check.outputs(None, versions)), \
+                    patch('toolchains.platform.python_version', return_value=interpreter):
+                return toolchains.problems(root)
+
+    def test_another_patch_release_of_the_pinned_minor_passes(self):
+        self.assertEqual(self.problems('3.9.25'), [])
+        self.assertEqual(self.problems('3.9.6'), [])
+
+    def test_another_minor_release_fails_with_both_versions(self):
+        problems = self.problems('3.10.0')
+        self.assertEqual(len(problems), 1, problems)
+        self.assertTrue(problems[0].startswith('python: expected 3.9 (.python-version, major.minor), actual 3.10.0 ('),
+                        problems[0])
+
+    def test_the_ci_python_is_the_pinned_minor(self):
+        ci = re.search(r"python-version: '(\d+\.\d+)\.\d+'", WORKFLOW.read_text())[1]
+        self.assertEqual(ci, (ROOT / '.python-version').read_text().strip())
 
 
 class EntryPoints(unittest.TestCase):

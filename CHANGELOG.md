@@ -6,6 +6,14 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Python is pinned by its minor release. `.python-version` named 3.9.6 and `scripts/toolchains.py`
+  required that exact release, while CI runs 3.9.25, because `actions/python-versions` builds no
+  3.9.6 for `ubuntu-24.04`; local runs and CI followed different rules. An interpreter whose patch
+  release cannot be the same locally and on CI is pinned by its minor release: `.python-version`
+  names 3.9, the check compares major.minor and prints the expected and the actual version, and the
+  aggregate and PIE records name the running patch release in `platform.python`. No check compares
+  the PHP patch release. The new cases of `scripts/tests/test_toolchains.py` failed before the
+  change, because a 3.9.25 interpreter failed the check, and pass after it; a 3.10 interpreter fails.
 - AGENTS.md has the section Idempotency: the same tree gives the same result at any time and on any
   machine, a defect found in one polyspec repository is a class corrected in every repository, and
   one rule per class names how this repository meets it: tools at their tracked versions without
