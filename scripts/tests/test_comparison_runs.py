@@ -37,15 +37,6 @@ def dumps(value):
 '''
 
 
-def limited(run):
-    """subprocess.run with any time limit the caller passes cut to 1 s."""
-    def call(*arguments, **options):
-        if 'timeout' in options:
-            options['timeout'] = 1
-        return run(*arguments, **options)
-    return call
-
-
 class ComparisonRuns(unittest.TestCase):
     def compare(self, compile_seconds, probe_seconds):
         with tempfile.TemporaryDirectory() as folder:
@@ -67,16 +58,18 @@ class ComparisonRuns(unittest.TestCase):
             output = io.StringIO()
             arguments = ['compare_ojson.py', '--python-package', str(package), '--erlang-source', str(source),
                          '--erl', str(erl), '--output', str(report)]
-            with patch.object(sys, 'argv', arguments), redirect_stdout(output), \
-                    patch('compare_ojson.subprocess.run', limited(subprocess.run)):
+            with patch.object(sys, 'argv', arguments), redirect_stdout(output):
                 compare_ojson.main()
             return output.getvalue(), json.loads(report.read_text())
 
     def test_a_silent_erlang_build_runs_past_any_limit_to_its_exit(self):
         log, report = self.compare(2, 0)
-        self.assertRegex(log, r'erlang compile: start\n'
-                              r'erlang compile: src/fixture\.erl:1: Warning: fixture warning\n'
-                              r'erlang compile: exit 0 after \d+ ms\n')
+        # A build has no time limit: a compile silent for 2 s ends with its own exit status.
+        match = re.search(r'erlang compile: start\n'
+                          r'erlang compile: src/fixture\.erl:1: Warning: fixture warning\n'
+                          r'erlang compile: exit 0 after (\d+) ms\n', log)
+        self.assertIsNotNone(match, log)
+        self.assertGreaterEqual(int(match[1]), 2000)
         self.assertEqual(report['erlang_package']['compile_warnings'],
                          'src/fixture.erl:1: Warning: fixture warning\n')
 

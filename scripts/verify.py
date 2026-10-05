@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 import re
 import select
-import signal
 import subprocess
 import sys
 import tempfile
@@ -21,8 +20,9 @@ CASE_ID = re.compile(r'^[a-z][a-z0-9_]*$')
 CASE_SECONDS = 60
 TIMED_LINE = re.compile(r'\(\d+(?:\.\d+)?\s*m?s\)$')
 
-from registry import (IMPLEMENTATIONS, Failures, adapter_commands, api_commands, case_commands, fixture_paths,
-                      parse_overrides, prepare, repository_paths, run_directory, test_commands)
+from registry import (IMPLEMENTATIONS, POLL_SECONDS, Failures, adapter_commands, api_commands, case_commands,
+                      end_group, fixture_paths, next_chunk, parse_overrides, prepare, repository_paths, run_directory,
+                      test_commands)
 from toolchains import require
 
 
@@ -332,14 +332,12 @@ def stream_package_tests(language, entry):
     pending, lines = b'', []
     try:
         while True:
-            remaining = last + CASE_SECONDS - time.monotonic()
-            if remaining <= 0 or not select.select([process.stdout], [], [], remaining)[0]:
-                os.killpg(process.pid, signal.SIGKILL)
-                process.wait()
+            chunk = next_chunk(process, process.stdout, max(last + CASE_SECONDS - time.monotonic(), 0))
+            if chunk is None:
+                end_group(process)
                 running = pending.decode('utf-8', 'replace').strip() or (lines[-1] if lines else 'no output')
                 raise RuntimeError(f'{language}: no test result within {CASE_SECONDS} s; running: {running}; '
                                    f'stopped after {milliseconds(time.monotonic() - started)}')
-            chunk = os.read(process.stdout.fileno(), 65536)
             if not chunk:
                 break
             pending += chunk
@@ -358,9 +356,7 @@ def stream_package_tests(language, entry):
             print(f'{language}: {lines[-1]}', flush=True)
         returncode = process.wait()
     finally:
-        if process.poll() is None:
-            os.killpg(process.pid, signal.SIGKILL)
-            process.wait()
+        end_group(process)
         process.stdout.close()
     elapsed = milliseconds(time.monotonic() - started)
     if returncode:
@@ -469,11 +465,18 @@ class Adapter:
         self.started = time.monotonic()
 
     def pump(self, until, done, missing):
-        """Read output until done(); at the deadline stop the adapter and report what is missing."""
-        while not done():
+        """Read output until done(); at the deadline stop the adapter and report what is missing. When
+        the adapter has exited, its group is killed and what it wrote is read to the end."""
+        while not done() and self.open:
             remaining = until - time.monotonic()
-            ready = select.select(self.open, [], [], remaining)[0] if remaining > 0 else []
-            if not ready:
+            ready = select.select(self.open, [], [], min(max(remaining, 0), POLL_SECONDS))[0]
+            if not ready and self.process.poll() is not None:
+                end_group(self.process)
+                ready = select.select(self.open, [], [], 1)[0]
+                if not ready:
+                    self.open = []
+                    break
+            elif not ready and remaining <= 0:
                 self.stop()
                 raise RuntimeError(f'{self.language} {missing} within {CASE_SECONDS} s; '
                                    f'stopped after {milliseconds(time.monotonic() - self.started)}')
@@ -516,9 +519,7 @@ class Adapter:
             raise AssertionError(f'{self.language}: expected {count} responses, got more')
 
     def stop(self):
-        if self.process.poll() is None:
-            os.killpg(self.process.pid, signal.SIGKILL)
-        self.process.wait()
+        end_group(self.process)
         for stream in (self.process.stdin, self.process.stdout, self.process.stderr):
             try:
                 stream.close()

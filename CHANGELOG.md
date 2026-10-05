@@ -6,6 +6,18 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- A build step, a package test command and an adapter end with their whole process group,
+  grandchildren included. The group was killed only while the direct child still ran, and the reader
+  waited for end of file, so a background process that a command started kept running after it, a
+  build step waited for that process without limit, and a package test run failed at the case
+  deadline. `scripts/registry.py` reads output with `next_chunk`, which kills the group once the
+  command has exited, and `end_group` kills the group in every `finally`. The cases of
+  `scripts/tests/test_build_runs.py` and `scripts/tests/test_comparison_runs.py` patched
+  `BUILD_SECONDS`, `PIE_SECONDS` and a `timeout` argument that no code has, so the patches changed
+  nothing; they now assert that the silent step ran for 2 s or more to its own exit. The cases of the
+  new `scripts/tests/test_process_groups.py` failed before the change, because the build step waited
+  until the test deadline, the package tests failed at their case deadline and the grandchild of a
+  stopped adapter survived, and pass after it.
 - Case listings are read in a declared machine format. The listing parser skipped lines by their
   human-readable text (`ok`, `?`, `running`, `test result:`, `FAIL`) for every language, so a line of
   a package's own list that started with `ok` was dropped, and any notice on standard error failed a

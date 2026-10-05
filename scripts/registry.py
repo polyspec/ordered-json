@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import re
+import select
 import shutil
 import signal
 import subprocess
@@ -207,11 +208,45 @@ def artifact_paths(name, paths, registry=REGISTRY):
             for value in registry['implementations'][name].get('artifacts', [])]
 
 
+# How often a reader that waits for output checks whether the process it reads has exited.
+POLL_SECONDS = 0.2
+
+
+def end_group(process):
+    """Kill the process group of a process started with start_new_session, grandchildren included,
+    and reap the process. A group whose processes have all ended is already gone; macOS reports EPERM
+    for a group whose remaining members are killed processes that their new parent has not reaped."""
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except (ProcessLookupError, PermissionError):
+        pass
+    process.wait()
+
+
+def next_chunk(process, stream, seconds=float('inf')):
+    """The next output of stream within seconds: bytes, b'' at its end, or None when the seconds pass
+    without output. The stream ends at end of file, or when the process has exited: its group is then
+    killed, so a grandchild that keeps the stream open neither holds the reader nor survives the run."""
+    deadline = time.monotonic() + seconds
+    while True:
+        wait = min(POLL_SECONDS, max(deadline - time.monotonic(), 0))
+        if select.select([stream], [], [], wait)[0]:
+            return os.read(stream.fileno(), 65536)
+        if process.poll() is not None:
+            end_group(process)
+            # Every writer of the group is gone; what it wrote is read, then end of file.
+            if select.select([stream], [], [], 1)[0]:
+                return os.read(stream.fileno(), 65536)
+            return b''
+        if time.monotonic() >= deadline:
+            return None
+
+
 def run_streamed(label, command, cwd, env=None):
     """Run a build command, printing a start line, each output line as it arrives, and the
     exit status with the elapsed time. A build has no time limit: it ends with its own exit
-    status, and the caller judges that status and the output. If the caller is interrupted,
-    the process group is killed."""
+    status, and the caller judges that status and the output. The process group, grandchildren
+    included, is killed when the command ends or the caller is interrupted."""
     print(f'{label}: start', flush=True)
     started = time.monotonic()
     process = subprocess.Popen(command, cwd=cwd, env=env, stdout=subprocess.PIPE,
@@ -225,7 +260,7 @@ def run_streamed(label, command, cwd, env=None):
 
     try:
         while True:
-            chunk = os.read(process.stdout.fileno(), 65536)
+            chunk = next_chunk(process, process.stdout)
             if not chunk:
                 break
             pending += chunk
@@ -236,9 +271,7 @@ def run_streamed(label, command, cwd, env=None):
             emit(pending)
         returncode = process.wait()
     finally:
-        if process.poll() is None:
-            os.killpg(process.pid, signal.SIGKILL)
-            process.wait()
+        end_group(process)
         process.stdout.close()
     print(f'{label}: exit {returncode} after {(time.monotonic() - started) * 1000:.0f} ms', flush=True)
     return subprocess.CompletedProcess(command, returncode, stdout=''.join(line + '\n' for line in lines))
