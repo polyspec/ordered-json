@@ -6,6 +6,10 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- `make check` runs clippy and go vet (T1.11). AGENTS required `cargo clippy --all-targets -- -D warnings` and
+  `go vet ./...`, but no command of the full suite ran them. `make check` runs `scripts/lint.py clippy` and
+  `scripts/lint.py go-vet` as guard targets of their own after the verification, and `make clippy` and `make go-vet`
+  run one. The changed and new cases of `test_full_run` and `test_lint` failed before the change and pass after it.
 - The first failure lines of the CI summary name the checker errors (T1.14). The summary of
   `docs-check` showed only the line of make, and the summary of `check` showed passing case lines whose names contain
   `missing`. `scripts/ci_run.py` takes a line that names a file and skips passing case lines and the directory lines

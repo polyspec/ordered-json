@@ -63,7 +63,7 @@ The [implementation registry](implementations.json) declares package paths, buil
 
 All language adapters use [official.json](examples/official.json) and [scripts/verify.py](scripts/verify.py). Add shared cases there or under `fixtures/`. Do not create separate language-specific examples or expected results.
 
-When Rust code changes, run `cargo clippy --all-targets -- -D warnings` in `rust/`. When Go code changes, run `go vet ./...` in `go/`. Rebuild the PHP extension when native code changes. Never treat old binaries or prior results as verification of changed code.
+Rust code passes `cargo clippy --all-targets -- -D warnings` in `rust/` and Go code passes `go vet ./...` in `go/`: `make check` runs both as targets of their own after the verification (`scripts/lint.py`, also `make clippy` and `make go-vet`), so hosted CI runs them on every pushed commit. Rebuild the PHP extension when native code changes. Never treat old binaries or prior results as verification of changed code.
 
 <a id="idempotency"></a>
 ## Idempotency

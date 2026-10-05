@@ -12,6 +12,7 @@
     {"paths": ["scripts/docs_check.py"], "tests": ["test_docs_check", "test_tracked_inputs", "test_failure_messages", "test_full_run", "test_push_gate"], "checks": ["docs"]},
     {"paths": ["scripts/full_run.py"], "tests": ["test_full_run", "test_push_gate"]},
     {"paths": ["scripts/ci_run.py"], "tests": ["test_ci_run"]},
+    {"paths": ["scripts/lint.py"], "tests": ["test_lint"], "languages": ["rust", "go"]},
     {"paths": ["scripts/push_gate.py", ".githooks/pre-push"], "tests": ["test_push_gate", "test_full_run", "test_failure_messages"]},
     {"paths": ["scripts/owner_check.py", "scripts/owner-checks.json", ".githooks/pre-commit"], "tests": ["test_owner_check", "test_push_gate"]},
     {"paths": ["scripts/toolchains.py", ".node-version", ".python-version", ".php-version", "rust-toolchain.toml"], "tests": ["test_toolchains"]},

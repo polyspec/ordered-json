@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: e519771fd98c5f5518bfac142e066b3307ac71d42d0ca54f6e9c6f17cc7d3965 -->
+<!-- source-sha256: c54368fb92fcc7eec7241e07828335eac6874d264b9c22f7e8acda14ab5bace9 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -64,7 +64,7 @@ push는 `partial` 기능과 `[~]` 작업이 없을 때만 합니다. pre-push ho
 
 모든 언어 어댑터는 [official.json](examples/official.json)과 [scripts/verify.py](scripts/verify.py)를 사용합니다. 공통 사례는 해당 파일이나 `fixtures/`에 추가합니다. 언어별로 다른 예제나 기대 결과를 만들지 않습니다.
 
-Rust 코드를 변경하면 `rust/`에서 `cargo clippy --all-targets -- -D warnings`를 실행합니다. Go 코드를 변경하면 `go/`에서 `go vet ./...`를 실행합니다. 네이티브 코드를 변경하면 PHP 확장을 다시 빌드합니다. 이전 바이너리나 이전 결과를 변경된 코드의 검증 근거로 사용하지 않습니다.
+Rust 코드는 `rust/`에서 `cargo clippy --all-targets -- -D warnings`를, Go 코드는 `go/`에서 `go vet ./...`을 통과합니다. `make check`는 검증 뒤에 둘을 각각의 target으로 실행하므로(`scripts/lint.py`, `make clippy`와 `make go-vet`으로도 실행) hosted CI가 push된 모든 commit에서 이를 실행합니다. 네이티브 코드를 변경하면 PHP 확장을 다시 빌드합니다. 이전 바이너리나 이전 결과를 변경된 코드의 검증 근거로 사용하지 않습니다.
 
 <a id="idempotency"></a>
 ## 멱등성
