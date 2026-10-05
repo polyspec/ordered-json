@@ -6,6 +6,14 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- AGENTS.md has the section Idempotency: the same tree gives the same result at any time and on any
+  machine, a defect found in one polyspec repository is a class corrected in every repository, and
+  one rule per class names how this repository meets it: tools at their tracked versions without
+  registry queries or installs on demand, tests that read only their own outputs and tracked files,
+  atomic publication, accumulated failures, failures with expected and actual values and the tool's
+  error, failing empty selections, process groups reaped and directories removed in `finally`, no
+  assertion on human-readable tool output, an owner for every changed file, and leases or per-run
+  directories for shared state.
 - The build copy of the PHP extension holds only the files Git tracks. `scripts/registry.py`
   copied `git ls-files --cached --others --exclude-standard`, so an untracked file in
   `php-extension/` entered the build of `scripts/verify.py`, `make pie-check` and the benchmark while

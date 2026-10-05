@@ -60,6 +60,22 @@ All language adapters use [official.json](examples/official.json) and [scripts/v
 
 When Rust code changes, run `cargo clippy --all-targets -- -D warnings` in `rust/`. When Go code changes, run `go vet ./...` in `go/`. Rebuild the PHP extension when native code changes. Never treat old binaries or prior results as verification of changed code.
 
+<a id="idempotency"></a>
+## Idempotency
+
+The same tree gives the same result at any time and on any machine. A defect found in one polyspec repository is a class: correct it in every repository and state its rule here. Each rule names how this repository meets it.
+
+- No command queries a registry for the latest release or installs a tool on demand; every tool runs at its tracked version. Tracked files pin Node.js, Rust, Go, Python and npm, `scripts/toolchains.py` compares each tool with its pin before any work, `GOTOOLCHAIN=local` and `RUSTUP_AUTO_INSTALL=0` keep go and rustup from fetching another toolchain, cargo runs with `--locked`, `make tools` is the only install step and checks the npm tarball against its hash, CI pins its image, actions and Python, and `make pie-check` and `make check` compare the PIE PHAR and the supplementary suite with `external-inputs.json` first.
+- A test reads only the outputs it creates and does not depend on untracked state. Records, documentation checks, shared cases and build copies read the files Git tracks, the guard refuses untracked files, each run builds in its own run directory with its own `CARGO_TARGET_DIR`, and a test writes its files only into its own temporary directory.
+- A shared output is published atomically: it is written completely to a file in `var/` and renamed over its path (`write_record`).
+- A check accumulates failures and does not stop at the first: every language, step and case runs to its end, and the run lists every failure before it exits with status 1.
+- A failure prints the expected value, the actual value and the tool's own error: matched lines, differing files, both versions or hashes, the exit status and standard error.
+- An empty selection fails: a unit test name that selects no test, a tracker without feature rows and a run that discovers no test fail by name.
+- Children are reaped by process group, grandchildren included, when a command ends or its caller stops (`end_group`), and a temporary directory is removed in `finally` or by its context manager.
+- No check asserts on human-readable tool output: a case listing declares its machine format, tool notices on standard error are printed and not judged, and a test that runs `make` removes the make variables of its caller.
+- Every changed file maps to its owning tests: `scripts/owner-checks.json` owns every tracked path, `make owner-check` runs the owners of a change, and the pre-commit hook refuses an unmapped path.
+- Shared directories, ports and fixtures go through leases or per-run directories: each run, test and build uses its own temporary directory, and the guard holds `var/full-run.lock` so one full run of a checkout runs at a time.
+
 <a id="completion"></a>
 ## Completion
 
