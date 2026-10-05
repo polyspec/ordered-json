@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 593c24d16be93a39ab0dcdee5bd90aa2fffa8f50108ffed62d8176bf210759bb -->
+<!-- source-sha256: 763e7ea819761118d0b7bd7a88fce7239369b80c27aa57d66d53d494b74620cb -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,13 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 검사는 offline으로 실행하고 `make tools`만 내려받습니다(T1.2). cargo, go, npm, Composer는 모든 검사에서 online으로
+  실행됐으므로 `cargo build --locked`가 `rust/Cargo.lock`의 crate를 필요할 때 내려받았고, PIE PHAR와 추가 사례는 손으로
+  내려받았습니다. Makefile은 `CARGO_NET_OFFLINE=true`, `GOPROXY=off`, `npm_config_offline=true`,
+  `COMPOSER_DISABLE_NETWORK=1`을 export하고, `scripts/toolchains.py`는 모든 진입점에 이를 설정하며, `make tools`는 이를
+  제거한 채 실행합니다. `make tools`는 Rust toolchain, npm, crate, `.cache/pie/pie.phar`의 PIE PHAR,
+  `.cache/JSONTestSuite`의 추가 사례를 설치하고 각각을 `external-inputs.json`과 대조합니다. `test_toolchains`의 새 사례는
+  변경 전에 실패했고 변경 후 통과합니다.
 - 제품 기능이 아닌 작업은 실행 체크리스트 `docs/plans/execution-checklist.md`에서 추적합니다(T1.1). `make check`의
   guard, pre-push hook, push gate는 `docs/features.md`의 `partial` 기능만 읽었으므로, 그런 작업에는 전체 실행이나 push를 멈추는
   상태가 없었습니다. 각 작업은 `[ ]`, `[~]`, `[o]`, `[!] cause: <cause>; retry: <condition>` 중 하나의 상태를 가집니다.

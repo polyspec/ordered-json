@@ -10,6 +10,15 @@ PIE ?= .cache/pie/pie.phar
 NPM_DIRECTORY := $(CURDIR)/.cache/tools/npm
 export GOTOOLCHAIN := local
 export RUSTUP_AUTO_INSTALL := 0
+# A check reads no network: make tools downloads what the checks read, and every other recipe and the scripts it
+# starts run cargo, go, npm and Composer offline, so a missing download fails at once instead of reaching a registry
+# in one run and not in another (scripts/toolchains.py sets the same for every entry point). make tools runs its
+# command with $(ONLINE).
+export CARGO_NET_OFFLINE := true
+export GOPROXY := off
+export npm_config_offline := true
+export COMPOSER_DISABLE_NETWORK := 1
+ONLINE := env -u CARGO_NET_OFFLINE -u GOPROXY -u npm_config_offline -u COMPOSER_DISABLE_NETWORK
 export PATH := $(NPM_DIRECTORY)/bin:$(PATH)
 
 .PHONY: check rerun-failed test docs-check pie-check benchmark hooks hooks-check tools toolchains-check owner-check
@@ -48,12 +57,13 @@ hooks:
 hooks-check:
 	$(PYTHON) scripts/push_gate.py hooks-check
 
-# tools installs the pinned Rust toolchain of rust-toolchain.toml and the pinned npm into
-# .cache/tools/npm (scripts/toolchains.py install); toolchains-check compares every tool with its pin.
+# tools installs the pinned Rust toolchain of rust-toolchain.toml, the pinned npm into .cache/tools/npm, the crates
+# of rust/Cargo.lock, and the PIE PHAR and the supplementary suite of external-inputs.json into .cache/pie/pie.phar
+# and .cache/JSONTestSuite (scripts/toolchains.py install); toolchains-check compares every tool with its pin.
 # No recipe runs a pinned tool by name: GNU Make 3.81 looks a simple recipe command up on its own
 # PATH, not the exported one, so each tool runs from a script that sets the PATH of the run.
 tools:
-	$(PYTHON) scripts/toolchains.py install
+	$(ONLINE) $(PYTHON) scripts/toolchains.py install
 
 toolchains-check:
 	$(PYTHON) scripts/toolchains.py

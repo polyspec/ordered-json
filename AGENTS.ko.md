@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 339d3d8a87849b87e3407fe793fd1c03768f5a0731e9ec75f5125a76d42ab074 -->
+<!-- source-sha256: dac7db3c6b1bca284303cdacdf63461bcf3df7f41ea05dee7d09cc9daea33cd8 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -71,7 +71,7 @@ Rust 코드를 변경하면 `rust/`에서 `cargo clippy --all-targets -- -D warn
 
 같은 tree는 언제 어느 기계에서든 같은 결과를 냅니다. 한 polyspec 저장소에서 찾은 결함은 하나의 부류입니다. 모든 저장소에서 고치고 그 규칙을 여기에 적습니다. 각 규칙은 이 저장소가 그것을 지키는 방법을 밝힙니다.
 
-- 어떤 명령도 registry에 최신 release를 묻거나 도구를 필요할 때 설치하지 않으며, 모든 도구는 추적되는 버전으로 실행합니다. 추적 파일이 Node.js, Rust, Go, Python, npm을 고정합니다. 로컬과 CI에서 같은 patch release를 쓸 수 없는 interpreter는 minor release로 고정하므로, `actions/python-versions`가 CI image `ubuntu-24.04`용 3.9.6을 build하지 않아 CI가 3.9.25를 실행하는 Python은 `.python-version`이 3.9를 적고, 검사는 major.minor를 비교하며, 각 기록은 실행 중인 patch release를 적습니다. 그리고 `scripts/toolchains.py`는 어떤 작업보다 먼저 각 도구를 고정값과 비교하며, `GOTOOLCHAIN=local`과 `RUSTUP_AUTO_INSTALL=0`은 go와 rustup이 다른 toolchain을 가져오지 못하게 하고, cargo는 `--locked`로 실행하며, `make tools`가 유일한 설치 단계이고 npm tarball을 hash와 대조하며, CI는 image, action, Python을 고정하고, `make pie-check`와 `make check`는 PIE PHAR와 추가 사례를 먼저 `external-inputs.json`과 비교합니다.
+- 어떤 명령도 registry에 최신 release를 묻거나 도구를 필요할 때 설치하지 않으며, 모든 도구는 추적되는 버전으로 실행합니다. 추적 파일이 Node.js, Rust, Go, Python, npm을 고정합니다. 로컬과 CI에서 같은 patch release를 쓸 수 없는 interpreter는 minor release로 고정하므로, `actions/python-versions`가 CI image `ubuntu-24.04`용 3.9.6을 build하지 않아 CI가 3.9.25를 실행하는 Python은 `.python-version`이 3.9를 적고, 검사는 major.minor를 비교하며, 각 기록은 실행 중인 patch release를 적습니다. 그리고 `scripts/toolchains.py`는 어떤 작업보다 먼저 각 도구를 고정값과 비교하며, `GOTOOLCHAIN=local`과 `RUSTUP_AUTO_INSTALL=0`은 go와 rustup이 다른 toolchain을 가져오지 못하게 하고, cargo는 `--locked`로 실행하며, `make tools`가 내려받는 유일한 단계로서 Rust toolchain, tarball hash와 대조한 npm, `rust/Cargo.lock`의 crate, `external-inputs.json`과 대조한 PIE PHAR와 추가 사례를 설치하고, 다른 모든 명령은 cargo, go, npm, Composer를 offline으로 실행하며(Makefile이 export하고 `scripts/toolchains.py`가 설정하는 `CARGO_NET_OFFLINE`, `GOPROXY=off`, `npm_config_offline`, `COMPOSER_DISABLE_NETWORK`), CI는 image, action, Python을 고정하고, `make pie-check`와 `make check`는 PIE PHAR와 추가 사례를 먼저 `external-inputs.json`과 비교합니다.
 - test는 자기가 만든 출력만 읽고 추적되지 않은 상태에 의존하지 않습니다. 기록, 문서 검사, 공통 사례, build 사본은 Git이 추적하는 파일을 읽고, guard는 추적되지 않은 파일을 거부하며, 각 실행은 자기 `CARGO_TARGET_DIR`를 가진 자기 실행 디렉터리에서 빌드하고, test는 자기 파일을 자기 임시 디렉터리에만 씁니다.
 - 공유 출력은 원자적으로 게시합니다. `var/`의 파일에 끝까지 쓴 뒤 그 경로 위로 이름을 바꿉니다(`write_record`).
 - 검사는 실패를 모으고 첫 실패에서 멈추지 않습니다. 모든 언어, 단계, 사례가 끝까지 실행되고, 실행은 status 1로 끝나기 전에 모든 실패를 나열합니다.
