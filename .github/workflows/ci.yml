@@ -21,6 +21,12 @@ on:
     branches: [main]
   pull_request:
 
+# Runners are few: a new push of the same ref cancels the run of the previous one. push-gate.yml has no such group,
+# so the gate of every pushed commit runs to its end.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
