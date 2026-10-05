@@ -108,7 +108,7 @@ class FullRunChecks(unittest.TestCase):
         self.assertEqual(active_items(DONE), [])
 
     def test_the_decision_refuses_active_work_a_dirty_tree_and_a_second_run(self):
-        clean = dict(mode='run', targets=stub('a'), active=[], dirty=[], tree='tree-1', record=None, running=False)
+        clean = dict(mode='run', targets=stub('a'), active=[], dirty=[], pie=None, tree='tree-1', record=None, running=False)
         fresh = decide(**clean)
         self.assertTrue(fresh['run'])
         self.assertIn('no full-run record', fresh['reason'])
@@ -118,6 +118,12 @@ class FullRunChecks(unittest.TestCase):
         dirty = decide(**{**clean, 'dirty': [' M Makefile']})
         self.assertFalse(dirty['run'])
         self.assertRegex(dirty['reason'], r'uncommitted tracked changes[\s\S]*M Makefile')
+        self.assertIn('commit them, then run make check again; make pie-check writes '
+                      'docs/pie-verification.json, which is committed by itself before make check', dirty['reason'])
+        stale = decide(**{**clean, 'pie': 'PIE verification is stale; run scripts/check_pie.py'})
+        self.assertFalse(stale['run'])
+        self.assertIn('PIE verification is stale', stale['reason'])
+        self.assertIn('make pie-check', stale['reason'])
         earlier = {'tree': 'tree-1', 'commit': 'c1', 'result': 'passed', 'started': 's1', 'targets': [{'name': 'a', 'status': 'passed'}]}
         second = decide(**{**clean, 'record': earlier})
         self.assertFalse(second['run'])
@@ -128,7 +134,7 @@ class FullRunChecks(unittest.TestCase):
         self.assertIn('process 42 is still running', running['reason'])
 
     def test_the_decision_of_rerun_failed_needs_targets_of_the_current_tree_that_did_not_pass(self):
-        clean = dict(mode='rerun-failed', targets=[], active=[], dirty=[], tree='tree-1', record=None, running=False)
+        clean = dict(mode='rerun-failed', targets=[], active=[], dirty=[], pie=None, tree='tree-1', record=None, running=False)
         self.assertFalse(decide(**clean)['run'])
         failed = {'tree': 'tree-1', 'commit': 'c1', 'result': 'failed', 'started': 's',
                   'targets': [{'name': 'a', 'status': 'passed'}, {'name': 'b', 'status': 'failed'}, {'name': 'c', 'status': 'pending'}]}
@@ -149,6 +155,21 @@ class FullRunChecks(unittest.TestCase):
         status, output, ran = checkout.guard('run', stub('a'))
         self.assertEqual((status, ran), (1, []))
         self.assertRegex(output, r'uncommitted tracked changes[\s\S]*M \.gitignore')
+
+    def test_a_stale_pie_record_refuses_the_run_and_the_rerun_before_any_target(self):
+        # The documentation check at the end of the verification rejects this record, so the
+        # single full run of the tree would be spent on a known failure.
+        checkout = self.checkout(DONE)
+        checkout.commit('docs/pie-verification.json', json.dumps({
+            'schema_version': 1, 'scope': 'pie-build', 'status': 'passed', 'checked_at': '2026-10-05T00:00:00+00:00',
+            'sources': {'sha256': '0' * 64, 'files': {}}}))
+        for mode, targets in (('run', stub('a')), ('rerun-failed', [])):
+            with self.subTest(mode=mode):
+                status, output, ran = checkout.guard(mode, targets)
+                self.assertEqual((status, ran), (1, []), output)
+                self.assertRegex(output, r'^\[full-run\] refuse: docs/pie-verification.json .*PIE verification is stale')
+                self.assertIn('run make pie-check PIE=/path/to/pie.phar with the supplementary suite once, '
+                              'commit docs/pie-verification.json by itself, then run make check', output)
 
     def test_a_full_run_records_each_target_and_the_same_tree_is_refused_a_second_time(self):
         checkout = self.checkout(DONE)
