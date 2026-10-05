@@ -6,6 +6,13 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The build copy of the PHP extension holds only the files Git tracks. `scripts/registry.py`
+  copied `git ls-files --cached --others --exclude-standard`, so an untracked file in
+  `php-extension/` entered the build of `scripts/verify.py`, `make pie-check` and the benchmark while
+  no record named it. The copy uses the tracked list of the source manifest; a tree without Git
+  metadata is copied whole, and a tracked symbolic link is still refused. The changed case of
+  `scripts/tests/test_run_isolation.py` failed before the change, because the untracked file was
+  copied, and passes after it.
 - Every tracked path maps to the checks that own it. The new `scripts/owner-checks.json` maps globs
   of paths to verifier unit test modules, implementations that `scripts/verify.py --only` checks, and
   the checks `docs` and `benchmark`; the new `scripts/owner_check.py`, run by `make owner-check`,

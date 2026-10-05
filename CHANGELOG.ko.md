@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 617076497623be73aca6bdcc8f8d5d5980429efa87f4ae16ac0c2a44ca3b12b8 -->
+<!-- source-sha256: 6a0c1d33ce845450ffeaf678c2744e4b4dea0788a18749fbc0f8b578f8e6b8df -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,11 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- PHP 확장의 build 사본은 Git이 추적하는 파일만 담습니다. `scripts/registry.py`는
+  `git ls-files --cached --others --exclude-standard`를 복사했으므로, `php-extension/`의 추적되지 않은 파일이 어떤 기록에도 밝혀지지
+  않은 채 `scripts/verify.py`, `make pie-check`, benchmark의 build에 들어갔습니다. 사본은 source manifest의 추적 목록을 사용하고, Git
+  metadata가 없는 tree는 통째로 복사하며, 추적되는 symbolic link는 여전히 거부합니다. `scripts/tests/test_run_isolation.py`의 바뀐
+  case는 추적되지 않은 파일이 복사되었으므로 변경 전에 실패했고, 변경 후에는 통과합니다.
 - 모든 추적 경로는 그것을 소유한 검사에 대응됩니다. 새 `scripts/owner-checks.json`은 경로 glob을 검증기 unit test module,
   `scripts/verify.py --only`가 검사하는 구현, 검사 `docs`와 `benchmark`에 대응시키고, `make owner-check`가 실행하는 새
   `scripts/owner_check.py`는 이 대응을 검사한 뒤 커밋되지 않은 변경, `PATHS`, 또는 `BASE` 이후 바뀐 경로의 소유자를 각각 끝까지
