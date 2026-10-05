@@ -111,6 +111,15 @@ class CiRun(unittest.TestCase):
         self.assertIn('### `later` pending', text)
         self.assertIn('The target did not start: the run stopped before it.', text)
 
+    def test_the_command_line_takes_the_job_before_and_the_targets_after_the_separator(self):
+        # make ci runs `ci_run.py run --job JOB -- TARGET...` and make ci-summary `ci_run.py summary --job JOB`.
+        calls = []
+        with unittest.mock.patch('ci_run.run', side_effect=lambda root, job, targets: calls.append(('run', job, targets)) or 0), \
+                unittest.mock.patch('ci_run.summary', side_effect=lambda root, job: calls.append(('summary', job)) or 0):
+            self.assertEqual(ci_run.main(['run', '--job', 'docs', '--', 'docs-check', 'owner-validate']), 0)
+            self.assertEqual(ci_run.main(['summary', '--job', 'docs']), 0)
+        self.assertEqual(calls, [('run', 'docs', ['docs-check', 'owner-validate']), ('summary', 'docs')])
+
     def test_make_ci_runs_the_targets_of_the_job_through_the_runner(self):
         def make(*arguments):
             return subprocess.run(['make', *arguments, 'PYTHON=python3'], cwd=ROOT, env=self.environment,
