@@ -12,6 +12,12 @@ import tempfile
 
 from registry import IMPLEMENTATIONS, REGISTRY, ROOT, tracked_files
 
+# The records of a run: make check writes the aggregate record and make pie-check the PIE record into var/records,
+# which Git ignores. A record is the evidence of the run that wrote it; CI uploads both in the report of its run. A
+# committed record would hash every tracked file and go stale with the next commit, so no record is committed.
+AGGREGATE_RECORD = 'var/records/verification.json'
+PIE_RECORD = 'var/records/pie-verification.json'
+
 SOURCE_PATTERNS = (
     'Makefile', 'js/*.js', 'js/*.ts', 'js/test/**/*.mjs', 'js/package.json',
     'rust/src/**/*.rs', 'rust/examples/**/*.rs', 'rust/Cargo.toml', 'rust/Cargo.lock',
@@ -29,7 +35,7 @@ def sha256(data):
 
 def source_manifest(root):
     # A record is evidence about the sources, not one of them.
-    excluded = {'docs/verification.json', 'docs/pie-verification.json', 'benchmarks/results.json'}
+    excluded = {'benchmarks/results.json'}
     # In a Git work tree the sources are the tracked files: an untracked file is not part of the tree
     # that the record names. A source archive without Git metadata uses the declared patterns.
     files = {}

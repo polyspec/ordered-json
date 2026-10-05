@@ -9,7 +9,7 @@ import re
 import sys
 from urllib.parse import unquote, urlsplit
 
-from verification_record import (IMPLEMENTATIONS, external_inputs, manifest_differences, package_revisions, sha256,
+from verification_record import (AGGREGATE_RECORD, IMPLEMENTATIONS, PIE_RECORD, external_inputs, manifest_differences, package_revisions, sha256,
                                  source_manifest)
 from registry import REGISTRY, artifact_paths, files_under, fixture_paths, repository_paths, tracked_files
 
@@ -163,13 +163,15 @@ def feature_rows(text):
         evidence_links, specification_links = link_targets(evidence), link_targets(specification)
         if len(specification_links) != 1:
             raise ValueError('A feature requires one specification link: ' + identifier)
-        records = {'shared-suite': 'verification.json', 'package-tests': 'verification.json',
-                   'docs-tests': 'verification.json',
+        # The shared suite, the package tests and the checker tests are recorded by the run that verifies a commit,
+        # which the validation procedure describes; a benchmark result is committed.
+        records = {'shared-suite': 'operations/validation.md#records', 'package-tests': 'operations/validation.md#records',
+                   'docs-tests': 'operations/validation.md#records',
                    'benchmark': '../benchmarks/results.json'}
-        if verification != 'not-verified' and evidence_links != [records[verification]]:
+        if verification != 'not-verified' and [link.replace('.ko.md', '.md') for link in evidence_links] != [records[verification]]:
             raise ValueError('A verified feature names the record that backs it: ' + identifier)
         rows[identifier] = (implementation, verification, distribution,
-                            tuple(evidence_links), tuple(link.replace('.ko.md', '.md') for link in specification_links))
+                            tuple(link.replace('.ko.md', '.md') for link in evidence_links), tuple(link.replace('.ko.md', '.md') for link in specification_links))
     return rows
 
 
@@ -363,7 +365,7 @@ def check_pie_verification(root, record):
     datetime.fromisoformat(record['checked_at'])
     current = source_manifest(root)
     if record.get('sources') != current:
-        raise ValueError('PIE verification is stale; run scripts/check_pie.py:\n'
+        raise ValueError('PIE verification is stale; run make pie-check:\n'
                          + '\n'.join(manifest_differences(record.get('sources'), current)))
     if record.get('packages') != package_revisions(root):
         raise ValueError('PIE verification package records differ from the current source')
@@ -477,7 +479,9 @@ def check_repository(root, include_children=True, records=True):
             if features != feature_rows(documents['docs/features.ko.md']):
                 raise ValueError('English and Korean feature states or references differ')
             if records and any(row[1] != 'not-verified' for row in features.values()):
-                check_verification(root, read_json('docs/verification.json'))
+                if not (root / AGGREGATE_RECORD).is_file():
+                    raise ValueError(f'{AGGREGATE_RECORD} does not exist; make check writes it before this check')
+                check_verification(root, read_json(AGGREGATE_RECORD))
             if any(row[1] == 'benchmark' for row in features.values()):
                 check_benchmark(root, read_json('benchmarks/results.json'))
         except (ValueError, KeyError, TypeError, OSError) as issue:
@@ -500,11 +504,11 @@ def check_repository(root, include_children=True, records=True):
             check_distribution(read_json('docs/distribution.json'), features)
         except (ValueError, KeyError, TypeError, OSError) as issue:
             error('docs/distribution.json', str(issue))
-        if records and (root / 'docs/pie-verification.json').exists():
+        if records and (root / PIE_RECORD).exists():
             try:
-                check_pie_verification(root, read_json('docs/pie-verification.json'))
+                check_pie_verification(root, read_json(PIE_RECORD))
             except (ValueError, KeyError, TypeError, OSError) as issue:
-                error('docs/pie-verification.json', str(issue))
+                error(PIE_RECORD, str(issue))
         if include_children:
             for name, path in repository_paths(root).items():
                 manifest = path / 'docs/documentation-manifest.json'

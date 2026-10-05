@@ -14,7 +14,8 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from docs_check import check_repository, feature_rows
 from registry import REGISTRY
-from verification_record import IMPLEMENTATIONS, create_record, sha256, source_manifest, write_record
+from verification_record import (AGGREGATE_RECORD, IMPLEMENTATIONS, PIE_RECORD, create_record, sha256, source_manifest,
+                                 write_record)
 from test import build_extension
 
 
@@ -23,10 +24,10 @@ class FeatureStateChecks(unittest.TestCase):
         row = ('| ID | Feature | Implementation | Verification | Evidence | Distribution | Specification |\n'
                '| --- | --- | --- | --- | --- | --- | --- |\n'
                '| F-RUST-SERDE | Typed Rust values | implemented | package-tests | '
-               '[result](verification.json) | source-only | [contract](../README.md#contract) |')
+               '[result](operations/validation.md#records) | source-only | [contract](../README.md#contract) |')
         self.assertIn('F-RUST-SERDE', feature_rows(row))
         with self.assertRaisesRegex(ValueError, 'record that backs it'):
-            feature_rows(row.replace('verification.json', 'other.json'))
+            feature_rows(row.replace('operations/validation.md#records', 'other.json'))
 
 
 class DocumentationChecks(unittest.TestCase):
@@ -40,8 +41,11 @@ class DocumentationChecks(unittest.TestCase):
         self.manifest = {'schema_version': 1, 'documents': [
             {'id': 'overview', 'kind': 'overview', 'en': 'README.md', 'ko': 'README.ko.md'},
             {'id': 'features', 'kind': 'state', 'en': 'docs/features.md', 'ko': 'docs/features.ko.md'},
+            {'id': 'validation', 'kind': 'operations', 'en': 'docs/operations/validation.md',
+             'ko': 'docs/operations/validation.ko.md'},
         ]}
         self.json('docs/documentation-manifest.json', self.manifest)
+        self.pair('docs/operations/validation.md', 'validation', '# Verification\n\n<a id="records"></a>\n## Records\n')
         self.pair('README.md', 'overview',
             '# Fixture\n\n<a id="contract"></a>\n## Contract\n\n[Features](docs/features.md)\n'
             '\n~~~js\nconst text = "[code only](missing.json)";\n~~~\n')
@@ -49,7 +53,7 @@ class DocumentationChecks(unittest.TestCase):
             '# Features\n\n<a id="state"></a>\n## State\n\n'
             '| ID | Feature | Implementation | Verification | Evidence | Distribution | Specification |\n'
             '| --- | --- | --- | --- | --- | --- | --- |\n'
-            '| F-ORDER | Order | implemented | shared-suite | [result](verification.json) | source-only | [contract](../README.md#contract) |\n')
+            '| F-ORDER | Order | implemented | shared-suite | [result](operations/validation.md#records) | source-only | [contract](../README.md#contract) |\n')
         self.distribution = {'schema_version': 1, 'checked_at': '2026-09-07T00:00:00+00:00',
             'source': {'state': 'available', 'url': 'https://github.com/polyspec/ordered-json',
                        'branch': 'main', 'visibility': 'public'},
@@ -73,7 +77,7 @@ class DocumentationChecks(unittest.TestCase):
         self.record = create_record(self.root, source_manifest(self.root), self.results,
                                    {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions,
                                    package_tests=self.package_tests)
-        self.json('docs/verification.json', self.record)
+        self.json(AGGREGATE_RECORD, self.record)
 
     def write(self, path, text):
         target = self.root / path
@@ -98,7 +102,7 @@ class DocumentationChecks(unittest.TestCase):
         self.assertTrue(any(text in error for error in errors), errors)
 
     def test_valid_documents_ignore_links_inside_code(self):
-        self.assertEqual(check_repository(self.root), ([], 2, 1))
+        self.assertEqual(check_repository(self.root), ([], 3, 1))
 
     def test_missing_translation_fails(self):
         (self.root / 'README.ko.md').unlink()
@@ -158,7 +162,7 @@ class DocumentationChecks(unittest.TestCase):
             '# Features\n\n<a id="state"></a>\n## State\n\n' + before_table +
             '| ID | Feature | Implementation | Verification | Evidence | Distribution | Specification |\n'
             '| --- | --- | --- | --- | --- | --- | --- |\n'
-            '| F-ORDER | Order | implemented | shared-suite | [result](verification.json) | source-only | [contract](../README.md#contract) |\n'
+            '| F-ORDER | Order | implemented | shared-suite | [result](operations/validation.md#records) | source-only | [contract](../README.md#contract) |\n'
             + after)
 
     def test_state_word_outside_implementation_cell_fails(self):
@@ -196,7 +200,7 @@ class DocumentationChecks(unittest.TestCase):
                        '| T1.2 | Task | File | `make docs-check` | [~] |\n'
                        '| T1.3 | Task | File | `make docs-check` | [ ] |\n'
                        '| T1.4 | Task | File | `make docs-check` | [!] cause: no runner; retry: a runner exists |\n')
-        self.assertEqual(check_repository(self.root), ([], 3, 1))
+        self.assertEqual(check_repository(self.root), ([], 4, 1))
         self.checklist('| T1.1 | Task | File | `make docs-check` | [x] |\n')
         self.assert_failure("docs/plans/execution-checklist.md: line 8 of the checklist: '[x]' is not a task state")
 
@@ -224,7 +228,7 @@ class DocumentationChecks(unittest.TestCase):
         self.assert_failure('English and Korean feature states')
 
     def test_verified_feature_requires_evidence(self):
-        self.change('docs/features.md', '[result](verification.json)', 'none')
+        self.change('docs/features.md', '[result](operations/validation.md#records)', 'none')
         self.assert_failure('names the record that backs it')
 
     def test_source_change_invalidates_old_result(self):
@@ -245,6 +249,25 @@ class DocumentationChecks(unittest.TestCase):
         self.assertEqual(recorded.returncode, 1)
         self.assertIn('Verification is stale', recorded.stderr)
 
+    def test_records_are_the_output_of_the_run_not_committed_files(self):
+        # A committed record goes stale with every commit, so it is not evidence: the checker reads the records
+        # that the run wrote into var/records, and a file left in docs/ is not read.
+        self.assertEqual((AGGREGATE_RECORD, PIE_RECORD),
+                         ('var/records/verification.json', 'var/records/pie-verification.json'))
+        stale = copy.deepcopy(self.record)
+        stale['sources'] = {'sha256': '0' * 64, 'files': {}}
+        self.json('docs/verification.json', stale)
+        self.json('docs/pie-verification.json', {'schema_version': 1, 'scope': 'pie-build', 'status': 'passed'})
+        errors, _, _ = check_repository(self.root)
+        self.assertEqual(errors, [])
+        (self.root / AGGREGATE_RECORD).unlink()
+        self.assert_failure('var/records/verification.json')
+
+    def test_a_feature_names_the_record_section_of_the_validation_procedure(self):
+        self.change('docs/features.md', '[result](operations/validation.md#records)', '[result](verification.json)')
+        self.write('docs/verification.json', '{}')
+        self.assert_failure('names the record that backs it')
+
     def test_source_addition_invalidates_old_result(self):
         self.write('js/new.js', 'export const added = true;\n')
         self.assert_failure('Verification is stale')
@@ -255,12 +278,12 @@ class DocumentationChecks(unittest.TestCase):
 
     def test_missing_implementation_result_fails(self):
         del self.record['implementations']['php-extension']
-        self.json('docs/verification.json', self.record)
+        self.json(AGGREGATE_RECORD, self.record)
         self.assert_failure('requires all registered implementations')
 
     def test_php_extension_and_runtime_versions_are_separate(self):
         del self.record['implementations']['php-extension']['runtime']['extension_version']
-        self.json('docs/verification.json', self.record)
+        self.json(AGGREGATE_RECORD, self.record)
         self.assert_failure('PHP runtime and extension versions')
 
     def test_private_paths_in_markdown_fail(self):
@@ -322,7 +345,7 @@ class DocumentationChecks(unittest.TestCase):
                           {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions)
 
     def test_record_write_replaces_complete_json(self):
-        target = self.root / 'docs/verification.json'
+        target = self.root / AGGREGATE_RECORD
         write_record(target, self.record)
         self.assertEqual(json.loads(target.read_text()), self.record)
         self.assertEqual(list(target.parent.glob('.verification-*')), [])
@@ -382,18 +405,18 @@ class DocumentationChecks(unittest.TestCase):
     def test_every_recorded_aggregate_hash_is_falsifiable(self):
         aggregate, pie = self.supplementary_records()
         self.assert_recorded_hashes_are_falsifiable(
-            'docs/verification.json', aggregate, ('docs/pie-verification.json', pie))
+            AGGREGATE_RECORD, aggregate, (PIE_RECORD, pie))
 
     def test_every_recorded_pie_hash_is_falsifiable(self):
         aggregate, pie = self.supplementary_records()
         self.assert_recorded_hashes_are_falsifiable(
-            'docs/pie-verification.json', pie, ('docs/verification.json', aggregate))
+            PIE_RECORD, pie, (AGGREGATE_RECORD, aggregate))
 
     def features_body(self, evidence='[result](../benchmarks/results.json)'):
         return ('# Features\n\n<a id="state"></a>\n## State\n\n'
                 '| ID | Feature | Implementation | Verification | Evidence | Distribution | Specification |\n'
                 '| --- | --- | --- | --- | --- | --- | --- |\n'
-                '| F-ORDER | Order | implemented | shared-suite | [result](verification.json) | source-only | [contract](../README.md#contract) |\n'
+                '| F-ORDER | Order | implemented | shared-suite | [result](operations/validation.md#records) | source-only | [contract](../README.md#contract) |\n'
                 f'| F-BENCH | Speed | implemented | benchmark | {evidence} | source-only | [contract](../README.md#contract) |\n')
 
     def benchmark_repository(self):
@@ -405,6 +428,8 @@ class DocumentationChecks(unittest.TestCase):
         self.json('benchmarks/workload.json', workload)
         self.pair('docs/features.md', 'features', self.features_body())
         self.json('benchmarks/results.json', {})
+        # As in the repository, Git ignores var/, where the run writes its records.
+        self.write('.gitignore', '/var/\n')
         for command in (['init', '--quiet'], ['add', '-A'],
                         ['-c', 'user.email=fixture@example.invalid', '-c', 'user.name=fixture',
                          'commit', '--quiet', '-m', 'fixture']):
@@ -415,7 +440,7 @@ class DocumentationChecks(unittest.TestCase):
                   'fixtures': workload['fixtures'], 'results': [],
                   'comparison': {'status': 'baseline-updated'}}
         self.json('benchmarks/results.json', record)
-        self.json('docs/verification.json', create_record(
+        self.json(AGGREGATE_RECORD, create_record(
             self.root, source_manifest(self.root), self.results,
             {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions,
             package_tests=self.package_tests))
@@ -425,7 +450,7 @@ class DocumentationChecks(unittest.TestCase):
 
     def test_benchmark_evidence_must_name_the_benchmark_record(self):
         self.benchmark_repository()
-        self.pair('docs/features.md', 'features', self.features_body('[result](verification.json)'))
+        self.pair('docs/features.md', 'features', self.features_body('[result](operations/validation.md#records)'))
         self.assert_failure('names the record that backs it')
 
     def test_benchmark_measured_from_a_dirty_tree_is_not_evidence(self):
@@ -461,15 +486,15 @@ class DocumentationChecks(unittest.TestCase):
     def test_unreproducible_artifact_hash_cannot_be_recorded(self):
         aggregate, pie = self.supplementary_records()
         pie['artifact']['sha256'] = sha256(b'built artifact')
-        self.json('docs/verification.json', aggregate)
-        self.json('docs/pie-verification.json', pie)
+        self.json(AGGREGATE_RECORD, aggregate)
+        self.json(PIE_RECORD, pie)
         self.assert_failure('carries its path alone')
 
     def test_recorded_artifact_must_be_the_declared_one(self):
         aggregate, pie = self.supplementary_records()
         pie['artifact'] = {'path': 'php-extension/src/modules/other.so'}
-        self.json('docs/verification.json', aggregate)
-        self.json('docs/pie-verification.json', pie)
+        self.json(AGGREGATE_RECORD, aggregate)
+        self.json(PIE_RECORD, pie)
         self.assert_failure('artifact the registry declares')
 
     def test_native_build_rejects_copy_error_with_zero_exit_status(self):

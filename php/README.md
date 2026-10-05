@@ -34,6 +34,6 @@ Install Python >= 3.9, Git, make, and this implementation's runtime/build tools.
 make check
 ~~~
 
-The command invokes the root verifier against this package. The root aggregate check tests all packages from the same source revision and writes the current result to `docs/verification.json`.
+The command invokes the root verifier against this package. The root aggregate check tests all packages from the same source revision and writes the current result to `var/records/verification.json`, the record of that run.
 
 Use `make check JSON_TEST_SUITE=/path/to/JSONTestSuite` for supplementary cases. [Development procedure](AGENTS.md) and [changelog](CHANGELOG.md) describe required checks and changes.

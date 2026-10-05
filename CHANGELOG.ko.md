@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: b94ee1c136cbf7f173a6e7efb9c9c63f24ff50fce819d75995beea928eaee1fd -->
+<!-- source-sha256: c4ec1dcff0fd995fb1c156a00c94d3924b47b17ce81b2bde8817e3da4eae52cd -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,13 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- commit의 근거는 그 실행이며, 어떤 기록도 커밋하지 않습니다(T1.6). `docs/pie-verification.json`과
+  `docs/verification.json`은 모든 추적 파일을 해시했으므로 commit마다 오래된 기록이 됐고, `make check`의 guard는 로컬의
+  `make pie-check`와 `make check`가 이를 다시 만들어 커밋할 때까지 거부했으며, 전체 suite를 실행하는 hosted CI는 commit마다
+  실패했을 것입니다. `make pie-check`와 `make check`는 Git이 무시하는 `var/records/pie-verification.json`과
+  `var/records/verification.json`을 쓰고, 커밋된 기록은 제거합니다. `scripts/docs_check.py --records`는 체크아웃의 기록을
+  검사하고, guard는 어떤 기록도 읽지 않으며, 기능은 근거로 검증 절차의 기록 절을 가리킵니다. `test_docs_check`와
+  `test_full_run`의 바뀐 사례와 새 사례는 변경 전에 실패했고 변경 후 통과합니다.
 - PHP는 minor release로 고정합니다(T1.5). 검사의 PHP를 적은 추적 파일이 없었으므로 다른 PHP에서의 실행은 어떤 고정값도
   적지 않은 PHP로 tree를 검증했습니다. `.php-version`은 8.5를 적고, `scripts/toolchains.py`는
   `php -n -r 'echo PHP_VERSION;'`의 major.minor를 그것과 비교해 기대값과 실제값을 출력하며, 기록은 실행 중인 patch
@@ -308,4 +315,4 @@
 - 공식 입력과 기대 결과를 [official.json](examples/official.json)으로 통합하고 공통 문법 사례와 선택적 추가 입력을 제공합니다.
 - 모든 구현을 공통 사례 433개로 검증했습니다. PIE 빌드 산출물도 같은 433개를 통과했으며 검사기 테스트 42개가 통과했습니다. 당시 PHP 빌드 도구의 링커 옵션 사용 중단 경고 두 건은 해당 검증 기록에 기록했습니다.
 
-현재 [검증 기록](docs/verification.json)은 검사한 소스와 다섯 구현 및 문서 검사기 테스트의 결과를 명시합니다. [배포 확인 결과](docs/distribution.json)는 별도입니다. 이 항목은 개발 변경을 기록하며 패키지 릴리스를 선언하지 않습니다.
+현재 검증 기록은 검사한 소스와 다섯 구현 및 문서 검사기 테스트의 결과를 명시합니다. [배포 확인 결과](docs/distribution.json)는 별도입니다. 이 항목은 개발 변경을 기록하며 패키지 릴리스를 선언하지 않습니다.
