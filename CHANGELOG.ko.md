@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: d0a1cf6784d33c8e6d9caeea03696b4a312a27855a4f88cdc4ddcffd7b89f7c0 -->
+<!-- source-sha256: 35ec08a597605714649e987e7a2d741a53ac5578b7a0fb0f6b0d0df8f77427d7 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,12 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- Python은 minor release로 고정합니다. `.python-version`은 3.9.6을 적었고 `scripts/toolchains.py`는 그 release를 정확히
+  요구했지만, `actions/python-versions`가 `ubuntu-24.04`용 3.9.6을 build하지 않으므로 CI는 3.9.25를 실행합니다. 로컬 실행과 CI가 서로
+  다른 규칙을 따랐습니다. 로컬과 CI에서 같은 patch release를 쓸 수 없는 interpreter는 minor release로 고정합니다. `.python-version`은
+  3.9를 적고, 검사는 major.minor를 비교해 기대 버전과 실제 버전을 출력하며, 통합 기록과 PIE 기록은 실행 중인 patch release를
+  `platform.python`에 적습니다. PHP patch release를 비교하는 검사는 없습니다. `scripts/tests/test_toolchains.py`의 새 case는 3.9.25
+  interpreter가 검사에 실패했으므로 변경 전에 실패했고, 변경 후에는 통과합니다. 3.10 interpreter는 실패합니다.
 - AGENTS.md에 멱등성 절이 있습니다. 같은 tree는 언제 어느 기계에서든 같은 결과를 내고, 한 polyspec 저장소에서 찾은 결함은 모든
   저장소에서 고치는 부류이며, 부류마다 규칙 하나가 이 저장소가 그것을 지키는 방법을 밝힙니다. registry 질의나 필요할 때의 설치 없이
   추적되는 버전의 도구, 자기 출력과 추적 파일만 읽는 test, 원자적 게시, 모으는 실패, 기대값, 실제값, 도구 오류를 담은 실패, 실패하는 빈

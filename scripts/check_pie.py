@@ -72,7 +72,8 @@ def build_and_verify(run, pie, suite):
         command['arguments'] = [argument.replace(str(ROOT) + '/', '') for argument in command['arguments']]
     record = {'schema_version': 1, 'scope': 'pie-build', 'status': 'passed',
               'checked_at': datetime.now(timezone.utc).isoformat(timespec='seconds'),
-              'platform': {'system': platform.system(), 'machine': platform.machine()},
+              'platform': {'system': platform.system(), 'machine': platform.machine(),
+                           'python': platform.python_version()},
               'sources': sources, 'packages': packages,
               'pie': {'version': version, 'phar_sha256': pie_hash},
               'package': package, 'commands': commands, 'build_warnings': warnings,

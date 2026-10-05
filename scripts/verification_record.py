@@ -106,7 +106,7 @@ def create_record(root, before, results, counts, documentation_tests, runtime_ve
     return {
         'schema_version': 1, 'status': 'passed',
         'checked_at': datetime.now(timezone.utc).isoformat(timespec='seconds'),
-        'platform': {'system': platform.system(), 'machine': platform.machine()},
+        'platform': {'system': platform.system(), 'machine': platform.machine(), 'python': platform.python_version()},
         'sources': before, 'cases': {**counts, 'total': total},
         'implementations': {name: {**results[name], 'runtime': runtime_versions[name],
                                    'tests': package_tests.get(name)}

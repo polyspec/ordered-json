@@ -6,7 +6,7 @@
     python3 scripts/toolchains.py pin TOOL  print the pinned version of TOOL (node, rust, go, python, npm)
 
 Each pin is an exact release in a tracked file: Node.js in .node-version, Rust in rust-toolchain.toml,
-Go in the toolchain line of go/go.mod, Python in .python-version and npm in the packageManager field of
+Go in the toolchain line of go/go.mod, Python by major.minor in .python-version and npm in the packageManager field of
 package.json. A run that uses other tools than the pins verifies the tree with tools that no record
 names, so every entry point (scripts/test.py, scripts/verify.py, scripts/check_pie.py and
 benchmarks/run.py) calls require() before its first step and fails with the expected and the actual
@@ -79,7 +79,9 @@ def pins(root=ROOT):
         'node': read('.node-version', r'\A(\d+\.\d+\.\d+)\s*\Z'),
         'rust': read('rust-toolchain.toml', r'^channel\s*=\s*"(\d+\.\d+\.\d+)"\s*$'),
         'go': read('go/go.mod', r'^toolchain\s+(go\d+\.\d+\.\d+)\s*$', 'go/go.mod toolchain'),
-        'python': read('.python-version', r'\A(\d+\.\d+\.\d+)\s*\Z'),
+        # Python is pinned by minor release: actions/python-versions builds no 3.9.6 for the CI image, so
+        # no patch release is available both locally and on CI. The running patch release is recorded.
+        'python': read('.python-version', r'\A(\d+\.\d+)\s*\Z'),
         'npm': (npm[0], 'package.json packageManager'),
     }
 
@@ -131,8 +133,9 @@ def problems(root=ROOT):
     compare('rust', ['rustc', '--version'], root, lambda out: (out.split() + ['', ''])[1])
     compare('go', ['go', 'env', 'GOVERSION'], root / 'go', lambda out: out.strip())
     python, source = expected['python']
-    if platform.python_version() != python:
-        found.append(f'python: expected {python} ({source}), actual {platform.python_version()} ({sys.executable})')
+    if '.'.join(platform.python_version().split('.')[:2]) != python:
+        found.append(f'python: expected {python} ({source}, major.minor), actual {platform.python_version()} '
+                     f'({sys.executable})')
     npm, source = expected['npm']
     local = npm_directory(root) / 'npm'
     resolved = shutil.which('npm', path=env['PATH'])
