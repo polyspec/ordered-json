@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 0c2a409b7a4b2a7b99cf5c8f30bea18042a3509d6b34cb858b42cc0f26bbfcab -->
+<!-- source-sha256: 26f840623b3d8e656b6f7d847441af3c87f7fa2fb423ff27958f921959b0feed -->
 # 검증
 
 [English](validation.md)
@@ -10,6 +10,7 @@
 [필수 도구](installation.ko.md#requirements)를 설치하고 저장소 루트에서 실행합니다.
 
 ~~~sh
+make tools
 make check
 ~~~
 

@@ -9,6 +9,7 @@
 Install the [required tools](installation.md#requirements) and run from the repository root:
 
 ~~~sh
+make tools
 make check
 ~~~
 

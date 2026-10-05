@@ -6,6 +6,27 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Every run checks its tools against tracked pins before any work. Nothing pinned them: a run used
+  whatever Node.js, Rust, Go, Python and npm the machine had, go could download the toolchain of
+  `go.mod`, rustup could install a toolchain on the first cargo, cargo could rewrite `Cargo.lock`,
+  and CI ran on `ubuntu-latest` with actions at moving tags. `.node-version` pins Node.js 26.8.1,
+  `rust-toolchain.toml` Rust 1.98.1, the new `toolchain` line of `go/go.mod` Go 1.27.0,
+  `.python-version` Python 3.9.6, and `packageManager` of `package.json` npm 12.2.0 with the SHA-512
+  of its registry tarball. The new `scripts/toolchains.py` compares each tool with its pin;
+  `scripts/test.py`, `scripts/verify.py`, `scripts/check_pie.py` and `benchmarks/run.py` call it
+  before their first step and fail with the expected and the actual version, or the error of the
+  command, of each tool that differs. `GOTOOLCHAIN=local` and `RUSTUP_AUTO_INSTALL=0` are set by the
+  Makefile, the registry and the check, every cargo command uses `--locked`, and runtime versions are
+  read in the repository directory, where rustup reads the pin. `make tools` installs the Rust
+  toolchain and downloads the npm tarball, refuses it unless its hash matches, and unpacks it without
+  links into `.cache/tools/npm`, which comes first on `PATH`; no npm of the machine is used or
+  changed. No recipe runs a pinned tool by name, because GNU Make 3.81 looks a simple recipe command
+  up on its own `PATH`, not the exported one. CI runs on `ubuntu-24.04` with `actions/checkout` and
+  `actions/setup-python` pinned to commits and Python 3.9.25, the last 3.9 release that
+  `actions/python-versions` builds for that image; it runs only `scripts/push_gate.py`. The cases of
+  the new `scripts/tests/test_toolchains.py` failed before the change, because no pin or check
+  existed, the cargo commands had no `--locked` and the workflow used `ubuntu-latest` and tags, and
+  pass after it.
 - A verification runs every step of every language to its end and reports every failure. The first
   failure ended the run: a failing prepare step raised, the package tests stopped at the first
   failing package, the shared cases stopped at the first mismatch, and `scripts/test.py` returned

@@ -146,6 +146,7 @@ class RunIsolation(unittest.TestCase):
             raise Stop
 
         with patch('run.prepare', side_effect=capture), patch('run.shutil.which', return_value='/usr/bin/true'), \
+                patch('toolchains.problems', return_value=[]), patch.dict(os.environ), \
                 patch.object(sys, 'argv', ['run.py', '--check']), redirect_stdout(io.StringIO()):
             with self.assertRaises(Stop):
                 benchmark.main()
@@ -169,10 +170,12 @@ class RunIsolation(unittest.TestCase):
             with patch.dict(os.environ, {'CARGO_TARGET_DIR': '/shared/target'}), \
                     patch('run.prepare', return_value=[]), patch('run.artifact_paths', return_value=[module]), \
                     patch('run.run', side_effect=capture), patch('run.shutil.which', return_value='/usr/bin/true'), \
+                    patch('toolchains.problems', return_value=[]), \
                     patch.object(sys, 'argv', ['run.py', '--check']), redirect_stdout(io.StringIO()):
                 with self.assertRaises(Stop):
                     benchmark.main()
         target = captured['target']
+        self.assertIn('--locked', captured['command'])
         self.assertIsNotNone(target, 'cargo run of the benchmark sets CARGO_TARGET_DIR')
         self.assertNotEqual(target, '/shared/target')
         self.assertFalse(inside(target), target)

@@ -2,7 +2,9 @@
 # docs/features.md is partial, but a push from a checkout without the hook does not run it. This job
 # runs the same gate, scripts/push_gate.py, on the pushed commit of every branch and on the head
 # commit of every pull request: it fails while a feature is partial, naming each one, and when
-# .githooks/pre-push is not tracked with mode 100755. The full verification is not run here.
+# .githooks/pre-push is not tracked with mode 100755. The full verification is not run here. The
+# runner image, each action and Python are exact releases, so the job does not change with a new
+# release of any of them.
 name: push-gate
 
 on:
@@ -14,10 +16,16 @@ permissions:
 
 jobs:
   push-gate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      # actions/checkout v6.1.0
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      # actions/setup-python v6.3.0. .python-version pins 3.9.6 for the local runs, which
+      # actions/python-versions does not build for ubuntu-24.04; 3.9.25 is the last 3.9 release it builds.
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.9.25'
       - name: push gate
         run: python3 scripts/push_gate.py commit "${{ github.event.pull_request.head.sha || github.sha }}"

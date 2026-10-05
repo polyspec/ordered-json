@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: a9033ce38ae1288f3896e9499305f7bc79a8c71acfa5ca5fb70f7badc26aab3b -->
+<!-- source-sha256: 5abf16af6b0045bffadc768d567077fd59c16adabf8143e06052f736ce71ae9d -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,21 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 모든 실행은 어떤 작업보다 먼저 도구를 추적되는 고정값과 비교합니다. 고정한 것이 없었습니다. 실행은 기계에 있는 Node.js, Rust, Go,
+  Python, npm을 그대로 사용했고, go는 `go.mod`의 toolchain을 내려받을 수 있었고, rustup은 첫 cargo에서 toolchain을 설치할 수
+  있었고, cargo는 `Cargo.lock`을 다시 쓸 수 있었으며, CI는 `ubuntu-latest`에서 움직이는 tag의 action으로 실행했습니다.
+  `.node-version`은 Node.js 26.8.1, `rust-toolchain.toml`은 Rust 1.98.1, `go/go.mod`의 새 `toolchain` 줄은 Go 1.27.0,
+  `.python-version`은 Python 3.9.6, `package.json`의 `packageManager`는 registry tarball의 SHA-512와 함께 npm 12.2.0을
+  고정합니다. 새 `scripts/toolchains.py`는 각 도구를 고정값과 비교하고, `scripts/test.py`, `scripts/verify.py`,
+  `scripts/check_pie.py`, `benchmarks/run.py`는 첫 단계 전에 이를 호출해 다른 도구마다 기대 버전과 실제 버전 또는 명령의 오류를 밝히며
+  실패합니다. `GOTOOLCHAIN=local`과 `RUSTUP_AUTO_INSTALL=0`은 Makefile, registry, 검사가 설정하고, 모든 cargo 명령은
+  `--locked`를 사용하며, runtime version은 rustup이 고정값을 읽는 저장소 디렉터리에서 읽습니다. `make tools`는 Rust toolchain을
+  설치하고 npm tarball을 내려받아 hash가 일치하지 않으면 거부하며, `PATH`의 맨 앞에 오는 `.cache/tools/npm`에 link 없이 풉니다.
+  기계의 npm은 사용하지도 바꾸지도 않습니다. GNU Make 3.81은 단순한 recipe 명령을 export한 `PATH`가 아니라 자기 `PATH`에서 찾으므로,
+  어떤 recipe도 고정된 도구를 이름으로 실행하지 않습니다. CI는 `ubuntu-24.04`에서 commit에 고정한 `actions/checkout`,
+  `actions/setup-python`과 `actions/python-versions`가 그 image용으로 build하는 마지막 3.9 release인 Python 3.9.25로 실행하며,
+  `scripts/push_gate.py`만 실행합니다. 새 `scripts/tests/test_toolchains.py`의 case는 고정값과 검사가 없었고, cargo 명령에
+  `--locked`가 없었고, workflow가 `ubuntu-latest`와 tag를 사용했으므로 변경 전에 실패했고, 변경 후에는 통과합니다.
 - 검증은 모든 언어의 모든 단계를 끝까지 실행하고 모든 실패를 보고합니다. 첫 실패가 실행을 끝냈습니다. 실패한 prepare 단계는 예외를
   던졌고, package test는 처음 실패한 package에서 멈추었고, 공통 사례는 첫 불일치에서 멈추었으며, `scripts/test.py`는 단위 테스트가
   실패하면 build 전에 반환했습니다. 그래서 두 번째로 실패한 언어는 첫 언어를 고치고 전체 실행을 다시 시작할 때까지 보고되지 않았습니다.

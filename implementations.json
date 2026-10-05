@@ -57,7 +57,8 @@
     "rust": {
       "repository": "rust",
       "env": {
-        "CARGO_TARGET_DIR": "{cache}/rust-target"
+        "CARGO_TARGET_DIR": "{cache}/rust-target",
+        "RUSTUP_AUTO_INSTALL": "0"
       },
       "prepare": [
         {
@@ -73,6 +74,7 @@
           "command": [
             "{cargo}",
             "build",
+            "--locked",
             "--quiet",
             "--example",
             "probe"
@@ -87,6 +89,7 @@
         "command": [
           "{cargo}",
           "test",
+          "--locked",
           "--",
           "--test-threads=1"
         ]
@@ -96,6 +99,7 @@
         "command": [
           "{cargo}",
           "test",
+          "--locked",
           "--quiet",
           "--",
           "--list"
@@ -106,6 +110,7 @@
         "command": [
           "{cargo}",
           "run",
+          "--locked",
           "--quiet",
           "--example",
           "api"
@@ -120,6 +125,9 @@
     },
     "go": {
       "repository": "go",
+      "env": {
+        "GOTOOLCHAIN": "local"
+      },
       "prepare": [
         {
           "cwd": "{go}",
