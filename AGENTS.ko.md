@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 4744b0dcd7ddb5e902e7aa749b54c1391f7d5a6062a9674ddcc90ac95f13f2e6 -->
+<!-- source-sha256: c80db7d77115570ef9b37f03420458934d1f6d8f110d03a0b7e433080ab6cc85 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -41,7 +41,7 @@ python3 scripts/test.py --unit test_docs_check.DocumentationChecks.test_missing_
 git diff --check
 ~~~
 
-`scripts/verify.py --only`는 선택한 구현을 빌드하고 그 구현의 케이스·심볼 목록, 선언된 패키지 테스트, 공통 사례를 실행하며 기록을 쓰지 않습니다. `scripts/test.py --unit`은 지정한 검증기 unit test를 실행하며 기록을 쓰지 않습니다.
+`scripts/verify.py --only`는 선택한 구현을 빌드하고 그 구현의 케이스·심볼 목록, 선언된 패키지 테스트, 공통 사례를 실행하며 기록을 쓰지 않습니다. `scripts/test.py --unit`은 지정한 검증기 unit test를 실행하며 기록을 쓰지 않습니다. test가 없는 module처럼 test를 하나도 고르지 않는 이름은 어떤 test도 실행하기 전에 `selected 0 tests`와 그 이름을 출력하며 실패합니다.
 
 `make check`는 활성 항목이 모두 끝난 뒤 한 번 실행하고 단계별 경과 시간을 보고합니다. 추가 사례를 포함하면 그 실행은 다음과 같습니다.
 

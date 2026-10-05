@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 3a17d25eea642dcf480ad08505262c9326412bd27bed14b96eb12353e4d6729d -->
+<!-- source-sha256: 5a7a6feecfe9901a63add3033b8af7dc472d9c67c648da7278a0929968871fed -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,11 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- `scripts/test.py --unit`은 이름이 test를 하나도 고르지 않으면 어떤 test도 실행하기 전에 `selected 0 tests`와 그 이름을 출력하며
+  실패하고, 전체 실행은 unit test를 하나도 찾지 못하면 실패합니다. `--unit registry`는 test가 없는 module `scripts/registry.py`를
+  읽어 0개의 test를 실행하고 status 0으로 끝났으므로, 잘못 적은 선택이 test 실행으로 통과했습니다.
+  `scripts/tests/test_unit_runner.py`의 새 case는 `--unit registry`가 status 0으로 끝났으므로 변경 전에 실패했고, 변경 후에는
+  통과합니다.
 - push gate와 guard는 기능 행을 내지 않는 tracker를 거부합니다. 둘 다 `| F-`로 시작하는 줄만 읽었으므로, 기능 표가 없거나, 표가
   비었거나, ID가 `F-...`가 아닌 행이 있는 `docs/features.md`에는 `partial` 행이 없었고 `scripts/push_gate.py hook`은 거부하지
   않았습니다. `scripts/docs_check.py`는 새 `feature_table`로 기능 표를 읽고, 이 함수는 표가 없거나, 행이 없거나, 기능이 아닌 행이

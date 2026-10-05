@@ -116,7 +116,13 @@ def main():
     args = parser.parse_args()
     if args.unit:
         sys.path.insert(0, str(ROOT / 'scripts/tests'))
-        return 0 if run_unit_tests(unittest.defaultTestLoader.loadTestsFromNames(args.unit)).wasSuccessful() else 1
+        selections = [(name, unittest.defaultTestLoader.loadTestsFromName(name)) for name in args.unit]
+        # A name that selects no test, such as a module without tests, ran nothing; it fails by name.
+        empty = [name for name, tests in selections if not tests.countTestCases()]
+        if empty:
+            print('selected 0 tests: ' + ', '.join(empty), file=sys.stderr)
+            return 1
+        return 0 if run_unit_tests(unittest.TestSuite(tests for _, tests in selections)).wasSuccessful() else 1
     suite = args.suite.resolve() if args.suite else None
     if suite and not (suite / 'test_parsing').is_dir():
         parser.error('--suite must contain test_parsing/')
@@ -128,7 +134,9 @@ def main():
     warnings, failures = [], []
     tests = unittest.defaultTestLoader.discover(str(ROOT / 'scripts/tests'))
     test_result = run_unit_tests(tests)
-    if not test_result.wasSuccessful():
+    if not test_result.testsRun:
+        failures.append('unit tests: selected 0 tests in scripts/tests')
+    elif not test_result.wasSuccessful():
         # The verification still runs to its end, so one run reports every failure.
         failures.append(f'unit tests: {count(len(test_result.failures), "failure")} and '
                         f'{count(len(test_result.errors), "error")} of {test_result.testsRun} tests')

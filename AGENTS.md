@@ -40,7 +40,7 @@ python3 scripts/test.py --unit test_docs_check.DocumentationChecks.test_missing_
 git diff --check
 ~~~
 
-`scripts/verify.py --only` builds the selected implementation and runs its case and symbol listings, its declared package tests, and the shared cases; it writes no record. `scripts/test.py --unit` runs the named verifier unit tests and writes no record.
+`scripts/verify.py --only` builds the selected implementation and runs its case and symbol listings, its declared package tests, and the shared cases; it writes no record. `scripts/test.py --unit` runs the named verifier unit tests and writes no record; a name that selects no test, such as a module without tests, fails with `selected 0 tests` and the name before any test runs.
 
 Run `make check` once, after every active item is complete, and report the elapsed time of each step. With the supplementary suite, that run is:
 
