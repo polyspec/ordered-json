@@ -8,7 +8,7 @@ import platform
 import subprocess
 import tempfile
 
-from registry import IMPLEMENTATIONS, REGISTRY, repository_paths, runtime_versions
+from registry import IMPLEMENTATIONS, REGISTRY
 
 SOURCE_PATTERNS = (
     'Makefile', 'js/*.js', 'js/*.ts', 'js/test/**/*.mjs', 'js/package.json',
@@ -71,10 +71,6 @@ def package_revisions(root):
 
 def output(command, cwd=None):
     return subprocess.check_output(command, cwd=cwd, text=True, stderr=subprocess.PIPE).strip()
-
-
-def runtimes(root):
-    return runtime_versions(IMPLEMENTATIONS, repository_paths(root), root / '.cache/probes')
 
 
 def create_record(root, before, results, counts, documentation_tests, runtime_versions,

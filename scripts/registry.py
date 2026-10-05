@@ -1,4 +1,6 @@
 """Load implementation commands and resolve monorepo package paths."""
+from contextlib import contextmanager
+from dataclasses import dataclass
 import json
 import os
 from pathlib import Path
@@ -6,6 +8,7 @@ import re
 import shutil
 import signal
 import subprocess
+import tempfile
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,6 +46,8 @@ def load_registry(root=ROOT):
         if any(not command or not isinstance(command, list) or
                any(not isinstance(argument, str) for argument in command) for command in commands):
             raise ValueError('Commands must be nonempty argument lists: ' + name)
+        if not isinstance(implementation.get('build_in_copy', False), bool):
+            raise ValueError('build_in_copy is true or false: ' + name)
         artifacts = implementation.get('artifacts')
         if artifacts is not None and (not isinstance(artifacts, list) or not artifacts or any(
                 not isinstance(path, str) or not path for path in artifacts)):
@@ -69,6 +74,56 @@ def required_repositories(selected, registry=REGISTRY):
         implementation = registry['implementations'][name]
         required.update([implementation['repository']] + implementation.get('dependencies', []))
     return sorted(required)
+
+
+@dataclass(frozen=True)
+class Run:
+    """One verification run: its temporary root, the repository paths its commands use, and
+    the cache directory that receives built probes."""
+    root: Path
+    paths: dict
+    cache: Path
+
+
+def copy_sources(source, target):
+    """Copy the files Git tracks or would track under source, without ignored build output.
+
+    A symbolic link is rejected, because the copy must hold the bytes the checkout holds."""
+    listing = subprocess.run(['git', 'ls-files', '--cached', '--others', '--exclude-standard', '-z'],
+                             cwd=source, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+    count = 0
+    for name in sorted(filter(None, listing.stdout.decode('utf-8').split('\0'))):
+        path = source / name
+        if path.is_symlink():
+            raise ValueError('A build source is a symbolic link: ' + str(path))
+        if not path.is_file():
+            continue  # A tracked file deleted in the checkout is not a source of this run.
+        destination = target / name
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, destination)
+        count += 1
+    print(f'copied {count} source files from {source} to {target}', flush=True)
+
+
+@contextmanager
+def run_directory(selected, paths, registry=REGISTRY):
+    """Give one run its own temporary directory and remove it when the run ends.
+
+    The cache for built probes lies in that directory. A repository whose implementation
+    declares build_in_copy is copied there and its commands use the copy, so a build never
+    cleans or replaces files in the checkout that another run uses."""
+    with tempfile.TemporaryDirectory(prefix='ordered-json-run-') as folder:
+        root = Path(folder).resolve()
+        print(f'run directory: {root}', flush=True)
+        run_paths = dict(paths)
+        for name in selected:
+            implementation = registry['implementations'][name]
+            repository = implementation['repository']
+            if implementation.get('build_in_copy') and run_paths[repository] == paths[repository]:
+                copy = root / registry['repositories'][repository]['path']
+                copy_sources(paths[repository], copy)
+                run_paths[repository] = copy
+        yield Run(root, run_paths, root / 'cache')
 
 
 def context(paths, cache):

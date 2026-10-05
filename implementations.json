@@ -215,6 +215,7 @@
       "dependencies": [
         "php"
       ],
+      "build_in_copy": true,
       "prepare": [
         {
           "cwd": "{php-extension}/src",
