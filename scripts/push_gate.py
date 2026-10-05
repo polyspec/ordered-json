@@ -25,8 +25,9 @@ from full_run import ACTIVE_STATE, FEATURES, active_items
 HOOKS_PATH = '.githooks'
 HOOK = '.githooks/pre-push'
 SHORT = 12
-RULE = ('A push happens only when no feature is partial (AGENTS.md): CI runs the full verification on the pushed '
-        'tree, and its guard refuses a tree with a feature in progress.')
+RULE = ('A push happens only when no feature is partial (AGENTS.md): CI does not run the verification, so make check '
+        'runs it once on the committed tree after every feature is complete, and a feature in progress does not '
+        'reach the remote.')
 FIX = ('Complete each feature and set its implementation to implemented in a commit with its documentation, '
        'tests and changelog entry; then push again.')
 

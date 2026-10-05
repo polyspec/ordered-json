@@ -95,7 +95,10 @@ def environment():
     }
 
 def run(command, env, cwd=ROOT, label=None):
-    result = subprocess.run(command, cwd=cwd, env=env, text=True, capture_output=True, check=True)
+    result = subprocess.run(command, cwd=cwd, env=env, text=True, capture_output=True)
+    if result.returncode:
+        raise RuntimeError(f"benchmark {label or command[0]} failed with exit {result.returncode}: {' '.join(map(str, command))}\n"
+                           f"{result.stderr.strip() or result.stdout.strip() or 'no output'}")
     rows = []
     for line in result.stdout.splitlines():
         file, name, parse_ns, stringify_ns, roundtrip_ns, parse_p95, stringify_p95, roundtrip_p95, samples, digest, input_bytes, output_bytes = line.split("\t")

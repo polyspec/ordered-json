@@ -16,6 +16,6 @@
     ]
   },
   "scripts": {
-    "test": "python3 scripts/check.py"
+    "test": "python3 ../scripts/verify.py --only php"
   }
 }

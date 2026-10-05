@@ -6,6 +6,18 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Failures name what differs. A PIE build or tool error said only "see the PIE output above"; it
+  now lists the lines that matched. A stale aggregate or PIE record, and sources that changed during
+  a run, said only that the sources differ; each now lists every changed, added and removed file.
+  A failing runtime version command and a failing benchmark command lost the tool's standard error;
+  both now include the exit status and that error. The `extension_version` runtime command of
+  `implementations.json` exited with status 1 and no message when `phpversion('ordered_json')`
+  differed from `ORDERED_JSON_VERSION`; it now prints both values. The rule that a refused push
+  prints said that CI runs the full verification, which it does not; it now says that CI does not
+  run the verification. The `test` scripts of `js/package.json` and `php/composer.json` ran
+  `scripts/check.py`, which does not exist; they run `../scripts/verify.py --only js` and
+  `--only php`. The cases of the new `scripts/tests/test_failure_messages.py` failed before the
+  change, because each message lacked the named lines, files, values or error, and pass after it.
 - `benchmarks/run.py` and `scripts/compare_ojson.py` publish their results through `write_record`,
   which renames a complete file over the result. They wrote `benchmarks/results.json`, the review
   copy `.cache/benchmark.current.json` and `docs/reports/ojson-comparison.json` in place, so a

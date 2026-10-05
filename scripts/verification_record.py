@@ -46,6 +46,16 @@ def source_manifest(root):
             'files': files}
 
 
+def manifest_differences(recorded, current):
+    """The files that differ between a recorded and a current source manifest, one line each:
+    changed, added and removed, in path order."""
+    before, after = (recorded or {}).get('files', {}), current.get('files', {})
+    lines = [f'changed {name}' for name in sorted(set(before) & set(after)) if before[name] != after[name]]
+    lines += [f'added {name}' for name in sorted(set(after) - set(before))]
+    lines += [f'removed {name}' for name in sorted(set(before) - set(after))]
+    return lines or ['the manifest hash differs while every file hash matches']
+
+
 def package_revisions(root):
     """Identify each package by the current root-tracked file content."""
     files = source_manifest(root)['files']
@@ -74,8 +84,10 @@ def output(command, cwd=None):
 
 def create_record(root, before, results, counts, documentation_tests, runtime_versions,
                   supplementary=None, build_warnings=(), package_tests=None):
-    if source_manifest(root) != before:
-        raise ValueError('Sources changed during verification; no current record was written')
+    current = source_manifest(root)
+    if current != before:
+        raise ValueError('Sources changed during verification; no current record was written:\n'
+                         + '\n'.join(manifest_differences(before, current)))
     if set(results) != set(IMPLEMENTATIONS):
         raise ValueError('A current record requires all registered implementations')
     total = sum(counts.values())
