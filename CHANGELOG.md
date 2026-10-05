@@ -6,6 +6,17 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- `scripts/docs_check.py` fails, with the file, line and column, on an implementation state
+  (`implemented`, `partial`, `planned`) written as a code span or a table cell anywhere in
+  `docs/features.md` or its translation other than the Implementation cell of a feature row, and on
+  a line other than the table in the section of the feature table. `docs/features.md` is the tracker
+  that `scripts/full_run.py` reads, and its legend paragraph wrote each state as a code span inside
+  that section, so a tool that reads the states saw states outside the feature rows. The legend
+  moved to the new section Feature state of AGENTS.md, which defines the states. A state word in
+  prose is ordinary English and is not checked. `scripts/tests/test_docs_check.py` failed in its two
+  new cases before the change, because a code span, a table cell and a paragraph in the table
+  section passed the check; both pass after it, and the check reported line 9 of `docs/features.md`
+  and line 10 of the translation before the legend moved.
 - `make check` starts the guard `scripts/full_run.py` before the verification. The development
   procedure runs `make check` once, after every active item is complete, and nothing enforced it:
   `make check` started the verification while work was in progress, with uncommitted changes and

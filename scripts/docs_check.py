@@ -136,6 +136,47 @@ def feature_rows(text):
     return rows
 
 
+STATES = ('implemented', 'partial', 'planned')
+STATE_SPAN = re.compile(r'(`+) ?(' + '|'.join(STATES) + r') ?\1')
+STATE_CELL = re.compile(r'\|\s*(' + '|'.join(STATES) + r')\s*(?=\|)')
+
+
+def tracker_errors(name, text):
+    """Locate implementation states outside the Implementation cell of a feature row and other lines in the
+    section of the feature table. docs/features.md is the tracker of this repository: scripts/full_run.py reads the
+    Implementation cells as its active work, so a state word stands only there, and AGENTS.md defines the states.
+    A state word in prose is ordinary English and is not read as a state; a state is a code span or a table cell
+    whose whole content is the state word. Lines and columns count from 1."""
+    lines = text.splitlines()
+    errors, fence = [], None
+    for number, line in enumerate(lines, 1):
+        marker = re.match(r'^ {0,3}(`{3,}|~{3,})', line)
+        if fence or marker:
+            if marker and (not fence or marker[1][0] == fence[0]):
+                fence = None if fence else marker[1]
+            continue
+        found = [(match.start() + 1, match[2]) for match in STATE_SPAN.finditer(line)]
+        if line.startswith('|'):
+            feature = re.match(r'^\|\s*F-', line)
+            for match in STATE_CELL.finditer(line):
+                if not (feature and line.count('|', 0, match.start() + 1) == 3):
+                    found.append((match.start(1) + 1, match[1]))
+        for column, state in found:
+            errors.append((number, column, f'state `{state}` stands outside the Implementation cell of a feature row'))
+    header = next((index for index, line in enumerate(lines) if line.startswith('| ID |')), None)
+    if header is not None:
+        start = max((index for index in range(header) if lines[index].startswith('#')), default=-1)
+        end = next((index for index in range(header, len(lines))
+                    if lines[index].startswith('#') or ANCHOR.match(lines[index])), len(lines))
+        for index in range(start + 1, end):
+            line = lines[index]
+            if not (line == '' or index == header or re.fullmatch(r'\|(?: --- \|)+', line) and index == header + 1
+                    or re.match(r'^\|\s*F-', line)):
+                errors.append((index + 1, 1, 'the line is not a row of the feature table; '
+                               'the section of the feature table holds only the table'))
+    return [f'{name}:{line}:{column}: {message}' for line, column, message in sorted(errors)]
+
+
 def external_inputs(root):
     """What the repository expects each external input to be, so a record can be wrong."""
     path = root / 'external-inputs.json'
@@ -365,6 +406,9 @@ def check_repository(root, include_children=True, records=True):
 
     features = {}
     if role == 'common':
+        for name in ('docs/features.md', 'docs/features.ko.md'):
+            if (root / name).is_file():
+                errors.extend(tracker_errors(name, (root / name).read_text(encoding='utf-8')))
         try:
             features = feature_rows(documents['docs/features.md'])
             if features != feature_rows(documents['docs/features.ko.md']):
