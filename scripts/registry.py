@@ -48,6 +48,10 @@ def load_registry(root=ROOT):
             raise ValueError('Commands must be nonempty argument lists: ' + name)
         if not isinstance(implementation.get('build_in_copy', False), bool):
             raise ValueError('build_in_copy is true or false: ' + name)
+        environment = implementation.get('env', {})
+        if not isinstance(environment, dict) or any(
+                not isinstance(key, str) or not isinstance(value, str) for key, value in environment.items()):
+            raise ValueError('env maps variable names to strings: ' + name)
         artifacts = implementation.get('artifacts')
         if artifacts is not None and (not isinstance(artifacts, list) or not artifacts or any(
                 not isinstance(path, str) or not path for path in artifacts)):
@@ -141,6 +145,16 @@ def expand(value, variables):
     return value
 
 
+def command_environment(name, variables, registry=REGISTRY):
+    """The environment of every command of an implementation: the caller's, with the variables the
+    implementation declares under env, or None when it declares none. A declared variable replaces the
+    caller's value, so a build output path such as CARGO_TARGET_DIR points into the run."""
+    declared = registry['implementations'][name].get('env')
+    if not declared:
+        return None
+    return dict(os.environ, **{key: expand(value, variables) for key, value in declared.items()})
+
+
 def artifact_paths(name, paths, registry=REGISTRY):
     """The files a prepared build leaves behind, as the registry declares them."""
     variables = {key: str(value) for key, value in paths.items()}
@@ -198,7 +212,8 @@ def prepare(selected, paths, cache, registry=REGISTRY):
                 continue
             command = [expand(argument, variables) for argument in step['command']]
             label = f'{name} prepare {index}/{len(steps)} ({Path(command[0]).name})'
-            process = run_streamed(label, command, expand(step['cwd'], variables))
+            process = run_streamed(label, command, expand(step['cwd'], variables),
+                                   env=command_environment(name, variables, registry))
             if process.returncode:
                 raise subprocess.CalledProcessError(process.returncode, command)
             for line in process.stdout.splitlines():
@@ -227,6 +242,9 @@ def declared_commands(key, selected, paths, cache, registry=REGISTRY):
             result[name] = {'cwd': expand(declaration['cwd'], variables),
                             'command': [expand(argument, variables) for argument in declaration['command']],
                             'declared': list(declaration['command'])}
+            environment = command_environment(name, variables, registry)
+            if environment is not None:
+                result[name]['env'] = environment
     return result
 
 
@@ -252,7 +270,8 @@ def runtime_versions(selected, paths, cache, registry=REGISTRY):
         result[name] = {}
         for key, command in registry['implementations'][name]['runtime'].items():
             value = subprocess.check_output([expand(argument, variables) for argument in command],
-                                            text=True, stderr=subprocess.PIPE).strip()
+                                            text=True, stderr=subprocess.PIPE,
+                                            env=command_environment(name, variables, registry)).strip()
             if not value:
                 raise ValueError('Runtime version is empty: ' + name + '/' + key)
             result[name][key] = value

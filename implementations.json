@@ -56,6 +56,9 @@
     },
     "rust": {
       "repository": "rust",
+      "env": {
+        "CARGO_TARGET_DIR": "{cache}/rust-target"
+      },
       "prepare": [
         {
           "cwd": "{rust}",
@@ -77,7 +80,7 @@
         }
       ],
       "command": [
-        "{rust}/target/debug/examples/probe"
+        "{cache}/rust-target/debug/examples/probe"
       ],
       "tests": {
         "cwd": "{rust}",

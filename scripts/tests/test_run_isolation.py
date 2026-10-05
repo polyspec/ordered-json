@@ -5,6 +5,7 @@ build, Go probe, PIE work directory or Erlang comparison modules.
 """
 from contextlib import redirect_stdout
 import io
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -97,6 +98,28 @@ class RunIsolation(unittest.TestCase):
                 test_runner.build_extension()
         self.assertFalse(inside(captured['cwd']), captured['cwd'])
 
+    def test_rust_builds_runs_and_lists_in_the_run_target_directory(self):
+        # A target directory outside the run, as CARGO_TARGET_DIR or build.target-dir name one, would
+        # hold a probe that another checkout or an earlier tree built.
+        built = []
+
+        def capture(label, command, cwd, env=None):
+            built.append((command, env))
+            return subprocess.CompletedProcess(command, 0, stdout='')
+
+        with patch.dict(os.environ, {'CARGO_TARGET_DIR': '/shared/target'}), redirect_stdout(io.StringIO()), \
+                registry.run_directory(['rust'], repository_paths()) as run, \
+                patch('registry.run_streamed', side_effect=capture):
+            target = str(run.cache / 'rust-target')
+            registry.prepare(['rust'], run.paths, run.cache)
+            probe = registry.adapter_commands(['rust'], run.paths, run.cache)['rust'][0]
+            declared = {key: registry.declared_commands(key, ['rust'], run.paths, run.cache)['rust']
+                        for key in ('tests', 'test_cases', 'api_symbols')}
+        self.assertTrue(Path(probe).is_relative_to(target), probe)
+        self.assertEqual([env.get('CARGO_TARGET_DIR') for _, env in built], [target] * len(built))
+        for key, entry in declared.items():
+            self.assertEqual(entry['env']['CARGO_TARGET_DIR'], target, key)
+
     def test_pie_builds_a_run_copy_in_a_run_work_directory(self):
         captured = []
 
@@ -128,6 +151,33 @@ class RunIsolation(unittest.TestCase):
                 benchmark.main()
         self.assertFalse(inside(captured['paths']['php-extension']), captured['paths']['php-extension'])
         self.assertFalse(inside(captured['cache']), captured['cache'])
+
+    def test_the_benchmark_builds_rust_in_the_run_target_directory(self):
+        # cargo run with an inherited or default target directory would measure a binary that another
+        # checkout or an earlier tree built.
+        captured = {}
+
+        def capture(command, env, cwd=None, label=None):
+            if label == 'rust':
+                captured.update(command=command, target=env.get('CARGO_TARGET_DIR'))
+                raise Stop
+            return []
+
+        with tempfile.TemporaryDirectory() as folder:
+            module = Path(folder) / 'ordered_json.so'
+            module.write_text('')
+            with patch.dict(os.environ, {'CARGO_TARGET_DIR': '/shared/target'}), \
+                    patch('run.prepare', return_value=[]), patch('run.artifact_paths', return_value=[module]), \
+                    patch('run.run', side_effect=capture), patch('run.shutil.which', return_value='/usr/bin/true'), \
+                    patch.object(sys, 'argv', ['run.py', '--check']), redirect_stdout(io.StringIO()):
+                with self.assertRaises(Stop):
+                    benchmark.main()
+        target = captured['target']
+        self.assertIsNotNone(target, 'cargo run of the benchmark sets CARGO_TARGET_DIR')
+        self.assertNotEqual(target, '/shared/target')
+        self.assertFalse(inside(target), target)
+        self.assertEqual(Path(target).name, 'rust-target')
+        self.assertFalse(Path(target).parent.exists(), 'the run directory is removed when the run ends')
 
     def test_the_comparison_compiles_erlang_outside_the_checkout(self):
         captured = {}

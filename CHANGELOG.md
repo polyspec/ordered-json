@@ -6,6 +6,16 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Every cargo command of a verification run builds into `CARGO_TARGET_DIR` inside that run. The Rust
+  probe was `rust/target/debug/examples/probe`, and cargo used the target directory that the
+  environment named, so a probe, a test binary or an API listing built by another checkout or an
+  earlier tree could answer for the current sources. `implementations.json` declares
+  `"env": {"CARGO_TARGET_DIR": "{cache}/rust-target"}` for `rust`, `scripts/registry.py` passes it to
+  every prepare step, listing, test and runtime command of the implementation, and the probe is
+  `{cache}/rust-target/debug/examples/probe`. `benchmarks/run.py` runs `cargo run` of the Rust
+  benchmark with `CARGO_TARGET_DIR` inside its run directory. The two new cases of
+  `scripts/tests/test_run_isolation.py` failed before the change, because the commands kept an
+  inherited `CARGO_TARGET_DIR=/shared/target`, and pass after it.
 - A push happens only when no feature of `docs/features.md` is `partial`. The pre-push hook
   `.githooks/pre-push` runs `scripts/push_gate.py hook`, which refuses the push while a pushed commit
   or the working tree has a `partial` row, naming each ref, commit, ID and feature, and refuses when
