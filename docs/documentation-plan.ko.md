@@ -1,5 +1,5 @@
 <!-- doc-id: documentation-plan -->
-<!-- source-sha256: 994d1007a36d21e6a8e4ec241c91f25556ff5e3a4b4f4d9d10b2b919561d27ba -->
+<!-- source-sha256: 7aad9120256ef0a05fea1b1236c3f1c3e1f6b336baf384ce09d67505ca57f66e -->
 # 문서 관리
 
 [English](documentation-plan.md)
@@ -44,7 +44,7 @@
 
 한국어 파일의 `source-sha256` 주석은 번역을 검토한 영어 개정본을 기록합니다. 번역 검토 후에만 갱신합니다. 해시 일치는 번역의 정확성을 증명하지 않습니다. 검사기는 외부 사이트의 접속 가능 여부나 문장의 의미를 검증하지 않으며, 코드와 테스트 결과를 읽고 확인해야 합니다.
 
-`make check`는 검증기와 문서 검사기 테스트, 등록된 모든 JSON 구현, `--records`를 붙인 문서 검사기를 실행합니다. 이 문서 검사기는 소스 해시가 현재 소스와 다른 검증 기록이나 PIE 기록도 거부합니다. [PIE 검증](operations/validation.ko.md#pie)은 별도의 빌드와 공통 사례 결과를 기록합니다. 호스팅 CI는 설정돼 있지 않습니다. 개발자는 커밋 전에 필수 명령을 실행해야 합니다.
+`make check`는 검증기와 문서 검사기 테스트, 등록된 모든 JSON 구현, `--records`를 붙인 문서 검사기를 실행합니다. 이 문서 검사기는 소스 해시가 현재 소스와 다른 검증 기록이나 PIE 기록도 거부합니다. [PIE 검증](operations/validation.ko.md#pie)은 별도의 빌드와 공통 사례 결과를 기록합니다. 호스팅 CI는 push gate `.github/workflows/push-gate.yml`만 실행합니다. 이 gate는 기능이 `partial`인 push된 commit을 거부하며, 이 검사들은 실행하지 않습니다. 개발자는 커밋 전에 필수 명령을 실행해야 합니다.
 
 <a id="records"></a>
 ## 기술 기록

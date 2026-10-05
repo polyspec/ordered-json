@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: f9fc86e2dccc4413981e222fac4e34012e592ba3d62434f617b1475fb27bdd9a -->
+<!-- source-sha256: 2e66264fbda74877bd67bb10c671bb7d6b93e5c8ca35f834fd4a62d35f49664a -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,16 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- push는 `docs/features.md`에 `partial` 기능이 없을 때만 합니다. pre-push hook `.githooks/pre-push`는
+  `scripts/push_gate.py hook`을 실행하고, 이 명령은 push되는 commit이나 working tree에 `partial` 행이 있으면 각 ref, commit, ID,
+  기능을 밝히며 push를 거부하고, push되는 commit의 `docs/features.md`를 읽을 수 없으면 거부합니다. 모든 `make` 실행은 Makefile을
+  읽을 때 `core.hooksPath`를 `.githooks`로 설정합니다. `make hooks`는 이를 설정하고 검사하며, `make hooks-check`는 설정되지 않았거나
+  hook이 실행 가능하지 않으면 실패합니다. guard `scripts/full_run.py`는 hook이 설치되지 않았으면 `make check`와 `make rerun-failed`를
+  거부합니다. hook이 없는 checkout에서 한 push는 hook을 실행하지 않으므로, workflow `.github/workflows/push-gate.yml`이 모든 push된
+  branch와 pull request에서 job `push-gate`로 `scripts/push_gate.py commit`을 실행합니다. 이 job은 기능이 `partial`이면 실패하고,
+  `.githooks/pre-push`가 mode 100755로 추적되지 않으면 실패합니다. AGENTS는 이 저장소에 CI workflow가 없다고 적었고, 진행 중인 작업의
+  push를 거부하는 것은 없었습니다. `scripts/tests/test_push_gate.py`와 `scripts/tests/test_full_run.py`의 새 case 두 개는 gate, hook,
+  workflow가 없고 guard가 hook 상태를 받지 않았으므로 변경 전에 실패했고, 두 file의 20개 case는 변경 후에 모두 통과합니다.
 - `scripts/docs_check.py`는 `docs/features.md`나 그 번역에서 기능 행의 구현 칸이 아닌 곳에 code span이나 표 칸으로 적힌 구현
   상태(`implemented`, `partial`, `planned`)와, 기능 표의 절에서 표가 아닌 줄에서 file, 줄, 열을 적으며 실패합니다.
   `docs/features.md`는 `scripts/full_run.py`가 읽는 tracker이고, 그 범례 문단이 각 상태를 그 절 안에 code span으로 적었으므로
