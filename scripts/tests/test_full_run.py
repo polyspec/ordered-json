@@ -19,8 +19,9 @@ import full_run as full_run_module
 from full_run import RECORD, active_items, decide, full_run
 
 ROOT = Path(__file__).resolve().parents[2]
-# The variables of the Makefile and the variables through which make passes its own to a nested make.
-MAKE_INPUTS = {'MAKEFLAGS', 'MFLAGS', 'MAKELEVEL', 'PYTHON', 'JSON_TEST_SUITE', 'PIE'}
+# The variables of the Makefile, the variables through which make passes its own to a nested make, and
+# GNUMAKEFLAGS and MAKEFILES, through which a caller adds flags and makefiles to every make.
+MAKE_INPUTS = {'MAKEFLAGS', 'GNUMAKEFLAGS', 'MFLAGS', 'MAKEFILES', 'MAKELEVEL', 'PYTHON', 'JSON_TEST_SUITE', 'PIE'}
 
 FEATURES = """# Feature state
 
@@ -110,6 +111,14 @@ class FullRunChecks(unittest.TestCase):
                                  f'scripts/full_run.py before any step; {why}. The nested make ran without '
                                  f'{", ".join(sorted(MAKE_INPUTS))} from the environment (the caller had '
                                  f'MAKEFLAGS={os.environ.get("MAKEFLAGS", "")!r}).')
+
+    def test_the_make_dry_run_ignores_make_variables_of_the_environment(self):
+        # GNUMAKEFLAGS and MAKEFILES of the caller change what make reads and prints.
+        with tempfile.TemporaryDirectory() as folder:
+            injected = Path(folder) / 'injected.mk'
+            injected.write_text('$(info injected by MAKEFILES)\n')
+            with patch.dict(os.environ, {'MAKEFILES': str(injected), 'GNUMAKEFLAGS': '--debug=b'}):
+                self.test_make_check_starts_the_guard_before_any_step()
 
     def test_active_items_are_the_partial_features(self):
         self.assertEqual(active_items(FEATURES), [{'id': 'F-STREAM', 'title': 'Streaming \\| incremental parsing'}])

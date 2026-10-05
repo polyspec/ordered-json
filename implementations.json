@@ -38,7 +38,8 @@
           "node",
           "test/api.mjs",
           "--cases"
-        ]
+        ],
+        "format": "lines"
       },
       "api_symbols": {
         "cwd": "{javascript}",
@@ -102,8 +103,11 @@
           "--locked",
           "--quiet",
           "--",
-          "--list"
-        ]
+          "--list",
+          "--format",
+          "terse"
+        ],
+        "format": "cargo-terse"
       },
       "api_symbols": {
         "cwd": "{rust}",
@@ -161,8 +165,10 @@
           "test",
           "-list",
           ".*",
+          "-json",
           "./..."
-        ]
+        ],
+        "format": "go-test-json"
       },
       "api_symbols": {
         "cwd": "{go}",
@@ -202,7 +208,8 @@
           "-n",
           "tests/api.php",
           "--cases"
-        ]
+        ],
+        "format": "lines"
       },
       "api_symbols": {
         "cwd": "{php}",
@@ -293,7 +300,8 @@
           "tests/descriptors.php",
           "{php}/src/OrderedJson.php",
           "--cases"
-        ]
+        ],
+        "format": "lines"
       },
       "api_symbols": {
         "cwd": "{php}",

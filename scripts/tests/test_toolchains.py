@@ -110,7 +110,7 @@ class Pins(unittest.TestCase):
             shutil.copy2(ROOT / 'Makefile', root / 'Makefile')
             shutil.copy2(ROOT / 'scripts/toolchains.py', root / 'scripts/toolchains.py')
             environment = {key: value for key, value in os.environ.items()
-                           if key not in ('MAKEFLAGS', 'MFLAGS', 'MAKELEVEL', 'PYTHON')}
+                           if key not in ('MAKEFLAGS', 'GNUMAKEFLAGS', 'MFLAGS', 'MAKEFILES', 'MAKELEVEL', 'PYTHON')}
             environment['PATH'] = f'{bin_directory}:/usr/bin:/bin'
 
             def make():
