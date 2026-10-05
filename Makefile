@@ -21,7 +21,7 @@ export COMPOSER_DISABLE_NETWORK := 1
 ONLINE := env -u CARGO_NET_OFFLINE -u GOPROXY -u npm_config_offline -u COMPOSER_DISABLE_NETWORK
 export PATH := $(NPM_DIRECTORY)/bin:$(PATH)
 
-.PHONY: check rerun-failed test docs-check pie-check benchmark hooks hooks-check tools toolchains-check owner-check
+.PHONY: check rerun-failed test docs-check pie-check benchmark hooks hooks-check push-gate tools toolchains-check owner-check
 
 # scripts/full_run.py runs the full verification once per committed tree, when no feature of
 # docs/features.md is partial, and records its result in var/full-run.json.
@@ -56,6 +56,12 @@ hooks:
 
 hooks-check:
 	$(PYTHON) scripts/push_gate.py hooks-check
+
+# push-gate runs the push gate on the commit COMMIT, as the job push-gate of .github/workflows/push-gate.yml does:
+# it fails while a feature of that commit is partial or a task is [~], and when a hook is not tracked executable.
+push-gate:
+	$(if $(COMMIT),,$(error make push-gate needs COMMIT=<commit> to check))
+	$(PYTHON) scripts/push_gate.py commit "$(COMMIT)"
 
 # tools installs the pinned Rust toolchain of rust-toolchain.toml, the pinned npm into .cache/tools/npm, the crates
 # of rust/Cargo.lock, and the PIE PHAR and the supplementary suite of external-inputs.json into .cache/pie/pie.phar
