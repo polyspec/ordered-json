@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 5a7a6feecfe9901a63add3033b8af7dc472d9c67c648da7278a0929968871fed -->
+<!-- source-sha256: 2a01cffe8c4b2d73074530f08c65b7992bd09e1cf4264475f5d33b9456ebec6e -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,12 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- `make pie-check`는 PIE를 실행하기 전에 PHAR의 해시와 JSONTestSuite checkout을 `external-inputs.json`의 고정값과 비교하고,
+  `make check`는 단위 테스트 전에 추가 사례를 비교합니다. 마지막의 문서 검사만 이를 비교했으므로, 고정값과 다른 PHAR나 추가 사례
+  checkout은 검사가 결국 거부하는 기록을 위해 build와 실행 전체를 소모했습니다. 다른 필드마다 기대값과 실제값을 밝히며 명령이 실패합니다.
+  고정값을 읽는 함수는 `scripts/docs_check.py`에서 새 `input_issues` 옆의 `scripts/verification_record.py`로 옮겼습니다. 새
+  `scripts/tests/test_external_pins.py`의 case는 PIE가 고정되지 않은 PHAR와 추가 사례로 실행되고 전체 실행이 고정되지 않은 추가
+  사례로 단위 테스트를 시작했으므로 변경 전에 실패했고, 변경 후에는 통과합니다.
 - `scripts/test.py --unit`은 이름이 test를 하나도 고르지 않으면 어떤 test도 실행하기 전에 `selected 0 tests`와 그 이름을 출력하며
   실패하고, 전체 실행은 unit test를 하나도 찾지 못하면 실패합니다. `--unit registry`는 test가 없는 module `scripts/registry.py`를
   읽어 0개의 test를 실행하고 status 0으로 끝났으므로, 잘못 적은 선택이 test 실행으로 통과했습니다.

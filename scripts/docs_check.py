@@ -9,7 +9,7 @@ import re
 import sys
 from urllib.parse import unquote, urlsplit
 
-from verification_record import IMPLEMENTATIONS, package_revisions, sha256, source_manifest
+from verification_record import IMPLEMENTATIONS, external_inputs, package_revisions, sha256, source_manifest
 from registry import REGISTRY, artifact_paths, files_under, fixture_paths, repository_paths, tracked_files
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -211,24 +211,6 @@ def tracker_errors(name, text):
                 errors.append((index + 1, 1, 'the line is not a row of the feature table; '
                                'the section of the feature table holds only the table'))
     return [f'{name}:{line}:{column}: {message}' for line, column, message in sorted(errors)]
-
-
-def external_inputs(root):
-    """What the repository expects each external input to be, so a record can be wrong."""
-    path = root / 'external-inputs.json'
-    if not path.is_file():
-        raise ValueError('A repository that records external inputs declares them in external-inputs.json')
-    pin = json.loads(path.read_text(encoding='utf-8'))
-    if pin.get('schema_version') != 1:
-        raise ValueError('Unsupported external input pin schema')
-    if not pin['pie'].get('release') or not re.fullmatch(r'[a-f0-9]{64}', pin['pie'].get('phar_sha256', '')):
-        raise ValueError('The PIE pin requires a release and its content hash')
-    supplementary = pin['supplementary']
-    if (not re.fullmatch(r'[a-f0-9]{40}', supplementary.get('revision', ''))
-            or not re.fullmatch(r'[a-f0-9]{64}', supplementary.get('inputs_sha256', ''))
-            or type(supplementary.get('cases')) is not int or supplementary['cases'] <= 0):
-        raise ValueError('The supplementary pin requires a revision, a content hash and a case count')
-    return pin
 
 
 def check_supplementary(record, counts, pin):

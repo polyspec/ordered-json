@@ -5,7 +5,9 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import subprocess
+import sys
 import tempfile
 
 from registry import IMPLEMENTATIONS, REGISTRY, tracked_files
@@ -101,6 +103,47 @@ def create_record(root, before, results, counts, documentation_tests, runtime_ve
         'supplementary': supplementary, 'build_warnings': list(build_warnings),
         'packages': package_revisions(root),
     }
+
+
+def external_inputs(root):
+    """What the repository expects each external input to be, so a record can be wrong."""
+    path = root / 'external-inputs.json'
+    if not path.is_file():
+        raise ValueError('A repository that records external inputs declares them in external-inputs.json')
+    pin = json.loads(path.read_text(encoding='utf-8'))
+    if pin.get('schema_version') != 1:
+        raise ValueError('Unsupported external input pin schema')
+    if not pin['pie'].get('release') or not re.fullmatch(r'[a-f0-9]{64}', pin['pie'].get('phar_sha256', '')):
+        raise ValueError('The PIE pin requires a release and its content hash')
+    supplementary = pin['supplementary']
+    if (not re.fullmatch(r'[a-f0-9]{40}', supplementary.get('revision', ''))
+            or not re.fullmatch(r'[a-f0-9]{64}', supplementary.get('inputs_sha256', ''))
+            or type(supplementary.get('cases')) is not int or supplementary['cases'] <= 0):
+        raise ValueError('The supplementary pin requires a revision, a content hash and a case count')
+    return pin
+
+
+def input_issues(pin, pie_sha256=None, supplementary=None):
+    """How the PIE PHAR hash and the supplementary manifest differ from the pin of external-inputs.json,
+    one message per field with the expected and the actual value. A check compares them before any
+    work, so a run is not spent on inputs that the documentation check rejects."""
+    issues = []
+    if pie_sha256 is not None and pie_sha256 != pin['pie']['phar_sha256']:
+        issues.append(f"PIE PHAR phar_sha256: expected {pin['pie']['phar_sha256']} (PIE {pin['pie']['release']}), "
+                      f'actual {pie_sha256}')
+    if supplementary is not None:
+        for field in ('project', 'revision', 'cases', 'inputs_sha256'):
+            if supplementary.get(field) != pin['supplementary'].get(field):
+                issues.append(f"JSONTestSuite {field}: expected {pin['supplementary'].get(field)}, "
+                              f'actual {supplementary.get(field)}')
+    return issues
+
+
+def report_input_issues(issues):
+    """Print each issue with the file that pins it; True when there is none."""
+    for issue in issues:
+        print(f'external input differs from external-inputs.json: {issue}', file=sys.stderr)
+    return not issues
 
 
 def supplementary_manifest(suite):
