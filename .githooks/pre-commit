@@ -1,0 +1,4 @@
+#!/bin/sh
+# Git runs this hook from the top level of the working tree before it records a commit.
+# scripts/owner_check.py refuses the commit while a tracked path matches no owner in scripts/owner-checks.json.
+exec python3 scripts/owner_check.py --validate

@@ -48,8 +48,9 @@ class Checkout:
         (self.root / 'docs/features.md').write_text(features)
         (self.root / '.gitignore').write_text('/var/\n')
         (self.root / '.githooks').mkdir()
-        (self.root / '.githooks/pre-push').write_text('#!/bin/sh\n')
-        (self.root / '.githooks/pre-push').chmod(0o755)
+        for hook in ('pre-push', 'pre-commit'):
+            (self.root / '.githooks' / hook).write_text('#!/bin/sh\n')
+            (self.root / '.githooks' / hook).chmod(0o755)
         git(self.root, 'init', '--quiet')
         git(self.root, 'config', 'core.hooksPath', '.githooks')
         self.commit()

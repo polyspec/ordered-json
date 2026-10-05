@@ -47,7 +47,7 @@ class Checkout:
         (self.root / 'scripts').mkdir(parents=True)
         for script in (ROOT / 'scripts').glob('*.py'):
             shutil.copy2(script, self.root / 'scripts')
-        for name in ('implementations.json', 'Makefile', '.githooks/pre-push'):
+        for name in ('implementations.json', 'Makefile', '.githooks/pre-push', '.githooks/pre-commit'):
             (self.root / name).parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ROOT / name, self.root / name)
         (self.root / 'docs').mkdir()
@@ -77,7 +77,8 @@ class Checkout:
         elif name:
             (self.root / name).write_text(text)
         self.git('add', '--all')
-        self.git('commit', '--quiet', '--allow-empty', '-m', 'state')
+        # The pre-commit hook checks the owner map of this repository, which the copy does not hold.
+        self.git('commit', '--quiet', '--allow-empty', '--no-verify', '-m', 'state')
         return self.git('rev-parse', 'HEAD')
 
     def push(self):
@@ -215,6 +216,18 @@ class PushGateChecks(unittest.TestCase):
         result = checkout.gate('commit', missing)
         self.assertEqual(result.returncode, 1)
         self.assertIn(f'::error::push refused: .githooks/pre-push is not tracked with mode 100755 in {missing[:12]} (not tracked)', result.stdout)
+
+    def test_the_commit_hook_must_be_installed_and_tracked_executable(self):
+        checkout = self.checkout()
+        (checkout.root / '.githooks/pre-commit').chmod(0o644)
+        result = checkout.gate('hooks-check')
+        self.assertEqual(result.returncode, 1)
+        self.assertIn('.githooks/pre-commit is missing or not executable', result.stderr)
+        plain = checkout.commit()
+        result = checkout.gate('commit', plain)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn(f'::error::push refused: .githooks/pre-commit is not tracked with mode 100755 in {plain[:12]} '
+                      '(mode 100644)', result.stdout)
 
     def test_the_workflow_runs_the_gate_on_every_push_and_pull_request(self):
         text = WORKFLOW.read_text()
