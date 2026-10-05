@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: b8045bbb9eee535f52208f8d59147e176cd5232517960defb3a8b2f8aa0b981d -->
+<!-- source-sha256: a9033ce38ae1288f3896e9499305f7bc79a8c71acfa5ca5fb70f7badc26aab3b -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,15 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 검증은 모든 언어의 모든 단계를 끝까지 실행하고 모든 실패를 보고합니다. 첫 실패가 실행을 끝냈습니다. 실패한 prepare 단계는 예외를
+  던졌고, package test는 처음 실패한 package에서 멈추었고, 공통 사례는 첫 불일치에서 멈추었으며, `scripts/test.py`는 단위 테스트가
+  실패하면 build 전에 반환했습니다. 그래서 두 번째로 실패한 언어는 첫 언어를 고치고 전체 실행을 다시 시작할 때까지 보고되지 않았습니다.
+  이제 `scripts/test.py`는 단위 테스트, 각 언어의 build, case와 symbol listing, package test, 모든 adapter의 모든 사례, runtime
+  version을 끝까지 실행하고, 모든 실패를 나열하며, record를 쓰지 않고 1을 반환합니다. 실패한 build는 자기 언어의 이후 단계만
+  건너뜁니다. `scripts/verify.py --only`는 모든 실패를 나열하고 status 1로 끝납니다. `scripts/tests/test_repositories.py`는 실패한
+  package가 검증을 멈춘다고 단언했고, 이제 그 뒤의 package가 실행되고 실패한 두 package가 모두 보고된다고 단언합니다. 그 case와 새
+  `scripts/tests/test_failure_collection.py`의 case는 실패한 두 언어 중 첫 언어만 보고되었으므로 변경 전에 실패했고, 변경 후에는
+  통과합니다.
 - 기록, 문서 검사, 공통 사례는 Git이 추적하는 파일만 읽습니다. `scripts/verification_record.py`의 source manifest는
   `git ls-files --cached --others --exclude-standard`를 나열하고 소스 pattern에 맞는 모든 파일을 더했으므로, 추적되지 않은 파일이
   record가 커밋된 tree로 밝히는 manifest를 바꾸었습니다. `scripts/docs_check.py`는 Markdown 문서와 JSON 보고서를 찾으려고

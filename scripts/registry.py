@@ -236,9 +236,20 @@ def run_streamed(label, command, cwd, env=None):
     return subprocess.CompletedProcess(command, returncode, stdout=''.join(line + '\n' for line in lines))
 
 
+class Failures(RuntimeError):
+    """Every failure of a step that ran each language to its end. `failures` holds one message per
+    failure and `languages` the implementations that failed."""
+
+    def __init__(self, failures, languages=()):
+        self.failures, self.languages = list(failures), set(languages)
+        super().__init__('\n'.join(self.failures))
+
+
 def prepare(selected, paths, cache, registry=REGISTRY):
+    """Run the prepare steps of every selected implementation. A failed step ends the build of its
+    implementation only; the others build to their end, and Failures then names every failure."""
     variables = context(paths, cache)
-    warnings = []
+    warnings, failures, failed = [], [], set()
     for name in required_repositories(selected, registry):
         if not paths[name].is_dir():
             raise ValueError('Missing package directory: ' + name)
@@ -251,15 +262,21 @@ def prepare(selected, paths, cache, registry=REGISTRY):
             label = f'{name} prepare {index}/{len(steps)} ({Path(command[0]).name})'
             process = run_streamed(label, command, expand(step['cwd'], variables),
                                    env=command_environment(name, variables, registry))
+            errors = [line for line in process.stdout.splitlines()
+                      if re.search(r'Permission denied|error:', line, re.IGNORECASE)]
             if process.returncode:
-                raise subprocess.CalledProcessError(process.returncode, command)
+                failures.append(f'{label}: exit {process.returncode}: {" ".join(command)}')
+            failures += [f'{label}: Build reported an error: {line}' for line in errors]
+            if process.returncode or errors:
+                failed.add(name)
+                break  # The later steps of this implementation need this one.
             for line in process.stdout.splitlines():
-                if re.search(r'Permission denied|error:', line, re.IGNORECASE):
-                    raise RuntimeError('Build reported an error: ' + line)
                 if re.search(r'warning:', line, re.IGNORECASE):
                     for repository, path in sorted(paths.items(), key=lambda item: -len(str(item[1]))):
                         line = line.replace(str(path) + '/', repository + '/')
                     warnings.append({'implementation': name, 'message': line})
+    if failures:
+        raise Failures(failures, failed)
     return warnings
 
 
@@ -301,17 +318,28 @@ def api_commands(selected, paths, cache, registry=REGISTRY):
 
 
 def runtime_versions(selected, paths, cache, registry=REGISTRY):
+    """The runtime versions of every selected implementation; Failures names every command that
+    failed or printed nothing, after all ran."""
     variables = context(paths, cache)
-    result = {}
+    result, failures, failed = {}, [], set()
     for name in selected:
         result[name] = {}
         for key, command in registry['implementations'][name]['runtime'].items():
-            value = subprocess.check_output([expand(argument, variables) for argument in command],
-                                            text=True, stderr=subprocess.PIPE,
-                                            env=command_environment(name, variables, registry)).strip()
+            resolved = [expand(argument, variables) for argument in command]
+            try:
+                value = subprocess.check_output(resolved, text=True, stderr=subprocess.PIPE,
+                                                env=command_environment(name, variables, registry)).strip()
+            except (OSError, subprocess.CalledProcessError) as error:
+                failures.append(f'{name}/{key}: {" ".join(resolved)}: {error}')
+                failed.add(name)
+                continue
             if not value:
-                raise ValueError('Runtime version is empty: ' + name + '/' + key)
+                failures.append('Runtime version is empty: ' + name + '/' + key)
+                failed.add(name)
+                continue
             result[name][key] = value
+    if failures:
+        raise Failures(failures, failed)
     return result
 
 

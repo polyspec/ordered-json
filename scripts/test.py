@@ -122,22 +122,39 @@ def main():
 
     before = source_manifest(ROOT)
     supplementary = supplementary_manifest(suite)
-    warnings = []
+    warnings, failures = [], []
     tests = unittest.defaultTestLoader.discover(str(ROOT / 'scripts/tests'))
     test_result = run_unit_tests(tests)
     if not test_result.wasSuccessful():
-        return 1
+        # The verification still runs to its end, so one run reports every failure.
+        failures.append(f'unit tests: {count(len(test_result.failures), "failure")} and '
+                        f'{count(len(test_result.errors), "error")} of {test_result.testsRun} tests')
     with run_directory(IMPLEMENTATIONS, repository_paths(ROOT)) as run:
-        results, counts, package_tests = verify(IMPLEMENTATIONS, suite, build_warnings=warnings, run=run)
-        versions = runtime_versions(IMPLEMENTATIONS, run.paths, run.cache)
+        try:
+            results, counts, package_tests = verify(IMPLEMENTATIONS, suite, build_warnings=warnings, run=run)
+        except RuntimeError as error:
+            failures.extend(getattr(error, 'failures', None) or [str(error)])
+        try:
+            versions = runtime_versions(IMPLEMENTATIONS, run.paths, run.cache)
+        except RuntimeError as error:
+            failures.extend(getattr(error, 'failures', None) or [str(error)])
     if supplementary_manifest(suite) != supplementary:
-        raise ValueError('Supplementary inputs changed during verification')
+        failures.append('Supplementary inputs changed during verification')
+    if failures:
+        print(f'verification failed with {count(len(failures), "failure")}; no record was written:', file=sys.stderr)
+        for failure in failures:
+            print('- ' + failure.replace('\n', '\n  '), file=sys.stderr)
+        return 1
     record = create_record(ROOT, before, results, counts, test_result.testsRun, versions,
                            supplementary, warnings, package_tests)
     write_record(ROOT / 'docs/verification.json', record)
     print('Saved docs/verification.json', flush=True)
     subprocess.run(DOCS_CHECK, cwd=ROOT, check=True)
     return 0
+
+
+def count(number, noun):
+    return f'{number} {noun}' + ('' if number == 1 else 's')
 
 
 if __name__ == '__main__':
