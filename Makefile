@@ -2,10 +2,15 @@ PYTHON ?= python3
 JSON_TEST_SUITE ?=
 PIE ?= .cache/pie/pie.phar
 
-.PHONY: check test docs-check pie-check benchmark
+.PHONY: check rerun-failed test docs-check pie-check benchmark
 
+# scripts/full_run.py runs the full verification once per committed tree, when no feature of
+# docs/features.md is partial, and records its result in var/full-run.json.
 check:
-	$(PYTHON) scripts/test.py $(if $(JSON_TEST_SUITE),--suite "$(JSON_TEST_SUITE)")
+	$(PYTHON) scripts/full_run.py run -- $(PYTHON) scripts/test.py$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
+
+rerun-failed:
+	$(PYTHON) scripts/full_run.py rerun-failed
 
 test: check
 

@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 96aa7db18fe7de9905c070165def3fb6b6c38273509845160cda562b6f23ade5 -->
+<!-- source-sha256: 36b7539c44ab30d3918cb9e36c345c4ce3ef65bc8090507a3299adedddc1baf1 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,14 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- `make check`는 검증보다 먼저 guard `scripts/full_run.py`를 시작합니다. 개발 절차는 `make check`를 모든 활성 항목이 완료된 뒤 한
+  번 실행하도록 하지만 이를 강제하는 것이 없었습니다. `make check`는 작업이 진행 중일 때, 커밋되지 않은 변경이 있을 때, 이미 검증한 tree에서도 검증을
+  시작했습니다. guard는 판단을 이유와 함께 출력하고, `docs/features.md`의 기능이 `partial`이면 각 ID를 기능과 함께 나열하며 거부하고, 추적
+  파일의 변경이 커밋되지 않았으면 거부하고, `var/full-run.json`이 현재 tree의 전체 실행을 기록하고 있으면 그 실행을 밝히며 거부합니다. 검증을 끝까지
+  실행하고 그 앞뒤에 record를 쓰므로 멈춘 실행은 `incomplete`로 남습니다. `make rerun-failed`는 현재 tree의 전체 실행이 실패했거나 끝나지
+  않았을 때만 검증을 다시 실행합니다. `docs/features.md`는 `partial`을 진행 중인 작업으로, `planned`를 시작하지 않은 작업으로 정의합니다.
+  `scripts/tests/test_full_run.py`는 변경 전 `No module named 'full_run'`으로 실패했고 그때 `make -n check`는
+  `scripts/test.py`만 출력했습니다. 변경 뒤 그 10개 case가 stub target으로 통과합니다.
 - 각 검증 실행은 자신만의 임시 실행 디렉터리에서 빌드하고 끝나면 그 디렉터리를 제거합니다.
   `make check`, `scripts/verify.py`, PIE 검사, 벤치마크는 그 디렉터리에 복사한 `php-extension/`
   소스 파일로 PHP 확장을 빌드하고, Go probe는 그 디렉터리에 기록되며, PIE는 그 디렉터리에서
