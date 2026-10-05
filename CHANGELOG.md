@@ -6,6 +6,20 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- A push happens only when no feature of `docs/features.md` is `partial`. The pre-push hook
+  `.githooks/pre-push` runs `scripts/push_gate.py hook`, which refuses the push while a pushed commit
+  or the working tree has a `partial` row, naming each ref, commit, ID and feature, and refuses when
+  it cannot read `docs/features.md` of a pushed commit. Every `make` run sets `core.hooksPath` to
+  `.githooks` while it reads the Makefile; `make hooks` sets and checks it, and `make hooks-check`
+  fails when it is not set or the hook is not executable. The guard `scripts/full_run.py` refuses
+  `make check` and `make rerun-failed` while the hook is not installed. The workflow
+  `.github/workflows/push-gate.yml` runs `scripts/push_gate.py commit` in the job `push-gate` on every
+  pushed branch and pull request, because a push from a checkout without the hook does not run it;
+  it fails while a feature is `partial` and when `.githooks/pre-push` is not tracked with mode
+  100755. AGENTS stated that the repository had no CI workflow and that nothing refused a push of
+  work in progress. `scripts/tests/test_push_gate.py` and the two new cases of
+  `scripts/tests/test_full_run.py` failed before the change, because the gate, the hook and the
+  workflow did not exist and the guard took no hook state; all 20 cases of both files pass after it.
 - `scripts/docs_check.py` fails, with the file, line and column, on an implementation state
   (`implemented`, `partial`, `planned`) written as a code span or a table cell anywhere in
   `docs/features.md` or its translation other than the Implementation cell of a feature row, and on

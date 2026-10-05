@@ -1,0 +1,4 @@
+#!/bin/sh
+# Git runs this hook from the top level of the working tree with the pushed refs on stdin.
+# scripts/push_gate.py refuses the push while a feature of docs/features.md is partial.
+exec python3 scripts/push_gate.py hook

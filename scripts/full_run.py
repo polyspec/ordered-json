@@ -7,7 +7,8 @@
 `make check` and `make rerun-failed` start this guard before any step. The full run happens once,
 after every active item is complete (AGENTS). The active work of this repository is a feature row
 of docs/features.md whose implementation state is `partial`. The guard refuses a run while such a
-row exists, while tracked changes are uncommitted, while docs/pie-verification.json fails the check
+row exists, while the pre-push hook of scripts/push_gate.py is not installed in the checkout, while
+tracked changes are uncommitted, while docs/pie-verification.json fails the check
 that the documentation check of the verification applies to it, and while the run of another process
 is still going on. A full run is refused when var/full-run.json already records a run of the current tree
 (`git rev-parse HEAD^{tree}`); `rerun-failed` is refused unless that record exists and has targets
@@ -71,10 +72,10 @@ def pie_issue(root):
     return None
 
 
-def decide(mode, targets, active, dirty, pie, tree, record, running):
+def decide(mode, targets, active, hooks, dirty, pie, tree, record, running):
     """Decide whether the guard runs; returns {'run', 'reason', 'targets'}.
 
-    `active` holds the partial features, `dirty` the `git status --porcelain` lines of tracked
+    `active` holds the partial features, `hooks` why the pre-push hook is not installed or None, `dirty` the `git status --porcelain` lines of tracked
     files, `pie` why the PIE record would fail the documentation check or None, `record` the record
     of the last run or None, and `running` whether the process of an incomplete record still exists.
     """
@@ -86,6 +87,8 @@ def decide(mode, targets, active, dirty, pie, tree, record, running):
         listed = '\n'.join(f"  {item['id']} {item['title']}" for item in active)
         return refuse(f'{len(active)} active feature{plural} (implementation {ACTIVE_STATE}) in {FEATURES}; '
                       f'the full run happens once, when every active item is complete:\n{listed}')
+    if hooks:
+        return refuse(f'the pre-push hook is not installed: {hooks}')
     if dirty:
         listed = '\n'.join(f'  {line}' for line in dirty)
         return refuse(f'the working tree has uncommitted tracked changes; a full run verifies a committed tree; '
@@ -165,14 +168,16 @@ def full_run(root, mode, targets, run_target=None, print_line=print):
     """Inspect the checkout, decide and run; return 0 when the full result of the tree is passed."""
     root = Path(root)
     run_target = run_target or (lambda target: run_command(root, target))
+    from push_gate import hooks_issue  # push_gate imports this module for its parser.
     active = active_items((root / FEATURES).read_text())
+    hooks = hooks_issue(root)
     dirty = [line for line in git(root, 'status', '--porcelain', '--untracked-files=no').splitlines() if line]
     tree = git(root, 'rev-parse', 'HEAD^{tree}').strip()
     commit = git(root, 'rev-parse', 'HEAD').strip()
     record = read_record(root)
     running = bool(record and record['result'] == 'incomplete' and record.get('pid') != os.getpid() and alive(record['pid']))
     pie = None if dirty else pie_issue(root)
-    decision = decide(mode, targets, active, dirty, pie, tree, record, running)
+    decision = decide(mode, targets, active, hooks, dirty, pie, tree, record, running)
     print_line(f"[full-run] {'run' if decision['run'] else 'refuse'}: {decision['reason']}")
     if not decision['run']:
         return 1

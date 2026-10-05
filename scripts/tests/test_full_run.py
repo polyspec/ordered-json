@@ -42,7 +42,11 @@ class Checkout:
         (self.root / 'docs').mkdir()
         (self.root / 'docs/features.md').write_text(features)
         (self.root / '.gitignore').write_text('/var/\n')
+        (self.root / '.githooks').mkdir()
+        (self.root / '.githooks/pre-push').write_text('#!/bin/sh\n')
+        (self.root / '.githooks/pre-push').chmod(0o755)
         git(self.root, 'init', '--quiet')
+        git(self.root, 'config', 'core.hooksPath', '.githooks')
         self.commit()
 
     def commit(self, name=None, text=''):
@@ -108,13 +112,17 @@ class FullRunChecks(unittest.TestCase):
         self.assertEqual(active_items(DONE), [])
 
     def test_the_decision_refuses_active_work_a_dirty_tree_and_a_second_run(self):
-        clean = dict(mode='run', targets=stub('a'), active=[], dirty=[], pie=None, tree='tree-1', record=None, running=False)
+        clean = dict(mode='run', targets=stub('a'), active=[], hooks=None, dirty=[], pie=None, tree='tree-1', record=None, running=False)
         fresh = decide(**clean)
         self.assertTrue(fresh['run'])
         self.assertIn('no full-run record', fresh['reason'])
         active = decide(**{**clean, 'active': [{'id': 'F-STREAM', 'title': 'Streaming'}]})
         self.assertFalse(active['run'])
         self.assertRegex(active['reason'], r'1 active feature[\s\S]*F-STREAM Streaming')
+        unhooked = decide(**{**clean, 'hooks': 'core.hooksPath is unset, not .githooks; run make hooks'})
+        self.assertFalse(unhooked['run'])
+        self.assertIn('the pre-push hook is not installed: core.hooksPath is unset, not .githooks; run make hooks',
+                      unhooked['reason'])
         dirty = decide(**{**clean, 'dirty': [' M Makefile']})
         self.assertFalse(dirty['run'])
         self.assertRegex(dirty['reason'], r'uncommitted tracked changes[\s\S]*M Makefile')
@@ -134,7 +142,7 @@ class FullRunChecks(unittest.TestCase):
         self.assertIn('process 42 is still running', running['reason'])
 
     def test_the_decision_of_rerun_failed_needs_targets_of_the_current_tree_that_did_not_pass(self):
-        clean = dict(mode='rerun-failed', targets=[], active=[], dirty=[], pie=None, tree='tree-1', record=None, running=False)
+        clean = dict(mode='rerun-failed', targets=[], active=[], hooks=None, dirty=[], pie=None, tree='tree-1', record=None, running=False)
         self.assertFalse(decide(**clean)['run'])
         failed = {'tree': 'tree-1', 'commit': 'c1', 'result': 'failed', 'started': 's',
                   'targets': [{'name': 'a', 'status': 'passed'}, {'name': 'b', 'status': 'failed'}, {'name': 'c', 'status': 'pending'}]}
@@ -148,6 +156,16 @@ class FullRunChecks(unittest.TestCase):
         self.assertEqual((status, ran), (1, []))
         self.assertRegex(output, r'^\[full-run\] refuse: 1 active feature')
         self.assertIn('F-STREAM Streaming \\| incremental parsing', output)
+
+    def test_a_checkout_without_the_pre_push_hook_is_refused(self):
+        checkout = self.checkout(DONE)
+        git(checkout.root, 'config', '--unset', 'core.hooksPath')
+        for mode, targets in (('run', stub('a')), ('rerun-failed', [])):
+            with self.subTest(mode=mode):
+                status, output, ran = checkout.guard(mode, targets)
+                self.assertEqual((status, ran), (1, []), output)
+                self.assertRegex(output, r'^\[full-run\] refuse: the pre-push hook is not installed: '
+                                         r'core.hooksPath is unset, not .githooks; .*make hooks')
 
     def test_a_dirty_tree_is_refused(self):
         checkout = self.checkout(DONE)
