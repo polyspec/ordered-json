@@ -100,26 +100,29 @@ def main():
         if not runtimes:
             parser.error('Provide an Erlang runtime with --erl')
         erl = runtimes[-1]
-    beam = ROOT / '.cache/comparison/probe-ebin'
-    warnings = compile_erlang(erl, args.erlang_source, beam)
-    commit = subprocess.check_output(['git', '-C', str(args.erlang_source), 'rev-parse', 'HEAD'], text=True).strip()
-    runtime = subprocess.check_output([str(erl), '+S', '2:2', '-noshell', '-eval',
-        'io:format("~s", [erlang:system_info(system_version)]), halt().'], text=True).strip()
-    metadata = Parser().parsestr((args.python_package / 'PKG-INFO').read_text())
-    suite_commit = subprocess.check_output(['git', '-C', str(args.suite.resolve()), 'rev-parse', 'HEAD'],
-        text=True).strip() if args.suite else None
-    report = {'python_package': {'version': metadata['Version'], 'runtime': sys.version.split()[0],
-                  'module_sha256': hashlib.sha256((args.python_package / 'ojson/ojson.py').read_bytes()).hexdigest()},
-              'erlang_package': {'commit': commit, 'runtime': runtime, 'compile_warnings': warnings},
-              'official_sha256': hashlib.sha256((ROOT / 'examples/official.json').read_bytes()).hexdigest(),
-              'suite_commit': suite_commit,
-              'case_source': 'examples/official.json + fixtures/ + optional JSONTestSuite', 'projects': {}}
-    commands = {
-        'pypi-ojson': [sys.executable, str(ROOT / 'scripts/comparison/python_ojson_probe.py'), str(args.python_package)],
-        'erlang-ojson': [str(erl), '+S', '2:2', '-noshell', '-pa', str(beam), '-s', 'ojson_comparison', 'main', '-s', 'init', 'stop'],
-    }
+    # The compiled modules and the case files belong to this run alone.
     with tempfile.TemporaryDirectory(prefix='ojson-comparison-') as directory:
-        cases, official_count = prepare_cases(Path(directory), args.suite.resolve() if args.suite else None)
+        beam = Path(directory) / 'probe-ebin'
+        cases_directory = Path(directory) / 'cases'
+        cases_directory.mkdir()
+        warnings = compile_erlang(erl, args.erlang_source, beam)
+        commit = subprocess.check_output(['git', '-C', str(args.erlang_source), 'rev-parse', 'HEAD'], text=True).strip()
+        runtime = subprocess.check_output([str(erl), '+S', '2:2', '-noshell', '-eval',
+            'io:format("~s", [erlang:system_info(system_version)]), halt().'], text=True).strip()
+        metadata = Parser().parsestr((args.python_package / 'PKG-INFO').read_text())
+        suite_commit = subprocess.check_output(['git', '-C', str(args.suite.resolve()), 'rev-parse', 'HEAD'],
+            text=True).strip() if args.suite else None
+        report = {'python_package': {'version': metadata['Version'], 'runtime': sys.version.split()[0],
+                      'module_sha256': hashlib.sha256((args.python_package / 'ojson/ojson.py').read_bytes()).hexdigest()},
+                  'erlang_package': {'commit': commit, 'runtime': runtime, 'compile_warnings': warnings},
+                  'official_sha256': hashlib.sha256((ROOT / 'examples/official.json').read_bytes()).hexdigest(),
+                  'suite_commit': suite_commit,
+                  'case_source': 'examples/official.json + fixtures/ + optional JSONTestSuite', 'projects': {}}
+        commands = {
+            'pypi-ojson': [sys.executable, str(ROOT / 'scripts/comparison/python_ojson_probe.py'), str(args.python_package)],
+            'erlang-ojson': [str(erl), '+S', '2:2', '-noshell', '-pa', str(beam), '-s', 'ojson_comparison', 'main', '-s', 'init', 'stop'],
+        }
+        cases, official_count = prepare_cases(cases_directory, args.suite.resolve() if args.suite else None)
         for project, command in commands.items():
             results = []
             for (name, _, expected), actual in zip(cases, observe(project, command, cases)):

@@ -6,6 +6,16 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Each verification run builds in its own temporary run directory and removes it at the end.
+  `make check`, `scripts/verify.py`, the PIE check and the benchmark build the PHP extension
+  from a copy of the `php-extension/` source files there, the Go probe is written there, PIE
+  works there, and the ojson comparison compiles its Erlang modules there. The extension was
+  built in `php-extension/src` with `make distclean`, `phpize` and `configure`, and the Go probe,
+  the PIE work directory and the Erlang modules used fixed paths under `.cache/`, so two runs of
+  one checkout cleaned or replaced each other's build output while the other run used it. The
+  registry key `build_in_copy` selects the copied build; the copy holds tracked and unignored
+  files and rejects a symbolic link. The PIE record names the artifact relative to the run
+  directory.
 - The ojson comparison streams the Erlang compile output with its exit status and elapsed time,
   and sends each project one case at a time with the shared 60 s reply deadline, printing each
   case with its elapsed time. The compile had a 45 s limit and each project run one 60 s limit

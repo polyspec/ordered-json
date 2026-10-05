@@ -21,7 +21,7 @@ CASE_SECONDS = 60
 TIMED_LINE = re.compile(r'\(\d+(?:\.\d+)?\s*m?s\)$')
 
 from registry import (IMPLEMENTATIONS, adapter_commands, api_commands, case_commands, parse_overrides,
-                      prepare, repository_paths, test_commands)
+                      prepare, repository_paths, run_directory, test_commands)
 
 
 class ObjectPairs(list):
@@ -144,9 +144,16 @@ def prepare_cases(directory, suite):
     return cases, len(official['cases'])
 
 
-def verify(selected, suite=None, paths=None, cache=None, build_warnings=None):
-    paths = paths or repository_paths(ROOT)
-    cache = cache or ROOT / '.cache/probes'
+def verify(selected, suite=None, paths=None, build_warnings=None, run=None):
+    """Build and verify the selected implementations in one run directory.
+
+    A caller that reads built artifacts after verification passes its own run."""
+    if run is None:
+        with run_directory(selected, paths or repository_paths(ROOT)) as run:
+            return verify(selected, suite, build_warnings=build_warnings, run=run)
+    if paths is not None:
+        raise ValueError('A run already declares its repository paths')
+    paths, cache = run.paths, run.cache
     warnings = prepare(selected, paths, cache)
     if build_warnings is not None:
         build_warnings.extend(warnings)

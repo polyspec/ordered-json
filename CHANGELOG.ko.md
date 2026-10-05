@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 8b0f91e15a65b4f11501ddf968c396f76823847f07b49a65485e3f436e3dec04 -->
+<!-- source-sha256: 467e0f9c1d45d8f60011c41fb173ff7b4c3939a5efa951891b09c55ab534a409 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,15 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 각 검증 실행은 자신만의 임시 실행 디렉터리에서 빌드하고 끝나면 그 디렉터리를 제거합니다.
+  `make check`, `scripts/verify.py`, PIE 검사, 벤치마크는 그 디렉터리에 복사한 `php-extension/`
+  소스 파일로 PHP 확장을 빌드하고, Go probe는 그 디렉터리에 기록되며, PIE는 그 디렉터리에서
+  작업하고, ojson 비교는 Erlang 모듈을 그 디렉터리에서 컴파일합니다. 확장은 `php-extension/src`
+  에서 `make distclean`, `phpize`, `configure`로 빌드되었고 Go probe, PIE 작업 디렉터리, Erlang
+  모듈은 `.cache/` 아래 고정 경로를 사용했기 때문에, 한 체크아웃의 두 실행이 다른 실행이 사용
+  중인 빌드 출력을 지우거나 교체했습니다. registry 키 `build_in_copy`가 복사본 빌드를 선택하며,
+  복사본은 추적 중이거나 무시되지 않은 파일을 담고 symbolic link를 거부합니다. PIE 기록은
+  산출물을 실행 디렉터리 기준 경로로 명시합니다.
 - ojson 비교는 Erlang 컴파일 출력을 종료 상태, 경과 시간과 함께 흘려 보내고, 각 프로젝트에
   사례를 한 번에 하나씩 공통 60 s 응답 deadline으로 보내며 사례마다 경과 시간을 출력합니다.
   컴파일에는 45 s 한도, 프로젝트 실행마다 전체 사례에 60 s 한도 하나가 있어서, 느린 컴파일이나

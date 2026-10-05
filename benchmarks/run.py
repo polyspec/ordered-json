@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
-from registry import prepare, repository_paths
+from registry import artifact_paths, prepare, repository_paths, run_directory
 
 WORKLOAD = json.loads((ROOT / "benchmarks/workload.json").read_text())
 if WORKLOAD.get("schema_version") != 2:
@@ -159,16 +159,18 @@ def main():
         ("php", ROOT, ["php", "-n", "benchmarks/php.php", "custom", *files]),
         ("php-native", ROOT, ["php", "-n", "benchmarks/php.php", "native-json", *files]),
     ])
-    extension = ROOT / "php-extension/src/modules/ordered_json.so"
-    prepare(["php-extension"], repository_paths(ROOT), ROOT / ".cache/probes")
-    if not extension.is_file(): raise SystemExit("PHP extension benchmark artifact was not built")
-    commands.extend([
-        ("php-extension", ROOT, ["php", "-n", "-d", f"extension={extension}", "benchmarks/php.php", "extension", *files]),
-        ("rust", ROOT, ["cargo", "run", "--release", "--quiet", "--manifest-path", "rust/Cargo.toml", "--example", "benchmark", "--", *files]),
-    ])
     rows = []
-    for label, cwd, argv in commands:
-        rows.extend(run(argv, env, cwd, label))
+    # The extension is built in a copy in this run's temporary directory.
+    with run_directory(["php-extension"], repository_paths(ROOT)) as build:
+        prepare(["php-extension"], build.paths, build.cache)
+        [extension] = artifact_paths("php-extension", build.paths)
+        if not extension.is_file(): raise SystemExit("PHP extension benchmark artifact was not built")
+        commands.extend([
+            ("php-extension", ROOT, ["php", "-n", "-d", f"extension={extension}", "benchmarks/php.php", "extension", *files]),
+            ("rust", ROOT, ["cargo", "run", "--release", "--quiet", "--manifest-path", "rust/Cargo.toml", "--example", "benchmark", "--", *files]),
+        ])
+        for label, cwd, argv in commands:
+            rows.extend(run(argv, env, cwd, label))
     ordered = {}
     for row in rows:
         if row["implementation"].endswith(":ordered-json") or row["implementation"] in {"php:custom", "php-extension:extension"}:

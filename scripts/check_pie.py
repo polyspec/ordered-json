@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Build the extension with PIE and test that artifact with the shared verifier."""
+"""Build the extension with PIE and test that artifact with the shared verifier.
+
+PIE builds a copy of the extension sources in a temporary run directory, so the build
+never cleans or replaces files in the checkout that another run uses."""
 import argparse
 from datetime import datetime, timezone
 import os
@@ -8,48 +11,40 @@ import platform
 import re
 import subprocess
 
-from registry import ROOT, adapter_commands, artifact_paths, repository_paths, run_streamed, runtime_versions
+from registry import (ROOT, adapter_commands, artifact_paths, repository_paths, run_directory, run_streamed,
+                      runtime_versions)
 from verification_record import (package_revisions, sha256, source_manifest,
                                  supplementary_manifest, write_record)
 from verify import verify_adapters
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--pie', type=Path, required=True, help='Verified PIE PHAR')
-    parser.add_argument('--suite', type=Path)
-    args = parser.parse_args()
-    pie = args.pie.resolve()
-    suite = args.suite.resolve() if args.suite else None
-    paths = repository_paths(ROOT)
-    cache = ROOT / '.cache/pie-check'
-    cache.mkdir(parents=True, exist_ok=True)
-    environment = dict(os.environ, PIE_WORKING_DIRECTORY=str(cache / 'work'))
+def build_and_verify(run, pie, suite):
+    paths, cache = run.paths, run.cache
+    environment = dict(os.environ, PIE_WORKING_DIRECTORY=str(run.root / 'pie'))
     sources = source_manifest(ROOT)
     packages = package_revisions(ROOT)
     supplementary = supplementary_manifest(suite)
     pie_hash = sha256(pie.read_bytes())
     commands, warnings = [], []
 
-    def run(*arguments):
+    def pie_command(*arguments):
         command = ['php', str(pie), *arguments, '--no-interaction', '--no-ansi']
         process = run_streamed('pie ' + arguments[0], command, paths['php-extension'], env=environment)
-        (cache / (str(len(commands)) + '.log')).write_text(process.stdout)
         if process.returncode:
             raise subprocess.CalledProcessError(process.returncode, command)
         if re.search(r'Permission denied|error:|build tools are missing', process.stdout, re.IGNORECASE):
-            raise RuntimeError('PIE reported a build or tool error; see .cache/pie-check')
+            raise RuntimeError('PIE reported a build or tool error; see the PIE output above')
         for line in process.stdout.splitlines():
             if re.search(r'warning:', line, re.IGNORECASE):
-                warnings.append(line.replace(str(ROOT) + '/', ''))
+                warnings.append(line.replace(str(run.root) + '/', ''))
         commands.append({'arguments': list(arguments), 'exit_code': process.returncode})
         return process.stdout.strip()
 
-    version = run('--version')
-    run('repository:add', 'path', '.')
+    version = pie_command('--version')
+    pie_command('repository:add', 'path', '.')
     package = 'ordered-json/ordered-json-extension:*@dev'
-    run('info', package)
-    run('build', package, '-j', '2', '-vv')
+    pie_command('info', package)
+    pie_command('build', package, '-j', '2', '-vv')
     modules = artifact_paths('php-extension', paths)
     if len(modules) != 1:
         raise ValueError('The extension declares exactly one build artifact')
@@ -72,10 +67,22 @@ def main():
               'sources': sources, 'packages': packages,
               'pie': {'version': version, 'phar_sha256': pie_hash},
               'package': package, 'commands': commands, 'build_warnings': warnings,
-              'artifact': {'path': module.relative_to(ROOT).as_posix()},
+              'artifact': {'path': module.relative_to(run.root).as_posix()},
               'cases': {**counts, 'total': sum(counts.values())},
               'implementations': {name: {**results[name], 'runtime': versions[name]} for name in selected},
               'supplementary': supplementary}
+    return record
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--pie', type=Path, required=True, help='Verified PIE PHAR')
+    parser.add_argument('--suite', type=Path)
+    args = parser.parse_args()
+    pie = args.pie.resolve()
+    suite = args.suite.resolve() if args.suite else None
+    with run_directory(['php-extension'], repository_paths(ROOT)) as run:
+        record = build_and_verify(run, pie, suite)
     write_record(ROOT / 'docs/pie-verification.json', record)
     print('Saved docs/pie-verification.json', flush=True)
 

@@ -8,10 +8,10 @@ import sys
 import time
 import unittest
 
-from verification_record import (IMPLEMENTATIONS, create_record, runtimes, source_manifest,
+from verification_record import (IMPLEMENTATIONS, create_record, source_manifest,
                                  supplementary_manifest, write_record)
 from verify import ROOT, verify
-from registry import prepare, repository_paths
+from registry import prepare, repository_paths, run_directory, runtime_versions
 
 # Only this path checks record freshness: it runs right after the record is written.
 DOCS_CHECK = [sys.executable, str(ROOT / 'scripts/docs_check.py'), '--records']
@@ -101,7 +101,8 @@ def run_unit_tests(tests, stream=None):
 
 
 def build_extension():
-    return prepare(['php-extension'], repository_paths(ROOT), ROOT / '.cache/probes')
+    with run_directory(['php-extension'], repository_paths(ROOT)) as run:
+        return prepare(['php-extension'], run.paths, run.cache)
 
 
 def main():
@@ -126,8 +127,9 @@ def main():
     test_result = run_unit_tests(tests)
     if not test_result.wasSuccessful():
         return 1
-    results, counts, package_tests = verify(IMPLEMENTATIONS, suite, build_warnings=warnings)
-    versions = runtimes(ROOT)
+    with run_directory(IMPLEMENTATIONS, repository_paths(ROOT)) as run:
+        results, counts, package_tests = verify(IMPLEMENTATIONS, suite, build_warnings=warnings, run=run)
+        versions = runtime_versions(IMPLEMENTATIONS, run.paths, run.cache)
     if supplementary_manifest(suite) != supplementary:
         raise ValueError('Supplementary inputs changed during verification')
     record = create_record(ROOT, before, results, counts, test_result.testsRun, versions,

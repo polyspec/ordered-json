@@ -51,7 +51,7 @@ cd ordered-json
 make check
 ~~~
 
-Each package has an independent build target, while the root registry and verifier define the shared test commands. The native extension is built from `php-extension/` and is tested with the sibling PHP package in the same checkout.
+Each package has an independent build target, while the root registry and verifier define the shared test commands. The native extension is built from a copy of the `php-extension/` source files in the run's temporary directory and is tested with the sibling PHP package in the same checkout. Each run prints its run directory and removes it when it ends, so runs of one checkout do not share build output.
 
 Run `make check JSON_TEST_SUITE=/path/to/JSONTestSuite` for supplementary inputs.
 
@@ -64,9 +64,9 @@ Download the pinned PIE release from the [official releases](https://github.com/
 make pie-check PIE=/path/to/pie.phar JSON_TEST_SUITE=.cache/JSONTestSuite
 ~~~
 
-The [PIE checker](../../scripts/check_pie.py) isolates PIE configuration under `.cache/`, registers the current extension checkout as a path repository, validates package recognition, and builds it with PIE. It tests that artifact directly with the same shared adapter and expectations. It does not run the ordinary native build in between.
+The [PIE checker](../../scripts/check_pie.py) copies the extension's source files into a temporary run directory, isolates PIE configuration in that directory, registers the copy as a path repository, validates package recognition, and builds it with PIE. It tests that artifact directly with the same shared adapter and expectations. It does not run the ordinary native build in between.
 
-When available, `pie-verification.json` records the PIE version and PHAR hash, the declared artifact path, commands, source hashes, PHP and extension versions, and case results. The PHAR hash and the supplementary revision must match their pins. The built module is named by path alone: a fresh identifier and signature enter it at link time, so its hash identifies one run, and the checker rejects a record that carries one. Build errors, missing build tools, adapter warnings, or changes during the check fail verification. Compilation warnings remain in the record. This check does not install the module or publish a package. Re-run it when its recorded inputs change, before `make check`, because the documentation check in `make check` rejects a stale PIE record.
+When available, `pie-verification.json` records the PIE version and PHAR hash, the declared artifact path relative to the run directory, commands, source hashes, PHP and extension versions, and case results. The PHAR hash and the supplementary revision must match their pins. The built module is named by path alone: a fresh identifier and signature enter it at link time, so its hash identifies one run, and the checker rejects a record that carries one. Build errors, missing build tools, adapter warnings, or changes during the check fail verification. Compilation warnings remain in the record. This check does not install the module or publish a package. Re-run it when its recorded inputs change, before `make check`, because the documentation check in `make check` rejects a stale PIE record.
 
 <a id="documentation-checks"></a>
 ## Documentation checks

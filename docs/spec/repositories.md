@@ -28,6 +28,8 @@ Every value a verification record carries must have something to compare it with
 
 Each package check runs against the verifier and fixtures in the same checkout. Test reports identify the repository revision, implementation paths, dependencies, runtimes, and results. The aggregate check verifies every registered implementation from the same working tree and rejects an incomplete package or missing declared build command.
 
+Each verification run, aggregate check, selected check, PIE check, benchmark, or comparison, builds in its own temporary run directory and removes it when the run ends. Built probes are written to that directory. An implementation that declares `build_in_copy` is built from a copy of its package directory's tracked and unignored source files in that directory, and its commands use the copy; the copy rejects a symbolic link. Two runs of one checkout therefore never clean, configure, or replace each other's build output, and a build leaves no output in the checkout. A record names the declared artifact by its path relative to the run directory, which has the repository layout.
+
 <a id="documents"></a>
 ## Documents and changes
 
