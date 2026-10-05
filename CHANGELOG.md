@@ -6,6 +6,11 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The ojson comparison streams the Erlang compile output with its exit status and elapsed time,
+  and sends each project one case at a time with the shared 60 s reply deadline, printing each
+  case with its elapsed time. The compile had a 45 s limit and each project run one 60 s limit
+  for all cases, so a slow compile or a slow whole run failed by the clock, and nothing was
+  printed until each command ended.
 - Build steps stream their output. Each `prepare` step and each PIE command prints a start line,
   every output line as it arrives, and its exit status with the elapsed time. Both collected the
   output and printed it after the command ended, so the PIE build showed nothing for about 42 s.

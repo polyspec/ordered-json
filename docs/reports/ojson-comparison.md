@@ -52,4 +52,6 @@ python3 scripts/compare_ojson.py --suite .cache/JSONTestSuite
 
 The [PyPI](https://pypi.org/project/ojson/) archive SHA-256 is `94a1c628c0b4447680d9039c110dafe4efd6e3fdf77602b3ff543c2a278b7ec5`. An Erlang runtime is required; `--erl /path/to/erl` selects a specific executable. The recorded run used an isolated Homebrew Erlang 29.0.6 archive with SHA-256 `60e6425e089726bcae182f1856b01aa88de2782b94dedf71559e8efbc5eea0f3`.
 
+The script prints the Erlang compiler output as it arrives with the exit status and elapsed time; the build has no time limit, and its exit status and output decide the result. Each project then receives one case at a time, and the script prints each case with its result and elapsed time. A reply has 60 s, the per-case deadline of the shared verifier; a project that misses it is stopped and the case is named. No limit applies to the whole run.
+
 The original Erlang modules emitted compilation warnings about removed `get_stacktrace/0`. The report retains those warnings using source-relative paths. This comparison did not call `decode!/1` and does not verify its error path.

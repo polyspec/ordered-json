@@ -10,7 +10,8 @@ import subprocess
 import sys
 import tempfile
 
-from verify import ROOT, prepare_cases, reference
+from registry import run_streamed
+from verify import ROOT, Adapter, milliseconds, prepare_cases, reference
 
 
 def structure(tree):
@@ -45,6 +46,8 @@ def assess(expected, actual):
 
 
 def compile_erlang(erl, source, out):
+    """Compile the Erlang modules, streaming the compiler output. A build has no time
+    limit; its exit status and output decide the result."""
     out.mkdir(parents=True, exist_ok=True)
     # JSON strings are also valid Erlang strings for these filesystem paths.
     files = sorted(source.glob('src/*.erl')) + [ROOT / 'scripts/comparison/ojson_comparison.erl']
@@ -52,11 +55,28 @@ def compile_erlang(erl, source, out):
         'Results = [compile:file(F, [report_errors, report_warnings, {outdir, ' + json.dumps(str(out))
         + '}]) || F <- Files], halt(case lists:all(fun({ok, _}) -> true; (_) -> false end, Results) '
         'of true -> 0; false -> 1 end).')
-    process = subprocess.run([str(erl), '+S', '2:2', '-noshell', '-eval', expression],
-                             capture_output=True, text=True, timeout=45)
+    process = run_streamed('erlang compile', [str(erl), '+S', '2:2', '-noshell', '-eval', expression], ROOT)
     if process.returncode:
-        raise RuntimeError('Erlang compilation failed:\n' + process.stdout + process.stderr)
-    return (process.stdout + process.stderr).replace(str(source) + '/', 'erlang-ojson/').replace(str(ROOT) + '/', '')
+        raise RuntimeError(f'Erlang compilation failed with exit {process.returncode}:\n' + process.stdout)
+    return process.stdout.replace(str(source) + '/', 'erlang-ojson/').replace(str(ROOT) + '/', '')
+
+
+def observe(project, command, cases):
+    """Send one case at a time and read its reply under the per-case deadline of the
+    shared verifier, printing each case with its elapsed time. The run has no limit."""
+    adapter = Adapter(project, command)
+    try:
+        replies = []
+        for name, path, _ in cases:
+            line, elapsed = adapter.exchange(name, path)
+            actual = json.loads(line)
+            verdict = 'accepted' if actual.get('ok') else 'rejected'
+            print(f'{project}: {name} {verdict} ({milliseconds(elapsed)})', flush=True)
+            replies.append(actual)
+        adapter.finish(len(cases))
+    finally:
+        adapter.stop()
+    return replies
 
 
 def main():
@@ -100,19 +120,9 @@ def main():
     }
     with tempfile.TemporaryDirectory(prefix='ojson-comparison-') as directory:
         cases, official_count = prepare_cases(Path(directory), args.suite.resolve() if args.suite else None)
-        request = ''.join(str(path) + '\n' for _, path, _ in cases)
         for project, command in commands.items():
-            process = subprocess.run(command, input=request, capture_output=True, encoding='utf-8', timeout=60)
-            if process.returncode or process.stderr:
-                raise RuntimeError(f'{project} probe failed:\n{process.stderr}\n{process.stdout[-1000:]}')
-            lines = process.stdout.split('\n')
-            if lines[-1] == '':
-                lines.pop()
-            if len(lines) != len(cases):
-                raise AssertionError(f'{project}: expected {len(cases)} results, got {len(lines)}')
             results = []
-            for (name, _, expected), line in zip(cases, lines):
-                actual = json.loads(line)
+            for (name, _, expected), actual in zip(cases, observe(project, command, cases)):
                 verdict = assess(expected, actual)
                 row = {'case': name, **verdict}
                 if name.startswith('official/'):

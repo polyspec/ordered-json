@@ -1,5 +1,5 @@
 <!-- doc-id: ojson-comparison -->
-<!-- source-sha256: f51637e54cbf5e4fb650608261647ff4c7c508cb6e867c8d72f9a44db0a95373 -->
+<!-- source-sha256: b459baf500c34a1486b99eceb41099d33d7f7412fb9c44f403cf694f1cfb7cc0 -->
 # ojson 비교
 
 [English](ojson-comparison.md)
@@ -52,5 +52,7 @@ python3 scripts/compare_ojson.py --suite .cache/JSONTestSuite
 ~~~
 
 [PyPI](https://pypi.org/project/ojson/) 압축 파일의 SHA-256은 `94a1c628c0b4447680d9039c110dafe4efd6e3fdf77602b3ff543c2a278b7ec5`입니다. Erlang 런타임이 필요하며 `--erl /path/to/erl`로 특정 실행 파일을 지정합니다. 기록된 실행은 SHA-256이 `60e6425e089726bcae182f1856b01aa88de2782b94dedf71559e8efbc5eea0f3`인 격리된 Homebrew Erlang 29.0.6 압축 파일을 사용했습니다.
+
+스크립트는 Erlang 컴파일러 출력을 도착하는 대로 출력하고 종료 상태와 경과 시간을 출력합니다. 빌드에는 시간 한도가 없으며 종료 상태와 출력이 결과를 결정합니다. 이어서 각 프로젝트는 사례를 한 번에 하나씩 받고, 스크립트는 사례마다 결과와 경과 시간을 출력합니다. 응답마다 공통 검증기의 사례별 deadline인 60 s가 주어지며, 이를 넘긴 프로젝트는 종료되고 해당 사례 이름이 보고됩니다. 실행 전체에는 한도를 두지 않습니다.
 
 원본 Erlang 모듈은 제거된 `get_stacktrace/0`에 대한 컴파일 경고를 발생시켰습니다. 보고서는 경고를 소스 기준 상대 경로로 보존합니다. 이 비교는 `decode!/1`을 호출하지 않았으며 그 오류 경로를 검증하지 않습니다.
