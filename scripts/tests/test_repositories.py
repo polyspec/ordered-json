@@ -1,5 +1,7 @@
 """Check repository selection, registry commands, and package record content."""
 import copy
+from contextlib import redirect_stdout
+import io
 import json
 from pathlib import Path
 import subprocess
@@ -80,17 +82,24 @@ class RepositoryChecks(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'cwd and command'):
                 load_registry(root)
 
-    def test_failing_package_tests_stop_verification(self):
+    def test_failing_package_tests_of_every_language_are_reported_after_all_ran(self):
+        # One failing package must not hide the result of the packages after it.
         with tempfile.TemporaryDirectory() as folder:
-            failing = {'sample': {'cwd': folder, 'command': [sys.executable, '-c', 'raise SystemExit(1)'],
-                                  'declared': ['{sample}/run']}}
-            with self.assertRaisesRegex(RuntimeError, 'package tests failed'):
-                run_package_tests(failing)
+            commands = {name: {'cwd': folder, 'command': [sys.executable, '-c', code], 'declared': ['{' + name + '}/run']}
+                        for name, code in (('first', 'raise SystemExit(1)'), ('middle', 'print("ok")'),
+                                           ('last', 'raise SystemExit(2)'))}
+            output = io.StringIO()
+            with self.assertRaises(RuntimeError) as raised, redirect_stdout(output):
+                run_package_tests(commands)
+            self.assertIn('first package tests failed', str(raised.exception))
+            self.assertIn('last package tests failed', str(raised.exception))
+            self.assertIn('middle: package tests passed', output.getvalue())
             passing = {'sample': {'cwd': folder, 'command': [sys.executable, '-c', 'print("ok")'],
                                   'declared': ['{sample}/run']}}
             # A record identifies the declared command, never a resolved local path.
-            self.assertEqual(run_package_tests(passing)['sample'],
-                             {'status': 'passed', 'command': ['{sample}/run']})
+            with redirect_stdout(io.StringIO()):
+                self.assertEqual(run_package_tests(passing)['sample'],
+                                 {'status': 'passed', 'command': ['{sample}/run']})
 
     def test_duplicate_repository_override_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'one --repository'):

@@ -8,6 +8,7 @@ import re
 import select
 import signal
 import subprocess
+import sys
 import tempfile
 import time
 
@@ -20,7 +21,7 @@ CASE_ID = re.compile(r'^[a-z][a-z0-9_]*$')
 CASE_SECONDS = 60
 TIMED_LINE = re.compile(r'\(\d+(?:\.\d+)?\s*m?s\)$')
 
-from registry import (IMPLEMENTATIONS, adapter_commands, api_commands, case_commands, fixture_paths,
+from registry import (IMPLEMENTATIONS, Failures, adapter_commands, api_commands, case_commands, fixture_paths,
                       parse_overrides, prepare, repository_paths, run_directory, test_commands)
 
 
@@ -154,13 +155,31 @@ def verify(selected, suite=None, paths=None, build_warnings=None, run=None):
     if paths is not None:
         raise ValueError('A run already declares its repository paths')
     paths, cache = run.paths, run.cache
-    warnings = prepare(selected, paths, cache)
+    failures, failed = [], set()
+
+    def step(function, *arguments):
+        """Run one step for every language to its end and keep its failures."""
+        try:
+            return function(*arguments)
+        except Failures as error:
+            failures.extend(error.failures)
+            failed.update(error.languages)
+        return None
+
+    warnings = step(prepare, selected, paths, cache) or []
     if build_warnings is not None:
         build_warnings.extend(warnings)
-    compare_package_cases(case_commands(selected, paths, cache), selected)
-    compare_api_coverage(api_commands(selected, paths, cache), selected)
-    package_tests = run_package_tests(test_commands(selected, paths, cache))
-    results, counts = verify_adapters(adapter_commands(selected, paths, cache), suite)
+    # A language whose build failed has no probe or artifact to list, test or compare.
+    built = [language for language in selected if language not in failed]
+    failures += [f'{language}: the case and symbol listings, the package tests and the shared cases did not run '
+                 'because its build failed' for language in selected if language in failed]
+    step(compare_package_cases, case_commands(built, paths, cache), built)
+    step(compare_api_coverage, api_commands(built, paths, cache), built)
+    package_tests = step(run_package_tests, test_commands(built, paths, cache))
+    adapters = step(verify_adapters, adapter_commands(built, paths, cache), suite) if built else None
+    if failures:
+        raise Failures(failures, failed)
+    results, counts = adapters
     return results, counts, package_tests
 
 
@@ -183,7 +202,8 @@ def compare_package_cases(commands, selected):
         process = subprocess.run(entry['command'], cwd=entry['cwd'], env=entry.get('env'), text=True,
                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if process.returncode or process.stderr:
-            raise RuntimeError(f'{language} case listing failed:\n{process.stdout}{process.stderr}')
+            problems.append(f'{language}: case listing failed:\n{process.stdout}{process.stderr}')
+            continue
         reported, noise = set(), []
         for line in process.stdout.splitlines():
             identifier = case_identifier(line)
@@ -196,14 +216,16 @@ def compare_package_cases(commands, selected):
             else:
                 noise.append(line)
         if noise:
-            raise RuntimeError(f'{language} case listing printed more than case ids:\n' + '\n'.join(noise))
+            problems.append(f'{language}: case listing printed more than case ids:\n' + '\n'.join(noise))
+            continue
         required = {case['id'] for case in STANDARD['cases'] if language not in case.get('exemptions', {})}
         required |= {case['id'] for case in STANDARD['package_cases'][language]}
         problems += [f'{language}: missing case {identifier}' for identifier in sorted(required - reported)]
         problems += [f'{language}: case {identifier} is not declared in the standard'
                      for identifier in sorted(reported - required)]
     if problems:
-        raise AssertionError('Package test cases do not match package-tests.json:\n' + '\n'.join(problems))
+        raise Failures(['Package test cases do not match package-tests.json: ' + problem for problem in problems],
+                       {problem.split(':')[0] for problem in problems})
     print('package test cases match the standard', flush=True)
 
 
@@ -212,7 +234,7 @@ def reported_lines(language, entry, what):
     process = subprocess.run(entry['command'], cwd=entry['cwd'], env=entry.get('env'), text=True,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if process.returncode or process.stderr:
-        raise RuntimeError(f'{language} {what} failed:\n{process.stdout}{process.stderr}')
+        raise RuntimeError(f'{language}: {what} failed:\n{process.stdout}{process.stderr}')
     return [line.strip() for line in process.stdout.splitlines() if line.strip()]
 
 
@@ -225,7 +247,11 @@ def compare_api_coverage(commands, selected):
         if entry is None:
             problems.append(f'{language}: declares no public API listing')
             continue
-        reported = set(reported_lines(language, entry, 'API listing'))
+        try:
+            reported = set(reported_lines(language, entry, 'API listing'))
+        except RuntimeError as error:
+            problems.append(str(error))
+            continue
         declared = coverage.get(language, {})
         known = {case['id'] for case in STANDARD['cases'] if language not in case.get('exemptions', {})}
         known |= {case['id'] for case in STANDARD['package_cases'][language]}
@@ -243,7 +269,8 @@ def compare_api_coverage(commands, selected):
             problems += [f'{language}: {symbol} names an unknown case {case}'
                          for case in cases if case not in known]
     if problems:
-        raise AssertionError('Public API coverage does not match package-tests.json:\n' + '\n'.join(problems))
+        raise Failures(['Public API coverage does not match package-tests.json: ' + problem for problem in problems],
+                       {problem.split(':')[0] for problem in problems})
     print('every public symbol names the cases that cover it', flush=True)
 
 
@@ -301,13 +328,21 @@ def stream_package_tests(language, entry):
 
 
 def run_package_tests(commands):
-    """Run each package's own tests. Shared cases cannot reach language-specific APIs."""
-    results = {}
+    """Run each package's own tests to their end. Shared cases cannot reach language-specific APIs.
+    Failures names every package whose tests failed, after all ran."""
+    results, failures, failed = {}, [], set()
     for language, entry in commands.items():
-        elapsed = stream_package_tests(language, entry)
+        try:
+            elapsed = stream_package_tests(language, entry)
+        except RuntimeError as error:
+            failures.append(str(error))
+            failed.add(language)
+            continue
         print(f'{language}: package tests passed ({elapsed})', flush=True)
         # Records keep the declared command; resolved paths belong to one checkout.
         results[language] = {'status': 'passed', 'command': entry['declared']}
+    if failures:
+        raise Failures(failures, failed)
     return results
 
 
@@ -451,7 +486,10 @@ class Adapter:
 
 
 def verify_adapters(commands, suite=None):
-    """Compare prepared adapters, including externally built modules, with shared cases."""
+    """Compare prepared adapters, including externally built modules, with shared cases.
+
+    Every case of every adapter runs; a mismatch is kept and the next case runs. An adapter that
+    stops answering ends its own cases only. Failures names every failure after all ran."""
     if not commands:
         raise ValueError('At least one adapter is required')
     results = {}
@@ -459,8 +497,10 @@ def verify_adapters(commands, suite=None):
     with tempfile.TemporaryDirectory(prefix='ordered-json-examples-') as folder:
         cases, official_count = prepare_cases(Path(folder), suite)
         documents = {name: path.read_bytes() for name, path, _ in cases}
+        failures, failed = [], set()
         for language, command in commands.items():
             adapter = Adapter(language, command)
+            mismatches = []
             try:
                 for name, path, expected in cases:
                     line, elapsed = adapter.exchange(name, path)
@@ -478,26 +518,42 @@ def verify_adapters(commands, suite=None):
                         try:
                             actual['rebuilt'] = reference(actual['rebuilt'].encode('utf-8'), require_unique=True)['tree']
                         except (KeyError, ValueError, UnicodeError, RecursionError) as error:
-                            raise AssertionError(f'{language} {name}: invalid reconstructed JSON') from error
+                            mismatches.append(f'{language} {name}: invalid reconstructed JSON: {error}')
+                            continue
                     if actual != expected:
-                        for key in set(actual) | set(expected):
+                        # Every differing field of every case is reported; the run goes on.
+                        for key in sorted(set(actual) | set(expected)):
                             if actual.get(key) != expected.get(key):
-                                raise AssertionError(f'{language} {name}: {key}\n'
-                                    f'expected {ascii(expected.get(key))[:500]}\n'
-                                    f'actual   {ascii(actual.get(key))[:500]}')
+                                mismatches.append(f'{language} {name}: {key}\n'
+                                                  f'expected {ascii(expected.get(key))[:500]}\n'
+                                                  f'actual   {ascii(actual.get(key))[:500]}')
+                        continue
                     print(f'{language}: {name} ok ({milliseconds(elapsed)})', flush=True)
                 adapter.finish(len(cases))
+            except (RuntimeError, AssertionError, ValueError) as error:
+                # The adapter stopped answering or broke the protocol; its remaining cases cannot run.
+                mismatches.append(str(error))
             finally:
                 adapter.stop()
+            elapsed = milliseconds(time.monotonic() - adapter.started)
+            if mismatches:
+                failures += mismatches
+                failed.add(language)
+                print(f'{language}: {len(mismatches)} failures in {len(cases)} cases ({elapsed})', flush=True)
+                continue
             print(f'{language}: {official_count} official examples + '
-                  f'{len(cases)-official_count} shared cases passed '
-                  f'({milliseconds(time.monotonic() - adapter.started)})', flush=True)
+                  f'{len(cases)-official_count} shared cases passed ({elapsed})', flush=True)
             results[language] = {'status': 'passed', 'cases': len(cases)}
         counts = {'official': official_count,
                   'fixtures': sum(name.startswith('fixtures/') for name, _, _ in cases),
                   'supplementary': sum(name.startswith('JSONTestSuite/') for name, _, _ in cases)}
-        compare_error_positions(rejections, documents)
-        compare_rejection_kinds(rejections)
+        for compare in (lambda: compare_error_positions(rejections, documents), lambda: compare_rejection_kinds(rejections)):
+            try:
+                compare()
+            except AssertionError as error:
+                failures.append(str(error))
+        if failures:
+            raise Failures(failures, failed)
     print('All selected implementations match the same expected results.', flush=True)
     return results, counts
 
@@ -508,9 +564,16 @@ def main():
     parser.add_argument('--suite', type=Path, help='Optional nst/JSONTestSuite checkout')
     parser.add_argument('--repository', action='append', metavar='NAME=PATH', help='Use another directory for a package')
     args = parser.parse_args()
-    verify(args.only or IMPLEMENTATIONS, args.suite.resolve() if args.suite else None,
-           repository_paths(ROOT, parse_overrides(args.repository)))  # raises on any failure
+    try:
+        verify(args.only or IMPLEMENTATIONS, args.suite.resolve() if args.suite else None,
+               repository_paths(ROOT, parse_overrides(args.repository)))
+    except Failures as error:
+        print(f'verification failed with {len(error.failures)} failures:', file=sys.stderr)
+        for failure in error.failures:
+            print('- ' + failure.replace('\n', '\n  '), file=sys.stderr)
+        return 1
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

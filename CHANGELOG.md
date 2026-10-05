@@ -6,6 +6,19 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- A verification runs every step of every language to its end and reports every failure. The first
+  failure ended the run: a failing prepare step raised, the package tests stopped at the first
+  failing package, the shared cases stopped at the first mismatch, and `scripts/test.py` returned
+  before the builds when a unit test failed, so a second failing language stayed unreported until
+  the first was fixed and the whole run started again. `scripts/test.py` now runs the unit tests,
+  the build of each language, the case and symbol listings, the package tests, every case of every
+  adapter and the runtime versions to their end, lists every failure, and returns 1 without writing a
+  record. A failed build skips only the later steps of its own language. `scripts/verify.py --only`
+  lists every failure and exits with status 1. `scripts/tests/test_repositories.py` asserted that a
+  failing package stopped the verification; it now asserts that the packages after it run and that
+  both failing packages are reported. That case and the cases of the new
+  `scripts/tests/test_failure_collection.py` failed before the change, because only the first of two
+  failing languages was reported, and pass after it.
 - Records, documentation checks and shared cases read only the files Git tracks. The source manifest
   of `scripts/verification_record.py` listed `git ls-files --cached --others --exclude-standard` and
   added every match of its source patterns, so an untracked file changed the manifest that a record
