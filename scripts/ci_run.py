@@ -30,9 +30,12 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 RECORDS = 'var/records'
-# The first failure lines of a failed target: lines that state a failure, refusal or error.
+# The first failure lines of a failed target: lines that state a failure, refusal or error, and the lines of a
+# checker that name a file (`docs/features.md: ...`). A line that reports a passing case or a directory of make is
+# not one, even when the name of the case contains such a word.
 FAILURE = re.compile(r'\b(FAIL|FAILED|ERROR|Error|error|failed|refuse|refused|mismatch|missing|stale|Traceback|'
-                     r'differs?|expected)\b|^- |^make: \*\*\*')
+                     r'differs?|expected)\b|^- |^make(\[\d+\])?: \*\*\*|^[\w./-]+\.\w+(:\d+)*: ')
+PASSING = re.compile(r'\bok \(\d+ ms\)$|test result: ok\.|^make(\[\d+\])?: (Entering|Leaving) directory')
 FAILURE_LINES = 20
 
 
@@ -96,7 +99,7 @@ def run(root, job, targets, make=('make',), stream=None):
 def failure_lines(log):
     """The first lines of a log that state a failure, or its last lines when none does."""
     lines = log.read_text(encoding='utf-8', errors='replace').splitlines()
-    matched = [line for line in lines if FAILURE.search(line)]
+    matched = [line for line in lines if FAILURE.search(line) and not PASSING.search(line)]
     return (matched or lines[-FAILURE_LINES:])[:FAILURE_LINES]
 
 

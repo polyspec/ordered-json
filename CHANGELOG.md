@@ -6,6 +6,10 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The first failure lines of the CI summary name the checker errors (T1.14). The summary of
+  `docs-check` showed only the line of make, and the summary of `check` showed passing case lines whose names contain
+  `missing`. `scripts/ci_run.py` takes a line that names a file and skips passing case lines and the directory lines
+  of make. The new case of `test_ci_run` failed before the change and passes after it.
 - The CI summary test compares the summary with the log of the target (T1.13). In CI it failed,
   because it expected the wording of GNU Make 3.81 and the runner's GNU Make 4 names the Makefile line.
 - Development runs unit tests only (T1.12). AGENTS and the validation procedure state that `make pie-check`,
