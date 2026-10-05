@@ -251,6 +251,21 @@ def guarded_run(root, mode, targets, run_target, print_line):
     return 0
 
 
+def targets_of(command):
+    """The targets of the command line after the first `--`: each command between further `--` separators is a
+    target of its own, named by its words. ValueError for an empty command."""
+    groups, current = [], []
+    for word in command + ['--']:
+        if word != '--':
+            current.append(word)
+            continue
+        if not current:
+            raise ValueError('an empty command between two -- separators')
+        groups.append(current)
+        current = []
+    return [{'name': shlex.join(group), 'command': group} for group in groups]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('mode', choices=['run', 'rerun-failed'])
@@ -259,7 +274,10 @@ def main():
     command = args.command[1:] if args.command[:1] == ['--'] else args.command
     if (args.mode == 'run') != bool(command):
         parser.error('run requires the full verification command after --; rerun-failed takes none')
-    targets = [{'name': shlex.join(command), 'command': command}] if command else []
+    try:
+        targets = targets_of(command) if command else []
+    except ValueError as error:
+        parser.error(str(error))
     return full_run(ROOT, args.mode, targets, print_line=lambda line: print(line, flush=True))
 
 

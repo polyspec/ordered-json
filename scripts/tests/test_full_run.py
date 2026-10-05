@@ -107,10 +107,13 @@ class FullRunChecks(unittest.TestCase):
         # through MAKEFLAGS; the nested make gets only the variables each case names.
         environment = {name: value for name, value in os.environ.items() if name not in MAKE_INPUTS}
         cases = [
-            (['check', 'JSON_TEST_SUITE='], 'python3 scripts/full_run.py run -- python3 scripts/test.py',
-             'without a supplementary suite the verification command is scripts/test.py alone'),
+            (['check', 'JSON_TEST_SUITE='], 'python3 scripts/full_run.py run -- python3 scripts/test.py'
+             ' -- python3 scripts/lint.py clippy -- python3 scripts/lint.py go-vet',
+             'without a supplementary suite the verification is scripts/test.py, and clippy and go vet are targets of '
+             'their own, as AGENTS requires'),
             (['check', 'JSON_TEST_SUITE=.cache/JSONTestSuite'],
-             'python3 scripts/full_run.py run -- python3 scripts/test.py --suite ".cache/JSONTestSuite"',
+             'python3 scripts/full_run.py run -- python3 scripts/test.py --suite ".cache/JSONTestSuite"'
+             ' -- python3 scripts/lint.py clippy -- python3 scripts/lint.py go-vet',
              'JSON_TEST_SUITE becomes the --suite argument of scripts/test.py, as in the run AGENTS.md prescribes'),
             (['rerun-failed'], 'python3 scripts/full_run.py rerun-failed',
              'rerun-failed takes its targets from the record of the guard, so it carries no command'),
@@ -133,6 +136,14 @@ class FullRunChecks(unittest.TestCase):
             injected.write_text('$(info injected by MAKEFILES)\n')
             with patch.dict(os.environ, {'MAKEFILES': str(injected), 'GNUMAKEFLAGS': '--debug=b'}):
                 self.test_make_check_starts_the_guard_before_any_step()
+
+    def test_each_command_after_a_separator_is_a_target_of_its_own(self):
+        self.assertEqual(full_run_module.targets_of(['python3', 'scripts/test.py', '--suite', 'x', '--',
+                                                     'python3', 'scripts/lint.py', 'clippy']),
+                         [{'name': 'python3 scripts/test.py --suite x', 'command': ['python3', 'scripts/test.py', '--suite', 'x']},
+                          {'name': 'python3 scripts/lint.py clippy', 'command': ['python3', 'scripts/lint.py', 'clippy']}])
+        with self.assertRaisesRegex(ValueError, 'an empty command'):
+            full_run_module.targets_of(['a', '--', '--', 'b'])
 
     def test_active_items_are_the_partial_features(self):
         self.assertEqual(active_items(FEATURES), [{'id': 'F-STREAM', 'title': 'Streaming \\| incremental parsing'}])

@@ -22,12 +22,20 @@ ONLINE := env -u CARGO_NET_OFFLINE -u GOPROXY -u npm_config_offline -u COMPOSER_
 export PATH := $(NPM_DIRECTORY)/bin:$(PATH)
 
 .PHONY: check rerun-failed test docs-check pie-check benchmark hooks hooks-check push-gate tools toolchains-check owner-check \
-	owner-validate ci ci-summary
+	owner-validate ci ci-summary clippy go-vet
 
 # scripts/full_run.py runs the full verification once per committed tree, when no feature of
 # docs/features.md is partial, and records its result in var/full-run.json.
+# The verification and the lints of AGENTS are targets of their own: each runs to its end and is recorded.
 check:
-	$(PYTHON) scripts/full_run.py run -- $(PYTHON) scripts/test.py$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
+	$(PYTHON) scripts/full_run.py run -- $(PYTHON) scripts/test.py$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)") -- $(PYTHON) scripts/lint.py clippy -- $(PYTHON) scripts/lint.py go-vet
+
+# clippy and go-vet run one lint of AGENTS (scripts/lint.py).
+clippy:
+	$(PYTHON) scripts/lint.py clippy
+
+go-vet:
+	$(PYTHON) scripts/lint.py go-vet
 
 rerun-failed:
 	$(PYTHON) scripts/full_run.py rerun-failed

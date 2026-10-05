@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: c78b5a47d518e71bd6ab92cf41bad89cf719c2bb2aa24f71674a465c2a17dd83 -->
+<!-- source-sha256: 90601779c9c222aae5e0c2d135886399717d8ab6212f2f7176dcc78077cf7ab7 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,10 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- `make check`가 clippy와 go vet을 실행합니다(T1.11). AGENTS는 `cargo clippy --all-targets -- -D warnings`와
+  `go vet ./...`을 요구했지만 전체 suite의 어떤 명령도 이를 실행하지 않았습니다. `make check`는 검증 뒤에
+  `scripts/lint.py clippy`와 `scripts/lint.py go-vet`을 각각의 guard target으로 실행하고, `make clippy`와 `make go-vet`은
+  하나씩 실행합니다. `test_full_run`과 `test_lint`의 바뀐 사례와 새 사례는 변경 전에 실패했고 변경 후 통과합니다.
 - CI summary의 첫 실패 줄이 검사기 error를 밝힙니다(T1.14). `docs-check`의 summary는 make의 줄만
   보여 줬고, `check`의 summary는 이름에 `missing`이 든 통과 사례 줄을 보여 줬습니다. `scripts/ci_run.py`는 file을 밝히는
   줄을 고르고 통과 사례 줄과 make의 directory 줄은 건너뜁니다. `test_ci_run`의 새 사례는 변경 전에 실패했고 변경 후
