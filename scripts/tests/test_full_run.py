@@ -6,12 +6,16 @@ no test runs the verification.
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
+import threading
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import full_run as full_run_module
 from full_run import RECORD, active_items, decide, full_run
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -222,6 +226,40 @@ class FullRunChecks(unittest.TestCase):
         status, output, ran = checkout.guard('run', stub('a'))
         self.assertEqual(status, 0, output)
         self.assertIn('differs from the tree', output)
+
+    def test_two_guards_started_at_once_run_the_targets_once(self):
+        # Both guards read the record before either writes it, so the record cannot keep the second
+        # one out; var/full-run.lock does.
+        checkout = self.checkout(DONE)
+        decided = threading.Barrier(2, timeout=3)
+        original = full_run_module.decide
+
+        def decide(*arguments):
+            decision = original(*arguments)
+            try:
+                decided.wait()
+            except threading.BrokenBarrierError:
+                pass  # The other guard refused before it decided.
+            return decision
+
+        ran, statuses, outputs = [], [], []
+
+        def guard():
+            lines = []
+            statuses.append(full_run(checkout.root, 'run', stub('a'), run_target=lambda target: ran.append(target) or True,
+                                     print_line=lines.append))
+            outputs.append('\n'.join(lines))
+
+        with patch('full_run.decide', side_effect=decide):
+            threads = [threading.Thread(target=guard) for _ in range(2)]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join(30)
+        self.assertEqual(len(ran), 1, outputs)
+        self.assertEqual(sorted(statuses), [0, 1], outputs)
+        self.assertTrue(any(re.search(r'^\[full-run\] refuse: another guard holds var/full-run.lock', output)
+                            for output in outputs), outputs)
 
     def test_rerun_failed_without_a_record_is_refused(self):
         checkout = self.checkout(DONE)

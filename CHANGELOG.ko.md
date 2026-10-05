@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: a4b67e0e1cb143607996175220c04e6b7381283338fa19a2d1812bbab47f3343 -->
+<!-- source-sha256: f0c4aceda58e962af442e3f01f27f61e45b83f8f5cd6e03ebe3b734703223895 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,13 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- `make check`와 `make rerun-failed`의 guard는 첫 검사부터 끝까지 `var/full-run.lock`을 배타적으로 잡고, 다른 guard가 이를 잡고
+  있으면 그 holder를 밝히며 거부합니다. 동시에 시작한 두 guard는 둘 다 실행 중인 실행의 record를 읽지 못해 한 tree의 검증을 둘 다
+  실행했습니다. Makefile을 읽는 것은 더 이상 `core.hooksPath`를 쓰지 않습니다. `make -n`을 포함한 모든 `make` 실행이 Makefile을 읽을 때
+  이를 설정했습니다. `make hooks`는 새 `scripts/push_gate.py hooks-install`을 실행하고, 이 명령은 값이 다를 때만 설정을 쓴 뒤 hook을
+  검사하며, guard는 여전히 hook이 없는 checkout을 거부합니다. `scripts/tests/test_full_run.py`의 새 case는 두 guard가 모두 target을
+  실행했으므로, `scripts/tests/test_push_gate.py`의 바뀐 case는 `make -n docs-check`가 `core.hooksPath`를 썼으므로 변경 전에
+  실패했고, 둘 다 변경 후에는 통과합니다.
 - 실패는 무엇이 다른지 밝힙니다. PIE build나 도구 오류는 "위의 PIE 출력을 보라"고만 했고, 이제 일치한 줄을 나열합니다. 오래된 통합
   기록이나 PIE 기록, 실행 중에 바뀐 소스는 소스가 다르다고만 했고, 이제 바뀐 파일, 추가된 파일, 제거된 파일을 모두 나열합니다. 실패한
   runtime version 명령과 benchmark 명령은 도구의 standard error를 잃었고, 이제 둘 다 종료 상태와 그 오류를 포함합니다.

@@ -6,6 +6,16 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The guard of `make check` and `make rerun-failed` holds `var/full-run.lock` exclusively from its
+  first inspection to its end, and refuses, naming the holder, while another guard holds it. Two
+  guards started at once both read no record of a running run and both ran the verification of
+  one tree. Reading the Makefile no longer writes `core.hooksPath`: every `make` run, including
+  `make -n`, set it while it read the Makefile. `make hooks` runs the new
+  `scripts/push_gate.py hooks-install`, which writes the configuration only when the value differs
+  and then checks the hook, and the guard still refuses a checkout without the hook. The new case of
+  `scripts/tests/test_full_run.py` failed before the change, because both guards ran the target,
+  and the changed case of `scripts/tests/test_push_gate.py` failed, because `make -n docs-check`
+  wrote `core.hooksPath`; both pass after it.
 - Failures name what differs. A PIE build or tool error said only "see the PIE output above"; it
   now lists the lines that matched. A stale aggregate or PIE record, and sources that changed during
   a run, said only that the sources differ; each now lists every changed, added and removed file.

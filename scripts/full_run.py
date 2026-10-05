@@ -18,6 +18,7 @@ target, so a run that is stopped stays recorded as `incomplete`. No step has a t
 """
 import argparse
 from datetime import datetime, timezone
+import fcntl
 import json
 import os
 from pathlib import Path
@@ -32,6 +33,9 @@ ROOT = Path(__file__).resolve().parents[1]
 FEATURES = 'docs/features.md'
 # The record of the last full run of this checkout; /var/ is ignored by Git.
 RECORD = 'var/full-run.json'
+# Held exclusively by the guard from its first inspection to its end, so two guards started at once do
+# not both read no record and both run; the operating system releases it when the process ends.
+LOCK = 'var/full-run.lock'
 ACTIVE_STATE = 'partial'
 # Written by make pie-check; the documentation check at the end of the verification rejects it when
 # it is stale.
@@ -158,9 +162,37 @@ def run_command(root, target):
     return subprocess.run(target['command'], cwd=root).returncode == 0
 
 
+def acquire(root):
+    """The descriptor of the exclusively locked var/full-run.lock, or None with what its holder wrote."""
+    path = Path(root) / LOCK
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor = os.open(path, os.O_RDWR | os.O_CREAT, 0o644)
+    try:
+        fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        holder = os.read(descriptor, 4096).decode('utf-8', 'replace').strip()
+        os.close(descriptor)
+        return None, holder or 'no holder recorded'
+    os.ftruncate(descriptor, 0)
+    os.write(descriptor, f'process {os.getpid()}, started {now()}\n'.encode())
+    return descriptor, None
+
+
 def full_run(root, mode, targets, run_target=None, print_line=print):
     """Inspect the checkout, decide and run; return 0 when the full result of the tree is passed."""
     root = Path(root)
+    descriptor, holder = acquire(root)
+    if descriptor is None:
+        print_line(f'[full-run] refuse: another guard holds {LOCK} ({holder}); one full run at a time per checkout')
+        return 1
+    try:
+        return guarded_run(root, mode, targets, run_target, print_line)
+    finally:
+        os.close(descriptor)  # Closing the descriptor releases the lock.
+
+
+def guarded_run(root, mode, targets, run_target, print_line):
+    """full_run while the guard holds var/full-run.lock."""
     run_target = run_target or (lambda target: run_command(root, target))
     from push_gate import hooks_issue  # push_gate imports this module for its parser.
     try:
