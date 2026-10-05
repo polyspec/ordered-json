@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: c8165aa229042065fcd7571c41cd2d74a06ec6bff6e93ac6f5e9b23d14597ad7 -->
+<!-- source-sha256: b8045bbb9eee535f52208f8d59147e176cd5232517960defb3a8b2f8aa0b981d -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,15 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 기록, 문서 검사, 공통 사례는 Git이 추적하는 파일만 읽습니다. `scripts/verification_record.py`의 source manifest는
+  `git ls-files --cached --others --exclude-standard`를 나열하고 소스 pattern에 맞는 모든 파일을 더했으므로, 추적되지 않은 파일이
+  record가 커밋된 tree로 밝히는 manifest를 바꾸었습니다. `scripts/docs_check.py`는 Markdown 문서와 JSON 보고서를 찾으려고
+  디렉터리를 순회하고 디스크의 fixture를 셌으며, `scripts/verify.py`는 디스크의 모든 fixture 파일을 공통 사례로 실행했습니다.
+  `scripts/registry.py`는 `git ls-files --cached`로 추적 파일을 나열하고, 이 읽기들은 모두 그 목록을 사용합니다. source archive처럼
+  Git metadata가 없는 tree는 여전히 자기 파일을 읽습니다. guard `scripts/full_run.py`도 `.gitignore`가 무시하지 않는 파일이 추적되지
+  않으면 build가 그 파일을 읽으므로 각각을 밝히며 전체 실행을 거부합니다. 새 `scripts/tests/test_tracked_inputs.py`의 case와
+  `scripts/tests/test_full_run.py`의 새 case는 추적되지 않은 파일이 manifest, 문서, 보고서, fixture, guard 판단을 바꾸었으므로 변경
+  전에 실패했고, 변경 후에는 통과합니다.
 - 검증 실행의 모든 cargo 명령은 그 실행 안의 `CARGO_TARGET_DIR`에 빌드합니다. Rust probe는
   `rust/target/debug/examples/probe`였고 cargo는 환경이 지정한 target 디렉터리를 사용했으므로, 다른 체크아웃이나 이전 tree가
   빌드한 probe, test binary, API listing이 현재 소스를 대신해 답할 수 있었습니다. `implementations.json`은 `rust`에

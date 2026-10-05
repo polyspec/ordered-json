@@ -20,8 +20,8 @@ CASE_ID = re.compile(r'^[a-z][a-z0-9_]*$')
 CASE_SECONDS = 60
 TIMED_LINE = re.compile(r'\(\d+(?:\.\d+)?\s*m?s\)$')
 
-from registry import (IMPLEMENTATIONS, adapter_commands, api_commands, case_commands, parse_overrides,
-                      prepare, repository_paths, run_directory, test_commands)
+from registry import (IMPLEMENTATIONS, adapter_commands, api_commands, case_commands, fixture_paths,
+                      parse_overrides, prepare, repository_paths, run_directory, test_commands)
 
 
 class ObjectPairs(list):
@@ -123,7 +123,7 @@ def prepare_cases(directory, suite):
                     'compact': example['compact'], 'tree': example['tree'], 'rebuilt': example['tree']}
         cases.append(('official/' + example['id'], path, expected))
     for category in ['valid', 'invalid']:
-        for path in sorted((ROOT / 'fixtures' / category).glob('*.json')):
+        for path in fixture_paths(ROOT, category):
             expected = reference(path.read_bytes()) if category == 'valid' else {'ok': False}
             cases.append(('fixtures/' + category + '/' + path.name, path, expected))
     if suite:
