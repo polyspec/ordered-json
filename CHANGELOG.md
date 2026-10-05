@@ -6,6 +6,11 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- `scripts/test.py --unit` fails with `selected 0 tests` and the name when a name selects no test,
+  before any test runs, and the full run fails when it discovers no unit test. `--unit registry`
+  loaded the module `scripts/registry.py`, which has no tests, ran 0 tests and exited with status 0,
+  so a mistyped selection passed as a test run. The new case of `scripts/tests/test_unit_runner.py`
+  failed before the change, because `--unit registry` exited with status 0, and passes after it.
 - The push gate and the guard refuse a tracker that yields no feature row. Both read only lines that
   start with `| F-`, so a `docs/features.md` without the feature table, with an empty table or with
   a row whose ID is not `F-...` had no `partial` row, and `scripts/push_gate.py hook` returned no

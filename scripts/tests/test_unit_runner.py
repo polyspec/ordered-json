@@ -1,6 +1,7 @@
 """The unit test runner reports every test with its time and stops a test at its deadline."""
 import io
 from pathlib import Path
+import subprocess
 import sys
 import time
 import unittest
@@ -28,6 +29,19 @@ class UnitRunnerChecks(unittest.TestCase):
         self.assertRegex(output, r'Sample\.test_hangs \.\.\. ERROR \(\d+ ms\)\n')
         self.assertIn('test_hangs exceeded its 1 s timeout', output)
         self.assertEqual((result.testsRun, len(result.errors), len(result.failures)), (2, 1, 0))
+
+
+    def test_a_selection_of_no_test_fails_by_name(self):
+        # A name that loads a module without tests ran nothing and must not pass as a test run.
+        script = str(Path(__file__).resolve().parents[1] / 'test.py')
+        empty = subprocess.run([sys.executable, script, '--unit', 'registry'], capture_output=True, text=True)
+        self.assertEqual(empty.returncode, 1, empty.stdout + empty.stderr)
+        self.assertIn('selected 0 tests: registry', empty.stderr)
+        mixed = subprocess.run([sys.executable, script, '--unit', 'test_benchmark.WorkloadChecks.test_wrong_depth_is_rejected',
+                                'registry'], capture_output=True, text=True)
+        self.assertEqual(mixed.returncode, 1, mixed.stdout + mixed.stderr)
+        self.assertIn('selected 0 tests: registry', mixed.stderr)
+        self.assertNotIn('test_wrong_depth_is_rejected ... ok', mixed.stderr, 'nothing runs after an empty selection')
 
 
 if __name__ == '__main__':
