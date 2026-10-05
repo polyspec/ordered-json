@@ -7,8 +7,9 @@
 `make check` and `make rerun-failed` start this guard before any step. The full run happens once,
 after every active item is complete (AGENTS). The active work of this repository is a feature row
 of docs/features.md whose implementation state is `partial`. The guard refuses a run while such a
-row exists, while tracked changes are uncommitted, and while the run of another process is still
-going on. A full run is refused when var/full-run.json already records a run of the current tree
+row exists, while tracked changes are uncommitted, while docs/pie-verification.json fails the check
+that the documentation check of the verification applies to it, and while the run of another process
+is still going on. A full run is refused when var/full-run.json already records a run of the current tree
 (`git rev-parse HEAD^{tree}`); `rerun-failed` is refused unless that record exists and has targets
 that did not pass. The guard prints its decision with the reason, runs each target to its end,
 prints its start and its result with the elapsed time, and writes the record before and after each
@@ -25,11 +26,16 @@ import subprocess
 import sys
 import time
 
+from docs_check import check_pie_verification
+
 ROOT = Path(__file__).resolve().parents[1]
 FEATURES = 'docs/features.md'
 # The record of the last full run of this checkout; /var/ is ignored by Git.
 RECORD = 'var/full-run.json'
 ACTIVE_STATE = 'partial'
+# Written by make pie-check; the documentation check at the end of the verification rejects it when
+# it is stale.
+PIE_RECORD = 'docs/pie-verification.json'
 
 
 def active_items(text):
@@ -53,12 +59,24 @@ def names(targets):
     return ', '.join(target['name'] for target in targets)
 
 
-def decide(mode, targets, active, dirty, tree, record, running):
+def pie_issue(root):
+    """Why the documentation check of the verification would reject the PIE record, or None."""
+    path = Path(root) / PIE_RECORD
+    if not path.exists():
+        return None
+    try:
+        check_pie_verification(Path(root), json.loads(path.read_text()))
+    except (ValueError, KeyError) as issue:
+        return str(issue)
+    return None
+
+
+def decide(mode, targets, active, dirty, pie, tree, record, running):
     """Decide whether the guard runs; returns {'run', 'reason', 'targets'}.
 
     `active` holds the partial features, `dirty` the `git status --porcelain` lines of tracked
-    files, `record` the record of the last run or None, and `running` whether the process of an
-    incomplete record still exists.
+    files, `pie` why the PIE record would fail the documentation check or None, `record` the record
+    of the last run or None, and `running` whether the process of an incomplete record still exists.
     """
     def refuse(reason):
         return {'run': False, 'reason': reason, 'targets': []}
@@ -70,7 +88,13 @@ def decide(mode, targets, active, dirty, tree, record, running):
                       f'the full run happens once, when every active item is complete:\n{listed}')
     if dirty:
         listed = '\n'.join(f'  {line}' for line in dirty)
-        return refuse(f'the working tree has uncommitted tracked changes; a full run verifies a committed tree:\n{listed}')
+        return refuse(f'the working tree has uncommitted tracked changes; a full run verifies a committed tree; '
+                      f'commit them, then run make check again; make pie-check writes {PIE_RECORD}, which is '
+                      f'committed by itself before make check (AGENTS):\n{listed}')
+    if pie:
+        return refuse(f'{PIE_RECORD} would fail the documentation check at the end of the verification: {pie}; '
+                      f'run make pie-check PIE=/path/to/pie.phar with the supplementary suite once, commit '
+                      f'{PIE_RECORD} by itself, then run make check (AGENTS)')
     if record and running:
         return refuse(f"the run started {record['started']} by process {record['pid']} is still running on tree {record['tree']}")
     if mode == 'run':
@@ -147,7 +171,8 @@ def full_run(root, mode, targets, run_target=None, print_line=print):
     commit = git(root, 'rev-parse', 'HEAD').strip()
     record = read_record(root)
     running = bool(record and record['result'] == 'incomplete' and record.get('pid') != os.getpid() and alive(record['pid']))
-    decision = decide(mode, targets, active, dirty, tree, record, running)
+    pie = None if dirty else pie_issue(root)
+    decision = decide(mode, targets, active, dirty, pie, tree, record, running)
     print_line(f"[full-run] {'run' if decision['run'] else 'refuse'}: {decision['reason']}")
     if not decision['run']:
         return 1
