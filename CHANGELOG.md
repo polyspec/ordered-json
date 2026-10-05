@@ -15,7 +15,9 @@
   one checkout cleaned or replaced each other's build output while the other run used it. The
   registry key `build_in_copy` selects the copied build; the copy holds tracked and unignored
   files and rejects a symbolic link. The PIE record names the artifact relative to the run
-  directory.
+  directory. The ignored output of the former in-place builds (the `phpize`, `configure` and
+  `make` files and `modules/` in `php-extension/src`, `.cache/probes` and `.cache/pie-check`) was
+  removed from the checkout, since no command reads it.
 - The ojson comparison streams the Erlang compile output with its exit status and elapsed time,
   and sends each project one case at a time with the shared 60 s reply deadline, printing each
   case with its elapsed time. The compile had a 45 s limit and each project run one 60 s limit
