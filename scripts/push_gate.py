@@ -25,6 +25,8 @@ from full_run import ACTIVE_STATE, FEATURES, active_items
 
 HOOKS_PATH = '.githooks'
 HOOK = '.githooks/pre-push'
+# The commit-time check: scripts/owner_check.py --validate refuses a commit with an unmapped path.
+HOOKS = (HOOK, '.githooks/pre-commit')
 SHORT = 12
 RULE = ('A push happens only when no feature is partial (AGENTS.md): CI does not run the verification, so make check '
         'runs it once on the committed tree after every feature is complete, and a feature in progress does not '
@@ -73,9 +75,10 @@ def hooks_issue(root):
     if configured != HOOKS_PATH:
         shown = configured or 'unset'
         return f'core.hooksPath is {shown}, not {HOOKS_PATH}; run make hooks'
-    hook = Path(root) / HOOK
-    if not (hook.is_file() and os.access(hook, os.X_OK)):
-        return f'{HOOK} is missing or not executable; restore it with git checkout -- {HOOK}'
+    for name in HOOKS:
+        hook = Path(root) / name
+        if not (hook.is_file() and os.access(hook, os.X_OK)):
+            return f'{name} is missing or not executable; restore it with git checkout -- {name}'
     return None
 
 
@@ -106,14 +109,17 @@ def commit(root, revision):
     try:
         sha = git(root, 'rev-parse', '--verify', f'{revision}^{{commit}}').strip()
         found = [(sha[:SHORT], item) for item in committed_items(root, sha, sha[:SHORT])]
-        entry = git(root, 'ls-tree', sha, '--', HOOK).split()
-        mode = entry[0] if entry else None
+        modes = {}
+        for name in HOOKS:
+            entry = git(root, 'ls-tree', sha, '--', name).split()
+            modes[name] = entry[0] if entry else None
     except (Refusal, OSError, ValueError, IndexError) as cause:
         return sha, [f'push refused: {cause}', RULE]
     lines = in_progress(found) if found else []
-    if mode != '100755':
-        lines = [f"push refused: {HOOK} is not tracked with mode 100755 in {sha[:SHORT]} "
-                 f"({f'mode {mode}' if mode else 'not tracked'}); every checkout runs it as its pre-push hook"] + lines
+    for name, mode in reversed(list(modes.items())):
+        if mode != '100755':
+            lines = [f"push refused: {name} is not tracked with mode 100755 in {sha[:SHORT]} "
+                     f"({f'mode {mode}' if mode else 'not tracked'}); every checkout runs it as a hook"] + lines
     return sha, lines
 
 
@@ -139,7 +145,7 @@ def main(argv):
         if lines:
             report_ci(lines)
         else:
-            print(f'push gate: no feature is {ACTIVE_STATE} in {sha[:SHORT]}; {HOOK} is tracked with mode 100755')
+            print(f'push gate: no feature is {ACTIVE_STATE} in {sha[:SHORT]}; {" and ".join(HOOKS)} are tracked with mode 100755')
     elif argv == ['hooks-install']:
         configured = subprocess.run(['git', 'config', 'core.hooksPath'], cwd=root, capture_output=True,
                                     text=True).stdout.strip()
@@ -149,12 +155,12 @@ def main(argv):
         issue = hooks_issue(root)
         lines = [f'the pre-push hook is not installed: {issue}'] if issue else []
         if not lines:
-            print(f'hooks-check: core.hooksPath is {HOOKS_PATH} and {HOOK} is executable')
+            print(f'hooks-check: core.hooksPath is {HOOKS_PATH} and {" and ".join(HOOKS)} are executable')
     elif argv == ['hooks-check']:
         issue = hooks_issue(root)
         lines = [f'the pre-push hook is not installed: {issue}'] if issue else []
         if not lines:
-            print(f'hooks-check: core.hooksPath is {HOOKS_PATH} and {HOOK} is executable')
+            print(f'hooks-check: core.hooksPath is {HOOKS_PATH} and {" and ".join(HOOKS)} are executable')
     else:
         print(__doc__, file=sys.stderr)
         return 2

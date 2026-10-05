@@ -2,7 +2,7 @@
 # docs/features.md is partial, but a push from a checkout without the hook does not run it. This job
 # runs the same gate, scripts/push_gate.py, on the pushed commit of every branch and on the head
 # commit of every pull request: it fails while a feature is partial, naming each one, and when
-# .githooks/pre-push is not tracked with mode 100755. The full verification is not run here. The
+# .githooks/pre-push or .githooks/pre-commit is not tracked with mode 100755. The full verification is not run here. The
 # runner image, each action and Python are exact releases, so the job does not change with a new
 # release of any of them.
 name: push-gate

@@ -12,7 +12,7 @@ export GOTOOLCHAIN := local
 export RUSTUP_AUTO_INSTALL := 0
 export PATH := $(NPM_DIRECTORY)/bin:$(PATH)
 
-.PHONY: check rerun-failed test docs-check pie-check benchmark hooks hooks-check tools toolchains-check
+.PHONY: check rerun-failed test docs-check pie-check benchmark hooks hooks-check tools toolchains-check owner-check
 
 # scripts/full_run.py runs the full verification once per committed tree, when no feature of
 # docs/features.md is partial, and records its result in var/full-run.json.
@@ -26,6 +26,11 @@ test: check
 
 docs-check:
 	$(PYTHON) scripts/docs_check.py
+
+# owner-check runs the owners of the changed paths (scripts/owner-checks.json): PATHS, the paths changed
+# since BASE, or the uncommitted changes and untracked files.
+owner-check:
+	$(PYTHON) scripts/owner_check.py $(if $(PATHS),--paths "$(PATHS)") $(if $(BASE),--base "$(BASE)")
 
 pie-check:
 	$(PYTHON) scripts/check_pie.py --pie "$(PIE)" $(if $(JSON_TEST_SUITE),--suite "$(JSON_TEST_SUITE)")

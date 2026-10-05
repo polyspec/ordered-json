@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 0cc2fd9a36448762fa3f2b87c32efffa4719b783d2111a209a5d68c380629a94 -->
+<!-- source-sha256: 617076497623be73aca6bdcc8f8d5d5980429efa87f4ae16ac0c2a44ca3b12b8 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,14 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 모든 추적 경로는 그것을 소유한 검사에 대응됩니다. 새 `scripts/owner-checks.json`은 경로 glob을 검증기 unit test module,
+  `scripts/verify.py --only`가 검사하는 구현, 검사 `docs`와 `benchmark`에 대응시키고, `make owner-check`가 실행하는 새
+  `scripts/owner_check.py`는 이 대응을 검사한 뒤 커밋되지 않은 변경, `PATHS`, 또는 `BASE` 이후 바뀐 경로의 소유자를 각각 끝까지
+  실행합니다. 새 pre-commit hook `.githooks/pre-commit`은 추적 경로가 어떤 규칙에도 맞지 않거나, glob이 어떤 경로에도 맞지 않거나,
+  소유자가 존재하지 않으면 commit을 거부하고, `scripts/push_gate.py`는 이 hook을 pre-push hook처럼 요구합니다. `make hooks-check`는 이
+  hook이 실행 가능하지 않으면 실패하고, CI는 mode 100755로 추적되지 않으면 실패합니다. 바뀐 파일을 소유한 test를 밝히는 것이 없었으므로,
+  소유한 test만 실행하는 절차는 소스를 읽는 데 의존했습니다. 새 `scripts/tests/test_owner_check.py`의 case와
+  `scripts/tests/test_push_gate.py`의 새 case는 대응, 검사, hook이 없었으므로 변경 전에 실패했고, 변경 후에는 통과합니다.
 - 빌드 단계, 패키지 테스트 명령, 어댑터는 손자 process를 포함한 process group 전체와 함께 끝납니다. group은 직접 자식이 실행 중일
   때만 종료되었고 읽는 쪽은 end of file을 기다렸으므로, 명령이 background에서 시작한 process는 명령이 끝난 뒤에도 실행되었고, 빌드
   단계는 그 process를 제한 없이 기다렸으며, 패키지 테스트 실행은 케이스 기한에서 실패했습니다. `scripts/registry.py`는 명령이 끝나면

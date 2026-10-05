@@ -6,6 +6,18 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Every tracked path maps to the checks that own it. The new `scripts/owner-checks.json` maps globs
+  of paths to verifier unit test modules, implementations that `scripts/verify.py --only` checks, and
+  the checks `docs` and `benchmark`; the new `scripts/owner_check.py`, run by `make owner-check`,
+  validates the map and runs the owners of the uncommitted changes, of `PATHS` or of the paths changed
+  since `BASE`, each to its end. The new pre-commit hook `.githooks/pre-commit` refuses a commit while
+  a tracked path matches no rule, a glob matches no path or an owner does not exist, and
+  `scripts/push_gate.py` requires it like the pre-push hook: `make hooks-check` fails when it is not
+  executable, and CI fails when it is not tracked with mode 100755. Nothing named the tests that own a
+  changed file, so the procedure to run only the owning tests depended on reading the sources. The
+  cases of the new `scripts/tests/test_owner_check.py` and the new case of
+  `scripts/tests/test_push_gate.py` failed before the change, because the map, the check and the hook
+  did not exist, and pass after it.
 - A build step, a package test command and an adapter end with their whole process group,
   grandchildren included. The group was killed only while the direct child still ran, and the reader
   waited for end of file, so a background process that a command started kept running after it, a
