@@ -65,6 +65,12 @@ def violations(name, text):
             if 'run' in step and not re.fullmatch(r'make [^|;&`$()]*(\$\{\{[^}]*\}\}[^|;&`$()]*)*', step['run']):
                 found.append(f"{name}: job {job} step {index} ({label}) runs `{step['run']}`; a step runs one make target, "
                              'never a script or a tool directly')
+        for index, step in enumerate(steps, 1):
+            # setup-node caches the dependencies of the packageManager of package.json by default and fails without
+            # a lock file; this repository has none, since no npm package is installed.
+            if step.get('uses', '').startswith('actions/setup-node@') and step.get('with.package-manager-cache') != 'false':
+                found.append(f'{name}: job {job} step {index} (setup-node) lacks package-manager-cache: false; the '
+                             'repository has no npm lock file to cache')
         if any('strategy:' in line for line in body['lines']) and not any(
                 re.fullmatch(r'\s+fail-fast: false', line) for line in body['lines']):
             found.append(f'{name}: job {job} has a matrix without fail-fast: false; one failed job would cancel the others')
@@ -126,6 +132,15 @@ class WorkflowRules(unittest.TestCase):
                       violations('ci.yml', text.replace('fail-fast: false', 'fail-fast: true')))
         timed = text.replace('    runs-on: ubuntu-24.04\n', '    runs-on: ubuntu-24.04\n    timeout-minutes: 60\n')
         self.assertTrue(any('timeout-minutes' in issue for issue in violations('ci.yml', timed)))
+
+    def test_setup_node_without_a_lock_file_disables_its_cache(self):
+        # In CI: setup-node failed with `Dependencies lock file is not found`.
+        tracked = [name for name in ('package-lock.json', 'npm-shrinkwrap.json', 'yarn.lock') if (ROOT / name).exists()]
+        self.assertEqual(tracked, [])
+        text = (WORKFLOWS / 'ci.yml').read_text()
+        broken = text.replace('          package-manager-cache: false\n', '')
+        self.assertIn('ci.yml: job ci step 3 (setup-node) lacks package-manager-cache: false; the repository has no npm '
+                      'lock file to cache', violations('ci.yml', broken))
 
     def test_a_step_that_does_not_run_after_a_failure_fails(self):
         text = (WORKFLOWS / 'ci.yml').read_text()
