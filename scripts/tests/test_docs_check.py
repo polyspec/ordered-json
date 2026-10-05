@@ -20,7 +20,9 @@ from test import build_extension
 
 class FeatureStateChecks(unittest.TestCase):
     def test_package_tests_require_verification_record(self):
-        row = ('| F-RUST-SERDE | Typed Rust values | implemented | package-tests | '
+        row = ('| ID | Feature | Implementation | Verification | Evidence | Distribution | Specification |\n'
+               '| --- | --- | --- | --- | --- | --- | --- |\n'
+               '| F-RUST-SERDE | Typed Rust values | implemented | package-tests | '
                '[result](verification.json) | source-only | [contract](../README.md#contract) |')
         self.assertIn('F-RUST-SERDE', feature_rows(row))
         with self.assertRaisesRegex(ValueError, 'record that backs it'):

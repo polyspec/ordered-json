@@ -21,13 +21,12 @@ from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
-import re
 import shlex
 import subprocess
 import sys
 import time
 
-from docs_check import check_pie_verification
+from docs_check import check_pie_verification, feature_table
 
 ROOT = Path(__file__).resolve().parents[1]
 FEATURES = 'docs/features.md'
@@ -40,16 +39,10 @@ PIE_RECORD = 'docs/pie-verification.json'
 
 
 def active_items(text):
-    """The feature rows whose implementation state is `partial`, with their feature text as title."""
-    items = []
-    for line in text.splitlines():
-        if not re.match(r'^\|\s*F-', line):
-            continue
-        # A cell may contain an escaped `\|`.
-        cells = [cell.strip() for cell in re.split(r'(?<!\\)\|', line.strip().strip('|'))]
-        if cells[2] == ACTIVE_STATE:
-            items.append({'id': cells[0], 'title': cells[1]})
-    return items
+    """The feature rows whose implementation state is `partial`, with their feature text as title.
+    ValueError when the text has no feature table, no feature row or a row that is not a feature."""
+    return [{'id': cells[0], 'title': cells[1]} for cells in feature_table(text)
+            if len(cells) > 2 and cells[2] == ACTIVE_STATE]
 
 
 def not_passed(record):
@@ -170,7 +163,12 @@ def full_run(root, mode, targets, run_target=None, print_line=print):
     root = Path(root)
     run_target = run_target or (lambda target: run_command(root, target))
     from push_gate import hooks_issue  # push_gate imports this module for its parser.
-    active = active_items((root / FEATURES).read_text())
+    try:
+        active = active_items((root / FEATURES).read_text())
+    except (OSError, ValueError) as issue:
+        # A tracker that cannot be read holds no evidence that no feature is in progress.
+        print_line(f'[full-run] refuse: {FEATURES} cannot be read as the tracker: {issue}')
+        return 1
     hooks = hooks_issue(root)
     # Untracked files that are not ignored count: a build reads them, but the record names only the tree.
     dirty = [line for line in git(root, 'status', '--porcelain', '--untracked-files=all').splitlines() if line]
