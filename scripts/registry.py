@@ -80,6 +80,43 @@ def required_repositories(selected, registry=REGISTRY):
     return sorted(required)
 
 
+def tracked_files(root):
+    """The paths, relative to root, of the files Git tracks under root, in name order; None when root
+    is not in a Git work tree, as in a source archive, where every file is a source.
+
+    An untracked file is not part of the tree that a record names, so no record, documentation check
+    or shared case reads one."""
+    process = subprocess.run(['git', 'rev-parse', '--is-inside-work-tree'], cwd=root,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if process.returncode:
+        if 'not a git repository' in process.stderr:
+            return None
+        raise RuntimeError(f'git rev-parse --is-inside-work-tree in {root} exited with {process.returncode}: '
+                           f'{process.stderr.strip()}')
+    listing = subprocess.run(['git', 'ls-files', '--cached', '-z'], cwd=root,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+    return sorted(name for name in listing.stdout.decode('utf-8').split('\0') if name)
+
+
+def files_under(root, directory, suffix, recursive):
+    """The files with the suffix in directory, a path relative to root, and with recursive in its
+    subdirectories: the tracked ones in a Git work tree, every one otherwise; in path order."""
+    base = Path(root) / directory
+    tracked = tracked_files(root)
+    if tracked is None:
+        found = base.rglob('*' + suffix) if recursive else base.glob('*' + suffix)
+        return sorted(path for path in found if path.is_file())
+    prefix = (Path(directory).as_posix().rstrip('/') + '/') if str(directory) not in ('', '.') else ''
+    return [Path(root) / name for name in tracked
+            if name.startswith(prefix) and name.endswith(suffix)
+            and (recursive or '/' not in name[len(prefix):]) and (Path(root) / name).is_file()]
+
+
+def fixture_paths(root, category):
+    """The shared fixtures of one category, valid or invalid, in name order."""
+    return files_under(root, 'fixtures/' + category, '.json', recursive=False)
+
+
 @dataclass(frozen=True)
 class Run:
     """One verification run: its temporary root, the repository paths its commands use, and

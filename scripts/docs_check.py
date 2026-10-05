@@ -10,7 +10,7 @@ import sys
 from urllib.parse import unquote, urlsplit
 
 from verification_record import IMPLEMENTATIONS, package_revisions, sha256, source_manifest
-from registry import REGISTRY, artifact_paths, repository_paths
+from registry import REGISTRY, artifact_paths, files_under, fixture_paths, repository_paths, tracked_files
 
 ROOT = Path(__file__).resolve().parents[1]
 KINDS = {'overview', 'specification', 'state', 'operations', 'history', 'procedure', 'usage', 'report'}
@@ -87,11 +87,19 @@ def local_target(root, source, target):
 
 
 def authored_markdown(root):
-    paths = set()
+    """The Markdown files of root: the tracked ones in a Git work tree, every one outside ignored
+    directories otherwise. The common root leaves the package directories to their own checks."""
+    root = Path(root)
     package_roots = {Path(entry['path']).parts[0] for entry in REGISTRY['repositories'].values()}
+    common = root.resolve() == ROOT.resolve()
+    tracked = tracked_files(root)
+    if tracked is not None:
+        return {name for name in tracked if name.endswith('.md') and (root / name).is_file()
+                and not (common and '/' in name and name.split('/')[0] in package_roots)}
+    paths = set()
     for folder, directories, files in os.walk(root):
-        relative = Path(folder).resolve().relative_to(Path(root).resolve())
-        if root.resolve() == ROOT.resolve() and relative.parts and relative.parts[0] in package_roots:
+        relative = Path(folder).resolve().relative_to(root.resolve())
+        if common and relative.parts and relative.parts[0] in package_roots:
             directories[:] = []
             continue
         directories[:] = [name for name in directories if name not in IGNORED
@@ -100,6 +108,11 @@ def authored_markdown(root):
             if name.endswith('.md'):
                 paths.add((Path(folder) / name).relative_to(root).as_posix())
     return paths
+
+
+def report_paths(root):
+    """The JSON reports under docs/."""
+    return files_under(root, 'docs', '.json', recursive=True)
 
 
 def feature_rows(text):
@@ -240,7 +253,7 @@ def check_verification(root, record):
     if counts['total'] != counts['official'] + counts['fixtures'] + counts['supplementary']:
         raise ValueError('Verification case total is inconsistent')
     official = json.loads((root / 'examples/official.json').read_text(encoding='utf-8'))
-    fixtures = sum(len(list((root / 'fixtures' / category).glob('*.json'))) for category in ('valid', 'invalid'))
+    fixtures = sum(len(fixture_paths(root, category)) for category in ('valid', 'invalid'))
     if counts['official'] != len(official['cases']) or counts['fixtures'] != fixtures or not fixtures:
         raise ValueError('Verification counts do not match repository inputs')
     implementations = record['implementations']
@@ -326,7 +339,7 @@ def check_pie_verification(root, record):
     if counts['total'] != counts['official'] + counts['fixtures'] + counts['supplementary']:
         raise ValueError('PIE verification case total is inconsistent')
     official = json.loads((root / 'examples/official.json').read_text())
-    fixtures = sum(len(list((root / 'fixtures' / category).glob('*.json'))) for category in ('valid', 'invalid'))
+    fixtures = sum(len(fixture_paths(root, category)) for category in ('valid', 'invalid'))
     if counts['official'] != len(official['cases']) or counts['fixtures'] != fixtures:
         raise ValueError('PIE verification counts differ from the shared inputs')
     if set(record['implementations']) != {'php-extension'}:
@@ -435,7 +448,7 @@ def check_repository(root, include_children=True, records=True):
                     child_errors, count, _ = check_repository(path, include_children=False, records=records)
                     errors.extend(name + '/' + issue for issue in child_errors)
 
-    for path in (root / 'docs').rglob('*.json'):
+    for path in report_paths(root):
         try:
             body = path.read_text(encoding='utf-8')
             json.loads(body)

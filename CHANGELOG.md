@@ -6,6 +6,18 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Records, documentation checks and shared cases read only the files Git tracks. The source manifest
+  of `scripts/verification_record.py` listed `git ls-files --cached --others --exclude-standard` and
+  added every match of its source patterns, so an untracked file changed the manifest that a record
+  names as the committed tree; `scripts/docs_check.py` walked the directories for Markdown documents
+  and JSON reports and counted the fixtures on disk, and `scripts/verify.py` ran every fixture file
+  on disk as a shared case. `scripts/registry.py` lists the tracked files with
+  `git ls-files --cached`, and each of these reads uses that list; a tree without Git metadata, such
+  as a source archive, still reads its files. The guard `scripts/full_run.py` also refuses a full run
+  while a file that `.gitignore` does not ignore is untracked, naming each one, because a build reads
+  it. The cases of the new `scripts/tests/test_tracked_inputs.py` and the new case of
+  `scripts/tests/test_full_run.py` failed before the change, because an untracked file changed the
+  manifest, the documents, the reports, the fixtures and the guard decision, and pass after it.
 - Every cargo command of a verification run builds into `CARGO_TARGET_DIR` inside that run. The Rust
   probe was `rust/target/debug/examples/probe`, and cargo used the target directory that the
   environment named, so a probe, a test binary or an API listing built by another checkout or an

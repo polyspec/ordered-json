@@ -125,8 +125,8 @@ class FullRunChecks(unittest.TestCase):
                       unhooked['reason'])
         dirty = decide(**{**clean, 'dirty': [' M Makefile']})
         self.assertFalse(dirty['run'])
-        self.assertRegex(dirty['reason'], r'uncommitted tracked changes[\s\S]*M Makefile')
-        self.assertIn('commit them, then run make check again; make pie-check writes '
+        self.assertRegex(dirty['reason'], r'uncommitted tracked changes or untracked files[\s\S]*M Makefile')
+        self.assertIn('commit them, or remove or ignore an untracked file, then run make check again; make pie-check writes '
                       'docs/pie-verification.json, which is committed by itself before make check', dirty['reason'])
         stale = decide(**{**clean, 'pie': 'PIE verification is stale; run scripts/check_pie.py'})
         self.assertFalse(stale['run'])
@@ -173,6 +173,18 @@ class FullRunChecks(unittest.TestCase):
         status, output, ran = checkout.guard('run', stub('a'))
         self.assertEqual((status, ran), (1, []))
         self.assertRegex(output, r'uncommitted tracked changes[\s\S]*M \.gitignore')
+
+    def test_an_untracked_file_is_refused_by_name(self):
+        # A build reads an untracked source, such as a test file that cargo or go test discovers, but
+        # the record names only the tracked tree.
+        checkout = self.checkout(DONE)
+        (checkout.root / 'scratch.rs').write_text('fn main() {}\n')
+        (checkout.root / 'var').mkdir()
+        (checkout.root / 'var/ignored.log').write_text('ignored\n')
+        status, output, ran = checkout.guard('run', stub('a'))
+        self.assertEqual((status, ran), (1, []), output)
+        self.assertRegex(output, r'untracked files[\s\S]*\?\? scratch\.rs')
+        self.assertNotIn('ignored.log', output)
 
     def test_a_stale_pie_record_refuses_the_run_and_the_rerun_before_any_target(self):
         # The documentation check at the end of the verification rejects this record, so the

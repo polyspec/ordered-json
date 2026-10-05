@@ -8,7 +8,7 @@ import platform
 import subprocess
 import tempfile
 
-from registry import IMPLEMENTATIONS, REGISTRY
+from registry import IMPLEMENTATIONS, REGISTRY, tracked_files
 
 SOURCE_PATTERNS = (
     'Makefile', 'js/*.js', 'js/*.ts', 'js/test/**/*.mjs', 'js/package.json',
@@ -28,21 +28,18 @@ def sha256(data):
 def source_manifest(root):
     # A record is evidence about the sources, not one of them.
     excluded = {'docs/verification.json', 'docs/pie-verification.json', 'benchmarks/results.json'}
+    # In a Git work tree the sources are the tracked files: an untracked file is not part of the tree
+    # that the record names. A source archive without Git metadata uses the declared patterns.
     files = {}
-    if (root / '.git').exists():
-        tracked = output(['git', 'ls-files', '--cached', '--others', '--exclude-standard', '-z'], cwd=root)
-        candidates = [root / filename for filename in tracked.split('\0') if filename]
+    tracked = tracked_files(root)
+    if tracked is not None:
+        candidates = [root / filename for filename in tracked]
     else:
         candidates = [path for pattern in SOURCE_PATTERNS for path in root.glob(pattern)]
     for path in candidates:
         name = path.relative_to(root).as_posix()
         if path.is_file() and name not in excluded and not name.endswith('/config.h'):
             files[name] = sha256(path.read_bytes())
-    for pattern in SOURCE_PATTERNS:
-        for path in root.glob(pattern):
-            name = path.relative_to(root).as_posix()
-            if path.is_file() and name not in excluded and not name.endswith('/config.h'):
-                files[name] = sha256(path.read_bytes())
     return {'sha256': sha256(json.dumps(files, sort_keys=True, separators=(',', ':')).encode()),
             'files': files}
 

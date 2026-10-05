@@ -8,7 +8,7 @@
 after every active item is complete (AGENTS). The active work of this repository is a feature row
 of docs/features.md whose implementation state is `partial`. The guard refuses a run while such a
 row exists, while the pre-push hook of scripts/push_gate.py is not installed in the checkout, while
-tracked changes are uncommitted, while docs/pie-verification.json fails the check
+tracked changes are uncommitted or files that are not ignored are untracked, while docs/pie-verification.json fails the check
 that the documentation check of the verification applies to it, and while the run of another process
 is still going on. A full run is refused when var/full-run.json already records a run of the current tree
 (`git rev-parse HEAD^{tree}`); `rerun-failed` is refused unless that record exists and has targets
@@ -76,7 +76,7 @@ def decide(mode, targets, active, hooks, dirty, pie, tree, record, running):
     """Decide whether the guard runs; returns {'run', 'reason', 'targets'}.
 
     `active` holds the partial features, `hooks` why the pre-push hook is not installed or None, `dirty` the `git status --porcelain` lines of tracked
-    files, `pie` why the PIE record would fail the documentation check or None, `record` the record
+    changes and untracked files that are not ignored, `pie` why the PIE record would fail the documentation check or None, `record` the record
     of the last run or None, and `running` whether the process of an incomplete record still exists.
     """
     def refuse(reason):
@@ -91,8 +91,9 @@ def decide(mode, targets, active, hooks, dirty, pie, tree, record, running):
         return refuse(f'the pre-push hook is not installed: {hooks}')
     if dirty:
         listed = '\n'.join(f'  {line}' for line in dirty)
-        return refuse(f'the working tree has uncommitted tracked changes; a full run verifies a committed tree; '
-                      f'commit them, then run make check again; make pie-check writes {PIE_RECORD}, which is '
+        return refuse(f'the working tree has uncommitted tracked changes or untracked files (??); a full run '
+                      f'verifies a committed tree; commit them, or remove or ignore an untracked file, then run '
+                      f'make check again; make pie-check writes {PIE_RECORD}, which is '
                       f'committed by itself before make check (AGENTS):\n{listed}')
     if pie:
         return refuse(f'{PIE_RECORD} would fail the documentation check at the end of the verification: {pie}; '
@@ -171,7 +172,8 @@ def full_run(root, mode, targets, run_target=None, print_line=print):
     from push_gate import hooks_issue  # push_gate imports this module for its parser.
     active = active_items((root / FEATURES).read_text())
     hooks = hooks_issue(root)
-    dirty = [line for line in git(root, 'status', '--porcelain', '--untracked-files=no').splitlines() if line]
+    # Untracked files that are not ignored count: a build reads them, but the record names only the tree.
+    dirty = [line for line in git(root, 'status', '--porcelain', '--untracked-files=all').splitlines() if line]
     tree = git(root, 'rev-parse', 'HEAD^{tree}').strip()
     commit = git(root, 'rev-parse', 'HEAD').strip()
     record = read_record(root)
