@@ -28,9 +28,9 @@ HOOK = '.githooks/pre-push'
 # The commit-time check: scripts/owner_check.py --validate refuses a commit with an unmapped path.
 HOOKS = (HOOK, '.githooks/pre-commit')
 SHORT = 12
-RULE = ('A push happens only when no feature is partial and no task is in progress (AGENTS.md): CI does not run '
-        'the verification, so make check runs it once on the committed tree after all work is complete, and work in '
-        'progress does not reach the remote.')
+RULE = ('A push happens only when no feature is partial and no task is in progress (AGENTS.md): work in progress '
+        'does not reach the remote, where hosted CI runs the full suite on every pushed commit of main and every pull '
+        'request.')
 FIX = ('Complete each feature and set its implementation to implemented, and complete each task and set it to [o], '
        'in a commit with its documentation, tests and changelog entry; then push again.')
 

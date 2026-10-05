@@ -1,0 +1,83 @@
+# CI: the full suite of every pushed commit of main and of every pull request. The run of a commit is its
+# evidence (AGENTS): the suite job runs make pie-check and make check, which write the PIE record and the aggregate
+# record into var/records and check both with the documentation check of make check, and uploads both in its
+# report. A failure never stops the run: every setup step and the step make ci run whatever the earlier steps did
+# (if: !cancelled()), make ci runs every target of the job to its end (scripts/ci_run.py), and the summary and the
+# report are written and uploaded also after a failure, with the status, the exit status and the time of each
+# target, the first failure lines of each failed target and the whole log of every target. fail-fast is false, so
+# one job does not cancel the other. No step or job has timeout-minutes: a build, an install, a PIE build or a
+# whole suite is a long operation that the log shows line by line; only a test case and an adapter reply have
+# their own deadline.
+# Every step runs a make target, never a script or a tool directly, so the environment and the prechecks of the
+# Makefile apply: checks run offline and make tools is the only step that downloads. A tool that only the suite
+# job needs is installed only there. The runner image is ubuntu-24.04, which push-gate.yml also uses:
+# actions/python-versions builds no Python 3.9 for ubuntu-26.04, and .python-version pins 3.9. Each action is
+# pinned to the commit of a release; Python and PHP come from the minor releases of .python-version and
+# .php-version, and the records name the patch releases that ran.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: ${{ matrix.job }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - job: suite
+            toolchains: true
+          - job: docs
+            toolchains: false
+    steps:
+      # actions/checkout v6.1.0
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      # actions/setup-python v6.3.0: the latest patch release of the minor release of .python-version.
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        if: ${{ !cancelled() }}
+        with:
+          python-version-file: .python-version
+      # actions/setup-node v6.5.0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        if: ${{ !cancelled() && matrix.toolchains }}
+        with:
+          node-version-file: .node-version
+      # actions/setup-go v6.5.0: the toolchain line of go/go.mod.
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        if: ${{ !cancelled() && matrix.toolchains }}
+        with:
+          go-version-file: go/go.mod
+          cache: false
+      # shivammathur/setup-php 2.37.2: the latest patch release of the minor release of .php-version, with phpize
+      # for the extension builds of make check and PIE.
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        if: ${{ !cancelled() && matrix.toolchains }}
+        with:
+          php-version-file: .php-version
+          coverage: none
+      # The Rust toolchain of rust-toolchain.toml, npm, the crates of rust/Cargo.lock, the PIE PHAR and the
+      # supplementary suite of external-inputs.json; the only step that downloads.
+      - name: make tools
+        if: ${{ !cancelled() && matrix.toolchains }}
+        run: make tools
+      - name: make ci
+        if: ${{ !cancelled() }}
+        run: make ci CI_JOB=${{ matrix.job }} JSON_TEST_SUITE=.cache/JSONTestSuite
+      - name: make ci-summary
+        if: ${{ !cancelled() }}
+        run: make ci-summary CI_JOB=${{ matrix.job }}
+      # actions/upload-artifact v7.0.1: the report of this job, var/ci/<job>.
+      - name: report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: ci-${{ matrix.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: var/ci/${{ matrix.job }}/
+          if-no-files-found: error
