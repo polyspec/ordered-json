@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 35ec08a597605714649e987e7a2d741a53ac5578b7a0fb0f6b0d0df8f77427d7 -->
+<!-- source-sha256: 593c24d16be93a39ab0dcdee5bd90aa2fffa8f50108ffed62d8176bf210759bb -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,12 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 제품 기능이 아닌 작업은 실행 체크리스트 `docs/plans/execution-checklist.md`에서 추적합니다(T1.1). `make check`의
+  guard, pre-push hook, push gate는 `docs/features.md`의 `partial` 기능만 읽었으므로, 그런 작업에는 전체 실행이나 push를 멈추는
+  상태가 없었습니다. 각 작업은 `[ ]`, `[~]`, `[o]`, `[!] cause: <cause>; retry: <condition>` 중 하나의 상태를 가집니다.
+  `scripts/docs_check.py`는 다른 상태, 작업 ID가 없는 행, 반복된 ID, 행이 없는 체크리스트, ID나 상태가 다른 번역을 거부하고,
+  `scripts/full_run.py`와 `scripts/push_gate.py`는 작업이 `[~]`이거나 체크리스트를 읽을 수 없으면 거부합니다.
+  `test_docs_check`, `test_full_run`, `test_push_gate`의 새 사례는 변경 전에 실패했고 변경 후 통과합니다.
 - Python은 minor release로 고정합니다. `.python-version`은 3.9.6을 적었고 `scripts/toolchains.py`는 그 release를 정확히
   요구했지만, `actions/python-versions`가 `ubuntu-24.04`용 3.9.6을 build하지 않으므로 CI는 3.9.25를 실행합니다. 로컬 실행과 CI가 서로
   다른 규칙을 따랐습니다. 로컬과 CI에서 같은 patch release를 쓸 수 없는 interpreter는 minor release로 고정합니다. `.python-version`은

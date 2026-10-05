@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-"""Refuse a push while a feature of docs/features.md is partial.
+"""Refuse a push while a feature of docs/features.md is partial or a task of the execution checklist is [~].
 
     python3 scripts/push_gate.py hook           the pre-push hook: the pushed commits and the working tree
     python3 scripts/push_gate.py commit <rev>   CI: one commit and its tracked pre-push hook
     python3 scripts/push_gate.py hooks-check    the pre-push hook is installed in this checkout
     python3 scripts/push_gate.py hooks-install  make hooks: set core.hooksPath when it differs, then hooks-check
 
-A push happens only when no feature is partial (AGENTS). The pre-push hook .githooks/pre-push runs the
+A push happens only when no feature is partial and no task is in progress (AGENTS). The pre-push hook .githooks/pre-push runs the
 `hook` mode with the lines that Git writes to it, `<local ref> <local sha> <remote ref> <remote sha>`,
 and refuses the push when the docs/features.md of a pushed commit or of the working tree has a
-partial feature, naming each one. `make hooks` runs `hooks-install`, which sets core.hooksPath to
+partial feature or its docs/plans/execution-checklist.md has a task in state [~], naming each one. `make hooks` runs `hooks-install`, which sets core.hooksPath to
 .githooks when it differs, and `hooks-check` fails when it is not set or the hook is not executable. The workflow .github/workflows/push-gate.yml
 runs the `commit` mode on every pushed commit and pull request, because a push from a checkout
-without the hook does not run it. The partial features are those of the guard scripts/full_run.py.
+without the hook does not run it. The partial features and the tasks in progress are those of the guard scripts/full_run.py.
 Every mode refuses when it cannot read what it checks.
 """
 import os
@@ -21,18 +21,18 @@ import re
 import subprocess
 import sys
 
-from full_run import ACTIVE_STATE, FEATURES, active_items
+from full_run import ACTIVE_STATE, CHECKLIST, FEATURES, TASK_ACTIVE, active_items, active_tasks
 
 HOOKS_PATH = '.githooks'
 HOOK = '.githooks/pre-push'
 # The commit-time check: scripts/owner_check.py --validate refuses a commit with an unmapped path.
 HOOKS = (HOOK, '.githooks/pre-commit')
 SHORT = 12
-RULE = ('A push happens only when no feature is partial (AGENTS.md): CI does not run the verification, so make check '
-        'runs it once on the committed tree after every feature is complete, and a feature in progress does not '
-        'reach the remote.')
-FIX = ('Complete each feature and set its implementation to implemented in a commit with its documentation, '
-       'tests and changelog entry; then push again.')
+RULE = ('A push happens only when no feature is partial and no task is in progress (AGENTS.md): CI does not run '
+        'the verification, so make check runs it once on the committed tree after all work is complete, and work in '
+        'progress does not reach the remote.')
+FIX = ('Complete each feature and set its implementation to implemented, and complete each task and set it to [o], '
+       'in a commit with its documentation, tests and changelog entry; then push again.')
 
 
 class Refusal(Exception):
@@ -46,25 +46,39 @@ def git(root, *args):
     return result.stdout
 
 
-def committed_items(root, commit, where):
-    """The partial features of docs/features.md in a commit; `where` names the commit in a refusal."""
-    result = subprocess.run(['git', 'show', f'{commit}:{FEATURES}'], cwd=root, capture_output=True, text=True)
+def committed_text(root, commit, where, name):
+    result = subprocess.run(['git', 'show', f'{commit}:{name}'], cwd=root, capture_output=True, text=True)
     if result.returncode:
-        raise Refusal(f'cannot read {FEATURES} of {where}: {result.stderr.strip()}')
-    return active_items(result.stdout)
+        raise Refusal(f'cannot read {name} of {where}: {result.stderr.strip()}')
+    return result.stdout
+
+
+def committed_items(root, commit, where):
+    """The partial features of docs/features.md and the tasks in progress of the execution checklist in a
+    commit, as two lists; `where` names the commit in a refusal."""
+    features = active_items(committed_text(root, commit, where, FEATURES))
+    return features, active_tasks(committed_text(root, commit, where, CHECKLIST))
 
 
 def working_items(root):
-    path = Path(root) / FEATURES
-    if not path.is_file():
-        raise Refusal(f'cannot read {FEATURES} of the working tree: {path} does not exist')
-    return active_items(path.read_text())
+    found = []
+    for name, read in ((FEATURES, active_items), (CHECKLIST, active_tasks)):
+        path = Path(root) / name
+        if not path.is_file():
+            raise Refusal(f'cannot read {name} of the working tree: {path} does not exist')
+        found.append(read(path.read_text()))
+    return found
 
 
-def in_progress(found):
-    """The refusal for `found`, a list of (where, feature) pairs."""
-    lines = [f'push refused: features are in progress (implementation {ACTIVE_STATE}, {FEATURES})']
-    lines += [f"  {where}: {item['id']} {item['title']}" for where, item in found]
+def in_progress(found, tasks=()):
+    """The refusal for `found` and `tasks`, lists of (where, item) pairs of partial features and tasks in progress."""
+    lines = []
+    if found:
+        lines += [f'push refused: features are in progress (implementation {ACTIVE_STATE}, {FEATURES})']
+        lines += [f"  {where}: {item['id']} {item['title']}" for where, item in found]
+    if tasks:
+        lines += [f'push refused: tasks are in progress ({TASK_ACTIVE}, {CHECKLIST})']
+        lines += [f"  {where}: {item['id']} {item['title']}" for where, item in tasks]
     return lines + [RULE, FIX]
 
 
@@ -85,7 +99,7 @@ def hooks_issue(root):
 def hook(root, lines):
     """The refusal lines for the pushed refs of the pre-push input `lines`, or [] to allow the push."""
     try:
-        found = []
+        found, tasks = [], []
         for line in lines:
             if not line.strip():
                 continue
@@ -96,11 +110,15 @@ def hook(root, lines):
             if re.fullmatch(r'0+', local_sha):
                 continue  # A deletion pushes no tree.
             where = f'{remote_ref} {local_sha[:SHORT]}'
-            found += [(where, item) for item in committed_items(root, local_sha, where)]
-        found += [('working tree', item) for item in working_items(root)]
+            features, active = committed_items(root, local_sha, where)
+            found += [(where, item) for item in features]
+            tasks += [(where, item) for item in active]
+        features, active = working_items(root)
+        found += [('working tree', item) for item in features]
+        tasks += [('working tree', item) for item in active]
     except (Refusal, OSError, ValueError, IndexError) as cause:
         return [f'push refused: {cause}', RULE]
-    return in_progress(found) if found else []
+    return in_progress(found, tasks) if found or tasks else []
 
 
 def commit(root, revision):
@@ -108,14 +126,16 @@ def commit(root, revision):
     sha = revision
     try:
         sha = git(root, 'rev-parse', '--verify', f'{revision}^{{commit}}').strip()
-        found = [(sha[:SHORT], item) for item in committed_items(root, sha, sha[:SHORT])]
+        features, active = committed_items(root, sha, sha[:SHORT])
+        found = [(sha[:SHORT], item) for item in features]
+        tasks = [(sha[:SHORT], item) for item in active]
         modes = {}
         for name in HOOKS:
             entry = git(root, 'ls-tree', sha, '--', name).split()
             modes[name] = entry[0] if entry else None
     except (Refusal, OSError, ValueError, IndexError) as cause:
         return sha, [f'push refused: {cause}', RULE]
-    lines = in_progress(found) if found else []
+    lines = in_progress(found, tasks) if found or tasks else []
     for name, mode in reversed(list(modes.items())):
         if mode != '100755':
             lines = [f"push refused: {name} is not tracked with mode 100755 in {sha[:SHORT]} "
@@ -145,7 +165,7 @@ def main(argv):
         if lines:
             report_ci(lines)
         else:
-            print(f'push gate: no feature is {ACTIVE_STATE} in {sha[:SHORT]}; {" and ".join(HOOKS)} are tracked with mode 100755')
+            print(f'push gate: no feature is {ACTIVE_STATE} and no task is {TASK_ACTIVE} in {sha[:SHORT]}; {" and ".join(HOOKS)} are tracked with mode 100755')
     elif argv == ['hooks-install']:
         configured = subprocess.run(['git', 'config', 'core.hooksPath'], cwd=root, capture_output=True,
                                     text=True).stdout.strip()

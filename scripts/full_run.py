@@ -6,8 +6,8 @@
 
 `make check` and `make rerun-failed` start this guard before any step. The full run happens once,
 after every active item is complete (AGENTS). The active work of this repository is a feature row
-of docs/features.md whose implementation state is `partial`. The guard refuses a run while such a
-row exists, while the pre-push hook of scripts/push_gate.py is not installed in the checkout, while
+of docs/features.md whose implementation state is `partial` and a task of the execution checklist
+docs/plans/execution-checklist.md in state `[~]`. The guard refuses a run while such a row exists, while the pre-push hook of scripts/push_gate.py is not installed in the checkout, while
 tracked changes are uncommitted or files that are not ignored are untracked, while docs/pie-verification.json fails the check
 that the documentation check of the verification applies to it, and while the run of another process
 is still going on. A full run is refused when var/full-run.json already records a run of the current tree
@@ -27,7 +27,7 @@ import subprocess
 import sys
 import time
 
-from docs_check import check_pie_verification, feature_table
+from docs_check import CHECKLIST, check_pie_verification, checklist_rows, feature_table
 
 ROOT = Path(__file__).resolve().parents[1]
 FEATURES = 'docs/features.md'
@@ -37,6 +37,8 @@ RECORD = 'var/full-run.json'
 # not both read no record and both run; the operating system releases it when the process ends.
 LOCK = 'var/full-run.lock'
 ACTIVE_STATE = 'partial'
+# The state of a task in progress in the execution checklist docs/plans/execution-checklist.md.
+TASK_ACTIVE = '[~]'
 # Written by make pie-check; the documentation check at the end of the verification rejects it when
 # it is stale.
 PIE_RECORD = 'docs/pie-verification.json'
@@ -47,6 +49,12 @@ def active_items(text):
     ValueError when the text has no feature table, no feature row or a row that is not a feature."""
     return [{'id': cells[0], 'title': cells[1]} for cells in feature_table(text)
             if len(cells) > 2 and cells[2] == ACTIVE_STATE]
+
+
+def active_tasks(text):
+    """The tasks of the execution checklist in state `[~]`, with their task text as title. ValueError when the
+    text has no task row or a row that is not a task."""
+    return [{'id': cells[0], 'title': cells[1]} for cells in checklist_rows(text) if cells[-1] == TASK_ACTIVE]
 
 
 def not_passed(record):
@@ -69,10 +77,10 @@ def pie_issue(root):
     return None
 
 
-def decide(mode, targets, active, hooks, dirty, pie, tree, record, running):
+def decide(mode, targets, active, hooks, dirty, pie, tree, record, running, tasks=()):
     """Decide whether the guard runs; returns {'run', 'reason', 'targets'}.
 
-    `active` holds the partial features, `hooks` why the pre-push hook is not installed or None, `dirty` the `git status --porcelain` lines of tracked
+    `active` holds the partial features, `tasks` the tasks of the checklist in progress, `hooks` why the pre-push hook is not installed or None, `dirty` the `git status --porcelain` lines of tracked
     changes and untracked files that are not ignored, `pie` why the PIE record would fail the documentation check or None, `record` the record
     of the last run or None, and `running` whether the process of an incomplete record still exists.
     """
@@ -84,6 +92,11 @@ def decide(mode, targets, active, hooks, dirty, pie, tree, record, running):
         listed = '\n'.join(f"  {item['id']} {item['title']}" for item in active)
         return refuse(f'{len(active)} active feature{plural} (implementation {ACTIVE_STATE}) in {FEATURES}; '
                       f'the full run happens once, when every active item is complete:\n{listed}')
+    if tasks:
+        plural = '' if len(tasks) == 1 else 's'
+        listed = '\n'.join(f"  {item['id']} {item['title']}" for item in tasks)
+        return refuse(f'{len(tasks)} task{plural} in progress ({TASK_ACTIVE}) in {CHECKLIST}; '
+                      f'the full run happens once, when every task is done:\n{listed}')
     if hooks:
         return refuse(f'the pre-push hook is not installed: {hooks}')
     if dirty:
@@ -201,6 +214,14 @@ def guarded_run(root, mode, targets, run_target, print_line):
         # A tracker that cannot be read holds no evidence that no feature is in progress.
         print_line(f'[full-run] refuse: {FEATURES} cannot be read as the tracker: {issue}')
         return 1
+    try:
+        checklist = root / CHECKLIST
+        if not checklist.is_file():
+            raise ValueError(f'{checklist} does not exist')
+        tasks = active_tasks(checklist.read_text())
+    except (OSError, ValueError) as issue:
+        print_line(f'[full-run] refuse: {CHECKLIST} cannot be read as the checklist: {issue}')
+        return 1
     hooks = hooks_issue(root)
     # Untracked files that are not ignored count: a build reads them, but the record names only the tree.
     dirty = [line for line in git(root, 'status', '--porcelain', '--untracked-files=all').splitlines() if line]
@@ -209,7 +230,7 @@ def guarded_run(root, mode, targets, run_target, print_line):
     record = read_record(root)
     running = bool(record and record['result'] == 'incomplete' and record.get('pid') != os.getpid() and alive(record['pid']))
     pie = None if dirty else pie_issue(root)
-    decision = decide(mode, targets, active, hooks, dirty, pie, tree, record, running)
+    decision = decide(mode, targets, active, hooks, dirty, pie, tree, record, running, tasks)
     print_line(f"[full-run] {'run' if decision['run'] else 'refuse'}: {decision['reason']}")
     if not decision['run']:
         return 1

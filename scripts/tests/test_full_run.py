@@ -16,7 +16,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import full_run as full_run_module
-from full_run import RECORD, active_items, decide, full_run
+from full_run import RECORD, active_items, active_tasks, decide, full_run
 
 ROOT = Path(__file__).resolve().parents[2]
 # The variables of the Makefile, the variables through which make passes its own to a nested make, and
@@ -32,6 +32,17 @@ FEATURES = """# Feature state
 | F-SCHEMA | Schema validation | planned | not-verified | | not-distributed | [parsing](spec/json-contract.md#parsing) |
 """
 DONE = FEATURES.replace('| partial |', '| implemented |')
+CHECKLIST = """# Execution checklist
+
+## Wave 1
+
+| ID | Task | Deliverables | Verification | Done |
+| --- | --- | --- | --- | --- |
+| T1.1 | Hosted CI | `ci.yml` | `make docs-check` | {state} |
+| T1.2 | Offline checks | `Makefile` | `make docs-check` | [ ] |
+"""
+TASKS_DONE = CHECKLIST.format(state='[o]')
+TASK_ACTIVE = CHECKLIST.format(state='[~]')
 
 
 def git(cwd, *args):
@@ -41,11 +52,13 @@ def git(cwd, *args):
 class Checkout:
     """A Git checkout with a committed feature record."""
 
-    def __init__(self, features):
+    def __init__(self, features, checklist=TASKS_DONE):
         self.temporary = tempfile.TemporaryDirectory(prefix='ordered-json-full-run-')
         self.root = Path(self.temporary.name)
-        (self.root / 'docs').mkdir()
+        (self.root / 'docs/plans').mkdir(parents=True)
         (self.root / 'docs/features.md').write_text(features)
+        if checklist is not None:
+            (self.root / 'docs/plans/execution-checklist.md').write_text(checklist)
         (self.root / '.gitignore').write_text('/var/\n')
         (self.root / '.githooks').mkdir()
         for hook in ('pre-push', 'pre-commit'):
@@ -84,8 +97,8 @@ def stub(*names):
 
 
 class FullRunChecks(unittest.TestCase):
-    def checkout(self, features):
-        checkout = Checkout(features)
+    def checkout(self, features, checklist=TASKS_DONE):
+        checkout = Checkout(features, checklist)
         self.addCleanup(checkout.temporary.cleanup)
         return checkout
 
@@ -170,6 +183,26 @@ class FullRunChecks(unittest.TestCase):
         self.assertEqual((status, ran), (1, []))
         self.assertRegex(output, r'^\[full-run\] refuse: 1 active feature')
         self.assertIn('F-STREAM Streaming \\| incremental parsing', output)
+
+    def test_active_tasks_are_the_tasks_in_progress(self):
+        self.assertEqual(active_tasks(TASK_ACTIVE), [{'id': 'T1.1', 'title': 'Hosted CI'}])
+        self.assertEqual(active_tasks(TASKS_DONE), [])
+
+    def test_a_task_in_progress_refuses_the_run_before_any_target(self):
+        checkout = self.checkout(DONE, TASK_ACTIVE)
+        for mode, targets in (('run', stub('a')), ('rerun-failed', [])):
+            with self.subTest(mode=mode):
+                status, output, ran = checkout.guard(mode, targets)
+                self.assertEqual((status, ran), (1, []), output)
+                self.assertRegex(output, r'^\[full-run\] refuse: 1 task in progress \(\[~\]\) in '
+                                         r'docs/plans/execution-checklist.md[\s\S]*\n  T1.1 Hosted CI')
+
+    def test_a_checkout_without_the_checklist_is_refused(self):
+        checkout = self.checkout(DONE, None)
+        status, output, ran = checkout.guard('run', stub('a'))
+        self.assertEqual((status, ran), (1, []), output)
+        self.assertRegex(output, r'^\[full-run\] refuse: docs/plans/execution-checklist.md cannot be read as the '
+                                 r'checklist: .*does not exist')
 
     def test_a_tracker_without_feature_rows_is_refused(self):
         checkout = self.checkout('# Feature state\n\nThe table moved elsewhere.\n')

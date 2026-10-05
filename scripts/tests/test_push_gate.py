@@ -27,6 +27,16 @@ FEATURES = """# Feature state
 """
 DONE = FEATURES.format(state='implemented')
 PARTIAL = FEATURES.format(state='partial')
+CHECKLIST = """# Execution checklist
+
+## Wave 1
+
+| ID | Task | Deliverables | Verification | Done |
+| --- | --- | --- | --- | --- |
+| T1.1 | Hosted CI | `ci.yml` | `make docs-check` | {state} |
+"""
+TASKS_DONE = CHECKLIST.format(state='[o]')
+TASK_ACTIVE = CHECKLIST.format(state='[~]')
 
 
 def environment(**extra):
@@ -50,8 +60,9 @@ class Checkout:
         for name in ('implementations.json', 'Makefile', '.githooks/pre-push', '.githooks/pre-commit'):
             (self.root / name).parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ROOT / name, self.root / name)
-        (self.root / 'docs').mkdir()
+        (self.root / 'docs/plans').mkdir(parents=True)
         (self.root / 'docs/features.md').write_text(features)
+        (self.root / 'docs/plans/execution-checklist.md').write_text(TASKS_DONE)
         (self.root / '.gitignore').write_text('__pycache__/\n/var/\n')
         self.git('init', '--quiet', '--initial-branch=main')
         self.git('config', 'user.name', 'test')
@@ -120,7 +131,7 @@ class PushGateChecks(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0, result.stderr)
         self.assertIn('push refused: features are in progress (implementation partial, docs/features.md)', result.stderr)
         self.assertIn(f'  refs/heads/main {partial[:12]}: F-STREAM Streaming parsing', result.stderr)
-        self.assertIn('A push happens only when no feature is partial (AGENTS.md)', result.stderr)
+        self.assertIn('A push happens only when no feature is partial and no task is in progress (AGENTS.md)', result.stderr)
         self.assertNotIn('--no-verify', result.stderr)
         self.assertEqual(checkout.remote_main(), clean, 'the refused push must leave the remote branch unchanged')
 
@@ -132,6 +143,31 @@ class PushGateChecks(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0, result.stderr)
         self.assertIn('  working tree: F-STREAM Streaming parsing', result.stderr)
         self.assertNotIn('refs/heads/main', result.stderr)
+        self.assertIsNone(checkout.remote_main())
+
+    def test_r6_a_task_in_progress_is_refused_in_a_pushed_commit_the_working_tree_and_ci(self):
+        checkout = self.checkout()
+        clean = checkout.git('rev-parse', 'HEAD')
+        self.assertEqual(checkout.push().returncode, 0)
+        active = checkout.commit('docs/plans/execution-checklist.md', TASK_ACTIVE)
+        result = checkout.push()
+        self.assertNotEqual(result.returncode, 0, result.stderr)
+        self.assertIn('push refused: tasks are in progress ([~], docs/plans/execution-checklist.md)', result.stderr)
+        self.assertIn(f'  refs/heads/main {active[:12]}: T1.1 Hosted CI', result.stderr)
+        self.assertIn('  working tree: T1.1 Hosted CI', result.stderr)
+        self.assertEqual(checkout.remote_main(), clean)
+        ci = checkout.gate('commit', active)
+        self.assertEqual(ci.returncode, 1, ci.stdout)
+        self.assertIn('::error::push refused: tasks are in progress ([~], docs/plans/execution-checklist.md)', ci.stdout)
+        self.assertIn(f'::error::  {active[:12]}: T1.1 Hosted CI', ci.stdout)
+
+    def test_r7_a_pushed_commit_without_the_checklist_is_refused(self):
+        checkout = self.checkout()
+        removed = checkout.commit('docs/plans/execution-checklist.md')
+        result = checkout.push()
+        self.assertNotEqual(result.returncode, 0, result.stderr)
+        self.assertIn(f'push refused: cannot read docs/plans/execution-checklist.md of refs/heads/main {removed[:12]}',
+                      result.stderr)
         self.assertIsNone(checkout.remote_main())
 
     def test_r3_hooks_check_fails_until_make_installs_the_hook(self):
@@ -199,7 +235,7 @@ class PushGateChecks(unittest.TestCase):
         clean = checkout.git('rev-parse', 'HEAD')
         result = checkout.gate('commit', clean, GITHUB_STEP_SUMMARY=str(summary))
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn(f'push gate: no feature is partial in {clean[:12]}', result.stdout)
+        self.assertIn(f'push gate: no feature is partial and no task is [~] in {clean[:12]}', result.stdout)
         partial = checkout.commit('docs/features.md', PARTIAL)
         result = checkout.gate('commit', partial, GITHUB_STEP_SUMMARY=str(summary))
         self.assertEqual(result.returncode, 1)
