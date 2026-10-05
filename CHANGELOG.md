@@ -6,6 +6,11 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- PHP is pinned by its minor release (T1.5). No tracked file named the PHP of the checks, so a run on another PHP
+  verified the tree with a PHP that no pin named. `.php-version` names 8.5, `scripts/toolchains.py` compares the
+  major.minor of `php -n -r 'echo PHP_VERSION;'` with it and prints the expected and the actual version, and the
+  records name the running patch release. The changed cases of `test_toolchains` failed before the change and pass
+  after it.
 - The push gate of CI runs through its make target (T1.4). The step of `.github/workflows/push-gate.yml` ran
   `python3 scripts/push_gate.py commit` directly, so the environment and the prechecks of the Makefile did not apply.
   `make push-gate COMMIT=<commit>` runs the gate and fails without `COMMIT`, and the step runs it. The changed and new

@@ -34,7 +34,7 @@ SHA = re.compile(r'[0-9a-f]{40}')
 
 
 def pinned_root(folder, node='26.8.1', rust='1.98.1', go='go1.27.0', python='3.9', npm='12.2.0',
-                digest='0' * 128):
+                digest='0' * 128, php='8.5'):
     """A checkout layout with only the pin files."""
     root = Path(folder)
     (root / 'go').mkdir(parents=True)
@@ -42,6 +42,7 @@ def pinned_root(folder, node='26.8.1', rust='1.98.1', go='go1.27.0', python='3.9
     (root / 'rust-toolchain.toml').write_text(f'[toolchain]\nchannel = "{rust}"\n')
     (root / 'go/go.mod').write_text(f'module example.com/fixture\n\ngo 1.22\n\ntoolchain {go}\n')
     (root / '.python-version').write_text(python + '\n')
+    (root / '.php-version').write_text(php + '\n')
     (root / 'package.json').write_text(json.dumps({'packageManager': f'npm@{npm}+sha512.{digest}'}))
     return root
 
@@ -64,17 +65,17 @@ def tarball(files, links=()):
 
 class Pins(unittest.TestCase):
     def test_every_pin_is_an_exact_tracked_version(self):
-        tracked = subprocess.run(['git', 'ls-files', '--', '.node-version', '.python-version', 'rust-toolchain.toml',
+        tracked = subprocess.run(['git', 'ls-files', '--', '.node-version', '.php-version', '.python-version', 'rust-toolchain.toml',
                                   'go/go.mod', 'package.json'], cwd=ROOT, check=True, capture_output=True,
                                  text=True).stdout.split()
-        self.assertEqual(sorted(tracked), ['.node-version', '.python-version', 'go/go.mod', 'package.json',
+        self.assertEqual(sorted(tracked), ['.node-version', '.php-version', '.python-version', 'go/go.mod', 'package.json',
                                            'rust-toolchain.toml'])
         pins = toolchains.pins(ROOT)
-        self.assertEqual(set(pins), {'node', 'rust', 'go', 'python', 'npm'})
+        self.assertEqual(set(pins), {'node', 'rust', 'go', 'python', 'php', 'npm'})
         for tool, (version, source) in pins.items():
             with self.subTest(tool=tool):
-                # Python is pinned by minor release; every other tool by exact release.
-                pattern = r'^\d+\.\d+$' if tool == 'python' else r'^(go)?\d+\.\d+\.\d+$'
+                # Python and PHP are pinned by minor release; every other tool by exact release.
+                pattern = r'^\d+\.\d+$' if tool in ('python', 'php') else r'^(go)?\d+\.\d+\.\d+$'
                 self.assertRegex(version, pattern, f'{source} pins its release')
         self.assertEqual(pins['npm'][0], '12.2.0')
         self.assertRegex(toolchains.npm_pin(ROOT)[1], r'^[0-9a-f]{128}$', 'npm is pinned with the hash of its tarball')
@@ -142,7 +143,7 @@ class Pins(unittest.TestCase):
             log = Path(folder) / 'log'
             bin_directory = Path(folder) / 'machine-bin'
             bin_directory.mkdir()
-            versions = {'node': 'v26.8.1', 'go': 'go1.27.0', 'rustc': 'rustc 1.98.1 (fixture 2026-09-01)'}
+            versions = {'node': 'v26.8.1', 'go': 'go1.27.0', 'rustc': 'rustc 1.98.1 (fixture 2026-09-01)', 'php': '8.5.10'}
             for name, text in {**versions, 'npm': '12.2.0'}.items():
                 (bin_directory / name).write_text(f'#!/bin/sh\necho machine-{name} >> "{log}"\necho "{text}"\n')
                 (bin_directory / name).chmod(0o755)
@@ -218,12 +219,13 @@ class Check(unittest.TestCase):
             (npm / 'npm').chmod(0o755)
             failing = subprocess.CalledProcessError(1, ['rustc', '--version'],
                                                     stderr="error: toolchain '1.98.1' is not installed")
-            versions = {'node': 'v20.11.0\n', 'rustc': failing, 'go': 'go1.26.3\n', 'npm': '12.2.0\n'}
+            versions = {'node': 'v20.11.0\n', 'rustc': failing, 'go': 'go1.26.3\n', 'npm': '12.2.0\n', 'php': '8.4.1'}
             with patch('toolchains.run_version', side_effect=self.outputs(versions)), \
                     patch('toolchains.platform.python_version', return_value='3.12.1'):
                 problems = toolchains.problems(root)
-        self.assertEqual(len(problems), 4, problems)
+        self.assertEqual(len(problems), 5, problems)
         self.assertIn('node: expected 26.8.1 (.node-version), actual 20.11.0', problems)
+        self.assertIn('php: expected 8.5 (.php-version, major.minor), actual 8.4.1', problems)
         self.assertIn('go: expected go1.27.0 (go/go.mod toolchain), actual go1.26.3', problems)
         self.assertTrue(any(problem.startswith('python: expected 3.9 (.python-version, major.minor), actual 3.12.1 (')
                             for problem in problems), problems)
@@ -238,7 +240,7 @@ class Check(unittest.TestCase):
             elsewhere.mkdir()
             (elsewhere / 'npm').write_text('#!/bin/sh\necho 12.2.0\n')
             (elsewhere / 'npm').chmod(0o755)
-            versions = {'node': 'v26.8.1\n', 'rustc': 'rustc 1.98.1 (x 2026-09-01)\n', 'go': 'go1.27.0\n'}
+            versions = {'node': 'v26.8.1\n', 'rustc': 'rustc 1.98.1 (x 2026-09-01)\n', 'go': 'go1.27.0\n', 'php': '8.5.10'}
             with patch.dict(os.environ, {'PATH': str(elsewhere)}), \
                     patch('toolchains.run_version', side_effect=self.outputs(versions)), \
                     patch('toolchains.platform.python_version', return_value='3.9.6'):
@@ -255,7 +257,7 @@ class Check(unittest.TestCase):
             (npm / 'npm').write_text('#!/bin/sh\n')
             (npm / 'npm').chmod(0o755)
             versions = {'node': 'v26.8.1\n', 'rustc': 'rustc 1.98.1 (x 2026-09-01)\n', 'go': 'go1.27.0\n',
-                        'npm': '12.2.0\n'}
+                        'npm': '12.2.0\n', 'php': '8.5.10'}
             with patch('toolchains.run_version', side_effect=self.outputs(versions)), \
                     patch('toolchains.platform.python_version', return_value='3.9.6'):
                 self.assertEqual(toolchains.problems(root), [])
@@ -468,7 +470,7 @@ class PythonPin(unittest.TestCase):
             (npm / 'npm').write_text('#!/bin/sh\n')
             (npm / 'npm').chmod(0o755)
             versions = {'node': 'v26.8.1\n', 'rustc': 'rustc 1.98.1 (x 2026-09-01)\n', 'go': 'go1.27.0\n',
-                        'npm': '12.2.0\n'}
+                        'npm': '12.2.0\n', 'php': '8.5.10'}
             with patch('toolchains.run_version', side_effect=Check.outputs(None, versions)), \
                     patch('toolchains.platform.python_version', return_value=interpreter):
                 return toolchains.problems(root)
@@ -482,6 +484,21 @@ class PythonPin(unittest.TestCase):
         self.assertEqual(len(problems), 1, problems)
         self.assertTrue(problems[0].startswith('python: expected 3.9 (.python-version, major.minor), actual 3.10.0 ('),
                         problems[0])
+
+    def test_another_php_patch_release_passes(self):
+        # PHP is pinned by minor release: setup-php installs the latest patch release of the minor, and the record
+        # names the running one.
+        with patch('toolchains.run_version', side_effect=lambda command, cwd, env: {
+                'node': 'v26.8.1', 'rustc': 'rustc 1.98.1 (x)', 'go': 'go1.27.0', 'npm': '12.2.0',
+                'php': '8.5.0'}[Path(command[0]).name]), \
+                patch('toolchains.platform.python_version', return_value='3.9.6'), \
+                tempfile.TemporaryDirectory() as folder:
+            root = pinned_root(folder)
+            npm = toolchains.npm_directory(root)
+            npm.mkdir(parents=True)
+            (npm / 'npm').write_text('#!/bin/sh\n')
+            (npm / 'npm').chmod(0o755)
+            self.assertEqual(toolchains.problems(root), [])
 
     def test_the_ci_python_is_the_pinned_minor(self):
         ci = re.search(r"python-version: '(\d+\.\d+)\.\d+'", WORKFLOW.read_text())[1]
