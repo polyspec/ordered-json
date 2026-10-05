@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: f0c4aceda58e962af442e3f01f27f61e45b83f8f5cd6e03ebe3b734703223895 -->
+<!-- source-sha256: aaa40632701c591a3c29305280c012e7f146bf5a8fb65a1200bd5ad99e04b845 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,16 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 케이스 목록은 선언된 기계 형식으로 읽습니다. 목록 parser는 모든 언어에서 사람이 읽는 text(`ok`, `?`, `running`, `test result:`,
+  `FAIL`)로 줄을 건너뛰었으므로, 패키지 자신의 목록에서 `ok`로 시작하는 줄은 빠졌고, standard error의 어떤 알림이든 성공한 목록을
+  실패시켰습니다. `implementations.json`의 `test_cases`는 `format`을 선언합니다. JavaScript, PHP, PHP 확장의 목록은 `lines`,
+  `cargo test -- --list --format terse`는 `cargo-terse`, `go test -list .* -json`은 `go-test-json`이며, 그 output event는 test
+  이름이나 자기 package의 요약 줄을 담습니다. 형식이 정의하지 않은 줄은 목록을 실패시키고, 0이 아닌 종료는 standard error와 함께 목록을
+  실패시키며, 0으로 끝난 목록의 standard error는 도구 알림으로 출력합니다. `scripts/tests/test_full_run.py`와
+  `scripts/tests/test_push_gate.py`의 `make -n` case는 모든 make에 flag와 makefile을 더하는 호출자의 `GNUMAKEFLAGS`와 `MAKEFILES`도
+  제거합니다. 새 `scripts/tests/test_case_listings.py`의 case와 `scripts/tests/test_full_run.py`의 새 case는 형식이 선언되지 않았고,
+  `ok` 줄이 통과했고, 알림이 목록을 실패시켰고, `MAKEFILES`의 makefile이 dry run에 출력했으므로 변경 전에 실패했고, 변경 후에는
+  통과합니다.
 - `make check`와 `make rerun-failed`의 guard는 첫 검사부터 끝까지 `var/full-run.lock`을 배타적으로 잡고, 다른 guard가 이를 잡고
   있으면 그 holder를 밝히며 거부합니다. 동시에 시작한 두 guard는 둘 다 실행 중인 실행의 record를 읽지 못해 한 tree의 검증을 둘 다
   실행했습니다. Makefile을 읽는 것은 더 이상 `core.hooksPath`를 쓰지 않습니다. `make -n`을 포함한 모든 `make` 실행이 Makefile을 읽을 때

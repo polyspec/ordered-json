@@ -6,6 +6,20 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Case listings are read in a declared machine format. The listing parser skipped lines by their
+  human-readable text (`ok`, `?`, `running`, `test result:`, `FAIL`) for every language, so a line of
+  a package's own list that started with `ok` was dropped, and any notice on standard error failed a
+  listing that had succeeded. `test_cases` of `implementations.json` declares `format`: `lines` for
+  the lists of JavaScript, PHP and the PHP extension, `cargo-terse` for
+  `cargo test -- --list --format terse`, and `go-test-json` for `go test -list .* -json`, whose output
+  events hold a test name or the summary line of their own package. A line that the format does not
+  define fails the listing; a nonzero exit fails it with standard error, and standard error of a
+  listing that exits with 0 is printed as tool notices. The `make -n` cases of
+  `scripts/tests/test_full_run.py` and `scripts/tests/test_push_gate.py` also remove `GNUMAKEFLAGS`
+  and `MAKEFILES` of the caller, which add flags and makefiles to every make. The cases of the new
+  `scripts/tests/test_case_listings.py` and the new case of `scripts/tests/test_full_run.py` failed
+  before the change, because no format was declared, an `ok` line passed, a notice failed a listing
+  and a makefile from `MAKEFILES` printed into the dry run, and pass after it.
 - The guard of `make check` and `make rerun-failed` holds `var/full-run.lock` exclusively from its
   first inspection to its end, and refuses, naming the holder, while another guard holds it. Two
   guards started at once both read no record of a running run and both ran the verification of

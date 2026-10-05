@@ -14,8 +14,9 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / '.github/workflows/push-gate.yml'
-# The variables of the Makefile and the variables through which make passes its own to a nested make.
-MAKE_INPUTS = {'MAKEFLAGS', 'MFLAGS', 'MAKELEVEL', 'PYTHON', 'JSON_TEST_SUITE', 'PIE'}
+# The variables of the Makefile, the variables through which make passes its own to a nested make, and
+# GNUMAKEFLAGS and MAKEFILES, through which a caller adds flags and makefiles to every make.
+MAKE_INPUTS = {'MAKEFLAGS', 'GNUMAKEFLAGS', 'MFLAGS', 'MAKEFILES', 'MAKELEVEL', 'PYTHON', 'JSON_TEST_SUITE', 'PIE'}
 
 FEATURES = """# Feature state
 

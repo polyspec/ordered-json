@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 5dff4195d2d074aeebea8d1e17e4402f375698d84b381e8ca4d94a9a2b7c1f8d -->
+<!-- source-sha256: 741945103586303f92dcfc5d38ccf096368aa0119caa99258890726adaf6be3e -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -55,7 +55,7 @@ push는 `partial` 기능이 없을 때만 합니다. pre-push hook `.githooks/pr
 
 문서만 검토할 때는 `make docs-check`를 실행합니다. 이 검사는 검증 기록을 소스와 비교하지 않습니다. PIE 기록과 통합 기록은 기록 자신을 뺀 모든 추적 파일을 해시하고, 어떤 기록, 문서 검사, 공통 사례도 추적되지 않은 파일을 읽지 않으므로, 어떤 변경이든 커밋되면 기존 PIE 기록은 오래된 기록이 됩니다. 그때 전체 실행은 다음 순서를 따릅니다. 해당 추가 사례와 함께 `make pie-check PIE=/path/to/pie.phar`를 한 번 실행하고, `docs/pie-verification.json`만 커밋하고, `make check`를 한 번 실행하고, 그것이 쓴 `docs/verification.json`만 커밋합니다. guard는 PIE 기록이 오래됐거나 커밋되지 않았으면 `make check`를 거부하고 이 절차를 알려 줍니다. 검사를 통과시키기 위해 검증 결과나 소스 해시를 직접 수정하지 않습니다.
 
-[구현 등록 정보](implementations.json)는 패키지 경로·빌드·어댑터·패키지 테스트·런타임 명령을 정의합니다. `make check`는 선언된 패키지 테스트 명령을 모두 실행합니다. 공통 사례는 JSON 계약만 검사하므로 한 패키지에만 있는 API에는 닿지 않으며, 그런 API는 해당 패키지의 테스트가 필요합니다. [package-tests.json](package-tests.json)은 모든 구현이 실행하는 케이스, 사유를 적은 면제, 패키지 고유 케이스, 그리고 공개 심볼마다 그것을 검증하는 케이스를 정의합니다. `make check`는 이 표준과 각 패키지가 보고한 케이스·심볼을 대조해 누락된 케이스, 선언되지 않은 케이스, 검증되지 않는 심볼, 더 이상 내보내지 않는 심볼 선언이 있으면 실패합니다. 공통 JSON 비교 알고리즘을 변경하지 않고 해당 등록 정보와 패키지 디렉터리로 새 언어를 추가합니다. 계약 변경은 같은 저장소 리비전에서 검증기와 관련 패키지를 갱신합니다. [저장소 계약](docs/spec/repositories.ko.md)을 참조합니다.
+[구현 등록 정보](implementations.json)는 패키지 경로·빌드·어댑터·패키지 테스트·런타임 명령을 정의합니다. `make check`는 선언된 패키지 테스트 명령을 모두 실행합니다. 공통 사례는 JSON 계약만 검사하므로 한 패키지에만 있는 API에는 닿지 않으며, 그런 API는 해당 패키지의 테스트가 필요합니다. [package-tests.json](package-tests.json)은 모든 구현이 실행하는 케이스, 사유를 적은 면제, 패키지 고유 케이스, 그리고 공개 심볼마다 그것을 검증하는 케이스를 정의합니다. `make check`는 이 표준과 각 패키지가 보고한 케이스·심볼을 대조해 누락된 케이스, 선언되지 않은 케이스, 검증되지 않는 심볼, 더 이상 내보내지 않는 심볼 선언이 있으면 실패합니다. 각 케이스 목록은 출력의 기계 형식을 선언합니다(`test_cases`의 `format`). 패키지 자신의 케이스 ID 목록은 `lines`, `cargo test -- --list --format terse`는 `cargo-terse`, `go test -list .* -json`의 event는 `go-test-json`입니다. 형식이 정의하지 않은 줄은 목록을 실패시키고, 0이 아닌 status로 끝난 목록은 standard error와 함께 실패하며, 성공한 목록의 standard error는 도구 알림으로 출력합니다. 공통 JSON 비교 알고리즘을 변경하지 않고 해당 등록 정보와 패키지 디렉터리로 새 언어를 추가합니다. 계약 변경은 같은 저장소 리비전에서 검증기와 관련 패키지를 갱신합니다. [저장소 계약](docs/spec/repositories.ko.md)을 참조합니다.
 
 모든 언어 어댑터는 [official.json](examples/official.json)과 [scripts/verify.py](scripts/verify.py)를 사용합니다. 공통 사례는 해당 파일이나 `fixtures/`에 추가합니다. 언어별로 다른 예제나 기대 결과를 만들지 않습니다.
 

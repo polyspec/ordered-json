@@ -192,6 +192,57 @@ def case_identifier(name):
     return name.lower()
 
 
+GO_TEST = re.compile(r'(?:Test|Fuzz|Example|Benchmark)[A-Za-z0-9_]*')
+
+
+def listed_cases(form, stdout):
+    """The test names of a case listing in its declared machine format, and the lines that are not one.
+
+    lines: every nonempty line is a case id. cargo-terse: every line is `<name>: test` or
+    `<name>: benchmark` (`cargo test -- --list --format terse`), and benchmarks are not cases.
+    go-test-json: the JSON events of `go test -list .* -json`; an output event holds a test name or
+    the summary line of its own package, as `ok  <package>` or `?   <package>`."""
+    names, noise = [], []
+    for line in stdout.splitlines():
+        if form == 'go-test-json':
+            try:
+                event = json.loads(line)
+            except ValueError:
+                noise.append(line)
+                continue
+            if event.get('Action') != 'output':
+                continue
+            text = event.get('Output', '').rstrip('\n')
+            summary = re.fullmatch(r'(?:ok|\?)\s+(\S+)(?:\s.*)?', text)
+            if GO_TEST.fullmatch(text):
+                names.append(text)
+            elif not (summary and summary[1] == event.get('Package')):
+                noise.append(text)
+        elif form == 'cargo-terse':
+            match = re.fullmatch(r'(.+): (test|benchmark)', line)
+            if not match:
+                noise.append(line)
+            elif match[2] == 'test':
+                names.append(match[1])
+        elif line.strip():
+            names.append(line.strip())
+    return names, noise
+
+
+def run_listing(language, entry, what):
+    """Run a declared listing command; a nonzero exit fails with its standard error, and standard error
+    of a listing that exits with 0 holds tool notices, which are printed and not judged."""
+    process = subprocess.run(entry['command'], cwd=entry['cwd'], env=entry.get('env'), text=True,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if process.returncode:
+        raise RuntimeError(f'{language}: {what} failed with exit {process.returncode}:\n'
+                           f'{process.stderr.strip() or process.stdout.strip() or "no output"}')
+    for line in process.stderr.splitlines():
+        if line.strip():
+            print(f'{language} {what} notice: {line}', flush=True)
+    return process.stdout
+
+
 def compare_package_cases(commands, selected):
     """Each package reports the cases it runs; the standard says which are required."""
     problems = []
@@ -200,24 +251,17 @@ def compare_package_cases(commands, selected):
         if entry is None:
             problems.append(f'{language}: declares no package test case listing')
             continue
-        process = subprocess.run(entry['command'], cwd=entry['cwd'], env=entry.get('env'), text=True,
-                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if process.returncode or process.stderr:
-            problems.append(f'{language}: case listing failed:\n{process.stdout}{process.stderr}')
+        try:
+            stdout = run_listing(language, entry, 'case listing')
+        except RuntimeError as error:
+            problems.append(str(error))
             continue
-        reported, noise = set(), []
-        for line in process.stdout.splitlines():
-            identifier = case_identifier(line)
-            if not line.strip():
-                continue
-            if re.match(r'^(?:ok|\?)\s+', line) or line.startswith(('test result:', 'running', 'FAIL')):
-                continue
-            if CASE_ID.fullmatch(identifier):
-                reported.add(identifier)
-            else:
-                noise.append(line)
+        names, noise = listed_cases(entry.get('format', 'lines'), stdout)
+        reported = {case_identifier(name) for name in names}
+        noise += [name for name in names if not CASE_ID.fullmatch(case_identifier(name))]
         if noise:
-            problems.append(f'{language}: case listing printed more than case ids:\n' + '\n'.join(noise))
+            problems.append(f'{language}: case listing ({entry.get("format", "lines")}) printed more than case names:\n'
+                            + '\n'.join(noise))
             continue
         required = {case['id'] for case in STANDARD['cases'] if language not in case.get('exemptions', {})}
         required |= {case['id'] for case in STANDARD['package_cases'][language]}
@@ -232,11 +276,7 @@ def compare_package_cases(commands, selected):
 
 def reported_lines(language, entry, what):
     """Run a declared listing command and return its non-empty lines."""
-    process = subprocess.run(entry['command'], cwd=entry['cwd'], env=entry.get('env'), text=True,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    if process.returncode or process.stderr:
-        raise RuntimeError(f'{language}: {what} failed:\n{process.stdout}{process.stderr}')
-    return [line.strip() for line in process.stdout.splitlines() if line.strip()]
+    return [line.strip() for line in run_listing(language, entry, what).splitlines() if line.strip()]
 
 
 def compare_api_coverage(commands, selected):

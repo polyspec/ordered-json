@@ -12,6 +12,9 @@ import tempfile
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
+# The machine formats of a case listing (scripts/verify.py listed_cases): one case id per line, the
+# terse list of the Rust test harness, and the JSON events of go test -json.
+LISTING_FORMATS = ('lines', 'cargo-terse', 'go-test-json')
 
 
 def load_registry(root=ROOT):
@@ -40,8 +43,13 @@ def load_registry(root=ROOT):
         for key in ('tests', 'test_cases', 'api_symbols'):
             declaration = implementation.get(key)
             if declaration is not None:
-                if not isinstance(declaration, dict) or set(declaration) != {'cwd', 'command'} or not declaration['cwd']:
+                # A case listing also names the machine format of its output.
+                allowed = {'cwd', 'command', 'format'} if key == 'test_cases' else {'cwd', 'command'}
+                if (not isinstance(declaration, dict) or not {'cwd', 'command'} <= set(declaration) <= allowed
+                        or not declaration['cwd']):
                     raise ValueError(f'{key} declares cwd and command: ' + name)
+                if key == 'test_cases' and declaration.get('format', 'lines') not in LISTING_FORMATS:
+                    raise ValueError(f'test_cases format is one of {", ".join(LISTING_FORMATS)}: ' + name)
                 commands.append(declaration['command'])
         if any(not command or not isinstance(command, list) or
                any(not isinstance(argument, str) for argument in command) for command in commands):
@@ -296,6 +304,8 @@ def declared_commands(key, selected, paths, cache, registry=REGISTRY):
             result[name] = {'cwd': expand(declaration['cwd'], variables),
                             'command': [expand(argument, variables) for argument in declaration['command']],
                             'declared': list(declaration['command'])}
+            if 'format' in declaration:
+                result[name]['format'] = declaration['format']
             environment = command_environment(name, variables, registry)
             if environment is not None:
                 result[name]['env'] = environment
