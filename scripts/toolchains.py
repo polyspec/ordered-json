@@ -43,6 +43,10 @@ ROOT = Path(__file__).resolve().parents[1]
 OFFLINE = {'CARGO_NET_OFFLINE': 'true', 'GOPROXY': 'off', 'npm_config_offline': 'true', 'COMPOSER_DISABLE_NETWORK': '1'}
 ENVIRONMENT = {'GOTOOLCHAIN': 'local', 'RUSTUP_AUTO_INSTALL': '0', **OFFLINE}
 FIX = 'run make tools'
+PIE_FIX = 'run make tools, which downloads the PIE release of external-inputs.json into .cache/pie/pie.phar'
+SUITE_FIX = 'run make tools, which installs the suite of external-inputs.json into .cache/JSONTestSuite'
+# The lock files whose crates make tools downloads; a check runs cargo offline.
+CARGO_LOCKS = ('rust/Cargo.lock',)
 
 
 NPM_TARBALL = 'https://registry.npmjs.org/npm/-/npm-{version}.tgz'
@@ -152,6 +156,29 @@ def problems(root=ROOT):
         found.append(f'npm: expected {npm} ({source}) from {local}, actual {resolved or "no npm on PATH"}; {FIX}')
     else:
         compare('npm', [str(local), '--version'], root, lambda out: out.strip())
+    return found
+
+
+def download_problems(root=ROOT, env=None):
+    """One message per lock file whose crates are not downloaded. cargo runs offline in a check, so a missing
+    crate would fail with cargo's advice to retry online; the message names make tools instead."""
+    root = Path(root)
+    env = environment(root) if env is None else env
+    command = ['cargo', 'fetch', '--locked', '--offline']
+    found = []
+    for lock in CARGO_LOCKS:
+        if not (root / lock).is_file():
+            continue
+        try:
+            process = subprocess.run(command, cwd=(root / lock).parent, env=env, capture_output=True, text=True)
+            lines = [line.strip() for line in process.stderr.splitlines() if line.strip()]
+            detail = next((line for line in lines if line.startswith('error')), lines[0] if lines else 'no output')
+            status = process.returncode
+        except OSError as error:
+            status, detail = 'an error', str(error)
+        if status:
+            found.append(f'{lock}: the crates are not downloaded ({" ".join(command)} exited with {status}: '
+                         f'{detail}); run make tools, which downloads them')
     return found
 
 
@@ -310,7 +337,11 @@ def require(root=ROOT):
     if found:
         print(f'{len(found)} {"tool differs" if len(found) == 1 else "tools differ"} from the tracked pins; install the pinned '
               f'releases ({FIX} installs Rust and npm) and run again', file=sys.stderr)
-    return not found
+        return False
+    missing = download_problems(root)
+    for problem in missing:
+        print(f'missing download: {problem}', file=sys.stderr)
+    return not missing
 
 
 def main(argv):

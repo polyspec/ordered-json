@@ -12,7 +12,7 @@ from verification_record import (IMPLEMENTATIONS, create_record, external_inputs
                                  source_manifest, supplementary_manifest, write_record)
 from verify import ROOT, verify
 from registry import prepare, repository_paths, run_directory, runtime_versions
-from toolchains import require
+from toolchains import SUITE_FIX, require
 
 # Only this path checks record freshness: it runs right after the record is written.
 DOCS_CHECK = [sys.executable, str(ROOT / 'scripts/docs_check.py'), '--records']
@@ -125,7 +125,7 @@ def main():
         return 0 if run_unit_tests(unittest.TestSuite(tests for _, tests in selections)).wasSuccessful() else 1
     suite = args.suite.resolve() if args.suite else None
     if suite and not (suite / 'test_parsing').is_dir():
-        parser.error('--suite must contain test_parsing/')
+        parser.error(f'the supplementary suite {args.suite} has no test_parsing/; {SUITE_FIX}')
     if not require():
         return 1
 

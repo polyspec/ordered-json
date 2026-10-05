@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 763e7ea819761118d0b7bd7a88fce7239369b80c27aa57d66d53d494b74620cb -->
+<!-- source-sha256: 4a3534569d84bfabe8adb896d152daab4e4de188d276c1775e1170110061335a -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,13 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 내려받지 않은 입력은 `make tools`를 안내합니다(T1.3). 검사가 offline이 되자 `make tools`가 내려받지 않은 crate는
+  `--offline` 없이 다시 시도하라는 cargo의 안내로, 없는 PIE PHAR는 `make pie-check`의 `FileNotFoundError` traceback으로,
+  없는 추가 사례는 `--suite must contain test_parsing/`나 `Supplementary suite is empty`로 실패했습니다. 모든 진입점은
+  toolchain 검사 뒤 `rust/Cargo.lock`에 `cargo fetch --locked --offline`을 실행하고 lock file, cargo의 첫 error 줄,
+  `run make tools, which downloads them`을 밝히며 실패합니다. `scripts/check_pie.py`와 `scripts/test.py`는 어떤 단계보다
+  먼저 없는 PHAR나 추가 사례와 `make tools`를 밝힙니다. `test_toolchains`의 새 사례는 변경 전에 실패했고 변경 후
+  통과합니다.
 - 검사는 offline으로 실행하고 `make tools`만 내려받습니다(T1.2). cargo, go, npm, Composer는 모든 검사에서 online으로
   실행됐으므로 `cargo build --locked`가 `rust/Cargo.lock`의 crate를 필요할 때 내려받았고, PIE PHAR와 추가 사례는 손으로
   내려받았습니다. Makefile은 `CARGO_NET_OFFLINE=true`, `GOPROXY=off`, `npm_config_offline=true`,

@@ -398,6 +398,65 @@ class ExternalInputs(unittest.TestCase):
         self.assertEqual(list((root / '.cache').iterdir()), [], 'the staging checkout is removed')
 
 
+class MissingDownloads(unittest.TestCase):
+    """A check runs offline, so a download that make tools did not make fails with the advice to run make tools,
+    never with a tool's advice to retry online."""
+
+    def test_missing_crates_name_the_lock_file_and_make_tools(self):
+        with tempfile.TemporaryDirectory() as folder:
+            env = toolchains.environment(ROOT, {**os.environ, 'CARGO_HOME': folder})
+            problems = toolchains.download_problems(ROOT, env)
+        self.assertEqual(len(problems), 1, problems)
+        self.assertRegex(problems[0], r'^rust/Cargo.lock: the crates are not downloaded \(cargo fetch --locked '
+                                      r'--offline exited with \d+: .+\); run make tools, which downloads them$')
+        self.assertNotIn('retry without --offline', problems[0])
+
+    def test_downloaded_crates_pass(self):
+        self.assertEqual(toolchains.download_problems(ROOT, toolchains.environment(ROOT)), [])
+
+    def test_require_reports_missing_downloads(self):
+        errors = io.StringIO()
+        with patch('toolchains.problems', return_value=[]), patch.dict(os.environ), \
+                patch('toolchains.download_problems', return_value=['rust/Cargo.lock: missing; run make tools']), \
+                redirect_stderr(errors):
+            self.assertFalse(toolchains.require(ROOT))
+        self.assertIn('missing download: rust/Cargo.lock: missing; run make tools', errors.getvalue())
+
+    def run_main(self, main, argv):
+        errors = io.StringIO()
+        with patch('check_pie.require', return_value=True), patch('test.require', return_value=True), \
+                patch.object(sys, 'argv', argv), redirect_stdout(io.StringIO()), redirect_stderr(errors):
+            try:
+                status = main()
+            except SystemExit as exit:
+                status = exit.code
+        return status, errors.getvalue()
+
+    def test_a_missing_phar_names_make_tools(self):
+        with tempfile.TemporaryDirectory() as folder, patch('check_pie.run_streamed') as pie:
+            missing = Path(folder) / 'pie.phar'
+            status, errors = self.run_main(check_pie.main, ['check_pie.py', '--pie', str(missing)])
+        self.assertEqual(status, 1, errors)
+        self.assertIn(f'the PIE PHAR {missing} does not exist; run make tools, which downloads the PIE release of '
+                      'external-inputs.json into .cache/pie/pie.phar', errors)
+        self.assertFalse(pie.called)
+
+    def test_a_missing_suite_names_make_tools(self):
+        with tempfile.TemporaryDirectory() as folder:
+            missing = Path(folder) / 'JSONTestSuite'
+            phar = Path(folder) / 'pie.phar'
+            phar.write_text('<?php\n')
+            for main, argv in ((test_runner.main, ['test.py', '--suite', str(missing)]),
+                               (check_pie.main, ['check_pie.py', '--pie', str(phar), '--suite', str(missing)])):
+                with self.subTest(command=argv[0]), patch('test.run_unit_tests') as unit, \
+                        patch('check_pie.run_streamed') as pie:
+                    status, errors = self.run_main(main, argv)
+                    self.assertNotEqual(status, 0, errors)
+                    self.assertIn(f'the supplementary suite {missing} has no test_parsing/; run make tools, '
+                                  'which installs the suite of external-inputs.json into .cache/JSONTestSuite', errors)
+                    self.assertFalse(unit.called or pie.called)
+
+
 class PythonPin(unittest.TestCase):
     """Python is pinned by minor release: the same patch release is not available both locally and on CI."""
 

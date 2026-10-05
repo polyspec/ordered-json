@@ -6,6 +6,13 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- A missing download names `make tools` (T1.3). With the checks offline, a crate that `make tools` did not
+  download failed with cargo's advice to retry without `--offline`, a missing PIE PHAR failed `make pie-check` with a
+  `FileNotFoundError` traceback, and a missing supplementary suite failed with `--suite must contain test_parsing/`
+  or `Supplementary suite is empty`. Every entry point runs `cargo fetch --locked --offline` for `rust/Cargo.lock`
+  after the toolchain check and fails with the lock file, the first error line of cargo and `run make tools, which
+  downloads them`; `scripts/check_pie.py` and `scripts/test.py` name the missing PHAR or suite and `make tools`
+  before any step. The new cases of `test_toolchains` failed before the change and pass after it.
 - The checks run offline and only `make tools` downloads (T1.2). cargo, go, npm and Composer ran online in every
   check, so `cargo build --locked` downloaded the crates of `rust/Cargo.lock` on demand, and the PIE PHAR and the
   supplementary suite were downloaded by hand. The Makefile exports `CARGO_NET_OFFLINE=true`, `GOPROXY=off`,
