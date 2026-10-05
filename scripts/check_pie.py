@@ -10,11 +10,13 @@ from pathlib import Path
 import platform
 import re
 import subprocess
+import sys
 
 from registry import (ROOT, adapter_commands, artifact_paths, repository_paths, run_directory, run_streamed,
                       runtime_versions)
 from verification_record import (package_revisions, sha256, source_manifest,
                                  supplementary_manifest, write_record)
+from toolchains import require
 from verify import verify_adapters
 
 
@@ -79,13 +81,16 @@ def main():
     parser.add_argument('--pie', type=Path, required=True, help='Verified PIE PHAR')
     parser.add_argument('--suite', type=Path)
     args = parser.parse_args()
+    if not require():
+        return 1
     pie = args.pie.resolve()
     suite = args.suite.resolve() if args.suite else None
     with run_directory(['php-extension'], repository_paths(ROOT)) as run:
         record = build_and_verify(run, pie, suite)
     write_record(ROOT / 'docs/pie-verification.json', record)
     print('Saved docs/pie-verification.json', flush=True)
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

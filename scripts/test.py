@@ -12,6 +12,7 @@ from verification_record import (IMPLEMENTATIONS, create_record, source_manifest
                                  supplementary_manifest, write_record)
 from verify import ROOT, verify
 from registry import prepare, repository_paths, run_directory, runtime_versions
+from toolchains import require
 
 # Only this path checks record freshness: it runs right after the record is written.
 DOCS_CHECK = [sys.executable, str(ROOT / 'scripts/docs_check.py'), '--records']
@@ -119,6 +120,8 @@ def main():
     suite = args.suite.resolve() if args.suite else None
     if suite and not (suite / 'test_parsing').is_dir():
         parser.error('--suite must contain test_parsing/')
+    if not require():
+        return 1
 
     before = source_manifest(ROOT)
     supplementary = supplementary_manifest(suite)

@@ -66,6 +66,7 @@ class RepositoryChecks(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             paths = repository_paths()
             commands = test_commands(['go'], paths, Path(folder) / 'cache')
+            self.assertEqual(commands['go'].pop('env')['GOTOOLCHAIN'], 'local')
             self.assertEqual(commands['go'], {'cwd': str(paths['go']),
                                               'command': ['go', 'test', '-v', '-p', '1', './...'],
                                               'declared': ['go', 'test', '-v', '-p', '1', './...']})

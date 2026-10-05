@@ -326,8 +326,10 @@ def runtime_versions(selected, paths, cache, registry=REGISTRY):
         result[name] = {}
         for key, command in registry['implementations'][name]['runtime'].items():
             resolved = [expand(argument, variables) for argument in command]
+            # The repository directory selects the toolchain that its pin files name.
+            repository = paths[registry['implementations'][name]['repository']]
             try:
-                value = subprocess.check_output(resolved, text=True, stderr=subprocess.PIPE,
+                value = subprocess.check_output(resolved, cwd=repository, text=True, stderr=subprocess.PIPE,
                                                 env=command_environment(name, variables, registry)).strip()
             except (OSError, subprocess.CalledProcessError) as error:
                 failures.append(f'{name}/{key}: {" ".join(resolved)}: {error}')

@@ -2,7 +2,17 @@ PYTHON ?= python3
 JSON_TEST_SUITE ?=
 PIE ?= .cache/pie/pie.phar
 
-.PHONY: check rerun-failed test docs-check pie-check benchmark hooks hooks-check
+# The tools of every run are the releases that the tracked pin files name (scripts/toolchains.py):
+# .node-version, rust-toolchain.toml, the toolchain line of go/go.mod, .python-version and the
+# packageManager field of package.json. No command installs or selects a toolchain on demand; make
+# tools installs the Rust toolchain and npm once, npm into .cache/tools/npm of this checkout, which
+# comes first on PATH, so no npm of the machine is used or changed.
+NPM_DIRECTORY := $(CURDIR)/.cache/tools/npm
+export GOTOOLCHAIN := local
+export RUSTUP_AUTO_INSTALL := 0
+export PATH := $(NPM_DIRECTORY)/bin:$(PATH)
+
+.PHONY: check rerun-failed test docs-check pie-check benchmark hooks hooks-check tools toolchains-check
 
 # Every make run points core.hooksPath at the tracked hooks while it reads this file, so the pre-push
 # hook .githooks/pre-push runs scripts/push_gate.py in every checkout and worktree.
@@ -37,3 +47,13 @@ hooks:
 
 hooks-check:
 	$(PYTHON) scripts/push_gate.py hooks-check
+
+# tools installs the pinned Rust toolchain of rust-toolchain.toml and the pinned npm into
+# .cache/tools/npm (scripts/toolchains.py install); toolchains-check compares every tool with its pin.
+# No recipe runs a pinned tool by name: GNU Make 3.81 looks a simple recipe command up on its own
+# PATH, not the exported one, so each tool runs from a script that sets the PATH of the run.
+tools:
+	$(PYTHON) scripts/toolchains.py install
+
+toolchains-check:
+	$(PYTHON) scripts/toolchains.py

@@ -23,6 +23,7 @@ TIMED_LINE = re.compile(r'\(\d+(?:\.\d+)?\s*m?s\)$')
 
 from registry import (IMPLEMENTATIONS, Failures, adapter_commands, api_commands, case_commands, fixture_paths,
                       parse_overrides, prepare, repository_paths, run_directory, test_commands)
+from toolchains import require
 
 
 class ObjectPairs(list):
@@ -564,6 +565,8 @@ def main():
     parser.add_argument('--suite', type=Path, help='Optional nst/JSONTestSuite checkout')
     parser.add_argument('--repository', action='append', metavar='NAME=PATH', help='Use another directory for a package')
     args = parser.parse_args()
+    if not require():
+        return 1
     try:
         verify(args.only or IMPLEMENTATIONS, args.suite.resolve() if args.suite else None,
                repository_paths(ROOT, parse_overrides(args.repository)))

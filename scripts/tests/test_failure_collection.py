@@ -63,7 +63,8 @@ class FailureCollection(unittest.TestCase):
 
         error = RuntimeError('rust package tests failed\ngo package tests failed')
         output, errors = io.StringIO(), io.StringIO()
-        with patch('test.run_unit_tests', return_value=Failed()), patch('test.verify', side_effect=error) as verify, \
+        with patch('toolchains.problems', return_value=[]), patch.dict('os.environ'), \
+                patch('test.run_unit_tests', return_value=Failed()), patch('test.verify', side_effect=error) as verify, \
                 patch('test.runtime_versions', return_value={}), patch('test.write_record') as write, \
                 patch.object(sys, 'argv', ['test.py']), redirect_stdout(output), redirect_stderr(errors):
             status = test_runner.main()
