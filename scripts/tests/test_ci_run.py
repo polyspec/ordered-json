@@ -98,6 +98,22 @@ class CiRun(unittest.TestCase):
         self.assertEqual((self.root / 'var/ci/unit/records/verification.json').read_text(), '{}\n')
         self.assertIn('records/verification.json', text)
 
+    def test_the_failure_lines_name_the_checker_errors_and_skip_passing_lines(self):
+        # The summary of docs-check showed only the line of make, and the summary of check showed
+        # passing case lines whose names contain `missing` or `error`.
+        log = self.root / 'check.log'
+        log.write_text('make[1]: Entering directory \'/home/runner/work\'\n'
+                       'python3 scripts/docs_check.py\n'
+                       'docs/features.md: A benchmark result is evidence only when measured from a clean checkout\n'
+                       'js: fixtures/invalid/missing-colon.json ok (0 ms)\n'
+                       'test_full_run.FullRunChecks.test_a_dirty_tree_is_refused ... ok (25 ms)\n'
+                       'rust: test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out\n'
+                       'make[1]: *** [Makefile:38: docs-check] Error 1\n'
+                       'make[1]: Leaving directory \'/home/runner/work\'\n')
+        self.assertEqual(ci_run.failure_lines(log),
+                         ['docs/features.md: A benchmark result is evidence only when measured from a clean checkout',
+                          'make[1]: *** [Makefile:38: docs-check] Error 1'])
+
     def test_the_summary_of_a_run_that_stopped_or_never_started_does_not_fail(self):
         report = self.root / 'var/ci/unit'
         with io.StringIO() as printed, unittest.mock.patch('sys.stdout', printed):
