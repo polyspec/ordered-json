@@ -17,7 +17,7 @@ from registry import (ROOT, adapter_commands, artifact_paths, repository_paths, 
 from verification_record import (external_inputs, input_issues, manifest_differences, package_revisions,
                                  report_input_issues, sha256,
                                  source_manifest, supplementary_manifest, write_record)
-from toolchains import require
+from toolchains import PIE_FIX, SUITE_FIX, require
 from verify import verify_adapters
 
 
@@ -90,6 +90,13 @@ def main():
     parser.add_argument('--suite', type=Path)
     args = parser.parse_args()
     if not require():
+        return 1
+    # A check runs offline, so a missing download names make tools, which makes it.
+    if not args.pie.is_file():
+        print(f'the PIE PHAR {args.pie} does not exist; {PIE_FIX}', file=sys.stderr)
+        return 1
+    if args.suite and not (args.suite / 'test_parsing').is_dir():
+        print(f'the supplementary suite {args.suite} has no test_parsing/; {SUITE_FIX}', file=sys.stderr)
         return 1
     pie = args.pie.resolve()
     suite = args.suite.resolve() if args.suite else None
