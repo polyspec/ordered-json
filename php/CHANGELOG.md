@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The Composer package is `polyspec/ordered-json` and the namespace is `Polyspec\OrderedJson`, the polyspec convention; they were `ordered-json/ordered-json` and `OrderedJson`. The suggested extension is the PIE package `polyspec/ordered-json-extension`.
 - The package test runner writes each case id before the case runs and `ok` or `FAIL` with the elapsed milliseconds after it, so the verifier can name a case that does not end. The `--cases` listing runs the checks without those lines and prints case ids only.
 - Add `Value::parseRejectDuplicates` for callers that require every decoded object key to occur once. It reports `Duplicate object key` with kind `duplicate_object_key` at the second key's byte offset, parses with the PHP parser in both backends, and keeps `Value::parse` unchanged.
 - `ParseError` carries a `kind` from the shared rejection list beside its own message.

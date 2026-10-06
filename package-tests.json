@@ -777,16 +777,16 @@
         "compact_node_rejects_mismatched_descriptors",
         "compact_node_copies_a_compact_token"
       ],
-      "OrderedJsonNativeParseError": [
+      "NativeParseError": [
         "scan_reports_the_parse_error_offset"
       ],
       "ORDERED_JSON_VERSION": {
         "exempt": "the registry runtime command compares it with phpversion('ordered_json')"
       },
-      "OrderedJsonNativeParseError.kind": [
+      "NativeParseError.kind": [
         "scan_reports_the_parse_error_offset"
       ],
-      "OrderedJsonNativeParseError.offset": [
+      "NativeParseError.offset": [
         "scan_reports_the_parse_error_offset"
       ]
     }

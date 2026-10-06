@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The Cargo package is `polyspec-ordered-json` and the library `polyspec_ordered_json`, the polyspec convention;
+  they were `ordered-json` and `ordered_json`.
 - Pin the Serde binding dependencies to the verified versions because raw JSON values use the
   Serde JSON token protocol.
 - Set Rust minimum to 1.71 to match the current JSON test dependency.

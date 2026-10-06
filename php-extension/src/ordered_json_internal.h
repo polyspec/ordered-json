@@ -118,7 +118,7 @@ static inline size_t oj_decode_name(const unsigned char *s, size_t i, size_t end
     return n;
 }
 
-/* Property slots of OrderedJson\Value, which ordered_json_hydrate() fills directly. */
+/* Property slots of Polyspec\OrderedJson\Value, which ordered_json_hydrate() fills directly. */
 typedef struct {
     zend_class_entry *ce;
     uint32_t source, tape, index;

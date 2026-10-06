@@ -3,8 +3,8 @@
 // extension must answer identically, so one suite runs against each.
 declare(strict_types=1);
 
-use OrderedJson\ParseError;
-use OrderedJson\Value;
+use Polyspec\OrderedJson\ParseError;
+use Polyspec\OrderedJson\Value;
 
 /**
  * Run one case. With $report the case id is written before it runs and its
@@ -67,7 +67,7 @@ function orderedJsonApiCases(): array
 
     $cases['values_come_only_from_the_library'] = static function () {
         expectThrows(Error::class, '', static fn() => new Value());
-        expectThrows(TypeError::class, '', static fn() => OrderedJson\stringify(new stdClass()));
+        expectThrows(TypeError::class, '', static fn() => Polyspec\OrderedJson\stringify(new stdClass()));
     };
 
     $cases['returned_collections_are_immutable'] = static function () {
@@ -130,7 +130,7 @@ function orderedJsonApiCases(): array
     };
 
     $cases['host_serialization_boundary'] = static function () {
-        expectThrows(LogicException::class, 'OrderedJson\\stringify', static fn() => json_encode(Value::parse('[1]')));
+        expectThrows(LogicException::class, 'Polyspec\\OrderedJson\\stringify', static fn() => json_encode(Value::parse('[1]')));
         expectSame('[1]', (string)Value::parse('[1]'));
     };
 

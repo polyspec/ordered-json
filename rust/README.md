@@ -8,17 +8,17 @@ Strict JSON with associative objects that preserve document key order recursivel
 <a id="usage"></a>
 ## Usage
 
-Rust >= 1.71; Cargo package `ordered-json`, import `ordered_json`.
+Rust >= 1.71; Cargo package `polyspec-ordered-json`, import `polyspec_ordered_json`.
 
 The usage fragment takes `source` (or `$source`) from an object case in the [common official examples](https://github.com/polyspec/ordered-json/blob/main/examples/official.json). Use the fragment inside a function that can return an error.
 
 ~~~rust
-use ordered_json::{parse, stringify};
+use polyspec_ordered_json::{parse, stringify};
 let value = parse(source)?;
 let output = stringify(&value);
 ~~~
 
-Typed values use `ordered_json::serde::{to_string, from_str, from_slice}` with Serde
+Typed values use `polyspec_ordered_json::serde::{to_string, from_str, from_slice}` with Serde
 `Serialize` and owned `Deserialize`. Struct fields retain declaration order. Duplicate keys,
 unknown fields, type errors and non-finite numbers fail. Embedded `Value` fields preserve
 object order and number tokens.

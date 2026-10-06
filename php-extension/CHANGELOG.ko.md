@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: dbf60acc1926596e21ced8155676c474aea59b643487d745d55fb85b5a015ab6 -->
+<!-- source-sha256: 486c34911016386e818e6882955dea14b8b8bf50068a93ea7a544afaad4d49ab -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- PIE 패키지는 `polyspec/ordered-json-extension`, 오류 클래스는 `Polyspec\OrderedJson\NativeParseError`입니다. 이전에는 `ordered-json/ordered-json-extension`과 전역 클래스 `OrderedJsonNativeParseError`였습니다. hydration은 `Polyspec\OrderedJson\Value`를 만듭니다.
 - 패키지 테스트 실행기는 케이스를 실행하기 전에 케이스 id를, 실행한 뒤 `ok` 또는 `FAIL`과 경과 밀리초를 출력하므로, 검증기가 끝나지 않는 케이스의 이름을 보고할 수 있습니다. `--cases` 목록은 그 줄 없이 검사를 실행하고 케이스 id만 출력합니다.
 - `OrderedJsonNativeParseError`가 공통 거부 목록의 `kind`를 전합니다.
 - 패키지는 공통 커버리지 검사를 위해 함수, 상수, 오류 클래스를 보고합니다.

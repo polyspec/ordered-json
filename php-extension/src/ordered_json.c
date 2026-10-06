@@ -298,7 +298,7 @@ static bool oj_value(oj_parser *p, zend_long depth) {
     return oj_fail(p, "Expected JSON value");
 }
 
-/* Parse into p->tape. On failure the tape is released and OrderedJsonNativeParseError is thrown. */
+/* Parse into p->tape. On failure the tape is released and Polyspec\OrderedJson\NativeParseError is thrown. */
 static bool oj_parse(zend_string *source, zend_long max_depth, oj_parser *p) {
     memset(p, 0, sizeof(*p));
     p->source = (const unsigned char *)ZSTR_VAL(source);
@@ -473,7 +473,7 @@ static const zend_function_entry ordered_json_functions[] = {
 };
 PHP_MINIT_FUNCTION(ordered_json) {
     zend_class_entry ce;
-    INIT_CLASS_ENTRY(ce, "OrderedJsonNativeParseError", NULL);
+    INIT_CLASS_ENTRY(ce, "Polyspec\\OrderedJson\\NativeParseError", NULL);
     oj_error_ce = zend_register_internal_class_ex(&ce, zend_ce_exception);
     zend_declare_property_long(oj_error_ce, "offset", sizeof("offset") - 1, 0, ZEND_ACC_PUBLIC);
     zend_declare_property_string(oj_error_ce, "kind", sizeof("kind") - 1, "", ZEND_ACC_PUBLIC);

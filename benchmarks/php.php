@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require dirname(__DIR__) . '/php/src/OrderedJson.php';
 
-use OrderedJson\Value;
+use Polyspec\OrderedJson\Value;
 
 $iterations = (int)($_SERVER['OJ_BENCH_ITERATIONS'] ?? 1000);
 $warmup = (int)($_SERVER['OJ_BENCH_WARMUP'] ?? 1000);

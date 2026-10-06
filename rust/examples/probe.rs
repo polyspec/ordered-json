@@ -1,5 +1,5 @@
 // Adapter only. The shared Python verifier owns examples and expectations.
-use ordered_json::{parse_bytes, stringify, Kind, OrderedMap, Value};
+use polyspec_ordered_json::{parse_bytes, stringify, Kind, OrderedMap, Value};
 use std::{
     fs,
     io::{self, BufRead},

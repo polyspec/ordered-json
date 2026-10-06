@@ -8,20 +8,20 @@ Strict JSON with associative objects that preserve document key order recursivel
 <a id="usage"></a>
 ## Usage
 
-PHP >= 8.2 with JSON and PCRE; Composer package `ordered-json/ordered-json`.
+PHP >= 8.2 with JSON and PCRE; Composer package `polyspec/ordered-json`.
 
 The usage fragment takes `source` (or `$source`) from an object case in the [common official examples](https://github.com/polyspec/ordered-json/blob/main/examples/official.json).
 
 ~~~php
 require 'src/OrderedJson.php';
-$value = OrderedJson\parse($source);
-$output = OrderedJson\stringify($value);
+$value = Polyspec\OrderedJson\parse($source);
+$output = Polyspec\OrderedJson\stringify($value);
 ~~~
 
 
 The [native extension](https://github.com/polyspec/ordered-json/tree/main/php-extension) is a separate optional package. Pure PHP needs no extension checkout. `parse()` uses the extension when it is loaded and the pure PHP implementation otherwise. The pure test process uses `php -n`.
 
-`OrderedJson\Value::parseRejectDuplicates($source)` rejects a repeated decoded object key at any depth with `OrderedJson\ParseError` of kind `duplicate_object_key` instead of keeping the last value. It parses with the pure PHP parser even when the extension is loaded.
+`Polyspec\OrderedJson\Value::parseRejectDuplicates($source)` rejects a repeated decoded object key at any depth with `Polyspec\OrderedJson\ParseError` of kind `duplicate_object_key` instead of keeping the last value. It parses with the pure PHP parser even when the extension is loaded.
 
 The [JSON contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.md) and [API contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.md) define behavior. Source is provided by this repository. Registry publication and versioned releases are not verified; a source version string is not a release record.
 

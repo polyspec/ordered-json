@@ -1,5 +1,5 @@
 {
-  "name": "ordered-json",
+  "name": "@polyspec/ordered-json",
   "version": "0.0.1",
   "description": "Strict JSON with insertion-ordered associative objects and exact number preservation",
   "type": "module",

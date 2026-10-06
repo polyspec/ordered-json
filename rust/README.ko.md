@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: 753e305f76b8311dd741400ec5cb38696767fbf7c7f99987352921469f98da43 -->
+<!-- source-sha256: db0d56fe7c425b0723fe15d800720d85df563b3cab756d906e1133fff71a5b5d -->
 # ordered-json for Rust
 
 [English](README.md)
@@ -9,18 +9,18 @@
 <a id="usage"></a>
 ## 사용
 
-Rust >= 1.71이며 Cargo 패키지는 `ordered-json`, 가져오기는 `ordered_json`입니다.
+Rust >= 1.71이며 Cargo 패키지는 `polyspec-ordered-json`, 가져오기는 `polyspec_ordered_json`입니다.
 
 사용 코드의 `source` 또는 `$source`는 [공통 공식 예제](https://github.com/polyspec/ordered-json/blob/main/examples/official.json)의 객체 사례에서 가져옵니다. 오류를 반환할 수 있는 함수 안에서 사용합니다.
 
 ~~~rust
-use ordered_json::{parse, stringify};
+use polyspec_ordered_json::{parse, stringify};
 let value = parse(source)?;
 let output = stringify(&value);
 ~~~
 
 타입 값은 Serde `Serialize`와 소유한 `Deserialize`를 통해
-`ordered_json::serde::{to_string, from_str, from_slice}`를 사용합니다. 구조체 필드는
+`polyspec_ordered_json::serde::{to_string, from_str, from_slice}`를 사용합니다. 구조체 필드는
 선언 순서를 유지합니다. 반복 키, 알 수 없는 필드, 타입 오류와 유한하지 않은 숫자는 오류로 처리합니다.
 포함된 `Value` 필드는 객체 순서와 숫자 토큰을 유지합니다.
 

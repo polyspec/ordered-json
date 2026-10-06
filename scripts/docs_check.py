@@ -369,7 +369,7 @@ def check_pie_verification(root, record):
                          + '\n'.join(manifest_differences(record.get('sources'), current)))
     if record.get('packages') != package_revisions(root):
         raise ValueError('PIE verification package records differ from the current source')
-    if record.get('package') != 'ordered-json/ordered-json-extension:*@dev':
+    if record.get('package') != 'polyspec/ordered-json-extension:*@dev':
         raise ValueError('PIE verification uses an unexpected package')
     pin = external_inputs(root)
     if (record['pie'].get('phar_sha256') != pin['pie']['phar_sha256']

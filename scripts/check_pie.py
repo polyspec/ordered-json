@@ -48,7 +48,7 @@ def build_and_verify(run, pie, suite):
 
     version = pie_command('--version')
     pie_command('repository:add', 'path', '.')
-    package = 'ordered-json/ordered-json-extension:*@dev'
+    package = 'polyspec/ordered-json-extension:*@dev'
     pie_command('info', package)
     pie_command('build', package, '-j', '2', '-vv')
     modules = artifact_paths('php-extension', paths)

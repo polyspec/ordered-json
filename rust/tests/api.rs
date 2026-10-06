@@ -1,7 +1,7 @@
 //! Package tests for the Rust value API. The shared cases exercise the JSON
 //! contract through the adapter; constructor arguments, map building, UTF-16
 //! units and wrong-kind access are reachable only from here.
-use ordered_json::{
+use polyspec_ordered_json::{
     parse, parse_bytes, parse_with_max_depth, stringify, Kind, OrderedMap, Value, MAX_DEPTH,
 };
 

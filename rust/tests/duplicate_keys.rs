@@ -1,4 +1,4 @@
-use ordered_json::{parse_bytes, parse_bytes_reject_duplicates};
+use polyspec_ordered_json::{parse_bytes, parse_bytes_reject_duplicates};
 
 #[test]
 fn strict_parse_rejects_duplicate_keys() {

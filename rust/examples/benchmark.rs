@@ -1,4 +1,4 @@
-use ordered_json::{parse_bytes, stringify};
+use polyspec_ordered_json::{parse_bytes, stringify};
 use serde_json::Value as NativeValue;
 use sha2::{Digest, Sha256};
 use std::{env, fs, hint::black_box, time::Instant};

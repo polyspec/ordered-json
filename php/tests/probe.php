@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
 require dirname(__DIR__) . '/src/OrderedJson.php';
-use OrderedJson\{Value, ParseError};
-use function OrderedJson\parse;
+use Polyspec\OrderedJson\{Value, ParseError};
+use function Polyspec\OrderedJson\parse;
 
 $expectNative = in_array('--native', $argv, true);
 if ($expectNative !== extension_loaded('ordered_json')) {
@@ -15,7 +15,7 @@ function text(Value $v): string { return Value::fromUnits($v->stringUnits())->ra
 function objectTree(Value $v): string {
     $parts = [];
     foreach ($v->members() as $key => $value)
-        $parts[] = '['.OrderedJson\quoteKey((string)$key).','.tree($value).']';
+        $parts[] = '['.Polyspec\OrderedJson\quoteKey((string)$key).','.tree($value).']';
     return '["object",['.implode(',', $parts).']]';
 }
 function tree(Value $v): string {
@@ -45,10 +45,10 @@ while (($line = fgets(STDIN)) !== false) {
     if ($source === false) throw new RuntimeException('Cannot read document');
     try { $value = parse($source); }
     catch (ParseError $e) { echo '{"ok":false,"offset":', $e->offset, ',"unit":"byte","kind":', quote($e->kind), '}', "\n"; continue; }
-    $serialized = OrderedJson\stringify($value);
+    $serialized = Polyspec\OrderedJson\stringify($value);
     $roundtrip = parse($serialized);
     $factory = Value::string("quote \" slash \\ line\n 한 🌍")->compact();
     echo '{"ok":true,"raw":',quote($value->raw()),',"serialized":',quote($serialized),',"compact":',quote($value->compact()),
-        ',"tree":',tree($value),',"roundtrip":',quote(OrderedJson\stringify($roundtrip)),',"roundtrip_tree":',tree($roundtrip),
+        ',"tree":',tree($value),',"roundtrip":',quote(Polyspec\OrderedJson\stringify($roundtrip)),',"roundtrip_tree":',tree($roundtrip),
         ',"rebuilt":',quote(rebuild($value)->compact()),',"factory":',quote($factory),"}\n";
 }
