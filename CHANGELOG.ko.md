@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: cd9a02d61c2917495fc2fea94e1592aed28840174d933aae8c440bdce838064c -->
+<!-- source-sha256: 657831e02dc84e302b7e69536be4b641933f98c155e491340c7cfdca7a243e75 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,8 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- ruleset `main`이 요구하는 job `push-gate`는 gate 뒤에 `make docs-check`를 실행합니다(T1.16). 문서, 기능 tracker,
+  체크리스트가 자체 검사에 실패하는 commit은 `main`에 갈 수 없습니다.
 - 새 push는 같은 ref의 이전 CI run을 취소합니다(T1.15). runner가 적으므로 `ci.yml`은 group
   `${{ github.workflow }}-${{ github.ref }}`와 `cancel-in-progress: true`인 `concurrency`를 선언하고, `push-gate.yml`은
   선언하지 않습니다. `test_workflow_rules`는 이것 없이 `make ci`를 실행하는 workflow에서 실패합니다.
