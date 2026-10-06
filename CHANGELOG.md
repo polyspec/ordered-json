@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The job `push-gate`, which the ruleset `main` requires, runs `make docs-check` after the gate (T1.16), so a commit
+  whose documents, feature tracker or checklist fail their own checks cannot reach `main`.
 - A new push cancels the previous CI run of the same ref (T1.15). `ci.yml` declares `concurrency` with group
   `${{ github.workflow }}-${{ github.ref }}` and `cancel-in-progress: true`, because runners are few; `push-gate.yml`
   declares none. `test_workflow_rules` fails on a workflow that runs `make ci` without it.

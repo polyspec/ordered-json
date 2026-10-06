@@ -3,7 +3,10 @@
 # runs the same gate, make push-gate (scripts/push_gate.py), on the pushed commit of every branch and on the
 # head commit of every pull request: it fails while a feature is partial or a task of
 # docs/plans/execution-checklist.md is [~], naming each one, and when .githooks/pre-push or
-# .githooks/pre-commit is not tracked with mode 100755. A step runs its make target, never a script
+# .githooks/pre-commit is not tracked with mode 100755. The ruleset main of .github/ruleset.json requires this job, so
+# it also runs the documentation check, make docs-check (scripts/docs_check.py), which reads only Python and Git: a
+# commit whose documents, feature tracker or checklist fail their own checks does not reach main. That check runs
+# also after a failed gate. A step runs its make target, never a script
 # directly, so the environment and the prechecks of the Makefile apply. The full verification is not run here. The
 # runner image, each action and Python are exact releases, so the job does not change with a new
 # release of any of them.
@@ -31,3 +34,6 @@ jobs:
           python-version: '3.9.25'
       - name: push gate
         run: make push-gate COMMIT="${{ github.event.pull_request.head.sha || github.sha }}"
+      - name: documentation check
+        if: ${{ !cancelled() }}
+        run: make docs-check

@@ -6,6 +6,7 @@ Git checkout with a temporary bare remote, so a push reaches no real remote.
 import os
 from pathlib import Path
 import re
+import shlex
 import shutil
 import stat
 import subprocess
@@ -273,8 +274,12 @@ class PushGateChecks(unittest.TestCase):
         # A step runs its make target, never a script directly, so the environment and the prechecks of the
         # Makefile apply.
         self.assertIn('run: make push-gate COMMIT="${{ github.event.pull_request.head.sha || github.sha }}"', text)
+        # The documentation check runs after the gate, also when the gate failed; both read the checked-out commit
+        # alone, so the checkout fetches that commit only.
         self.assertEqual(re.findall(r'(?m)^\s*run: (.*)$', text),
-                         ['make push-gate COMMIT="${{ github.event.pull_request.head.sha || github.sha }}"'])
+                         ['make push-gate COMMIT="${{ github.event.pull_request.head.sha || github.sha }}"', 'make docs-check'])
+        self.assertIn('      - name: documentation check\n        if: ${{ !cancelled() }}\n        run: make docs-check\n', text)
+        self.assertNotIn('fetch-depth', text)
         self.assertNotIn('timeout-minutes', text)
 
     def test_make_push_gate_runs_the_gate_on_one_commit(self):
@@ -290,6 +295,49 @@ class PushGateChecks(unittest.TestCase):
         missing = checkout.run('make', 'push-gate', f'PYTHON={sys.executable}')
         self.assertNotEqual(missing.returncode, 0, missing.stdout + missing.stderr)
         self.assertIn('make push-gate needs COMMIT=<commit>', missing.stdout + missing.stderr)
+
+    def test_the_job_fails_on_a_commit_whose_documentation_check_fails(self):
+        """The check push-gate is what the ruleset of main requires, so a commit that fails its own documentation and
+        checklist checks must fail it. Each step of the job runs in a clone of this checkout that holds the tracked
+        files of the working tree; a state of the Korean checklist that is no task state passes the gate itself, which
+        reads only the English checklist."""
+        temporary = tempfile.TemporaryDirectory(prefix='ordered-json-push-gate-job-')
+        self.addCleanup(temporary.cleanup)
+        clone = Path(temporary.name) / 'clone'
+        subprocess.run(['git', 'clone', '--quiet', '--no-checkout', str(ROOT), str(clone)], check=True, env=environment())
+        names = subprocess.run(['git', 'ls-files', '-z'], cwd=ROOT, check=True, capture_output=True, text=True,
+                               env=environment()).stdout.split('\0')
+        for name in filter(None, names):
+            if (ROOT / name).is_file():
+                (clone / name).parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(ROOT / name, clone / name)
+
+        def commit():
+            for args in (('add', '--all'), ('-c', 'user.name=test', '-c', 'user.email=test@example.com', 'commit',
+                                            '--quiet', '--no-verify', '--allow-empty', '-m', 'state')):
+                subprocess.run(['git', *args], cwd=clone, check=True, capture_output=True, env=environment())
+            return subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=clone, check=True, capture_output=True, text=True,
+                                  env=environment()).stdout.strip()
+
+        def job(sha):
+            """The exit status and the output of each step of the job push-gate on the commit `sha`."""
+            results = []
+            for line in re.findall(r'(?m)^\s*run: (.*)$', WORKFLOW.read_text()):
+                command = shlex.split(re.sub(r'\$\{\{[^}]*\}\}', sha, line)) + [f'PYTHON={sys.executable}']
+                result = subprocess.run(command, cwd=clone, capture_output=True, text=True, env=environment())
+                results.append((line, result.returncode, result.stdout + result.stderr))
+            return results
+
+        clean = job(commit())
+        self.assertEqual([status for _, status, _ in clean], [0] * len(clean), clean)
+        checklist = clone / 'docs/plans/execution-checklist.ko.md'
+        text = checklist.read_text()
+        last = text.rindex('| [o] |')
+        checklist.write_text(text[:last] + '| [x] |' + text[last + len('| [o] |'):])
+        broken = job(commit())
+        self.assertTrue(any(status for _, status, _ in broken), broken)
+        self.assertTrue(any("docs/plans/execution-checklist.ko.md: line" in output and "'[x]' is not a task state" in output
+                            for _, status, output in broken if status), broken)
 
 
 if __name__ == '__main__':

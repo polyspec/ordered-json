@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: 8a0e08392080b82fea2714ead836a5ac2bccd66bae4dd328578d5f3d56913568 -->
+<!-- source-sha256: a9d09a5e94048d6ef522e098cdec7b383b9e288107d565b7d1733a8ebc916c3e -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
@@ -21,3 +21,4 @@
 | T1.13 | CI summary test를 make의 문구가 아니라 log와 비교: CI에서 `test_ci_run`이 실패했다. GNU Make 3.81의 문구인 `make: *** [third-fails] Error 1`을 기대했는데 runner의 GNU Make 4는 `make: *** [Makefile:11: third-fails] Error 1`을 쓰기 때문이다. 사례는 target log의 마지막 줄을 읽어 summary에 있는지 요구한다 | `scripts/tests/test_ci_run.py` | `python3 scripts/test.py --unit test_ci_run` | [o] |
 | T1.14 | 첫 실패 줄에 검사기 error를 표시: `docs-check`의 summary는 make의 줄만 보여 주고 file을 밝히는 검사기의 줄은 보여 주지 않았으며, `check`의 summary는 이름에 `missing`이나 `error`가 든 통과 사례 줄을 보여 줬다. `scripts/ci_run.py`는 file을 밝히는 줄(`<path>: <message>`)을 고르고, 통과 사례 줄(`ok (N ms)`, `test result: ok.`)과 make의 directory 줄은 건너뛴다 | `scripts/ci_run.py`, `scripts/tests/test_ci_run.py` | `python3 scripts/test.py --unit test_ci_run` | [o] |
 | T1.15 | 새 push에서 같은 ref의 이전 CI run을 취소: runner가 적은데, 같은 ref의 이전 push run이 아직 도는 동안 push마다 `ci.yml`의 전체 run이 시작됐다. `ci.yml`은 group `${{ github.workflow }}-${{ github.ref }}`와 `cancel-in-progress: true`인 `concurrency`를 선언하고, `push-gate.yml`은 선언하지 않아 push된 모든 commit의 gate가 끝까지 실행되며, `test_workflow_rules`는 이것 없이 `make ci`를 실행하는 workflow에서 실패한다 | `.github/workflows/ci.yml`, `scripts/tests/test_workflow_rules.py` | `python3 scripts/test.py --unit test_workflow_rules` | [o] |
+| T1.16 | `main`이 요구하는 check에서 문서 검사 실행: ruleset `main`이 요구하는 job `push-gate`는 영어 기능 tracker와 체크리스트만 읽는 `make push-gate`만 실행했으므로, 문서, tracker, 체크리스트가 `scripts/docs_check.py`에 실패하는 commit(예: state가 `[x]`인 한국어 체크리스트 행)이 check를 통과해 `main`에 갈 수 있었다. job은 gate 뒤에 `if: ${{ !cancelled() }}`로 `make docs-check`를 실행한다. `test_push_gate`는 clone에서 job의 step을 실행해 그런 commit이 통과하면 실패한다 | `.github/workflows/push-gate.yml`, `scripts/tests/test_push_gate.py`, `AGENTS.md`(.ko) | `python3 scripts/test.py --unit test_push_gate` | [o] |
