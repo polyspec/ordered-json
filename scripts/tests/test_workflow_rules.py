@@ -57,12 +57,26 @@ def violations(name, text):
     if re.search(r'(?m)^\s*timeout-minutes:', text):
         found.append(f'{name}: timeout-minutes gives a long operation a deadline; the log shows its progress instead')
     parsed = jobs(text)
-    # Runners are few, so a new push of the same ref cancels the run of the previous one; the push gate keeps every run.
+    # Runners are few, so a new push to a pull request cancels the run of its previous push. A merge group has a ref of
+    # its own, and its run is never cancelled: the merge queue merges only a group whose checks completed. The push gate
+    # keeps every run.
     if any(step.get('run', '').startswith('make ci ') for body in parsed.values() for step in body['steps']) and not re.search(
-            r'(?m)^concurrency:\n  group: \$\{\{ github\.workflow \}\}-\$\{\{ github\.ref \}\}\n  cancel-in-progress: true$', text):
+            r"(?m)^concurrency:\n  group: \$\{\{ github\.workflow \}\}-\$\{\{ github\.ref \}\}\n"
+            r"  cancel-in-progress: \$\{\{ github\.event_name == 'pull_request' \}\}$", text):
         found.append(f'{name}: a workflow that runs make ci lacks concurrency with group '
-                     '${{ github.workflow }}-${{ github.ref }} and cancel-in-progress: true; a new push must cancel the '
-                     'previous run')
+                     "${{ github.workflow }}-${{ github.ref }} and cancel-in-progress: ${{ github.event_name == "
+                     "'pull_request' }}; a new push to a pull request cancels its previous run and no merge group run "
+                     'is cancelled')
+    # The ruleset of main requires the checks of every workflow, and the merge queue runs them on the merge group, the
+    # commit that main receives; a push to a branch of the merge queue would run them a second time.
+    trigger = re.search(r'(?ms)^on:\n(.*?)^\S', text)
+    events = re.findall(r'(?m)^  ([\w-]+):', trigger.group(1)) if trigger else []
+    if 'merge_group' not in events or 'pull_request' not in events:
+        found.append(f'{name}: the workflow runs on {events}, not on pull_request and merge_group; the ruleset of main '
+                     'requires its checks on every pull request and every merge group')
+    if 'push' in events and "branches-ignore: ['gh-readonly-queue/**']" not in trigger.group(1):
+        found.append(f"{name}: the push trigger lacks branches-ignore: ['gh-readonly-queue/**']; the merge group runs the "
+                     'workflow already')
     for job, body in parsed.items():
         steps = body['steps']
         if not steps:
@@ -153,10 +167,27 @@ class WorkflowRules(unittest.TestCase):
         text = (WORKFLOWS / 'ci.yml').read_text()
         alone = re.sub(r'\nconcurrency:\n(?:  .*\n)+', '\n', text)
         self.assertNotIn('cancel-in-progress', alone)
-        self.assertIn('ci.yml: a workflow that runs make ci lacks concurrency with group ${{ github.workflow }}-${{ github.ref }} '
-                      'and cancel-in-progress: true; a new push must cancel the previous run', violations('ci.yml', alone))
+        message = ("ci.yml: a workflow that runs make ci lacks concurrency with group ${{ github.workflow }}-${{ github.ref }} "
+                   "and cancel-in-progress: ${{ github.event_name == 'pull_request' }}; a new push to a pull request "
+                   'cancels its previous run and no merge group run is cancelled')
+        self.assertIn(message, violations('ci.yml', alone))
+        always = text.replace("cancel-in-progress: ${{ github.event_name == 'pull_request' }}", 'cancel-in-progress: true')
+        self.assertNotEqual(always, text)
+        self.assertIn(message, violations('ci.yml', always))
         self.assertNotIn('concurrency', (WORKFLOWS / 'push-gate.yml').read_text(),
                          'the push gate of every pushed commit runs to its end')
+
+    def test_every_workflow_runs_on_pull_requests_and_merge_groups(self):
+        for name in ('ci.yml', 'push-gate.yml'):
+            text = (WORKFLOWS / name).read_text()
+            without = text.replace('  merge_group:\n', '')
+            self.assertNotEqual(without, text, name)
+            self.assertTrue(any('not on pull_request and merge_group' in issue for issue in violations(name, without)), name)
+        gate = (WORKFLOWS / 'push-gate.yml').read_text()
+        queue = gate.replace("    branches-ignore: ['gh-readonly-queue/**']\n", '')
+        self.assertNotEqual(queue, gate)
+        self.assertTrue(any("lacks branches-ignore: ['gh-readonly-queue/**']" in issue
+                            for issue in violations('push-gate.yml', queue)))
 
     def test_a_step_that_does_not_run_after_a_failure_fails(self):
         text = (WORKFLOWS / 'ci.yml').read_text()

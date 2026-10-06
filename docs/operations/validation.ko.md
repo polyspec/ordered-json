@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 937ffd897dfbf1c9c1ef4ff76d0e0b8f9469aa0793f627418b4f8bf847f530b1 -->
+<!-- source-sha256: f08bebfc51971ccc43fa9a72282de8141ffd252f31965be0e424eade7a43ed71 -->
 # 검증
 
 [English](validation.md)
@@ -79,7 +79,7 @@ PIE 기록 `var/records/pie-verification.json`은 PIE 버전과 PHAR 해시, 실
 <a id="ci"></a>
 ## Hosted CI
 
-`.github/workflows/ci.yml`은 `main`에 push된 모든 commit과 모든 pull request에서 전체 suite를 실행합니다. 하나의 matrix에 두 job이 있고 `fail-fast: false`이므로 한 job이 다른 job을 취소하지 않습니다.
+`.github/workflows/ci.yml`은 모든 pull request와 [merge queue](#publish)의 모든 merge group에서 전체 suite를 실행합니다. 하나의 matrix에 두 job이 있고 `fail-fast: false`이므로 한 job이 다른 job을 취소하지 않습니다.
 
 ~~~sh
 make tools
@@ -90,6 +90,28 @@ make ci-summary CI_JOB=suite
 
 job `suite`는 고정 파일에서 Python, Node.js, Go, PHP를 설치하고, 내려받는 유일한 단계인 `make tools`를 실행한 뒤 target `hooks`, `pie-check`, `check`를 실행합니다. `make pie-check`는 PIE 기록을, `make check`는 통합 기록을 쓰고 그 문서 검사가 두 기록을 검사합니다. job `docs`는 Python만 설치하고 `docs-check`와 `owner-validate`를 실행합니다. 모든 step은 make target을 실행하고 실패한 step 뒤에도 실행됩니다(`if: !cancelled()`). `make ci`(`scripts/ci_run.py`)는 job의 모든 target을 끝까지 실행하고, 출력을 도착하는 대로 출력하며 `var/ci/<job>/logs/<target>.log`에 쓰고, 각 target의 상태, 종료 상태, 시간을 `var/ci/<job>/summary.json`에 기록합니다. `make ci-summary`는 각 target과 그 상태와 시간, 실패한 target마다 첫 실패 줄을 담은 `var/ci/<job>/summary.md`를 쓰고, `var/records`의 기록을 `var/ci/<job>/records`로 복사하고, 요약을 GitHub의 job summary에 덧붙이며 실패하지 않습니다. step `report`는 실패 뒤에도 `var/ci/<job>/`를 artifact `ci-<job>-<run id>-<attempt>`로 upload합니다. 어떤 step에도 시간 한도가 없습니다. `actions/python-versions`가 `ubuntu-26.04`용 Python 3.9를 build하지 않으므로 job은 push gate처럼 `ubuntu-24.04`에서 실행하며, 기록은 실행한 Python과 PHP의 patch release를 적습니다.
 
+<a id="publish"></a>
+## main 공개
+
+모든 변경은 pull request와 merge queue를 거쳐 `main`에 들어갑니다. 이 저장소의 어떤 명령도 `main`을 push하지 않습니다. branch는 GitHub의 표준 명령이나 GitHub UI로 공개합니다.
+
+~~~sh
+git push origin HEAD:refs/heads/<branch>
+gh pr create --base main --head <branch> --fill
+gh pr merge <branch> --auto --rebase
+~~~
+
+`.github/ruleset.json`의 GitHub ruleset `main`은 enforcement `active`로 `refs/heads/main`에 적용되고 bypass actor가 없으므로 관리자에게도 적용됩니다. 규칙은 다음과 같습니다.
+
+- `pull_request`: 변경은 pull request로 들어옵니다. 승인은 필요 없고 모든 merge method를 허용합니다. merge queue는 자체 method로 merge하고 `gh pr merge --auto`는 자기가 고른 method로 auto-merge를 요청하므로, `rebase`만 허용하는 규칙은 pull request를 queue 밖에 둡니다.
+- `merge_queue`: merge queue는 method `REBASE`로 merge하므로 pull request의 각 commit이 `main`에 각각의 commit으로 들어갑니다. grouping strategy는 `ALLGREEN`이고, 한 번에 최대 5개 항목을 build하고 merge하며, 항목을 더 기다리지 않습니다. `check_response_timeout_minutes`는 GitHub의 최대값인 360이므로 긴 suite가 이것으로 끊기지 않습니다.
+- `required_linear_history`, `non_fast_forward`, `deletion`: `main`에 merge commit, force-push, 삭제가 없습니다.
+- `required_status_checks`: GitHub Actions app(integration 15368)의 check `push-gate`, `suite`, `docs`입니다. 각각 `make push-gate`와 `make docs-check`를 실행하는 `.github/workflows/push-gate.yml`의 job, 전체 suite를 실행하는 `.github/workflows/ci.yml`의 job입니다.
+
+직접 `git push origin <commit>:main`은 `GH013: Repository rule violations found`로 거부됩니다. `gh pr merge --auto`는 pull request의 필수 check가 pull request에서 통과하면 그 pull request를 merge queue에 넣습니다. queue는 그것을 `main` 위에 rebase해 branch `gh-readonly-queue/main/pr-<number>-<sha>`에 merge group을 만들고, 두 workflow가 그 commit에서 실행되며(`merge_group`), check가 통과하면 queue가 `main`을 정확히 그 commit으로 옮깁니다. check가 실패하면 pull request는 queue에서 빠지고 `main`은 움직이지 않습니다. merge group의 `ci.yml` 실행은 취소되지 않습니다. group마다 ref가 따로 있고, `cancel-in-progress`는 pull request에만 적용됩니다. merge된 pull request의 branch는 삭제됩니다(`delete_branch_on_merge`). rebase는 merge된 commit에 새 hash를 주므로, `git pull --rebase`가 queue가 merge한 local commit을 버립니다.
+
+`make github-ruleset`은 선언의 저장소 설정(`allow_rebase_merge`, `allow_auto_merge`, `delete_branch_on_merge`)을 바꾸고 선언된 이름의 ruleset을 만들거나 갱신하되 다른 곳만 바꾸며, 다시 비교합니다. `make github-ruleset-check`는 아무것도 바꾸지 않으며, 설정이 다르거나 live ruleset이 없거나 선언과 다르면 field마다 live 값과 선언 값을 밝히며 실패합니다. 둘 다 저장소 administration 권한이 있는 인증된 `gh`가 필요합니다. `scripts/tests/test_github_ruleset.py`는 가짜 `gh`로 script를 실행합니다.
+
 <a id="documentation-checks"></a>
 ## 문서 검사
 
@@ -99,7 +121,7 @@ make docs-check
 
 [검사기](../../scripts/docs_check.py)는 각 문서 목록, 링크, 번역 쌍과 개정 해시, 절과 코드 블록 일치, 기능 상태를 검사합니다. `make check`가 통합 기록을 쓴 뒤 붙이는 `--records`가 있으면 체크아웃의 [기록](#records)이 현재 소스와 일치하는지도 검사합니다. `make docs-check`는 그 비교를 생략합니다. 공통 목록에는 공통 문서만 등록합니다. 각 패키지 디렉터리는 자체 목록으로 검사합니다.
 
-한국어 `source-sha256`을 갱신하기 전에 코드·테스트와 영어·한국어 내용을 비교합니다. 해시 일치는 번역 정확성을 증명하지 않습니다. 외부 링크는 문법만 검사하며 접속하지 않습니다. [hosted CI](#ci)가 `main`에 push된 모든 commit과 모든 pull request에서 이 검사들을 실행합니다.
+한국어 `source-sha256`을 갱신하기 전에 코드·테스트와 영어·한국어 내용을 비교합니다. 해시 일치는 번역 정확성을 증명하지 않습니다. 외부 링크는 문법만 검사하며 접속하지 않습니다. [hosted CI](#ci)가 모든 pull request와 모든 merge group에서 이 검사들을 실행합니다.
 
 <a id="limits"></a>
 ## 한계

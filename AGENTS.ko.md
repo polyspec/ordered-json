@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 9ad7d907e9c485cd2104e1a926d78147951938dcd1e61c5906e468d017bb2009 -->
+<!-- source-sha256: 10af74504f2ec5f80745d2655d428b3837969056373cf4775787ab546f0a8f7c -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -48,15 +48,25 @@ git diff --check
 
 `scripts/verify.py --only`는 선택한 구현을 빌드하고 그 구현의 케이스·심볼 목록, 선언된 패키지 테스트, 공통 사례를 실행하며 기록을 쓰지 않습니다. `scripts/test.py --unit`은 지정한 검증기 unit test를 실행하며 기록을 쓰지 않습니다. test가 없는 module처럼 test를 하나도 고르지 않는 이름은 어떤 test도 실행하기 전에 `selected 0 tests`와 그 이름을 출력하며 실패합니다.
 
-`make check`는 hosted CI가 push된 모든 commit에서 실행하는 전체 suite입니다. 로컬 실행은 선택이며, 활성 항목이 모두 끝난 뒤 tree마다 많아야 한 번 합니다. 추가 사례를 포함하면 그 실행은 다음과 같습니다.
+`make check`는 hosted CI가 모든 pull request와 merge queue의 모든 merge group에서 실행하는 전체 suite입니다. 로컬 실행은 선택이며, 활성 항목이 모두 끝난 뒤 tree마다 많아야 한 번 합니다. 추가 사례를 포함하면 그 실행은 다음과 같습니다.
 
 ~~~sh
 make check JSON_TEST_SUITE=.cache/JSONTestSuite
 ~~~
 
-`make check`는 검증보다 먼저 guard `scripts/full_run.py`를 시작합니다. 이 저장소의 활성 작업은 [기능 상태](docs/features.ko.md)에서 구현 상태가 `partial`인 기능 행과 [실행 체크리스트](docs/plans/execution-checklist.ko.md)에서 상태가 `[~]`인 작업입니다. guard는 판단을 이유와 함께 출력하고, 그런 행이 있으면 각 ID를 기능이나 작업과 함께 나열하며 거부하고, `make hooks-check`가 보고하듯 pre-push hook이 설치되지 않았으면 거부하고, 추적 파일의 변경이 커밋되지 않았거나 `.gitignore`가 무시하지 않는 파일이 추적되지 않으면 각각을 밝히며 거부합니다. 전체 실행은 커밋된 tree를 검증하고, build는 추적되지 않은 파일도 읽기 때문입니다. `var/full-run.json`이 현재 tree(`git rev-parse HEAD^{tree}`)의 전체 실행을 기록하고 있으면 그 실행을 commit, 시작 시각, 결과와 함께 밝히며 거부하고, `incomplete` record의 process가 아직 실행 중이면 거부합니다. guard는 첫 검사부터 끝까지 `var/full-run.lock`을 배타적으로 잡고, 다른 guard가 이를 잡고 있으면 그 holder를 밝히며 거부하므로, 동시에 시작한 두 guard가 모두 실행하지 않습니다. 검증 명령을 시간 제한 없이 끝까지 실행하고 그 앞뒤에 record를 쓰므로, 멈춘 실행은 `incomplete`로 기록되어 남습니다. `make rerun-failed`는 현재 tree의 전체 실행이 실패했거나 끝나지 않았을 때만 검증을 다시 실행하고, 그 밖에는 거부됩니다. 검증은 target 하나이므로 전체가 다시 실행됩니다. `var/`는 Git이 무시하므로 checkout과 worktree마다 자기 record를 가집니다. hosted CI는 전체 suite를 실행합니다. `.github/workflows/ci.yml`은 `main`에 push된 모든 commit과 모든 pull request에서 모든 실패를 지나 `make pie-check`와 `make check`를 실행하고, 각 job의 보고서를 실행의 기록과 함께 upload합니다([hosted CI](docs/operations/validation.ko.md#ci)). commit의 근거는 그 실행입니다. workflow의 step은 script나 도구를 직접 실행하지 않고 make target을 실행합니다. 새 checkout에는 record가 없으므로, 그곳에서 `make check`는 `partial` 기능이 없고 tree가 깨끗하면 실행됩니다.
+`make check`는 검증보다 먼저 guard `scripts/full_run.py`를 시작합니다. 이 저장소의 활성 작업은 [기능 상태](docs/features.ko.md)에서 구현 상태가 `partial`인 기능 행과 [실행 체크리스트](docs/plans/execution-checklist.ko.md)에서 상태가 `[~]`인 작업입니다. guard는 판단을 이유와 함께 출력하고, 그런 행이 있으면 각 ID를 기능이나 작업과 함께 나열하며 거부하고, `make hooks-check`가 보고하듯 pre-push hook이 설치되지 않았으면 거부하고, 추적 파일의 변경이 커밋되지 않았거나 `.gitignore`가 무시하지 않는 파일이 추적되지 않으면 각각을 밝히며 거부합니다. 전체 실행은 커밋된 tree를 검증하고, build는 추적되지 않은 파일도 읽기 때문입니다. `var/full-run.json`이 현재 tree(`git rev-parse HEAD^{tree}`)의 전체 실행을 기록하고 있으면 그 실행을 commit, 시작 시각, 결과와 함께 밝히며 거부하고, `incomplete` record의 process가 아직 실행 중이면 거부합니다. guard는 첫 검사부터 끝까지 `var/full-run.lock`을 배타적으로 잡고, 다른 guard가 이를 잡고 있으면 그 holder를 밝히며 거부하므로, 동시에 시작한 두 guard가 모두 실행하지 않습니다. 검증 명령을 시간 제한 없이 끝까지 실행하고 그 앞뒤에 record를 쓰므로, 멈춘 실행은 `incomplete`로 기록되어 남습니다. `make rerun-failed`는 현재 tree의 전체 실행이 실패했거나 끝나지 않았을 때만 검증을 다시 실행하고, 그 밖에는 거부됩니다. 검증은 target 하나이므로 전체가 다시 실행됩니다. `var/`는 Git이 무시하므로 checkout과 worktree마다 자기 record를 가집니다. hosted CI는 전체 suite를 실행합니다. `.github/workflows/ci.yml`은 모든 pull request와 merge queue의 모든 merge group에서 모든 실패를 지나 `make pie-check`와 `make check`를 실행하고, 각 job의 보고서를 실행의 기록과 함께 upload합니다([hosted CI](docs/operations/validation.ko.md#ci)). commit의 근거는 그 실행이며, merge group의 실행은 `main`이 받는 commit의 근거입니다. workflow의 step은 script나 도구를 직접 실행하지 않고 make target을 실행합니다. 새 checkout에는 record가 없으므로, 그곳에서 `make check`는 `partial` 기능이 없고 tree가 깨끗하면 실행됩니다.
 
 push는 `partial` 기능과 `[~]` 작업이 없을 때만 합니다. pre-push hook `.githooks/pre-push`는 `scripts/push_gate.py hook`을 실행합니다. 이 명령은 push되는 commit이나 working tree의 `docs/features.md`에 `partial` 행이 있거나 `docs/plans/execution-checklist.md`에 `[~]` 작업이 있으면 각 ref, commit, ID, 기능이나 작업을 밝히며 push를 거부하고, 두 file 중 하나를 읽을 수 없으면 거부합니다. Makefile을 읽는 것은 설정을 쓰지 않습니다. `make hooks`는 값이 다를 때만 `core.hooksPath`를 `.githooks`로 설정하고 hook을 검사하며, `make hooks-check`는 `core.hooksPath`가 `.githooks`가 아니거나 `.githooks/pre-push`나 `.githooks/pre-commit`이 실행 가능하지 않으면 실패합니다. hook이 없는 checkout에서 한 push는 hook을 실행하지 않으므로, `.github/workflows/push-gate.yml`의 job `push-gate`가 모든 branch에 push된 commit과 모든 pull request의 head commit에 `scripts/push_gate.py commit`을 실행하는 `make push-gate COMMIT=<commit>`을 실행합니다. 이 job은 기능이 `partial`이거나 작업이 `[~]`이면 실패하고, `.githooks/pre-push`나 `.githooks/pre-commit`이 mode 100755로 추적되지 않으면 실패합니다. 같은 job은 이어서 `make docs-check`를 실행하고, gate가 실패해도 실행합니다. 그래서 문서, 기능 tracker, 체크리스트가 자체 검사에 실패하는 commit은 `main`이 요구하는 check에 실패합니다. 이 job은 local checkout의 설정을 검사할 수 없습니다.
+
+모든 변경은 owner의 변경이든 agent의 변경이든 pull request와 merge queue를 거쳐 `main`에 들어갑니다. 이 저장소의 어떤 명령도 `main`을 push하지 않습니다. branch는 GitHub의 표준 명령이나 GitHub UI로 공개합니다.
+
+~~~sh
+git push origin HEAD:refs/heads/<branch>
+gh pr create --base main --head <branch> --fill
+gh pr merge <branch> --auto --rebase
+~~~
+
+`.github/ruleset.json`에 선언된 GitHub ruleset `main`은 pull request(승인 없음), merge method `REBASE`인 merge queue, linear history, GitHub Actions의 check `push-gate`, `suite`, `docs`를 요구하고, `main`의 force-push와 삭제를 거부하며, bypass actor가 없습니다. 그래서 GitHub는 관리자의 push도 포함해 `main`으로의 직접 push를 거부합니다. merge queue는 queue에 들어간 pull request를 `main` 위에 rebase해 merge group을 만들고, 그 commit에서 필수 check를 실행해 통과하면 `main`을 그 commit으로 옮깁니다. check가 실패하면 pull request를 queue에서 뺍니다. branch push에서 pre-push hook이 실행되고, job `push-gate`는 pull request와 merge group에서 `[~]` 작업을 거부합니다. rebase는 merge된 commit에 새 hash를 주므로, `git pull --rebase`가 queue가 merge한 local commit을 버립니다. `make github-ruleset`은 ruleset과 선언된 저장소 설정을 만들거나 갱신하고, `make github-ruleset-check`는 둘이 선언과 다르면 실패합니다([main 공개](docs/operations/validation.ko.md#publish)).
 
 문서만 검토할 때는 `make docs-check`를 실행합니다. 이 검사는 검증 기록을 소스와 비교하지 않습니다. commit의 근거는 커밋된 파일이 아니라 그것을 검증하는 실행입니다. `make pie-check`는 PIE 기록 `var/records/pie-verification.json`을, `make check`는 통합 기록 `var/records/verification.json`을 쓰며 Git은 이를 무시하고, `make check` 마지막의 문서 검사는 두 기록을 현재 소스와 대조합니다([기록](docs/operations/validation.ko.md#records)). 기록은 모든 추적 파일을 해시하므로 커밋된 기록은 commit마다 오래된 기록이 됩니다. 어떤 기록도 커밋하지 않으며, 어떤 guard도 기록이 없다는 이유로 거부하지 않습니다. 검사를 통과시키기 위해 검증 결과나 소스 해시를 직접 수정하지 않습니다.
 
@@ -64,7 +74,7 @@ push는 `partial` 기능과 `[~]` 작업이 없을 때만 합니다. pre-push ho
 
 모든 언어 어댑터는 [official.json](examples/official.json)과 [scripts/verify.py](scripts/verify.py)를 사용합니다. 공통 사례는 해당 파일이나 `fixtures/`에 추가합니다. 언어별로 다른 예제나 기대 결과를 만들지 않습니다.
 
-Rust 코드는 `rust/`에서 `cargo clippy --all-targets -- -D warnings`를, Go 코드는 `go/`에서 `go vet ./...`을 통과합니다. `make check`는 검증 뒤에 둘을 각각의 target으로 실행하므로(`scripts/lint.py`, `make clippy`와 `make go-vet`으로도 실행) hosted CI가 push된 모든 commit에서 이를 실행합니다. 네이티브 코드를 변경하면 PHP 확장을 다시 빌드합니다. 이전 바이너리나 이전 결과를 변경된 코드의 검증 근거로 사용하지 않습니다.
+Rust 코드는 `rust/`에서 `cargo clippy --all-targets -- -D warnings`를, Go 코드는 `go/`에서 `go vet ./...`을 통과합니다. `make check`는 검증 뒤에 둘을 각각의 target으로 실행하므로(`scripts/lint.py`, `make clippy`와 `make go-vet`으로도 실행) hosted CI가 모든 pull request와 모든 merge group에서 이를 실행합니다. 네이티브 코드를 변경하면 PHP 확장을 다시 빌드합니다. 이전 바이너리나 이전 결과를 변경된 코드의 검증 근거로 사용하지 않습니다.
 
 <a id="idempotency"></a>
 ## 멱등성

@@ -4,8 +4,8 @@
     python3 scripts/lint.py clippy   cargo clippy --locked --all-targets -- -D warnings in rust/
     python3 scripts/lint.py go-vet   go vet ./... in go/
 
-make check runs each lint as a target of its own after the verification, so hosted CI runs them on every pushed
-commit, and make clippy and make go-vet run one. The tools are the pinned ones (scripts/toolchains.py) and run
+make check runs each lint as a target of its own after the verification, so hosted CI runs them on every pull
+request and merge group, and make clippy and make go-vet run one. The tools are the pinned ones (scripts/toolchains.py) and run
 offline. cargo builds into a target directory of this run, which is removed when the run ends, so no target
 directory of another checkout or run decides the result. A lint prints its output as it arrives and fails with
 its command, its directory and its exit status; it has no time limit.

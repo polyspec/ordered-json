@@ -6,6 +6,10 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Every change reaches `main` through a pull request and the merge queue (T1.17). The ruleset `main` requires a pull
+  request that allows every merge method, the merge queue with the method `REBASE`, a linear history and the checks `push-gate`, `suite` and `docs`,
+  without a bypass actor. `ci.yml` and `push-gate.yml` run on `merge_group`, and `ci.yml` not on a push to
+  `main`.
 - The job `push-gate`, which the ruleset `main` requires, runs `make docs-check` after the gate (T1.16), so a commit
   whose documents, feature tracker or checklist fail their own checks cannot reach `main`.
 - A new push cancels the previous CI run of the same ref (T1.15). `ci.yml` declares `concurrency` with group
