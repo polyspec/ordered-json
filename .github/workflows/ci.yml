@@ -1,5 +1,6 @@
-# CI: the full suite of every pushed commit of main and of every pull request. The run of a commit is its
-# evidence (AGENTS): the suite job runs make pie-check and make check, which write the PIE record and the aggregate
+# CI: the full suite of every pull request and of every merge group of the merge queue. The ruleset of main requires the
+# jobs suite and docs, and the merge queue moves main to the merge group commit only after they passed on it, so the run
+# of the merge group is the evidence of the commit that main receives (AGENTS): the suite job runs make pie-check and make check, which write the PIE record and the aggregate
 # record into var/records and check both with the documentation check of make check, and uploads both in its
 # report. A failure never stops the run: every setup step and the step make ci run whatever the earlier steps did
 # (if: !cancelled()), make ci runs every target of the job to its end (scripts/ci_run.py), and the summary and the
@@ -17,15 +18,15 @@
 name: ci
 
 on:
-  push:
-    branches: [main]
   pull_request:
+  merge_group:
 
-# Runners are few: a new push of the same ref cancels the run of the previous one. push-gate.yml has no such group,
-# so the gate of every pushed commit runs to its end.
+# Runners are few: a new push to a pull request cancels the run of its previous push. Each merge group has a ref of its
+# own (gh-readonly-queue/main/pr-<number>-<sha>), and its run is never cancelled. push-gate.yml has no such group, so the
+# gate of every commit runs to its end.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read

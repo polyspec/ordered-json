@@ -269,7 +269,8 @@ class PushGateChecks(unittest.TestCase):
 
     def test_the_workflow_runs_the_gate_on_every_push_and_pull_request(self):
         text = WORKFLOW.read_text()
-        self.assertIn('on:\n  push:\n  pull_request:\n', text, 'every branch: no branch filter')
+        # Every branch but those of the merge queue, every pull request and every merge group of the merge queue.
+        self.assertIn("on:\n  push:\n    branches-ignore: ['gh-readonly-queue/**']\n  pull_request:\n  merge_group:\n", text)
         self.assertIn('\n  push-gate:\n', text)
         # A step runs its make target, never a script directly, so the environment and the prechecks of the
         # Makefile apply.

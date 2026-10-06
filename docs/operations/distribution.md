@@ -15,15 +15,15 @@ Source version strings do not establish a released artifact. Registry publishing
 <a id="source-publication"></a>
 ## Source publication
 
-Run each changed package's required checks and commit the package with the common contract. For an authorized source push:
+Run each changed package's required checks and commit the package with the common contract. Every change reaches `main` through a pull request and the merge queue ([publishing main](validation.md#publish)):
 
 ~~~sh
-git push origin main
-git rev-parse HEAD
-git ls-remote origin refs/heads/main
+git push origin HEAD:refs/heads/<branch>
+gh pr create --base main --head <branch> --fill
+gh pr merge <branch> --auto --rebase
 ~~~
 
-Confirm that the full local and remote repository commit IDs match. Run the aggregate and applicable PIE checks from the same checkout before publishing. Verify a clean clone can build every package from the published revision. A shared contract change is published only with its verifier, fixtures, and affected packages in that same revision.
+Hosted CI runs the aggregate and PIE checks on the pull request and on the merge group, and the merge queue moves `main` to the commit whose required checks passed. Verify a clean clone can build every package from the published revision. A shared contract change is published only with its verifier, fixtures, and affected packages in that same revision.
 
 Keep authentication information in the system credential store. Keep publication observations separate from test results.
 

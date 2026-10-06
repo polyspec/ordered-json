@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 657831e02dc84e302b7e69536be4b641933f98c155e491340c7cfdca7a243e75 -->
+<!-- source-sha256: 4923fc35f70c4902ef4ae2ee19911871b2e94f3b8cfb8f8d86a8a5f42f991b86 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,9 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 모든 변경은 pull request와 merge queue를 거쳐 `main`에 들어갑니다(T1.17). ruleset `main`은 모든 merge method를 허용하는 pull request, method
+  `REBASE`인 merge queue, linear history, check `push-gate`, `suite`, `docs`를 bypass actor 없이 요구합니다.
+  `ci.yml`과 `push-gate.yml`은 `merge_group`에서 실행되고, `ci.yml`은 `main` push에서 실행되지 않습니다.
 - ruleset `main`이 요구하는 job `push-gate`는 gate 뒤에 `make docs-check`를 실행합니다(T1.16). 문서, 기능 tracker,
   체크리스트가 자체 검사에 실패하는 commit은 `main`에 갈 수 없습니다.
 - 새 push는 같은 ref의 이전 CI run을 취소합니다(T1.15). runner가 적으므로 `ci.yml`은 group

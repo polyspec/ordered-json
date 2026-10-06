@@ -22,7 +22,7 @@ ONLINE := env -u CARGO_NET_OFFLINE -u GOPROXY -u npm_config_offline -u COMPOSER_
 export PATH := $(NPM_DIRECTORY)/bin:$(PATH)
 
 .PHONY: check rerun-failed test docs-check pie-check benchmark hooks hooks-check push-gate tools toolchains-check owner-check \
-	owner-validate ci ci-summary clippy go-vet
+	owner-validate ci ci-summary clippy go-vet github-ruleset github-ruleset-check
 
 # scripts/full_run.py runs the full verification once per committed tree, when no feature of
 # docs/features.md is partial, and records its result in var/full-run.json.
@@ -104,3 +104,13 @@ tools:
 
 toolchains-check:
 	$(PYTHON) scripts/toolchains.py
+
+# The GitHub ruleset of main and the merge settings, declared in .github/ruleset.json (scripts/github_ruleset.py,
+# docs/operations/validation.md#publish): every change reaches main through a pull request and the merge queue, which
+# requires the checks push-gate, suite and docs. github-ruleset creates or updates the ruleset of the declared name and the
+# settings; github-ruleset-check fails when the live ruleset or a setting differs from the declaration.
+github-ruleset:
+	$(PYTHON) scripts/github_ruleset.py apply
+
+github-ruleset-check:
+	$(PYTHON) scripts/github_ruleset.py check

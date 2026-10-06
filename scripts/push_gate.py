@@ -11,7 +11,7 @@ A push happens only when no feature is partial and no task is in progress (AGENT
 and refuses the push when the docs/features.md of a pushed commit or of the working tree has a
 partial feature or its docs/plans/execution-checklist.md has a task in state [~], naming each one. `make hooks` runs `hooks-install`, which sets core.hooksPath to
 .githooks when it differs, and `hooks-check` fails when it is not set or the hook is not executable. The workflow .github/workflows/push-gate.yml
-runs the `commit` mode on every pushed commit and pull request, because a push from a checkout
+runs the `commit` mode on every pushed commit, pull request and merge group, because a push from a checkout
 without the hook does not run it. The partial features and the tasks in progress are those of the guard scripts/full_run.py.
 Every mode refuses when it cannot read what it checks.
 """
@@ -29,8 +29,8 @@ HOOK = '.githooks/pre-push'
 HOOKS = (HOOK, '.githooks/pre-commit')
 SHORT = 12
 RULE = ('A push happens only when no feature is partial and no task is in progress (AGENTS.md): work in progress '
-        'does not reach the remote, where hosted CI runs the full suite on every pushed commit of main and every pull '
-        'request.')
+        'does not reach the remote, where hosted CI runs the full suite on every pull request and every merge group '
+        'of the merge queue.')
 FIX = ('Complete each feature and set its implementation to implemented, and complete each task and set it to [o], '
        'in a commit with its documentation, tests and changelog entry; then push again.')
 

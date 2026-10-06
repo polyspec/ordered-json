@@ -98,7 +98,7 @@ class FailureMessages(unittest.TestCase):
 
     def test_the_push_rule_states_that_ci_runs_the_full_suite(self):
         self.assertNotIn('CI does not run the verification', push_gate.RULE)
-        self.assertIn('hosted CI runs the full suite on every pushed commit of main and every pull request', push_gate.RULE)
+        self.assertIn('hosted CI runs the full suite on every pull request and every merge group of the merge queue', push_gate.RULE)
 
     def test_each_package_script_runs_a_file_that_exists(self):
         for manifest in ('package.json', 'js/package.json', 'php/composer.json'):
