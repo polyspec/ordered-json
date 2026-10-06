@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 3f097d42068c84f19650329e7f4caa13e1e673c9c972e3bfa81f5eb362efe44d -->
+<!-- source-sha256: badd5f8149e88821abea8fb5b0359e491716e9b991a2c4f225ba33f922bde44b -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,8 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 각 패키지의 개발 절차는 저장소 루트의 필수 검사를 가리킵니다(T1.19). 개발 중에는 unit test만 실행하고, 패키지의
+  `make check`는 그 패키지만 공통 검증기로 검사하며, hosted CI가 push 뒤에 전체 suite를 실행합니다.
 - 패키지는 polyspec 이름 관례를 따릅니다(T1.18): Composer `polyspec/ordered-json`과
   `polyspec/ordered-json-extension`, 확장 클래스 `Polyspec\OrderedJson\NativeParseError`를 포함한 PHP 네임스페이스
   `Polyspec\OrderedJson`, npm `@polyspec/ordered-json`, 라이브러리 `polyspec_ordered_json`을 가진 Cargo 패키지
