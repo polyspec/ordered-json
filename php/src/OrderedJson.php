@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace OrderedJson;
+namespace Polyspec\OrderedJson;
 
 const MAX_DEPTH = 256;
 
@@ -251,7 +251,7 @@ final class Value implements \JsonSerializable, \Stringable
             throw new \InvalidArgumentException('maxDepth must be between 0 and 256');
         if (self::$native ??= \extension_loaded('ordered_json')) {
             try { $tape = \ordered_json_scan($source, $maxDepth); }
-            catch (\OrderedJsonNativeParseError $e) {
+            catch (NativeParseError $e) {
                 throw new ParseError($e->getMessage(), $e->offset);
             }
         } else {
@@ -462,7 +462,7 @@ final class Value implements \JsonSerializable, \Stringable
     public function __toString(): string { return $this->compact(); }
     public function jsonSerialize(): never
     {
-        throw new \LogicException('Use OrderedJson\\stringify($value)');
+        throw new \LogicException('Use Polyspec\\OrderedJson\\stringify($value)');
     }
 }
 

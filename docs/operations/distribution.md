@@ -8,7 +8,7 @@
 
 [distribution.json](../distribution.json) records source and publication observations. The repository holds the five [implementation packages](../spec/repositories.md#ownership) in one revision. No GitHub releases or version tags were found in the recorded observations.
 
-Registry publication for npm, crates.io, Packagist, Go, and the PHP extension is not verified. Source checkout is the confirmed local distribution. PIE metadata and a passing PIE build establish local build compatibility, not Packagist publication. The extension package is `ordered-json/ordered-json-extension`; the PHP library is `ordered-json/ordered-json`.
+Registry publication for npm, crates.io, Packagist, Go, and the PHP extension is not verified. Source checkout is the confirmed local distribution. PIE metadata and a passing PIE build establish local build compatibility, not Packagist publication. The extension package is `polyspec/ordered-json-extension`; the PHP library is `polyspec/ordered-json`.
 
 Source version strings do not establish a released artifact. Registry publishing workflows are not configured; hosted CI runs the full suite and the push gate ([hosted CI](validation.md#ci)). LICENSE files are not present.
 

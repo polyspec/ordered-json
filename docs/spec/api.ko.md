@@ -1,12 +1,12 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 850a861ea57ff5e2071d595d03daa535cc0c25137ec74685fa483fc60bdc3d39 -->
+<!-- source-sha256: c9b6047cadc1c5f3ea0c5f65388a5cab4ef8a2bcae33ebf98ef79fbba37f4636 -->
 # API 계약
 
 [English](api.md)
 
 [JSON 계약](json-contract.ko.md)은 모든 구현의 공통 동작을 정의합니다. 이 문서는 현재 언어별 API를 정의합니다. 현재 식별자는 [설치 문서](../operations/installation.ko.md)에 작성합니다.
 
-프로젝트와 패키지 이름은 `ordered-json`입니다. Rust 가져오기는 `ordered_json`을 사용합니다. Go는 `github.com/polyspec/ordered-json/go` 모듈과 `orderedjson` 패키지를 사용합니다. PHP는 `ordered-json/ordered-json` Composer 패키지, `OrderedJson` 네임스페이스, `ordered_json` 확장을 사용합니다. 네이티브 함수와 상수 접두사는 `ordered_json_`과 `ORDERED_JSON_`입니다.
+프로젝트는 `ordered-json`이고 모든 패키지 이름은 polyspec 관례를 따릅니다. JavaScript는 npm 패키지 `@polyspec/ordered-json`을 사용합니다. Rust는 Cargo 패키지 `polyspec-ordered-json`을 사용하며 `polyspec_ordered_json`으로 가져옵니다. Go는 `github.com/polyspec/ordered-json/go` 모듈과 `orderedjson` 패키지를 사용합니다. PHP는 `polyspec/ordered-json` Composer 패키지, `Polyspec\OrderedJson` 네임스페이스, PIE 패키지 `polyspec/ordered-json-extension`의 `ordered_json` 확장을 사용하며, 확장은 `Polyspec\OrderedJson\NativeParseError`를 발생시킵니다. 네이티브 함수와 상수 접두사는 `ordered_json_`과 `ORDERED_JSON_`입니다.
 
 <a id="values"></a>
 ## 값과 파싱
@@ -34,7 +34,7 @@ Rust 바인딩은 `parse_bytes_reject_duplicates(source)`를 제공합니다. �
 
 JavaScript 바인딩은 `parse(source, options)`와 `parseBytes(bytes, options)`의 options에서 `rejectDuplicates: true`를 받습니다. 이 옵션이 있으면 이스케이프 표기가 같은 UTF-16 키를 만드는 경우를 포함하여 어느 깊이든 해석된 객체 키가 반복될 때 `Duplicate object key at UTF-16 offset N` 메시지와 `duplicate_object_key` `kind`의 `ParseError`로 거부하며, `N`은 두 번째 키 토큰의 UTF-16 위치입니다. `rejectDuplicates`는 boolean이어야 하며 기본값 `false`는 공통 중복 키 동작을 유지합니다. 이 옵션은 `maxDepth`와 함께 쓸 수 있습니다. 그 밖의 유효한 값과 오류 및 위치는 바뀌지 않습니다.
 
-PHP 바인딩은 `Value::parseRejectDuplicates(source)`를 제공합니다. 일반 문법과 기본 깊이 한도로 UTF-8 텍스트를 파싱하지만 어느 깊이든 해석된 객체 키가 반복되면 거부합니다. 이스케이프 표기가 같은 UTF-16 키를 만드는 경우를 포함하여 `Duplicate object key at byte N` 메시지와 `duplicate_object_key` 종류의 `OrderedJson\ParseError`를 발생시키며, `N`은 두 번째 키 토큰의 첫 바이트 위치입니다. 네이티브 scanner는 공통 중복 키 동작을 유지하므로 `ordered_json` 확장이 로드되어 있어도 순수 PHP parser로 파싱합니다. 반환한 값은 조회와 직렬화에 로드된 backend를 사용합니다. `Value::parse`는 공통 중복 키 동작을 유지합니다. 그 밖의 유효한 값과 오류 및 위치는 바뀌지 않습니다.
+PHP 바인딩은 `Value::parseRejectDuplicates(source)`를 제공합니다. 일반 문법과 기본 깊이 한도로 UTF-8 텍스트를 파싱하지만 어느 깊이든 해석된 객체 키가 반복되면 거부합니다. 이스케이프 표기가 같은 UTF-16 키를 만드는 경우를 포함하여 `Duplicate object key at byte N` 메시지와 `duplicate_object_key` 종류의 `Polyspec\OrderedJson\ParseError`를 발생시키며, `N`은 두 번째 키 토큰의 첫 바이트 위치입니다. 네이티브 scanner는 공통 중복 키 동작을 유지하므로 `ordered_json` 확장이 로드되어 있어도 순수 PHP parser로 파싱합니다. 반환한 값은 조회와 직렬화에 로드된 backend를 사용합니다. `Value::parse`는 공통 중복 키 동작을 유지합니다. 그 밖의 유효한 값과 오류 및 위치는 바뀌지 않습니다.
 
 Rust `serde` 모듈은 Serde `Serialize`와 소유한 `Deserialize` 타입에 `to_string(&value)`, `from_str(text)`, `from_slice(bytes)`를 제공합니다. 인코딩은 구조체 필드를 선언 순서로 기록하고 Serde 필드 이름과 생략 속성을 적용하며 compact JSON을 기록합니다. `Value`는 두 Serde trait을 구현하여 포함된 JSON의 객체 순서와 숫자 토큰을 유지합니다. map 키는 문자열로 직렬화되어야 하며 반복 키, 유한하지 않은 숫자, 256개보다 깊은 컨테이너는 오류로 처리합니다. 디코딩은 라이브러리 파서로 UTF-8과 JSON을 검사하고 해석된 반복 키를 거부한 뒤 대상 Serde 타입을 적용합니다. 알 수 없는 필드와 뒤따르는 입력은 버리지 않고 오류로 처리합니다. 타입 오류도 오류로 유지합니다. wire와 manifest 패키지 fixture가 정확한 출력 바이트를 정합니다.
 
@@ -80,8 +80,8 @@ JavaScript는 기존 UTF-16 텍스트로 문자열을 생성할 수 있습니다
 <a id="php"></a>
 ## PHP 파서
 
-`OrderedJson\parse`는 `ordered_json` 확장이 로드돼 있으면 네이티브 파서와 직렬화를, 그렇지 않으면 순수 PHP 구현을 사용합니다. 공통 `Value` API는 루트 파서 디스크립터만 보유하고 트리 접근이 필요할 때 자식 값을 지연 생성합니다.
+`Polyspec\OrderedJson\parse`는 `ordered_json` 확장이 로드돼 있으면 네이티브 파서와 직렬화를, 그렇지 않으면 순수 PHP 구현을 사용합니다. 공통 `Value` API는 루트 파서 디스크립터만 보유하고 트리 접근이 필요할 때 자식 값을 지연 생성합니다.
 
-확장은 `ordered_json_scan(source, maxDepth)`, `ordered_json_hydrate(source, descriptor, index)`, `ordered_json_compact_node(source, descriptor, index)`를 제공합니다. 디스크립터는 문서 순서대로 값마다 `meta`, `start`, `end` 세 정수를 담은 목록입니다. `start`와 `end`는 값 토큰의 바이트 범위이며 첫 항목은 원문이 전체 소스인 루트 값입니다. `meta`는 0–2비트에 종류(1 object, 2 array, 3 string, 4 number, 5 boolean, 6 null), 3–5비트에 플래그, 8비트부터 연결 인덱스를 저장합니다. compact 플래그(8)는 무의미한 공백과 중복 키가 없는 값을 표시하며 이 값의 compact 출력은 토큰과 같습니다. escaped 플래그(16)는 escape 시퀀스가 있는 문자열 토큰을 표시하며 UTF-16 단위는 조회할 때 해석합니다. 컨테이너는 마지막 하위 값 다음 항목을 연결합니다. 객체 멤버는 키 항목 뒤에 값이 이어지며 키는 멤버가 유지하는 값을 연결합니다. 반복된 키에는 skip 플래그(32)가 있으며 같은 이름의 첫 키가 마지막 값을 연결합니다. 네이티브 파싱 실패는 `OrderedJsonNativeParseError`를 사용하며 공통 API가 이를 `OrderedJson\ParseError`로 변환합니다. `ordered_json_hydrate`는 `index`에 있는 컨테이너의 자식 `Value` 객체를 만듭니다. 배열이면 항목 목록을, 객체이면 해석한 멤버 이름을 키로 첫 삽입 순서를 따르는 멤버 배열을 반환합니다. 키 토큰은 직렬화할 때 디스크립터에서 읽으므로 멤버 하나에 값 하나만 만듭니다. `ordered_json_hydrate`와 `ordered_json_compact_node`는 소스와 맞지 않는 디스크립터를 `ValueError`로 거부합니다.
+확장은 `ordered_json_scan(source, maxDepth)`, `ordered_json_hydrate(source, descriptor, index)`, `ordered_json_compact_node(source, descriptor, index)`를 제공합니다. 디스크립터는 문서 순서대로 값마다 `meta`, `start`, `end` 세 정수를 담은 목록입니다. `start`와 `end`는 값 토큰의 바이트 범위이며 첫 항목은 원문이 전체 소스인 루트 값입니다. `meta`는 0–2비트에 종류(1 object, 2 array, 3 string, 4 number, 5 boolean, 6 null), 3–5비트에 플래그, 8비트부터 연결 인덱스를 저장합니다. compact 플래그(8)는 무의미한 공백과 중복 키가 없는 값을 표시하며 이 값의 compact 출력은 토큰과 같습니다. escaped 플래그(16)는 escape 시퀀스가 있는 문자열 토큰을 표시하며 UTF-16 단위는 조회할 때 해석합니다. 컨테이너는 마지막 하위 값 다음 항목을 연결합니다. 객체 멤버는 키 항목 뒤에 값이 이어지며 키는 멤버가 유지하는 값을 연결합니다. 반복된 키에는 skip 플래그(32)가 있으며 같은 이름의 첫 키가 마지막 값을 연결합니다. 네이티브 파싱 실패는 `Polyspec\OrderedJson\NativeParseError`를 사용하며 공통 API가 이를 `Polyspec\OrderedJson\ParseError`로 변환합니다. `ordered_json_hydrate`는 `index`에 있는 컨테이너의 자식 `Value` 객체를 만듭니다. 배열이면 항목 목록을, 객체이면 해석한 멤버 이름을 키로 첫 삽입 순서를 따르는 멤버 배열을 반환합니다. 키 토큰은 직렬화할 때 디스크립터에서 읽으므로 멤버 하나에 값 하나만 만듭니다. `ordered_json_hydrate`와 `ordered_json_compact_node`는 소스와 맞지 않는 디스크립터를 `ValueError`로 거부합니다.
 
 네이티브 빌드는 PHP 버전, 플랫폼, 스레드 안전 설정과 일치해야 합니다. [네이티브 설치](../operations/installation.ko.md#native-php)를 확인합니다.

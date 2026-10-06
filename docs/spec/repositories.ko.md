@@ -1,5 +1,5 @@
 <!-- doc-id: repositories -->
-<!-- source-sha256: 987ea965b725701b693c9c13a64b8baccde5ee4b9316b4206a4c05e8dbaaa96a -->
+<!-- source-sha256: 0e4f824911af44eafdd884685e187ec84f7f4c633afc06218f9d489412223b45 -->
 # 저장소 계약
 
 [English](repositories.md)
@@ -41,7 +41,7 @@
 <a id="php-extension"></a>
 ## PHP 확장 패키지
 
-PHP 라이브러리는 `ordered-json/ordered-json` Composer 패키지를 사용합니다. 확장은 별도 PIE 패키지 `ordered-json/ordered-json-extension`, `php-ext` 유형, `ordered_json` 확장 이름, `src` 빌드 경로를 사용합니다. 설정은 단독 확장 빌드를 기본으로 활성화합니다. PHP 라이브러리는 테스트 의존성이며 네이티브 빌드나 PIE 패키지 의존성이 아닙니다.
+PHP 라이브러리는 `polyspec/ordered-json` Composer 패키지를 사용합니다. 확장은 별도 PIE 패키지 `polyspec/ordered-json-extension`, `php-ext` 유형, `ordered_json` 확장 이름, `src` 빌드 경로를 사용합니다. 설정은 단독 확장 빌드를 기본으로 활성화합니다. PHP 라이브러리는 테스트 의존성이며 네이티브 빌드나 PIE 패키지 의존성이 아닙니다.
 
 macOS의 configure는 명시된 `MACOSX_DEPLOYMENT_TARGET`을 유지하며 값이 없으면 현재 C 컴파일러의 배포 대상에서 구합니다. 확장은 로드 가능한 번들이므로 Libtool의 `LT_MULTI_MODULE` 옵션으로 불필요한 동적 라이브러리 단일 모듈 플래그 검사를 제외합니다. 최신 macOS 대상에는 동적 심볼 조회를 사용합니다. 일반 빌드와 PIE 빌드는 오래된 `-single_module` 및 `-undefined suppress` 경고 없이 완료해야 합니다.
 

@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The npm package is `@polyspec/ordered-json`, the polyspec convention; it was `ordered-json`.
 - The package test runner writes each case id before the case runs and `ok` or `FAIL` with the elapsed milliseconds after it, with synchronous writes, so the verifier can name a case that does not end. Unreachable code after the run that listed the cases a second time is removed.
 - Add the `rejectDuplicates` parse option for callers that require every decoded object key to occur once. It reports `Duplicate object key` with kind `duplicate_object_key` at the second key's UTF-16 offset, requires a boolean, and keeps the default parse unchanged. `ParseOptions` lists each field on its own line so the package reports both fields for the coverage check.
 - `ParseError` carries a `kind` from the shared rejection list beside its own message.

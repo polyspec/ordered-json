@@ -1,5 +1,5 @@
 <!-- doc-id: installation -->
-<!-- source-sha256: c937ed9678cbc8277023e79bf7aa411c890cfe35ec1681d450582baa10643fcf -->
+<!-- source-sha256: 726ab9ba6164a271762da9443b95c396ade082d995a55e174ff9148ff77c10a0 -->
 # 설치와 실행
 
 [English](installation.md)
@@ -9,10 +9,10 @@
 
 | 구성 요소 | 선언된 요구사항 | 현재 식별자 | 메타데이터 |
 | --- | --- | --- | --- |
-| JavaScript | Node.js >= 20, ESM | `ordered-json`, 0.0.1 | [package.json](https://github.com/polyspec/ordered-json/blob/main/js/package.json) |
-| Rust | Rust >= 1.71, edition 2021 | `ordered-json`, 0.0.1 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/rust/Cargo.toml) |
+| JavaScript | Node.js >= 20, ESM | `@polyspec/ordered-json`, 0.0.1 | [package.json](https://github.com/polyspec/ordered-json/blob/main/js/package.json) |
+| Rust | Rust >= 1.71, edition 2021 | `polyspec-ordered-json`, 0.0.1 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/rust/Cargo.toml) |
 | Go | Go >= 1.22 | `github.com/polyspec/ordered-json/go` 모듈, `orderedjson` 패키지 | [go.mod](https://github.com/polyspec/ordered-json/blob/main/go/go.mod) |
-| PHP | PHP >= 8.2, JSON 및 PCRE 확장 | `ordered-json/ordered-json`, `OrderedJson` 네임스페이스 | [composer.json](https://github.com/polyspec/ordered-json/blob/main/php/composer.json) |
+| PHP | PHP >= 8.2, JSON 및 PCRE 확장 | `polyspec/ordered-json`, `Polyspec\OrderedJson` 네임스페이스 | [composer.json](https://github.com/polyspec/ordered-json/blob/main/php/composer.json) |
 | 네이티브 PHP | 일치하는 PHP 개발 헤더, C 컴파일러, phpize, make | `ordered_json` 확장, 0.0.1 | [확장 소스](https://github.com/polyspec/ordered-json/blob/main/php-extension/src/ordered_json.c) |
 | 저장소 검사 | 고정된 Python, Node.js, Rust, Go, npm release, Git, make, 위 PHP | `make tools`, `make check` | [검증](validation.ko.md) |
 

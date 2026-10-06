@@ -1,4 +1,4 @@
-/* Child value hydration: creates OrderedJson\Value instances for the children of a container. */
+/* Child value hydration: creates Polyspec\OrderedJson\Value instances for the children of a container. */
 #include "ordered_json_internal.h"
 
 ZEND_DECLARE_MODULE_GLOBALS(ordered_json)
@@ -17,7 +17,7 @@ PHP_RSHUTDOWN_FUNCTION(ordered_json) {
 static const oj_value_class *oj_find_value_class(void) {
     oj_value_class *vc = &OJ_G(value_class);
     if (vc->ce) return vc;
-    zend_string *name = zend_string_init("OrderedJson\\Value", sizeof("OrderedJson\\Value") - 1, 0);
+    zend_string *name = zend_string_init("Polyspec\\OrderedJson\\Value", sizeof("Polyspec\\OrderedJson\\Value") - 1, 0);
     zend_class_entry *ce = zend_lookup_class_ex(name, NULL, ZEND_FETCH_CLASS_NO_AUTOLOAD);
     zend_string_release(name);
     if (!ce) return NULL;
@@ -74,7 +74,7 @@ PHP_FUNCTION(ordered_json_hydrate) {
     ZEND_PARSE_PARAMETERS_END();
     const oj_value_class *vc = oj_find_value_class();
     if (!vc) {
-        zend_throw_error(NULL, "Class OrderedJson\\Value with source, tape and index properties is not loaded");
+        zend_throw_error(NULL, "Class Polyspec\\OrderedJson\\Value with source, tape and index properties is not loaded");
         RETURN_THROWS();
     }
     zval source_value, item, members;

@@ -34,6 +34,37 @@ class RepositoryChecks(unittest.TestCase):
             owners.setdefault(package, []).append(name)
         self.assertEqual({package: names for package, names in owners.items() if len(names) > 1}, {})
 
+    def test_package_names_follow_the_polyspec_convention(self):
+        # Every polyspec repository names its packages after the organization: Composer polyspec/<name>, npm
+        # @polyspec/<name>, the Rust package polyspec-<name> with the library polyspec_<name>, the Go module under
+        # github.com/polyspec/<repository>, and the PHP classes and functions in the namespace Polyspec\<Name>.
+        root = Path(__file__).resolve().parents[2]
+        composer = {name: json.loads((root / name).read_text())['name']
+                    for name in ('composer.json', 'php/composer.json', 'php-extension/composer.json')}
+        self.assertEqual(composer, {'composer.json': 'polyspec/ordered-json', 'php/composer.json': 'polyspec/ordered-json',
+                                    'php-extension/composer.json': 'polyspec/ordered-json-extension'})
+        for name in ('composer.json', 'php/composer.json'):
+            self.assertIn('polyspec/ordered-json-extension', json.loads((root / name).read_text())['suggest']['ext-ordered_json'])
+        npm = {name: json.loads((root / name).read_text())['name'] for name in ('package.json', 'js/package.json')}
+        self.assertEqual(npm, {'package.json': '@polyspec/ordered-json', 'js/package.json': '@polyspec/ordered-json'})
+        cargo = (root / 'rust/Cargo.toml').read_text()
+        self.assertIn('[package]\nname = "polyspec-ordered-json"\n', cargo)
+        self.assertIn('[lib]\nname = "polyspec_ordered_json"\n', cargo)
+        self.assertIn('name = "polyspec-ordered-json"\n', (root / 'rust/Cargo.lock').read_text())
+        self.assertEqual((root / 'go/go.mod').read_text().splitlines()[0], 'module github.com/polyspec/ordered-json/go')
+        php = (root / 'php/src/OrderedJson.php').read_text()
+        self.assertIn('\nnamespace Polyspec\\OrderedJson;\n', php)
+        native = (root / 'php-extension/src/ordered_json.c').read_text() + (root / 'php-extension/src/hydrate.c').read_text()
+        self.assertIn('"Polyspec\\\\OrderedJson\\\\NativeParseError"', native)
+        self.assertIn('"Polyspec\\\\OrderedJson\\\\Value"', native)
+        # No tracked file keeps an old name: the Composer vendor ordered-json/, the namespace OrderedJson\, the global
+        # class OrderedJsonNativeParseError or the crate path ordered_json::.
+        old = subprocess.run(['git', 'grep', '-n', '-I', '-E', '-e', 'ordered-json/ordered-json', '-e', 'OrderedJsonNativeParseError',
+                              '-e', '(^|[^_])ordered_json::', '-e', '(^|[^\\\\])OrderedJson\\\\', '--', '.', ':!CHANGELOG*',
+                              ':!*/CHANGELOG*', ':!docs/plans/*', ':!scripts/tests/test_repositories.py'],
+                             cwd=root, capture_output=True, text=True).stdout
+        self.assertEqual(old, '')
+
     def test_override_replaces_package_directory(self):
         with tempfile.TemporaryDirectory() as folder:
             candidate = Path(folder) / 'override with spaces'

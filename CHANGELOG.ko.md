@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 4923fc35f70c4902ef4ae2ee19911871b2e94f3b8cfb8f8d86a8a5f42f991b86 -->
+<!-- source-sha256: 3f097d42068c84f19650329e7f4caa13e1e673c9c972e3bfa81f5eb362efe44d -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,10 @@
 <a id="unreleased"></a>
 ## 미릴리스 — 2026-09-07
 
+- 패키지는 polyspec 이름 관례를 따릅니다(T1.18): Composer `polyspec/ordered-json`과
+  `polyspec/ordered-json-extension`, 확장 클래스 `Polyspec\OrderedJson\NativeParseError`를 포함한 PHP 네임스페이스
+  `Polyspec\OrderedJson`, npm `@polyspec/ordered-json`, 라이브러리 `polyspec_ordered_json`을 가진 Cargo 패키지
+  `polyspec-ordered-json`입니다. Go 모듈 `github.com/polyspec/ordered-json/go`는 이미 관례를 따랐습니다.
 - 모든 변경은 pull request와 merge queue를 거쳐 `main`에 들어갑니다(T1.17). ruleset `main`은 모든 merge method를 허용하는 pull request, method
   `REBASE`인 merge queue, linear history, check `push-gate`, `suite`, `docs`를 bypass actor 없이 요구합니다.
   `ci.yml`과 `push-gate.yml`은 `merge_group`에서 실행되고, `ci.yml`은 `main` push에서 실행되지 않습니다.

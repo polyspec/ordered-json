@@ -78,11 +78,11 @@ function descriptorCases(): array
         'scan_reports_the_parse_error_offset' => static function () {
             try {
                 ordered_json_scan('[1,]');
-            } catch (OrderedJsonNativeParseError $error) {
+            } catch (Polyspec\OrderedJson\NativeParseError $error) {
                 expectSame(3, $error->offset);
                 return;
             }
-            throw new RuntimeException('expected OrderedJsonNativeParseError');
+            throw new RuntimeException('expected Polyspec\\OrderedJson\\NativeParseError');
         },
     ];
 }

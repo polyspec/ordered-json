@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 4ae4b900bcd2f9645f6c294f03c3fe7ad3e65ababb8f1cc63c9ab69af7b0235d -->
+<!-- source-sha256: 7cf2f54e1c3325f1474cd9932a9d4ef5b3f88779e815298ddddcf28e2a029dee -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- Composer 패키지는 `polyspec/ordered-json`, 네임스페이스는 `Polyspec\OrderedJson`으로 polyspec 관례를 따릅니다. 이전에는 `ordered-json/ordered-json`과 `OrderedJson`이었습니다. 제안하는 확장은 PIE 패키지 `polyspec/ordered-json-extension`입니다.
 - 패키지 테스트 실행기는 케이스를 실행하기 전에 케이스 id를, 실행한 뒤 `ok` 또는 `FAIL`과 경과 밀리초를 출력하므로, 검증기가 끝나지 않는 케이스의 이름을 보고할 수 있습니다. `--cases` 목록은 그 줄 없이 검사를 실행하고 케이스 id만 출력합니다.
 - 해석된 객체 키가 한 번씩만 나와야 하는 호출자를 위해 `Value::parseRejectDuplicates`를 추가합니다. 두 번째 키의 바이트 위치에 `duplicate_object_key` 종류의 `Duplicate object key` 오류를 보고하고, 두 backend 모두에서 PHP parser로 파싱하며, `Value::parse`는 바뀌지 않습니다.
 - `ParseError`가 자체 메시지와 함께 공통 거부 목록의 `kind`를 전합니다.

@@ -8,7 +8,7 @@ Strict JSON with associative objects that preserve document key order recursivel
 <a id="usage"></a>
 ## Usage
 
-PHP >= 8.2 and matching development headers; PIE package `ordered-json/ordered-json-extension`, extension `ordered_json`.
+PHP >= 8.2 and matching development headers; PIE package `polyspec/ordered-json-extension`, extension `ordered_json`.
 
 The source build produces `src/modules/ordered_json.so`. Load it with PHP using `-d extension=/absolute/path/to/ordered_json.so`. The [PHP library](https://github.com/polyspec/ordered-json/tree/main/php) provides the common Value API.
 
@@ -26,7 +26,7 @@ PIE metadata declares type `php-ext`, extension name `ordered_json`, and build p
 
 ~~~sh
 pie repository:add path .
-pie build 'ordered-json/ordered-json-extension:*@dev'
+pie build 'polyspec/ordered-json-extension:*@dev'
 ~~~
 
 PIE configuration can be isolated with its `PIE_WORKING_DIRECTORY` environment variable. A build does not install or enable the extension. Windows binaries and ZTS builds have not been verified. PHP and extension versions are recorded separately by the shared check. The PHP library is the sibling `php/` package in this monorepo; it remains separate from the native build and PIE package.

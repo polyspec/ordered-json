@@ -1,5 +1,5 @@
-use ordered_json::serde::{from_slice, from_str, to_string};
-use ordered_json::{parse, Value};
+use polyspec_ordered_json::serde::{from_slice, from_str, to_string};
+use polyspec_ordered_json::{parse, Value};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 

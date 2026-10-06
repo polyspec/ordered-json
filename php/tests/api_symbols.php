@@ -21,13 +21,14 @@ $symbols = [];
 if ($native) {
     foreach (get_extension_funcs('ordered_json') as $name) $symbols[] = $name;
     $symbols[] = 'ORDERED_JSON_VERSION';
-    $symbols[] = 'OrderedJsonNativeParseError';
-    foreach ((new ReflectionClass('OrderedJsonNativeParseError'))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-        if ($property->getDeclaringClass()->getName() !== 'OrderedJsonNativeParseError') continue;
-        $symbols[] = 'OrderedJsonNativeParseError.' . $property->getName();
+    $error = new ReflectionClass('Polyspec\\OrderedJson\\NativeParseError');
+    $symbols[] = $error->getShortName();
+    foreach ($error->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+        if ($property->getDeclaringClass()->getName() !== $error->getName()) continue;
+        $symbols[] = $error->getShortName() . '.' . $property->getName();
     }
 } else {
-    foreach (['OrderedJson\\Value', 'OrderedJson\\ParseError'] as $class) {
+    foreach (['Polyspec\\OrderedJson\\Value', 'Polyspec\\OrderedJson\\ParseError'] as $class) {
         $reflection = new ReflectionClass($class);
         $symbols[] = $reflection->getShortName();
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
@@ -41,9 +42,9 @@ if ($native) {
         }
     }
     foreach (get_defined_functions()['user'] as $name) {
-        if (!str_starts_with($name, 'orderedjson\\')) continue;
+        if (!str_starts_with($name, 'polyspec\\orderedjson\\')) continue;
         if (internal((new ReflectionFunction($name))->getDocComment())) continue;
-        $symbols[] = substr($name, strlen('orderedjson\\'));
+        $symbols[] = substr($name, strlen('polyspec\\orderedjson\\'));
     }
     $symbols[] = 'MAX_DEPTH';
 }

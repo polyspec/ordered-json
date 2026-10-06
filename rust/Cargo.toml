@@ -1,5 +1,5 @@
 [package]
-name = "ordered-json"
+name = "polyspec-ordered-json"
 version = "0.0.1"
 edition = "2021"
 rust-version = "1.71"
@@ -14,6 +14,7 @@ serde_ignored = "=0.1.14"
 serde_json = { version = "=1.0.151", features = ["raw_value", "unbounded_depth"] }
 
 [lib]
+name = "polyspec_ordered_json"
 path = "src/lib.rs"
 
 [dev-dependencies]

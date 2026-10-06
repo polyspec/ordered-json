@@ -361,7 +361,7 @@ class DocumentationChecks(unittest.TestCase):
                'checked_at': aggregate['checked_at'], 'platform': aggregate['platform'],
                'sources': aggregate['sources'], 'packages': aggregate['packages'],
                'pie': {'version': 'synthetic fixture', 'phar_sha256': sha256(b'pie tool')},
-               'package': 'ordered-json/ordered-json-extension:*@dev',
+               'package': 'polyspec/ordered-json-extension:*@dev',
                'commands': [{'arguments': ['build'], 'exit_code': 0}], 'build_warnings': [],
                'artifact': {'path': 'php-extension/src/modules/ordered_json.so'},
                'cases': aggregate['cases'],

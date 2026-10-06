@@ -6,6 +6,10 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The packages follow the polyspec naming convention (T1.18): Composer `polyspec/ordered-json` and
+  `polyspec/ordered-json-extension`, the PHP namespace `Polyspec\OrderedJson` with the extension class
+  `Polyspec\OrderedJson\NativeParseError`, npm `@polyspec/ordered-json`, and the Cargo package `polyspec-ordered-json`
+  with the library `polyspec_ordered_json`. The Go module `github.com/polyspec/ordered-json/go` already followed it.
 - Every change reaches `main` through a pull request and the merge queue (T1.17). The ruleset `main` requires a pull
   request that allows every merge method, the merge queue with the method `REBASE`, a linear history and the checks `push-gate`, `suite` and `docs`,
   without a bypass actor. `ci.yml` and `push-gate.yml` run on `merge_group`, and `ci.yml` not on a push to

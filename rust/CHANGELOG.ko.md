@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: a859b44bcf4bf240c674c37ead604a4d2f91350d3f4c7712faa5f798c96928f4 -->
+<!-- source-sha256: bc061f1182f613f70472a0561428ec2045c6177691e7c5f9128b3a5b68c6bab6 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,8 @@
 <a id="unreleased"></a>
 ## 미릴리스
 
+- Cargo 패키지는 `polyspec-ordered-json`, 라이브러리는 `polyspec_ordered_json`으로 polyspec 관례를 따릅니다.
+  이전에는 `ordered-json`과 `ordered_json`이었습니다.
 - JSON 원문 값이 Serde JSON 토큰 프로토콜을 사용하므로 Serde 바인딩 의존성을 검증한 버전으로
   고정합니다.
 - 현재 JSON 테스트 의존성에 맞춰 Rust 최소 버전을 1.71로 설정합니다.

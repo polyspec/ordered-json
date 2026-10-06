@@ -40,7 +40,7 @@ For a shared contract change, update the verifier, affected implementations, and
 <a id="php-extension"></a>
 ## PHP extension package
 
-The PHP library uses Composer package `ordered-json/ordered-json`. The extension uses the distinct PIE package `ordered-json/ordered-json-extension`, type `php-ext`, extension name `ordered_json`, and build path `src`. Its configuration enables a standalone extension build by default. The PHP library is a test dependency, not a native build or PIE package dependency.
+The PHP library uses Composer package `polyspec/ordered-json`. The extension uses the distinct PIE package `polyspec/ordered-json-extension`, type `php-ext`, extension name `ordered_json`, and build path `src`. Its configuration enables a standalone extension build by default. The PHP library is a test dependency, not a native build or PIE package dependency.
 
 On macOS, configure preserves an explicit `MACOSX_DEPLOYMENT_TARGET` or obtains the missing value from the active C compiler's deployment target. The extension is a loadable bundle; configure uses Libtool's `LT_MULTI_MODULE` option to omit the unnecessary dynamic-library single-module flag check. Modern macOS targets use dynamic symbol lookup. Ordinary and PIE builds must complete without the obsolete `-single_module` and `-undefined suppress` warnings.
 

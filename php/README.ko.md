@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: fc576659a5527c8988bfad344f574140337f4c6818c13c796c81f47fc86acaf9 -->
+<!-- source-sha256: cfa47887ed98be26f8121361b36795cf7ad0bb3a887005fc9e4ea58073bef569 -->
 # ordered-json for PHP
 
 [English](README.md)
@@ -9,20 +9,20 @@
 <a id="usage"></a>
 ## 사용
 
-JSON 및 PCRE를 제공하는 PHP >= 8.2를 요구하며 Composer 패키지는 `ordered-json/ordered-json`입니다.
+JSON 및 PCRE를 제공하는 PHP >= 8.2를 요구하며 Composer 패키지는 `polyspec/ordered-json`입니다.
 
 사용 코드의 `source` 또는 `$source`는 [공통 공식 예제](https://github.com/polyspec/ordered-json/blob/main/examples/official.json)의 객체 사례에서 가져옵니다.
 
 ~~~php
 require 'src/OrderedJson.php';
-$value = OrderedJson\parse($source);
-$output = OrderedJson\stringify($value);
+$value = Polyspec\OrderedJson\parse($source);
+$output = Polyspec\OrderedJson\stringify($value);
 ~~~
 
 
 [네이티브 확장](https://github.com/polyspec/ordered-json/tree/main/php-extension)은 별도의 선택적 패키지입니다. 순수 PHP에는 확장 체크아웃이 필요하지 않습니다. `parse()`는 확장이 로드되어 있으면 확장을, 그렇지 않으면 순수 PHP 구현을 사용합니다. 순수 구현 테스트는 `php -n`을 사용합니다.
 
-`OrderedJson\Value::parseRejectDuplicates($source)`는 마지막 값을 유지하지 않고 어느 깊이든 해석된 객체 키가 반복되면 `duplicate_object_key` 종류의 `OrderedJson\ParseError`로 거부합니다. 확장이 로드되어 있어도 순수 PHP parser로 파싱합니다.
+`Polyspec\OrderedJson\Value::parseRejectDuplicates($source)`는 마지막 값을 유지하지 않고 어느 깊이든 해석된 객체 키가 반복되면 `duplicate_object_key` 종류의 `Polyspec\OrderedJson\ParseError`로 거부합니다. 확장이 로드되어 있어도 순수 PHP parser로 파싱합니다.
 
 동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
 
