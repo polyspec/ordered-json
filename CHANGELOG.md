@@ -6,6 +6,9 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- The development procedure of each package names the required checks of the repository root (T1.19): development
+  runs unit tests only, `make check` of a package runs the shared verifier for that package alone, and hosted CI runs
+  the full suite after the push.
 - The packages follow the polyspec naming convention (T1.18): Composer `polyspec/ordered-json` and
   `polyspec/ordered-json-extension`, the PHP namespace `Polyspec\OrderedJson` with the extension class
   `Polyspec\OrderedJson\NativeParseError`, npm `@polyspec/ordered-json`, and the Cargo package `polyspec-ordered-json`
