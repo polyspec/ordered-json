@@ -1,11 +1,16 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: ee3965ae8f5f17e42718200f48d62db062d7da6fa02f15051679382285c0e9bf -->
+<!-- source-sha256: 919cb93997cc227b5c19777d606f7d0092222942ac4959ddc21932a1336d281f -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+<a id="0-0-2"></a>
+## 0.0.2
+
+- 저장소의 0.0.2 릴리스입니다. 패키지는 0.0.1 이후 변경이 없습니다.
 
 <a id="0-0-1"></a>
 ## 0.0.1

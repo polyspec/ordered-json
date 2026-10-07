@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: b1764094269deec7a7f53527a0528418bb872064aea1dd8c149cdaacdd3e6152 -->
+<!-- source-sha256: bbd57c3ead5f8d99b372882180125ca72abdabde807e666ea76c77741e13a90f -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,12 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+<a id="0-0-2"></a>
+## 0.0.2
+
+- 0.0.2 릴리스(T1.22): `package.json`, `js/package.json`, `rust/Cargo.toml`과 `rust/Cargo.lock`의 패키지 항목이
+  0.0.2를 선언하고, changelog는 빈 `## Unreleased` 아래에 section `## 0.0.2`를 가지며, 설치 표는 0.0.2를 적고,
+  `make release-versions`는 `test_release`가 요구하는 대로 tag `v0.0.2`와 `go/v0.0.2`에서 통과합니다.
 - tag의 릴리스는 어느 깊이의 Go 모듈 tag든 포함하고, 그 asset은 npm tarball과 Composer zip뿐입니다(T1.21-4).
   `.github/workflows/release.yml`의 trigger는 `tags: ['v*', '**/v*']`입니다. tag filter에서 `*`는 `/`와 맞지
   않으므로 `**/v*`가 `go/vX.Y.Z`와 어느 깊이의 Go 모듈 tag든 포함합니다. `rust/`의 Cargo 패키지는 archive로
