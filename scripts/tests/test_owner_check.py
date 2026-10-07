@@ -50,7 +50,7 @@ class OwnerMap(unittest.TestCase):
         self.assertEqual(selection['unowned'], [])
         self.assertEqual(selection['languages'], ['js'])
         self.assertEqual(selection['checks'], ['docs'])
-        self.assertEqual(selection['tests'], ['test_benchmark', 'test_full_run', 'test_push_gate'])
+        self.assertEqual(selection['tests'], ['test_benchmark', 'test_full_run', 'test_push_gate', 'test_release'])
         every = owner_check.select(self.declaration(), ['implementations.json'], exists)
         self.assertEqual(every['languages'], ['js', 'rust', 'go', 'php', 'php-extension'])
         unowned = owner_check.select(self.declaration(), ['scratch.txt'], lambda path: True)

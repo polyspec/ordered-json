@@ -19,7 +19,8 @@ every manifest of MANIFESTS (a composer.json declares `version`, because a Compo
 version of the manifest) and requires the section `## X.Y.Z` in CHANGELOG.md; for a Go tag it requires the module path of the go.mod of
 the directory. `assets` builds one archive per package, named `<package name>-<version>.<ext>` with `@scope/` written
 as `scope-` and `vendor/` as `vendor-`: `npm pack` (.tgz) and a zip of the directory of a Composer package from `git
-archive` of the tagged commit (.zip). Before it packs, the published manifests of the tagged commit must be in the
+archive` of the tagged commit (.zip), with stored entries, the time ARCHIVE_MTIME and TZ=UTC, so the zip of a tree has
+the same bytes on every machine and at every time. Before it packs, the published manifests of the tagged commit must be in the
 standard form of `manifest_issues`; after it packs, the manifest of each archive must equal the manifest of the tagged
 commit byte for byte, because no step rewrites a manifest. The Cargo package is not released as an archive; it is consumed by git tag,
 because `cargo package` rewrites git dependencies into crates.io requirements that do not resolve. A Go tag builds and
@@ -72,6 +73,10 @@ MANIFESTS = {
     'php-extension/composer.json': ARCHIVE,
     'rust/Cargo.toml': GIT_TAG,
 }
+# The time of every entry of a Composer zip, the time that npm pack gives every entry of a tarball. With it, stored
+# entries (-0) and TZ=UTC, the zip of a tree has the same bytes on every machine and at every time, so a consumer lock
+# pins it by its shasum.
+ARCHIVE_MTIME = '1985-10-26T08:15:00Z'
 # A dependency on a polyspec package of a published manifest is one exact version.
 EXACT = re.compile(r'(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)')
 NPM_DEPENDENCIES = ('dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies')
@@ -312,7 +317,8 @@ def build_assets(root, commit, version, target):
         if kind == 'npm':
             run(['npm', 'pack', '--pack-destination', str(target)], root / path, env)
         else:
-            run(['git', 'archive', '--format=zip', f'--output={target / expected}', f'{commit}:{path}'], root)
+            run(['git', 'archive', '--format=zip', '-0', f'--mtime={ARCHIVE_MTIME}', f'--output={target / expected}',
+                 f'{commit}:{path}'], root, {**os.environ, 'TZ': 'UTC'})
     present = sorted(item.name for item in target.iterdir())
     if present != sorted(asset_names(tag)):
         raise Stop(f'{target} holds {present}, not the archives {sorted(asset_names(tag))}')

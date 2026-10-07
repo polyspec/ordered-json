@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 33fe62557c00f7bf910777e41759f40f014485b8357eb1e643904d0031e16919 -->
+<!-- source-sha256: 0b74980b024ded86e9126d0558b7793dd2bfb7b760cd8e4cae6d81fd4b19b41f -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -10,6 +10,12 @@
 <a id="0-0-3"></a>
 ## 0.0.3
 
+- 릴리스 asset 설치 테스트는 consumer처럼 설치합니다(T1.26). `scripts/tests/install`에는 archive를 hash로 고정하는
+  `package.json`과 `package-lock.json`, `composer.json`과 `composer.lock`이 있고, `test_release`는 offline 설정 없이
+  빈 cache와 도달할 수 없는 registry를 가리키는 scope `@polyspec`로 `npm ci`를, 빈 `COMPOSER_HOME`과
+  `COMPOSER_CACHE_DIR`로 `composer install`을 실행합니다. `make install-fixtures`가 fixture와 lock을 씁니다.
+  Composer zip은 압축하지 않은 entry, 고정된 entry 시각, `TZ=UTC`로 만들어 어느 기계에서나 byte와 shasum이 같습니다.
+  AGENTS는 검사가 결과가 시간에 따라 달라지는 registry 질의를 하지 않으며 lock이 고정한 내려받기는 설치라고 적습니다.
 - 0.0.3 릴리스(T1.25): `package.json`, `js/package.json`, `composer.json`, `php/composer.json`,
   `php-extension/composer.json`, `rust/Cargo.toml`과 `rust/Cargo.lock`의 패키지 항목이 0.0.3을 선언하고, changelog는
   빈 `## Unreleased` 아래에 section `## 0.0.3`을 가지며, 설치 표는 0.0.3을 적고, `make release-versions`는

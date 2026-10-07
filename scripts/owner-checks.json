@@ -12,7 +12,7 @@
     {"paths": ["scripts/docs_check.py"], "tests": ["test_docs_check", "test_tracked_inputs", "test_failure_messages", "test_full_run", "test_push_gate"], "checks": ["docs"]},
     {"paths": ["scripts/full_run.py"], "tests": ["test_full_run", "test_push_gate"]},
     {"paths": ["scripts/ci_run.py"], "tests": ["test_ci_run"]},
-    {"paths": ["scripts/release.py"], "tests": ["test_release"]},
+    {"paths": ["scripts/release.py", "scripts/install_fixtures.py", "scripts/tests/install/**"], "tests": ["test_release"]},
     {"paths": ["scripts/lint.py"], "tests": ["test_lint"], "languages": ["rust", "go"]},
     {"paths": ["scripts/push_gate.py", ".githooks/pre-push"], "tests": ["test_push_gate", "test_full_run", "test_failure_messages"]},
     {"paths": ["scripts/owner_check.py", "scripts/owner-checks.json", ".githooks/pre-commit"], "tests": ["test_owner_check", "test_push_gate"]},
@@ -30,12 +30,12 @@
     {"paths": ["external-inputs.json"], "tests": ["test_external_pins", "test_docs_check"], "checks": ["docs"]},
     {"paths": ["package.json", "composer.json"], "tests": ["test_toolchains", "test_failure_messages", "test_release"]},
     {"paths": ["examples/official.json", "fixtures/**"], "tests": ["test_verify_runs", "test_docs_check"], "languages": ["*"]},
-    {"paths": ["js/**"], "languages": ["js"]},
+    {"paths": ["js/**"], "tests": ["test_release"], "languages": ["js"]},
     {"paths": ["js/package.json", "php/composer.json"], "tests": ["test_failure_messages", "test_release"]},
     {"paths": ["CHANGELOG.md", "php-extension/composer.json", "rust/Cargo.toml", "go/go.mod"], "tests": ["test_release"]},
     {"paths": ["rust/**"], "languages": ["rust"]},
     {"paths": ["go/**"], "languages": ["go"]},
-    {"paths": ["php/**"], "languages": ["php", "php-extension"]},
+    {"paths": ["php/**"], "tests": ["test_release"], "languages": ["php", "php-extension"]},
     {"paths": ["php-extension/**"], "languages": ["php-extension"]}
   ]
 }

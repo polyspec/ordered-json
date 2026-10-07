@@ -1,0 +1,16 @@
+{
+  "name": "polyspec/ordered-json-install-check",
+  "type": "project",
+  "repositories": [
+    {
+      "type": "artifact",
+      "url": "assets"
+    },
+    {
+      "packagist.org": false
+    }
+  ],
+  "require": {
+    "polyspec/ordered-json": "0.0.3"
+  }
+}
