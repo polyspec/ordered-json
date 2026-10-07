@@ -6,6 +6,9 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+<a id="0-0-3"></a>
+## 0.0.3
+
 - `composer.json` declares `version`, so a Composer artifact repository of the release zips reads the package
   (T1.24).
 

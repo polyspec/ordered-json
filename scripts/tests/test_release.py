@@ -470,8 +470,8 @@ class Repository(unittest.TestCase):
         self.assertEqual(release.manifest_issues(release.published_manifests(ROOT)), [])
 
     def test_the_released_versions_pass_the_version_check(self):
-        self.assertEqual(release.versions(ROOT, 'v0.0.2'), '0.0.2')
-        self.assertEqual(release.versions(ROOT, 'go/v0.0.2'), '0.0.2')
+        self.assertEqual(release.versions(ROOT, 'v0.0.3'), '0.0.3')
+        self.assertEqual(release.versions(ROOT, 'go/v0.0.3'), '0.0.3')
 
     def test_make_runs_each_step_with_the_tag_of_the_environment(self):
         environment = {name: value for name, value in os.environ.items()

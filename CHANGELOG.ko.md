@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 4c58c70a11e88a46cc3dc2fcfe85339d7cd028f874ceb71f33e35fd1aaef8ebd -->
+<!-- source-sha256: 33fe62557c00f7bf910777e41759f40f014485b8357eb1e643904d0031e16919 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,13 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+<a id="0-0-3"></a>
+## 0.0.3
+
+- 0.0.3 릴리스(T1.25): `package.json`, `js/package.json`, `composer.json`, `php/composer.json`,
+  `php-extension/composer.json`, `rust/Cargo.toml`과 `rust/Cargo.lock`의 패키지 항목이 0.0.3을 선언하고, changelog는
+  빈 `## Unreleased` 아래에 section `## 0.0.3`을 가지며, 설치 표는 0.0.3을 적고, `make release-versions`는
+  `test_release`가 요구하는 대로 tag `v0.0.3`과 `go/v0.0.3`에서 통과합니다.
 - Composer artifact repository는 manifest의 버전을 읽으므로 공개되는 모든 `composer.json`은 `version`을 선언합니다
   (T1.24). `make release-versions`는 `composer.json`, `php/composer.json`, `php-extension/composer.json`에 X.Y.Z를
   요구합니다. `make release-assets`는 표준 형식이 아닌 공개 manifest(`composer.json`의 `version` 없음, `repositories`,

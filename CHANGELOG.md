@@ -6,6 +6,13 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+<a id="0-0-3"></a>
+## 0.0.3
+
+- Release 0.0.3 (T1.25): `package.json`, `js/package.json`, `composer.json`, `php/composer.json`,
+  `php-extension/composer.json`, `rust/Cargo.toml` and the package entry of `rust/Cargo.lock` declare 0.0.3, the
+  changelogs hold the section `## 0.0.3` under an empty `## Unreleased`, the installation table names 0.0.3, and
+  `make release-versions` passes for the tags `v0.0.3` and `go/v0.0.3`, as `test_release` requires.
 - Every published `composer.json` declares `version`, because a Composer artifact repository reads the version of the
   manifest (T1.24). `make release-versions` requires X.Y.Z in `composer.json`, `php/composer.json` and
   `php-extension/composer.json`; `make release-assets` fails on a published manifest outside the standard form (no
