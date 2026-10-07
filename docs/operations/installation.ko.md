@@ -1,5 +1,5 @@
 <!-- doc-id: installation -->
-<!-- source-sha256: 4da44ffa72c3056ff21ed202085e9c67f1414826cd7e5e8df33b8cc3bf9d4c5b -->
+<!-- source-sha256: 272827b6b9a3c0b9281d56c3e20535dd2394dd816bfcaa12486676c4f2e6956e -->
 # 설치와 실행
 
 [English](installation.md)
@@ -66,7 +66,7 @@ composer install
 
 Composer는 두 zip을 모두 읽습니다. type이 `php-ext`인 package `polyspec/ordered-json-extension`은 설치하지 않으며, PIE가 빌드하고 설치합니다([네이티브 PHP](#native-php)).
 
-이 저장소의 package는 다른 package에 의존하지 않으므로 저장소에는 npm workspaces와 비공개 개발 manifest가 없습니다. 루트의 `package.json`과 `composer.json`은 checkout에서 설치하도록 `js/`, `php/`와 같은 package를 같은 `version`으로 선언하며 `repositories`가 없습니다. `scripts/tests/test_release.py`는 archive를 빌드하고, 저장소 밖의 임시 디렉터리에서 `scripts/tests/install`의 커밋된 consumer fixture로 consumer처럼 설치합니다. fixture는 tarball에 릴리스 이름으로 의존하는 `package.json`과 그 `package-lock.json`, zip의 artifact repository에서 library를 요구하는 `composer.json`과 그 `composer.lock`입니다. 각 lock은 archive를 hash로 고정합니다. `npm ci`는 빈 cache와 도달할 수 없는 registry를 가리키는 scope `@polyspec`로, `composer install`은 빈 `COMPOSER_HOME`과 `COMPOSER_CACHE_DIR`로 실행합니다. `make install-fixtures`는 작업 tree의 archive로 fixture와 lock을 쓰며, package나 버전이 바뀌면 실행합니다.
+이 저장소의 package는 다른 package에 의존하지 않으므로 저장소에는 npm workspaces와 비공개 개발 manifest가 없습니다. 루트의 `package.json`과 `composer.json`은 checkout에서 설치하도록 `js/`, `php/`와 같은 package를 같은 `version`으로 선언하며 `repositories`가 없습니다. `scripts/tests/test_release.py`는 archive를 빌드하고, 저장소 밖의 임시 디렉터리에서 `scripts/tests/install`의 커밋된 consumer fixture로 consumer처럼 설치합니다. fixture는 tarball에 릴리스 이름으로 의존하는 `package.json`과 그 `package-lock.json`, zip의 artifact repository에서 library를 요구하는 `composer.json`과 그 `composer.lock`입니다. 테스트가 archive를 빌드하므로 각 lock은 `integrity` 없이 빈 `shasum`으로 이름과 버전만 기록하며, 제3자 package는 버전과 hash로 기록합니다. `npm ci`는 빈 cache와 도달할 수 없는 registry를 가리키는 scope `@polyspec`로, `composer install`은 빈 `COMPOSER_HOME`과 `COMPOSER_CACHE_DIR`로 실행합니다. `make install-fixtures`는 작업 tree의 archive로 fixture와 lock을 쓰며, 릴리스 버전이나 의존성이 바뀌면 실행합니다.
 
 <a id="native-php"></a>
 ## 네이티브 PHP

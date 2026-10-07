@@ -74,8 +74,7 @@ MANIFESTS = {
     'rust/Cargo.toml': GIT_TAG,
 }
 # The time of every entry of a Composer zip, the time that npm pack gives every entry of a tarball. With it, stored
-# entries (-0) and TZ=UTC, the zip of a tree has the same bytes on every machine and at every time, so a consumer lock
-# pins it by its shasum.
+# entries (-0) and TZ=UTC, the zip of a tree has the same bytes on every machine and at every time.
 ARCHIVE_MTIME = '1985-10-26T08:15:00Z'
 # A dependency on a polyspec package of a published manifest is one exact version.
 EXACT = re.compile(r'(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)')

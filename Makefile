@@ -133,7 +133,7 @@ release-verify release-versions release-assets release-publish:
 
 # install-fixtures writes the consumer fixtures of the release asset install test of scripts/tests/test_release.py:
 # the manifests and the locks of scripts/tests/install for the version of js/package.json, from the archives of the
-# working tree (scripts/install_fixtures.py). A lock pins each archive by its hash, so a change of a package or of the
-# version runs this target; the release commit runs it. Writing a lock resolves dependencies, so it runs with $(ONLINE).
+# working tree (scripts/install_fixtures.py). A lock records each archive of this repository by name and version only,
+# without a hash, so a change of a release version or of a dependency runs this target; the release commit runs it. It runs offline, as every target other than make tools.
 install-fixtures:
-	$(ONLINE) $(PYTHON) scripts/install_fixtures.py
+	$(PYTHON) scripts/install_fixtures.py

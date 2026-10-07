@@ -12,7 +12,7 @@
             "dist": {
                 "type": "zip",
                 "url": "assets/polyspec-ordered-json-0.0.3.zip",
-                "shasum": "93e3a3f234a2dd21cff17f4b47390562656a6c68"
+                "shasum": ""
             },
             "require": {
                 "ext-json": "*",

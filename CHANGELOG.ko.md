@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 0b74980b024ded86e9126d0558b7793dd2bfb7b760cd8e4cae6d81fd4b19b41f -->
+<!-- source-sha256: a478d777a58b762cfe11759942d03c747a5a33c6b15c1a6e8ca7fcb0ce0c523f -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -10,7 +10,7 @@
 <a id="0-0-3"></a>
 ## 0.0.3
 
-- 릴리스 asset 설치 테스트는 consumer처럼 설치합니다(T1.26). `scripts/tests/install`에는 archive를 hash로 고정하는
+- 릴리스 asset 설치 테스트는 consumer처럼 설치합니다(T1.26). `scripts/tests/install`에는 테스트가 빌드하는 archive를 이름과 버전으로만(`integrity` 없음, 빈 `shasum`) 기록하는
   `package.json`과 `package-lock.json`, `composer.json`과 `composer.lock`이 있고, `test_release`는 offline 설정 없이
   빈 cache와 도달할 수 없는 registry를 가리키는 scope `@polyspec`로 `npm ci`를, 빈 `COMPOSER_HOME`과
   `COMPOSER_CACHE_DIR`로 `composer install`을 실행합니다. `make install-fixtures`가 fixture와 lock을 씁니다.

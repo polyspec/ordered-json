@@ -325,7 +325,7 @@ class InstallFromAssets(unittest.TestCase):
 
     The fixtures are a package.json with its package-lock.json, which depends on the tarball by its release name, and a
     composer.json with its composer.lock, which requires the library from an artifact repository of the zips with
-    Packagist disabled; each lock pins its archive by its hash. `npm ci` runs with an empty cache and the scope
+    Packagist disabled. The archives are built in this run, so the locks record them by name and version only. `npm ci` runs with an empty cache and the scope
     @polyspec pointed at an unreachable registry, so a polyspec package can come only from its tarball, and `composer
     install` with an empty COMPOSER_HOME and COMPOSER_CACHE_DIR. Neither runs offline: a third-party package of a lock
     is downloaded at its locked version and hash. Composer reads the extension zip but does not install a package of
@@ -352,6 +352,16 @@ class InstallFromAssets(unittest.TestCase):
                                                f'make install-fixtures writes the fixtures of the working tree')
         return result.stdout
 
+    def test_the_locks_record_the_archives_by_name_and_version_only(self):
+        npm = json.loads((install_fixtures.FIXTURES / 'npm/package-lock.json').read_text())
+        entry = npm['packages']['node_modules/@polyspec/ordered-json']
+        self.assertEqual((entry['version'], entry['resolved']),
+                         (self.version, 'file:' + release.asset_name('@polyspec/ordered-json', self.version, 'tgz')))
+        self.assertNotIn('integrity', entry)
+        composer = json.loads((install_fixtures.FIXTURES / 'composer/composer.lock').read_text())
+        self.assertEqual([(entry['name'], entry['version'], entry['dist']['shasum']) for entry in composer['packages']],
+                         [('polyspec/ordered-json', self.version, '')])
+
     def test_the_fixtures_are_those_of_the_version(self):
         for path, text in install_fixtures.manifests(self.version).items():
             with self.subTest(fixture=path):
@@ -361,7 +371,7 @@ class InstallFromAssets(unittest.TestCase):
     @timeout(120)
     def test_npm_ci_installs_the_tarball_of_the_lock(self):
         project = self.work / 'npm'
-        env = install_fixtures.npm_environment()
+        env = install_fixtures.npm_environment(True)
         self.run_in(['npm', 'ci', '--cache', str(self.folder / 'npm-cache'),
                      f'--@polyspec:registry={install_fixtures.UNREACHABLE}', '--no-audit', '--no-fund'], project, env)
         installed = json.loads((project / 'node_modules/@polyspec/ordered-json/package.json').read_text())
@@ -374,7 +384,7 @@ class InstallFromAssets(unittest.TestCase):
     @timeout(120)
     def test_composer_install_installs_the_zip_of_the_lock(self):
         project = self.work / 'composer'
-        env = install_fixtures.composer_environment(self.folder)
+        env = install_fixtures.composer_environment(self.folder, True)
         self.run_in(['composer', 'install', '--no-interaction', '--no-progress'], project, env)
         installed = json.loads((project / 'vendor/composer/installed.json').read_text())
         self.assertEqual([(entry['name'], entry['version']) for entry in installed['packages']],

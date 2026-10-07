@@ -10,8 +10,8 @@
 ## 0.0.3
 
 - The release asset install test installs as a consumer does (T1.26): `scripts/tests/install` holds a `package.json`
-  with its `package-lock.json` and a `composer.json` with its `composer.lock`, which pin the archives by their hashes,
-  and `test_release` runs `npm ci` with an empty cache and the scope `@polyspec` pointed at an unreachable registry and
+  with its `package-lock.json` and a `composer.json` with its `composer.lock`, which record the archives that
+  the test builds by name and version only (no `integrity`, an empty `shasum`), and `test_release` runs `npm ci` with an empty cache and the scope `@polyspec` pointed at an unreachable registry and
   `composer install` with an empty `COMPOSER_HOME` and `COMPOSER_CACHE_DIR`, without the offline settings.
   `make install-fixtures` writes the fixtures and their locks. A Composer zip has stored entries, a fixed entry time
   and `TZ=UTC`, so its bytes and its shasum are the same on every machine. AGENTS states that a check makes no
