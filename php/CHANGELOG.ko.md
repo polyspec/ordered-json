@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: e049911f10fe3cbf3d70c604efe7857ad3718f4a35f4942143fa64d053f3ab73 -->
+<!-- source-sha256: ea3082c9432a9124ad37580cfcbffba1972eace280bb922fca1ed96f634417d7 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- `composer.json`이 `version`을 선언하므로 릴리스 zip의 Composer artifact repository가 package를 읽습니다(T1.24).
 
 <a id="0-0-2"></a>
 ## 0.0.2

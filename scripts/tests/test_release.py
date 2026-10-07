@@ -2,21 +2,26 @@
 
 Each case builds a Git repository in a temporary directory with the manifests of the release, a changelog, a branch
 origin/main and the tag, and puts fakes of gh and npm first on PATH. The fake gh answers the check runs of the GitHub
-API from a JSON state file and records each call; the fake npm writes the archive that npm pack writes. No case reaches
-GitHub or a registry.
+API from a JSON state file and records each call; the fake npm writes a tarball that carries package.json as npm pack
+does. No case of a sandbox reaches GitHub or a registry. InstallFromAssets builds the archives of the repository with the
+real npm and git, and installs them in a temporary project outside the repository with npm and Composer.
 """
+import io
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
+import tarfile
 import unittest
 import unittest.mock
 import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import release
+from test import timeout
 
 ROOT = Path(__file__).resolve().parents[2]
 REPOSITORY = 'polyspec/ordered-json'
@@ -38,12 +43,14 @@ else:
 json.dump(state, open(state_path, 'w'))
 '''
 FAKE_NPM = r'''
-import json, os, sys
+import json, os, sys, tarfile
 args = sys.argv[1:]
 assert args[0] == 'pack', args
 manifest = json.load(open('package.json'))
 name = manifest['name'].lstrip('@').replace('/', '-')
-open(os.path.join(args[args.index('--pack-destination') + 1], f"{name}-{manifest['version']}.tgz"), 'w').write('npm')
+with tarfile.open(os.path.join(args[args.index('--pack-destination') + 1], f"{name}-{manifest['version']}.tgz"),
+                  'w:gz') as packed:
+    packed.add('package.json', 'package/package.json')
 '''
 CHANGELOG = '''# Changelog
 
@@ -87,7 +94,7 @@ class Sandbox:
             if path.name == 'package.json':
                 path.write_text(json.dumps({'name': package, 'version': version}))
             elif path.name == 'composer.json':
-                path.write_text(json.dumps({'name': package.lstrip('@')}))
+                path.write_text(json.dumps({'name': package.lstrip('@'), 'version': version}))
             else:
                 path.write_text(f'[package]\nname = "polyspec-ordered-json"\nversion = "{version}"\n\n[dependencies]\n')
         (self.root / 'php/src').mkdir()
@@ -149,11 +156,12 @@ class Versions(unittest.TestCase):
         self.assertEqual(str(stopped.exception), 'js/package.json: version 0.1.0, the tag v0.0.1 is 0.0.1; '
                                                  'rust/Cargo.toml: version 0.0.2, the tag v0.0.1 is 0.0.1')
 
-    def test_a_composer_manifest_without_a_version_takes_the_tag_and_one_with_a_version_is_compared(self):
+    def test_a_composer_manifest_without_a_version_fails_and_one_with_a_version_is_compared(self):
         sandbox = Sandbox(self)
         composer = sandbox.root / 'php/composer.json'
-        self.assertNotIn('version', json.loads(composer.read_text()))
-        self.assertEqual(release.versions(sandbox.root, 'v0.0.1'), '0.0.1')
+        composer.write_text(json.dumps({'name': 'polyspec/ordered-json'}))
+        with self.assertRaisesRegex(release.Stop, r'^php/composer.json: no version, the tag v0.0.1 is 0.0.1$'):
+            release.versions(sandbox.root, 'v0.0.1')
         composer.write_text(json.dumps({'name': 'polyspec/ordered-json', 'version': '0.0.2'}))
         with self.assertRaisesRegex(release.Stop, r'^php/composer.json: version 0.0.2, the tag v0.0.1 is 0.0.1$'):
             release.versions(sandbox.root, 'v0.0.1')
@@ -248,10 +256,131 @@ class Assets(unittest.TestCase):
         with zipfile.ZipFile(sandbox.root / release.ASSETS / 'polyspec-ordered-json-0.0.1.zip') as archive:
             self.assertEqual(sorted(archive.namelist()), ['composer.json', 'src/', 'src/OrderedJson.php'])
 
+    def test_each_archive_carries_the_manifest_of_its_package_unchanged(self):
+        sandbox = Sandbox(self)
+        release.assets(sandbox.root, sandbox.tag('v0.0.1'))
+        for kind, path, _ in release.PACKAGES:
+            manifest = f"{path}/{'package.json' if kind == 'npm' else 'composer.json'}"
+            archive = sandbox.root / release.ASSETS / release.asset_name(
+                dict((name, package) for _, name, package in release.PACKAGES)[path], '0.0.1',
+                'tgz' if kind == 'npm' else 'zip')
+            with self.subTest(manifest=manifest):
+                self.assertEqual(release.packed_manifest(archive), (sandbox.root / manifest).read_text())
+
+    def test_a_packed_manifest_that_differs_from_its_source_fails(self):
+        sandbox = Sandbox(self)
+        tag = sandbox.tag('v0.0.1')
+        package = sandbox.root / 'js/package.json'
+        package.write_text(json.dumps({'name': '@polyspec/ordered-json', 'version': '0.0.1', 'private': False}))
+        with self.assertRaisesRegex(release.Stop, r'^polyspec-ordered-json-0.0.1.tgz: its manifest differs from '
+                                                  r'js/package.json of the commit [0-9a-f]{40}; the archive carries '
+                                                  r'the manifest unchanged$'):
+            release.assets(sandbox.root, tag)
+
+    def test_a_manifest_outside_the_standard_form_fails_before_any_archive(self):
+        sandbox = Sandbox(self)
+        (sandbox.root / 'php/composer.json').write_text(json.dumps({
+            'name': 'polyspec/ordered-json', 'version': '0.0.1',
+            'repositories': [{'type': 'path', 'url': '../php-extension'}],
+            'require': {'polyspec/ordered-json-extension': '@dev'}}))
+        git(sandbox.root, 'commit', '--quiet', '-am', 'repositories')
+        sandbox.commit = git(sandbox.root, 'rev-parse', 'HEAD')
+        with self.assertRaises(release.Stop) as stopped:
+            release.assets(sandbox.root, sandbox.tag('v0.0.1'))
+        self.assertEqual(str(stopped.exception),
+                         "php/composer.json: declares repositories; a published composer.json resolves only by name "
+                         "and version; php/composer.json: require polyspec/ordered-json-extension is '@dev', a "
+                         "constraint with @dev")
+        self.assertEqual(list((sandbox.root / release.ASSETS).iterdir()), [])
+
+    def test_the_standard_form_names_every_departure(self):
+        texts = {
+            'php/composer.json': json.dumps({'name': 'polyspec/a', 'require': {
+                'polyspec/b': '^0.0.1', 'vendor/c': 'dev-main@dev', 'php': '>=8.2'}}),
+            'js/package.json': json.dumps({'name': '@polyspec/a', 'version': '0.0.1', 'overrides': {}, 'dependencies': {
+                '@polyspec/b': '~0.0.1', '@polyspec/c': 'file:../c', 'd': 'git+https://example.com/d.git',
+                '@polyspec/e': 'workspace:*', 'f': '^1.0.0'}, 'peerDependencies': {'@polyspec/g': '0.0.1'}}),
+        }
+        self.assertEqual(release.manifest_issues(texts), [
+            'php/composer.json: no version X.Y.Z; a Composer artifact repository reads the version of the manifest, so '
+            'a published composer.json declares it',
+            "php/composer.json: require polyspec/b is '^0.0.1', not one exact version X.Y.Z",
+            "php/composer.json: require vendor/c is 'dev-main@dev', a constraint with @dev",
+            'js/package.json: declares overrides; a published package.json resolves only by name and version',
+            "js/package.json: dependencies @polyspec/b is '~0.0.1', not one exact version X.Y.Z",
+            "js/package.json: dependencies @polyspec/c is 'file:../c', not a registry version",
+            "js/package.json: dependencies d is 'git+https://example.com/d.git', not a registry version",
+            "js/package.json: dependencies @polyspec/e is 'workspace:*', not a registry version",
+        ])
+
     def test_a_go_tag_builds_no_archive(self):
         sandbox = Sandbox(self)
         self.assertEqual(release.assets(sandbox.root, sandbox.tag('go/v0.0.1')), [])
         self.assertEqual(list((sandbox.root / release.ASSETS).iterdir()), [])
+
+
+class InstallFromAssets(unittest.TestCase):
+    """The archives of the repository install from the archives alone, in a temporary project outside the repository.
+
+    npm runs with an empty cache and the scope @polyspec pointed at an unreachable registry, so a polyspec package can
+    come only from its tarball. Composer runs with an empty COMPOSER_HOME and COMPOSER_CACHE_DIR, an artifact repository
+    of the zips and Packagist disabled. Composer reads the extension zip but does not install a package of the type
+    php-ext, which PIE installs, so the project installs the library and lists the extension of the artifact
+    repository."""
+
+    @classmethod
+    def setUpClass(cls):
+        folder = tempfile.TemporaryDirectory(prefix='ordered-json-install-')
+        cls.addClassCleanup(folder.cleanup)
+        cls.folder = Path(folder.name)
+        cls.version = json.loads((ROOT / 'js/package.json').read_text())['version']
+        # The working tree as a commit, without changing the checkout: git stash create prints nothing for a clean tree.
+        commit = git(ROOT, 'stash', 'create') or git(ROOT, 'rev-parse', 'HEAD')
+        cls.assets = cls.folder / 'assets'
+        cls.assets.mkdir()
+        release.build_assets(ROOT, commit, cls.version, cls.assets)
+
+    def run_in(self, command, cwd, env):
+        result = subprocess.run(command, cwd=cwd, env=env, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, f'{" ".join(command)}:\n{result.stdout}\n{result.stderr}')
+        return result.stdout
+
+    @timeout(120)
+    def test_npm_installs_the_tarball(self):
+        project = self.folder / 'npm'
+        project.mkdir()
+        (project / 'package.json').write_text(json.dumps({'name': 'install-check', 'private': True, 'type': 'module'}))
+        env = release.environment(ROOT)
+        env.pop('npm_config_offline', None)
+        tarball = self.assets / release.asset_name('@polyspec/ordered-json', self.version, 'tgz')
+        self.run_in(['npm', 'install', '--cache', str(self.folder / 'npm-cache'),
+                     '--@polyspec:registry=http://127.0.0.1:9/', '--no-audit', '--no-fund', f'file:{tarball}'],
+                    project, env)
+        installed = json.loads((project / 'node_modules/@polyspec/ordered-json/package.json').read_text())
+        self.assertEqual(installed['version'], self.version)
+        output = self.run_in(['node', '--input-type=module', '-e',
+                              "import {parse, stringify} from '@polyspec/ordered-json';"
+                              "console.log(stringify(parse('{\"b\":1,\"a\":2}')));"], project, env)
+        self.assertEqual(output.strip(), '{"b":1,"a":2}')
+
+    @timeout(120)
+    def test_composer_installs_from_an_artifact_repository_of_the_zips(self):
+        project = self.folder / 'composer'
+        project.mkdir()
+        (project / 'composer.json').write_text(json.dumps({
+            'repositories': [{'type': 'artifact', 'url': str(self.assets)}, {'packagist.org': False}],
+            'require': {'polyspec/ordered-json': self.version}}))
+        env = {**os.environ, 'COMPOSER_HOME': str(self.folder / 'composer-home'),
+               'COMPOSER_CACHE_DIR': str(self.folder / 'composer-cache')}
+        self.run_in(['composer', 'install', '--no-interaction', '--no-progress'], project, env)
+        listed = json.loads(self.run_in(['composer', 'show', '--available', '--format=json',
+                                         'polyspec/ordered-json-extension'], project, env))
+        self.assertEqual(listed['versions'], [self.version])
+        self.assertEqual(listed['type'], 'php-ext')
+        output = self.run_in(['php', '-r', "require 'vendor/autoload.php';"
+                              "echo Polyspec\\OrderedJson\\stringify(Polyspec\\OrderedJson\\Value::parse('{\"b\":1,\"a\":2}'));"],
+                             project, env)
+        self.assertEqual(output, '{"b":1,"a":2}')
 
 
 class Publish(unittest.TestCase):
@@ -336,6 +465,9 @@ class Repository(unittest.TestCase):
         source = (ROOT / 'scripts/release.py').read_text()
         self.assertNotIn("'cargo', 'package'", source)
         self.assertNotIn('.crate', source)
+
+    def test_every_published_manifest_is_in_the_standard_form(self):
+        self.assertEqual(release.manifest_issues(release.published_manifests(ROOT)), [])
 
     def test_the_released_versions_pass_the_version_check(self):
         self.assertEqual(release.versions(ROOT, 'v0.0.2'), '0.0.2')

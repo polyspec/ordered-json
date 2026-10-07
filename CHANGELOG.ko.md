@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 2dc8a5564464c47ac9e69a95ddc1d8995fd4cdb7bdbc99bf7d9aa3200a72769d -->
+<!-- source-sha256: 4c58c70a11e88a46cc3dc2fcfe85339d7cd028f874ceb71f33e35fd1aaef8ebd -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,13 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Composer artifact repository는 manifest의 버전을 읽으므로 공개되는 모든 `composer.json`은 `version`을 선언합니다
+  (T1.24). `make release-versions`는 `composer.json`, `php/composer.json`, `php-extension/composer.json`에 X.Y.Z를
+  요구합니다. `make release-assets`는 표준 형식이 아닌 공개 manifest(`composer.json`의 `version` 없음, `repositories`,
+  `@dev`, `overrides`, `file:`, `link:`, `workspace:`, URL, git 의존성, 정확한 버전 하나가 아닌 polyspec 의존성)와
+  manifest가 원본과 다른 archive에서 실패합니다. `make check`는 tree에 표준 형식을 요구하고, `test_release`는
+  archive를 임시 project에 npm과 zip의 Composer artifact repository로 설치합니다. 설치 안내는 릴리스 asset에서
+  설치하는 절차를 설명합니다.
 - 릴리스 본문은 GitHub의 한도인 125000자 이하입니다(T1.23). `make release-publish`는 `CHANGELOG.md`의 section
   `## X.Y.Z`가 125000자 이하이면 그 section을 notes로 쓰고, 그렇지 않으면 한 줄
   `The changes of X.Y.Z are listed in [CHANGELOG.md](<URL>).`을 씁니다. URL은 tag의 `CHANGELOG.md`와 그 section의

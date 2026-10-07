@@ -6,6 +6,14 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Every published `composer.json` declares `version`, because a Composer artifact repository reads the version of the
+  manifest (T1.24). `make release-versions` requires X.Y.Z in `composer.json`, `php/composer.json` and
+  `php-extension/composer.json`; `make release-assets` fails on a published manifest outside the standard form (no
+  `version` in a `composer.json`, `repositories`, `@dev`, `overrides`, a `file:`, `link:`, `workspace:`, URL or git
+  dependency, or a polyspec dependency other than one exact version) and on an archive whose manifest differs from its
+  source; `make check` requires the standard form of the tree; `test_release` installs the archives in a temporary
+  project with npm and with a Composer artifact repository of the zips. The installation guide describes the install
+  from the release assets.
 - A release body has at most 125000 characters, the limit of GitHub (T1.23). `make release-publish` uses the section
   `## X.Y.Z` of `CHANGELOG.md` as notes when it has at most 125000 characters, and otherwise the one line
   `The changes of X.Y.Z are listed in [CHANGELOG.md](<URL>).`, whose URL is `CHANGELOG.md` at the tag with the anchor

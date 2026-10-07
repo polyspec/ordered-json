@@ -1,5 +1,5 @@
 <!-- doc-id: installation -->
-<!-- source-sha256: 72a6e97c98b67a4bfb56eb8845a9572ec8e24ec6e8298ca645eeae951b602330 -->
+<!-- source-sha256: cdf0a16d0265ff3f3f4683e660519d789128a77ad5a393d2c3999e9f2941d503 -->
 # 설치와 실행
 
 [English](installation.md)
@@ -34,6 +34,39 @@ cd ordered-json
 - Rust: `path`가 `rust/`를 지정하는 로컬 Cargo 의존성을 설정합니다.
 - Go: `github.com/polyspec/ordered-json/go` 모듈의 로컬 `replace`가 `go/`를 지정하도록 설정합니다.
 - PHP: `php/src/OrderedJson.php`를 require하거나 `php/`를 Composer path 저장소로 사용합니다.
+
+<a id="release-assets"></a>
+## 릴리스 asset
+
+GitHub Release `vX.Y.Z`마다 `polyspec-ordered-json-X.Y.Z.tgz`, `polyspec-ordered-json-X.Y.Z.zip`, `polyspec-ordered-json-extension-X.Y.Z.zip`이 있습니다. 각 archive는 자기 package의 manifest를 바꾸지 않고 담습니다. `js/`의 `package.json`, `php/`와 `php-extension/`의 `composer.json`이며, 모두 `version` X.Y.Z를 선언하고 `repositories`와 `@dev`가 없습니다.
+
+npm은 tarball을 경로로 설치합니다.
+
+~~~sh
+mkdir app && cd app
+npm init -y
+npm install ./polyspec-ordered-json-X.Y.Z.tgz
+~~~
+
+Composer는 zip들을 담은 디렉터리인 artifact repository에서 zip을 설치합니다. `composer.json` 옆의 `assets/`에 zip이 있을 때:
+
+~~~json
+{
+  "repositories": [
+    {"type": "artifact", "url": "assets"},
+    {"packagist.org": false}
+  ],
+  "require": {"polyspec/ordered-json": "X.Y.Z"}
+}
+~~~
+
+~~~sh
+composer install
+~~~
+
+Composer는 두 zip을 모두 읽습니다. type이 `php-ext`인 package `polyspec/ordered-json-extension`은 설치하지 않으며, PIE가 빌드하고 설치합니다([네이티브 PHP](#native-php)).
+
+이 저장소의 package는 다른 package에 의존하지 않으므로 저장소에는 npm workspaces와 비공개 개발 manifest가 없습니다. 루트의 `package.json`과 `composer.json`은 checkout에서 설치하도록 `js/`, `php/`와 같은 package를 같은 `version`으로 선언하며 `repositories`가 없습니다. `scripts/tests/test_release.py`는 archive를 빌드하고 저장소 밖의 임시 project에 설치합니다. npm은 빈 cache와 도달할 수 없는 registry를 가리키는 scope `@polyspec`로, Composer는 빈 `COMPOSER_HOME`과 `COMPOSER_CACHE_DIR`, zip의 artifact repository로 설치합니다.
 
 <a id="native-php"></a>
 ## 네이티브 PHP
