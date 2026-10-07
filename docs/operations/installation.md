@@ -8,11 +8,11 @@
 
 | Component | Declared requirement | Current identifier | Metadata |
 | --- | --- | --- | --- |
-| JavaScript | Node.js >= 20, ESM | `@polyspec/ordered-json`, 0.0.2 | [package.json](https://github.com/polyspec/ordered-json/blob/main/js/package.json) |
-| Rust | Rust >= 1.71, edition 2021 | `polyspec-ordered-json`, 0.0.2 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/rust/Cargo.toml) |
+| JavaScript | Node.js >= 20, ESM | `@polyspec/ordered-json`, 0.0.3 | [package.json](https://github.com/polyspec/ordered-json/blob/main/js/package.json) |
+| Rust | Rust >= 1.71, edition 2021 | `polyspec-ordered-json`, 0.0.3 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/rust/Cargo.toml) |
 | Go | Go >= 1.22 | `github.com/polyspec/ordered-json/go` module, `orderedjson` package | [go.mod](https://github.com/polyspec/ordered-json/blob/main/go/go.mod) |
 | PHP | PHP >= 8.2, JSON and PCRE extensions | `polyspec/ordered-json`, `Polyspec\OrderedJson` namespace | [composer.json](https://github.com/polyspec/ordered-json/blob/main/php/composer.json) |
-| Native PHP | Matching PHP development headers, C compiler, phpize, make | `ordered_json` extension, 0.0.2 | [extension source](https://github.com/polyspec/ordered-json/blob/main/php-extension/src/ordered_json.c) |
+| Native PHP | Matching PHP development headers, C compiler, phpize, make | `ordered_json` extension, 0.0.3 | [extension source](https://github.com/polyspec/ordered-json/blob/main/php-extension/src/ordered_json.c) |
 | Repository checks | The pinned Python, Node.js, Rust, Go and npm releases, Git, make, PHP above | `make tools`, `make check` | [verification](validation.md) |
 
 The repository checks run with the exact releases that tracked files pin: Node.js in `.node-version`, Rust in `rust-toolchain.toml`, Go in the `toolchain` line of `go/go.mod`, Python by its minor release in `.python-version`, PHP by its minor release in `.php-version`, and npm with the SHA-512 of its registry tarball in the `packageManager` field of `package.json`. `make tools` installs that Rust toolchain with rustup and that npm into `.cache/tools/npm` of the checkout, which Git ignores; no npm of the machine is used or changed. `make toolchains-check` compares every tool with its pin, and each entry point of the checks does the same before its first step and fails with the expected and the actual version, or the error of the command, of each tool that differs. `GOTOOLCHAIN=local` and `RUSTUP_AUTO_INSTALL=0` keep go and rustup from downloading or installing another toolchain during a run, and every cargo command uses `--locked`.
