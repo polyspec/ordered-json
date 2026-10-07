@@ -3,6 +3,7 @@
 
     python3 scripts/ci_run.py run --job JOB -- TARGET...   make ci: run each target, past failures
     python3 scripts/ci_run.py summary --job JOB            make ci-summary: the summary of the job
+    python3 scripts/ci_run.py passed                       make ci-passed: every job of RESULTS passed
 
 Hosted CI runs the full suite after a push (.github/workflows/ci.yml). A failure never stops the run: every
 target of the job runs to its end, and every failure leaves a reason detailed enough to fix every failure
@@ -16,6 +17,12 @@ target the first failure lines of its log. It copies the records of the run (var
 var/ci/JOB/records and appends the summary to the job summary of GitHub ($GITHUB_STEP_SUMMARY). It never
 fails: a missing or unreadable summary.json, log or record is named in the summary, and the step exits with
 status 0, so the report of a job whose runner stopped is still written and uploaded.
+
+`passed` is the step of the job ci-passed, the last job of ci.yml, which runs after every other job of the workflow
+(`if: ${{ always() }}`) and is the check of ci.yml that the ruleset of main requires. It reads the environment
+variable RESULTS, the JSON of `needs` (`{"<job>": {"result": "success", "outputs": {}}}`), prints the result of each
+job and exits with status 1 unless every job has the result `success`: a failed, skipped or cancelled job fails it,
+and so do RESULTS that is unset, is not JSON or names no job.
 """
 import argparse
 from datetime import datetime, timezone
@@ -176,13 +183,45 @@ def summary(root, job, environ=os.environ):
     return 0
 
 
+def passed(text, stream=None):
+    """make ci-passed: 0 when every job of `text`, the JSON of `needs`, has the result success, else 1."""
+    stream = stream or sys.stdout
+
+    def fail(message):
+        stream.write(f'[ci-passed] failed: {message}\n')
+        stream.flush()
+        return 1
+
+    if text is None:
+        return fail('RESULTS is not set; the step passes the JSON of needs: make ci-passed RESULTS=<json>')
+    try:
+        needs = json.loads(text)
+    except ValueError as error:
+        return fail(f'RESULTS is not JSON: {error}: {text!r}')
+    if not isinstance(needs, dict) or not needs:
+        return fail(f'RESULTS names no job: {text!r}')
+    failed = []
+    for job, value in needs.items():
+        result = value.get('result') if isinstance(value, dict) else None
+        stream.write(f'[ci-passed] {job}: {result if result is not None else "no result"}\n')
+        if result != 'success':
+            failed.append(f'{job} ({result if result is not None else "no result"})')
+    if failed:
+        return fail(f'{", ".join(failed)}; every needed job must have the result success')
+    stream.write(f'[ci-passed] every needed job passed: {", ".join(needs)}\n')
+    stream.flush()
+    return 0
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('mode', choices=['run', 'summary'])
+    parser.add_argument('mode', choices=['run', 'summary', 'passed'])
     parser.add_argument('--job', required=True)
     # The targets follow `--`; they are split off before parsing, because a remainder argument after the mode would
     # also take --job.
     argv = list(sys.argv[1:] if argv is None else argv)
+    if argv == ['passed']:
+        return passed(os.environ.get('RESULTS'))
     targets = argv[argv.index('--') + 1:] if '--' in argv else []
     args = parser.parse_args(argv[:argv.index('--')] if '--' in argv else argv)
     if not re.fullmatch(r'[a-z][a-z0-9-]*', args.job):

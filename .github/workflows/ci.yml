@@ -1,7 +1,7 @@
 # CI: the full suite of every pull request, of every merge group of the merge queue and of every manual run
-# (workflow_dispatch). The ruleset of main requires the
-# jobs suite and docs, and the merge queue moves main to the merge group commit only after they passed on it, so the run
-# of the merge group is the evidence of the commit that main receives (AGENTS): the suite job runs make pie-check and make check, which write the PIE record and the aggregate
+# (workflow_dispatch). The ruleset of main requires the job ci-passed, the last job, which passes only when every other
+# job of this workflow passed, and the merge queue moves main to the merge group commit only after it passed on it, so
+# the run of the merge group is the evidence of the commit that main receives (AGENTS): the suite job runs make pie-check and make check, which write the PIE record and the aggregate
 # record into var/records and check both with the documentation check of make check, and uploads both in its
 # report. A failure never stops the run: every setup step and the step make ci run whatever the earlier steps did
 # (if: !cancelled()), make ci runs every target of the job to its end (scripts/ci_run.py), and the summary and the
@@ -92,3 +92,20 @@ jobs:
           name: ci-${{ matrix.job }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: var/ci/${{ matrix.job }}/
           if-no-files-found: error
+  # The check of this workflow that the ruleset of main requires. It runs after every other job, also after a failed,
+  # skipped or cancelled one (if: always()), and make ci-passed fails unless every job of needs has the result success,
+  # so a new job of this workflow is required once it is listed in needs. It installs Python as the job push-gate does.
+  ci-passed:
+    if: ${{ always() }}
+    needs: [ci]
+    runs-on: ubuntu-24.04
+    steps:
+      # actions/checkout v6.1.0
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      # actions/setup-python v6.3.0. .python-version pins the minor release 3.9; 3.9.25 is the last 3.9
+      # release that actions/python-versions builds for ubuntu-24.04.
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.9.25'
+      - name: make ci-passed
+        run: make ci-passed RESULTS='${{ toJSON(needs) }}'

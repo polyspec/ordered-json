@@ -6,6 +6,11 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The ruleset `main` requires exactly the checks `push-gate` and `ci-passed` (T1.21-2). `ci-passed`, the last job of
+  `ci.yml`, needs every other job, runs after each of them under `if: ${{ always() }}` and runs `make ci-passed`, which
+  fails unless every needed job has the result `success`; a job added to `ci.yml` is required once it is in `needs`.
+  `test_workflow_rules` fails when the job is missing, is not last, lacks `if: ${{ always() }}`, does not need every
+  other job, runs on another runner or runs another step.
 - The changelogs keep the section `## Unreleased` above the released versions (T1.21-1). The entries of the tag
   `v0.0.1` form the section `## 0.0.1`, the changelog of each package has the same two sections, and every change adds
   its entry under `## Unreleased`.
