@@ -6,6 +6,11 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+<a id="0-0-2"></a>
+## 0.0.2
+
+- Release 0.0.2 of the repository; the package has no change since 0.0.1.
+
 <a id="0-0-1"></a>
 ## 0.0.1
 

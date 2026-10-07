@@ -6,6 +6,12 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+<a id="0-0-2"></a>
+## 0.0.2
+
+- Release 0.0.2 (T1.22): `package.json`, `js/package.json`, `rust/Cargo.toml` and the package entry of
+  `rust/Cargo.lock` declare 0.0.2, the changelogs hold the section `## 0.0.2` under an empty `## Unreleased`, the
+  installation table names 0.0.2, and `make release-versions` passes for the tags `v0.0.2` and `go/v0.0.2`, as `test_release` requires.
 - The release of a tag covers the Go module tags at any depth, and its assets are npm tarballs and Composer zips only
   (T1.21-4). The trigger of `.github/workflows/release.yml` is `tags: ['v*', '**/v*']`: in a tag filter `*` does not
   match `/`, so `**/v*` covers `go/vX.Y.Z` and the tag of a Go module at any depth. The Cargo package of `rust/` is
