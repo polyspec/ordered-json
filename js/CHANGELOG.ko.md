@@ -1,11 +1,14 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 9f3f2bcd3dd47fe8ce0851e26897d8d400ab10cd41bbb046ede8f9e07d58427e -->
+<!-- source-sha256: ee3965ae8f5f17e42718200f48d62db062d7da6fa02f15051679382285c0e9bf -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
-## 미릴리스
+## Unreleased
+
+<a id="0-0-1"></a>
+## 0.0.1
 
 - npm 패키지는 `@polyspec/ordered-json`으로 polyspec 관례를 따릅니다. 이전에는 `ordered-json`이었습니다.
 - 패키지 테스트 실행기는 케이스를 실행하기 전에 케이스 id를, 실행한 뒤 `ok` 또는 `FAIL`과 경과 밀리초를 동기 쓰기로 출력하므로, 검증기가 끝나지 않는 케이스의 이름을 보고할 수 있습니다. 실행 뒤에 케이스를 한 번 더 나열하던 도달할 수 없는 코드를 제거했습니다.
@@ -21,4 +24,4 @@
 - 패키지 자체의 개발 절차, 변경 기록, Makefile, 문서 목록을 추가했습니다.
 - 영어와 한국어 사용 방법, 개발 절차, 변경 기록을 추가했습니다.
 
-공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 저장소 루트의 [검증 기록](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.ko.md#records)에서 설명합니다. 여기서는 레지스트리 게시와 버전 릴리스를 선언하지 않습니다.
+공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 저장소 루트의 [검증 기록](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.ko.md#records)에서 설명합니다. 여기서는 레지스트리 게시를 선언하지 않습니다.

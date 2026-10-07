@@ -1,11 +1,14 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: a3efccf054c518598da02a3d848113541b929e422cc8c09e7ec29a5cbbec85f4 -->
+<!-- source-sha256: c68913232cd56d8677923337a8c468cdb70491618146778e773eaaf023f2b116 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
-## 미릴리스
+## Unreleased
+
+<a id="0-0-1"></a>
+## 0.0.1
 
 - `Marshal`이 nil `*Value`와 타입이 `MarshalJSON`을 구현하는 다른 nil 포인터를 `null`로 기록하고, 인터페이스는 그 안에 담긴 값으로 인코딩합니다. 이전에는 nil 포인터의 `MarshalJSON`을 호출해 `expected orderedjson Value` 오류를 반환했습니다.
 - `ParseError.Kind`가 공통 식별자로 거부 이유를 알립니다.
@@ -19,4 +22,4 @@
 - 영어와 한국어 사용 방법, 개발 절차, 변경 기록을 추가했습니다.
 - Go 모듈과 검사 어댑터 가져오기를 `github.com/polyspec/ordered-json/go`로 변경했습니다.
 
-공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 저장소 루트의 [검증 기록](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.ko.md#records)에서 설명합니다. 여기서는 레지스트리 게시와 버전 릴리스를 선언하지 않습니다.
+공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 저장소 루트의 [검증 기록](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.ko.md#records)에서 설명합니다. 여기서는 레지스트리 게시를 선언하지 않습니다.

@@ -1,15 +1,21 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: b1ca1c6a1bde82551a60a0f352d9cbcf6040c6968739708ea774a4ca62836908 -->
+<!-- source-sha256: 792fce00fd37ccefebee09291c8e06aa7e15d1a8665bba11063ede1259b07c1e -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
-## 미릴리스 — 2026-09-07
+## Unreleased
 
+- changelog는 릴리스된 버전 위에 `## Unreleased` section을 둡니다(T1.21-1). tag `v0.0.1`의 항목은 `## 0.0.1` section을
+  이루고, 각 패키지의 changelog도 같은 두 section을 가지며, 모든 변경은 항목을 `## Unreleased` 아래에 추가합니다.
 - 각 workflow는 trigger를 정확히 선언합니다(T1.20): `ci.yml`은 `pull_request`, `merge_group`, `workflow_dispatch`에서,
   `push-gate.yml`은 `branches-ignore: ['gh-readonly-queue/**']`를 가진 `push`, `pull_request`, `merge_group`에서
   실행됩니다. `test_workflow_rules`는 workflow의 `on:` block이 다르면 실패합니다.
+
+<a id="0-0-1"></a>
+## 0.0.1
+
 - 각 패키지의 개발 절차는 저장소 루트의 필수 검사를 가리킵니다(T1.19). 개발 중에는 unit test만 실행하고, 패키지의
   `make check`는 그 패키지만 공통 검증기로 검사하며, hosted CI가 push 뒤에 전체 suite를 실행합니다.
 - 패키지는 polyspec 이름 관례를 따릅니다(T1.18): Composer `polyspec/ordered-json`과

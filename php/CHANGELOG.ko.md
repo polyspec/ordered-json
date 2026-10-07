@@ -1,11 +1,14 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 7cf2f54e1c3325f1474cd9932a9d4ef5b3f88779e815298ddddcf28e2a029dee -->
+<!-- source-sha256: 550ffc2c81551af87effacded8c3c9c239683ad2ebffbac4336000a1e0755c93 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
-## 미릴리스
+## Unreleased
+
+<a id="0-0-1"></a>
+## 0.0.1
 
 - Composer 패키지는 `polyspec/ordered-json`, 네임스페이스는 `Polyspec\OrderedJson`으로 polyspec 관례를 따릅니다. 이전에는 `ordered-json/ordered-json`과 `OrderedJson`이었습니다. 제안하는 확장은 PIE 패키지 `polyspec/ordered-json-extension`입니다.
 - 패키지 테스트 실행기는 케이스를 실행하기 전에 케이스 id를, 실행한 뒤 `ok` 또는 `FAIL`과 경과 밀리초를 출력하므로, 검증기가 끝나지 않는 케이스의 이름을 보고할 수 있습니다. `--cases` 목록은 그 줄 없이 검사를 실행하고 케이스 id만 출력합니다.
@@ -26,4 +29,4 @@
 - 영어와 한국어 사용 방법, 개발 절차, 변경 기록을 추가했습니다.
 - 네이티브 확장을 `php-extension` 패키지로 분리했으며 PHP 라이브러리는 독립적으로 사용할 수 있습니다.
 
-공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 저장소 루트의 [검증 기록](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.ko.md#records)에서 설명합니다. 여기서는 레지스트리 게시와 버전 릴리스를 선언하지 않습니다.
+공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 저장소 루트의 [검증 기록](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.ko.md#records)에서 설명합니다. 여기서는 레지스트리 게시를 선언하지 않습니다.
