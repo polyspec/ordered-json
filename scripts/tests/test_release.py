@@ -275,6 +275,33 @@ class Publish(unittest.TestCase):
         self.assertEqual(call[:7], ['release', 'create', 'go/v0.0.1', '--verify-tag', '--title', 'go/v0.0.1', '--notes-file'])
         self.assertEqual(len(call), 8)
 
+    def test_a_section_over_the_limit_is_one_line_that_links_the_section_of_the_tag(self):
+        entry = '- ' + 'x' * (release.NOTES_LIMIT - 2) + '\n'
+        changelog = CHANGELOG.replace('- The second entry of 0.0.1.\n', '- The second entry of 0.0.1.\n' + entry)
+        sandbox = Sandbox(self, changelog=changelog)
+        release.publish(sandbox.root, sandbox.tag('go/v0.0.1'))
+        self.assertEqual(sandbox.recorded()['notes'],
+                         'The changes of 0.0.1 are listed in [CHANGELOG.md]'
+                         '(https://github.com/polyspec/ordered-json/blob/go/v0.0.1/CHANGELOG.md#0-0-1).\n')
+
+    def test_a_section_without_an_explicit_anchor_links_the_anchor_of_its_heading(self):
+        entry = '- ' + 'x' * release.NOTES_LIMIT + '\n'
+        changelog = CHANGELOG.replace('<a id="0-0-1"></a>\n', '') + entry
+        sandbox = Sandbox(self, changelog=changelog)
+        release.publish(sandbox.root, sandbox.tag('go/v0.0.1'))
+        self.assertEqual(sandbox.recorded()['notes'],
+                         'The changes of 0.0.1 are listed in [CHANGELOG.md]'
+                         '(https://github.com/polyspec/ordered-json/blob/go/v0.0.1/CHANGELOG.md#001).\n')
+
+    def test_a_section_of_exactly_the_limit_in_characters_is_kept_whole(self):
+        entry = '- ' + '\uac00' * (release.NOTES_LIMIT - 3) + '\n'
+        changelog = CHANGELOG.split('- The first entry of 0.0.1.')[0] + entry
+        sandbox = Sandbox(self, changelog=changelog)
+        release.publish(sandbox.root, sandbox.tag('go/v0.0.1'))
+        notes = sandbox.recorded()['notes']
+        self.assertEqual(notes, entry)
+        self.assertEqual(len(notes), release.NOTES_LIMIT)
+
     def test_publish_without_the_archives_fails_before_any_request(self):
         sandbox = Sandbox(self)
         with self.assertRaisesRegex(release.Stop, r'var/release/assets lacks \[.*\]; make release-assets builds them'):

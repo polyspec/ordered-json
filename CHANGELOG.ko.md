@@ -1,11 +1,17 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: bbd57c3ead5f8d99b372882180125ca72abdabde807e666ea76c77741e13a90f -->
+<!-- source-sha256: 2dc8a5564464c47ac9e69a95ddc1d8995fd4cdb7bdbc99bf7d9aa3200a72769d -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- 릴리스 본문은 GitHub의 한도인 125000자 이하입니다(T1.23). `make release-publish`는 `CHANGELOG.md`의 section
+  `## X.Y.Z`가 125000자 이하이면 그 section을 notes로 쓰고, 그렇지 않으면 한 줄
+  `The changes of X.Y.Z are listed in [CHANGELOG.md](<URL>).`을 씁니다. URL은 tag의 `CHANGELOG.md`와 그 section의
+  anchor입니다. `test_release`는 한도를 넘는 section(`<a id>` anchor가 있는 경우와 없는 경우)과 정확히 한도인
+  section을 다룹니다.
 
 <a id="0-0-2"></a>
 ## 0.0.2
