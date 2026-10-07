@@ -17,11 +17,17 @@ WORKFLOWS = ROOT / '.github/workflows'
 ALWAYS = '${{ !cancelled() }}'
 # The `on:` block of each workflow: ci.yml runs the checks on every pull request, every merge group and every manual
 # run; push-gate.yml runs the gate on every push to a branch other than those of the merge queue, every pull request
-# and every merge group. No other workflow exists.
+# and every merge group; release.yml runs on the push of a tag vX.Y.Z or <directory>/vX.Y.Z. No other workflow exists.
 TRIGGERS = {
     'ci.yml': 'on:\n  pull_request:\n  merge_group:\n  workflow_dispatch:\n',
     'push-gate.yml': "on:\n  push:\n    branches-ignore: ['gh-readonly-queue/**']\n  pull_request:\n  merge_group:\n",
+    'release.yml': "on:\n  push:\n    tags: ['v*', '*/v*']\n",
 }
+# The workflows whose checks the ruleset of main requires; they run on every pull request and every merge group.
+CHECK_WORKFLOWS = ('ci.yml', 'push-gate.yml')
+# The steps of release.yml in their order (scripts/release.py): verify the tagged commit, check the versions, build the
+# archives, create the release.
+RELEASE_STEPS = ['make release-verify', 'make release-versions', 'make release-assets', 'make release-publish']
 
 
 def jobs(text):
@@ -96,6 +102,27 @@ def ci_passed_violations(name, parsed):
     return found
 
 
+def release_violations(name, text, parsed):
+    """Each broken rule of release.yml: one job with the permission to create a release, the tag in its environment,
+    the whole history checked out and the release steps last and in order."""
+    found = []
+    if not re.search(r'(?m)^permissions:\n  contents: write\n(?!  )', text):
+        found.append(f'{name}: the permissions are not exactly contents: write, which gh release create needs')
+    if list(parsed) != ['release']:
+        found.append(f'{name}: the jobs are {list(parsed)}, not the one job release')
+        return found
+    body = parsed['release']
+    if '      TAG: ${{ github.ref_name }}' not in body['lines']:
+        found.append(f'{name}: the job release does not set TAG: ${{{{ github.ref_name }}}} in its environment')
+    if body['steps'][0].get('uses', '').split('@')[0] != 'actions/checkout' or body['steps'][0].get('with.fetch-depth') != '0':
+        found.append(f'{name}: the first step is not actions/checkout with fetch-depth: 0; the ancestry check needs '
+                     'origin/main')
+    runs = [step['run'] for step in body['steps'] if 'run' in step]
+    if runs[-len(RELEASE_STEPS):] != RELEASE_STEPS:
+        found.append(f'{name}: the steps run {runs}, not the release steps {RELEASE_STEPS} last and in order')
+    return found
+
+
 def violations(name, text):
     """Each broken rule of the workflow `text`, named with the file, the job and the step."""
     found = []
@@ -116,10 +143,10 @@ def violations(name, text):
     # commit that main receives; a push to a branch of the merge queue would run them a second time.
     trigger = re.search(r'(?ms)^on:\n(.*?)^\S', text)
     events = re.findall(r'(?m)^  ([\w-]+):', trigger.group(1)) if trigger else []
-    if 'merge_group' not in events or 'pull_request' not in events:
+    if name in CHECK_WORKFLOWS and ('merge_group' not in events or 'pull_request' not in events):
         found.append(f'{name}: the workflow runs on {events}, not on pull_request and merge_group; the ruleset of main '
                      'requires its checks on every pull request and every merge group')
-    if 'push' in events and "branches-ignore: ['gh-readonly-queue/**']" not in trigger.group(1):
+    if 'push' in events and 'tags:' not in trigger.group(1) and "branches-ignore: ['gh-readonly-queue/**']" not in trigger.group(1):
         found.append(f"{name}: the push trigger lacks branches-ignore: ['gh-readonly-queue/**']; the merge group runs the "
                      'workflow already')
     declared = 'on:\n' + trigger.group(1).rstrip('\n') + '\n' if trigger else ''
@@ -127,6 +154,8 @@ def violations(name, text):
         found.append(f'{name}: the on: block is {declared!r}, not {TRIGGERS[name]!r}')
     if name == 'ci.yml':
         found += ci_passed_violations(name, parsed)
+    if name == 'release.yml':
+        found += release_violations(name, text, parsed)
     for job, body in parsed.items():
         steps = body['steps']
         if not steps:
@@ -163,7 +192,7 @@ def violations(name, text):
 class WorkflowRules(unittest.TestCase):
     def test_every_workflow_follows_the_rules(self):
         workflows = sorted(WORKFLOWS.glob('*.yml'))
-        self.assertEqual([path.name for path in workflows], ['ci.yml', 'push-gate.yml'])
+        self.assertEqual([path.name for path in workflows], ['ci.yml', 'push-gate.yml', 'release.yml'])
         for path in workflows:
             with self.subTest(workflow=path.name):
                 self.assertEqual(violations(path.name, path.read_text()), [])
@@ -279,6 +308,26 @@ class WorkflowRules(unittest.TestCase):
                 self.assertNotEqual(broken_text, text)
                 self.assertTrue(any(expected[case] in issue for issue in violations('ci.yml', broken_text)),
                                 violations('ci.yml', broken_text))
+
+    def test_release_runs_its_steps_in_order_with_the_tag_and_the_permission_to_release(self):
+        text = (WORKFLOWS / 'release.yml').read_text()
+        self.assertEqual(release_violations('release.yml', text, jobs(text)), [])
+        runs = [step['run'] for step in jobs(text)['release']['steps'] if 'run' in step]
+        self.assertEqual(runs, ['make tools'] + RELEASE_STEPS)
+        broken = {
+            'order': (text.replace('run: make release-versions', 'run: make release-swap')
+                      .replace('run: make release-verify', 'run: make release-versions')
+                      .replace('run: make release-swap', 'run: make release-verify'), 'not the release steps'),
+            'read only': (text.replace('  contents: write\n', '  contents: read\n'), 'not exactly contents: write'),
+            'no tag': (text.replace('      TAG: ${{ github.ref_name }}\n', ''), 'does not set TAG'),
+            'shallow': (text.replace('          fetch-depth: 0\n', '          fetch-depth: 1\n'), 'fetch-depth: 0'),
+            'trigger': (text.replace("tags: ['v*', '*/v*']", "tags: ['v*']"), 'the on: block is'),
+        }
+        for case, (broken_text, message) in broken.items():
+            with self.subTest(case=case):
+                self.assertNotEqual(broken_text, text)
+                self.assertTrue(any(message in issue for issue in violations('release.yml', broken_text)),
+                                violations('release.yml', broken_text))
 
     def test_a_step_that_does_not_run_after_a_failure_fails(self):
         text = (WORKFLOWS / 'ci.yml').read_text()

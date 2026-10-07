@@ -6,6 +6,12 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- A tag of a commit of `main` releases it (T1.21-3). `.github/workflows/release.yml` runs on the push of a tag `v*` or
+  `*/v*` with the permission `contents: write`; `make release-verify` requires the tagged commit on `origin/main` with
+  the check runs `push-gate` and `ci-passed` concluded `success`, `make release-versions` the version of the tag in
+  every manifest and the section `## X.Y.Z` in `CHANGELOG.md`, `make release-assets` builds the npm, Composer and
+  Cargo archives, and `make release-publish` creates the GitHub Release with the section as notes (`scripts/release.py`,
+  `scripts/tests/test_release.py`). AGENTS states the release procedure.
 - The ruleset `main` requires exactly the checks `push-gate` and `ci-passed` (T1.21-2). `ci-passed`, the last job of
   `ci.yml`, needs every other job, runs after each of them under `if: ${{ always() }}` and runs `make ci-passed`, which
   fails unless every needed job has the result `success`; a job added to `ci.yml` is required once it is in `needs`.

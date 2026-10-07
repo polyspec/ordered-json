@@ -1,0 +1,334 @@
+"""The release of a tag (scripts/release.py, .github/workflows/release.yml).
+
+Each case builds a Git repository in a temporary directory with the manifests of the release, a changelog, a branch
+origin/main and the tag, and puts fakes of gh, npm and cargo first on PATH. The fake gh answers the check runs of the
+GitHub API from a JSON state file and records each call; the fakes of npm and cargo write the archive that the real tool
+writes. No case reaches GitHub or a registry.
+"""
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+import unittest.mock
+import zipfile
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import release
+
+ROOT = Path(__file__).resolve().parents[2]
+REPOSITORY = 'polyspec/ordered-json'
+
+FAKE_GH = r'''
+import json, os, sys
+state_path = os.environ['FAKE_STATE']
+state = json.load(open(state_path))
+args = sys.argv[1:]
+state['calls'].append(args)
+if args[:2] == ['api', '--paginate']:
+    for run in state['check_runs']:
+        print(json.dumps([run['id'], run['name'], run['status'], run['conclusion']]))
+elif args[:2] == ['release', 'create']:
+    notes = args[args.index('--notes-file') + 1]
+    state['notes'] = open(notes).read()
+else:
+    sys.exit(f'fake gh: unexpected arguments {args}')
+json.dump(state, open(state_path, 'w'))
+'''
+FAKE_NPM = r'''
+import json, os, sys
+args = sys.argv[1:]
+assert args[0] == 'pack', args
+manifest = json.load(open('package.json'))
+name = manifest['name'].lstrip('@').replace('/', '-')
+open(os.path.join(args[args.index('--pack-destination') + 1], f"{name}-{manifest['version']}.tgz"), 'w').write('npm')
+'''
+FAKE_CARGO = r'''
+import os, re, sys
+args = sys.argv[1:]
+assert args[:3] == ['package', '--no-verify', '--locked'], args
+text = open('Cargo.toml').read()
+name = re.search(r'(?m)^name = "([^"]+)"', text).group(1)
+version = re.search(r'(?m)^version = "([^"]+)"', text).group(1)
+folder = os.path.join(os.environ['CARGO_TARGET_DIR'], 'package')
+os.makedirs(folder, exist_ok=True)
+open(os.path.join(folder, f'{name}-{version}.crate'), 'w').write('crate')
+'''
+CHANGELOG = '''# Changelog
+
+<a id="unreleased"></a>
+## Unreleased
+
+- A change after the release.
+
+<a id="0-0-1"></a>
+## 0.0.1
+
+- The first entry of 0.0.1.
+- The second entry of 0.0.1.
+'''
+
+
+def git(root, *args):
+    return subprocess.run(['git', '-c', 'user.name=test', '-c', 'user.email=test@example.com', *args], cwd=root,
+                          check=True, capture_output=True, text=True).stdout.strip()
+
+
+class Sandbox:
+    """A repository with the manifests of release.MANIFESTS at one version, a changelog, origin/main and fakes."""
+
+    def __init__(self, test, version='0.0.1', changelog=CHANGELOG):
+        folder = tempfile.TemporaryDirectory(prefix='ordered-json-release-')
+        test.addCleanup(folder.cleanup)
+        self.root = Path(folder.name) / 'repository'
+        self.bin = Path(folder.name) / 'bin'
+        self.state = Path(folder.name) / 'state.json'
+        self.root.mkdir()
+        self.bin.mkdir()
+        for name, source in (('gh', FAKE_GH), ('npm', FAKE_NPM), ('cargo', FAKE_CARGO)):
+            (self.bin / name).write_text(f'#!{sys.executable}\n{source}')
+            (self.bin / name).chmod(0o755)
+        names = {path: name for _, path, name in release.PACKAGES}
+        for manifest in release.MANIFESTS:
+            path = self.root / manifest
+            path.parent.mkdir(parents=True, exist_ok=True)
+            package = names.get(str(Path(manifest).parent), '@polyspec/ordered-json')
+            if path.name == 'package.json':
+                path.write_text(json.dumps({'name': package, 'version': version}))
+            elif path.name == 'composer.json':
+                path.write_text(json.dumps({'name': package.lstrip('@')}))
+            else:
+                path.write_text(f'[package]\nname = "{package}"\nversion = "{version}"\n\n[dependencies]\n')
+        (self.root / 'php/src').mkdir()
+        (self.root / 'php/src/OrderedJson.php').write_text('<?php\n')
+        for directory, module in release.GO_MODULES.items():
+            (self.root / directory).mkdir(exist_ok=True)
+            (self.root / directory / 'go.mod').write_text(f'module {module}\n\ngo 1.22\n')
+        (self.root / 'CHANGELOG.md').write_text(changelog)
+        git(self.root, 'init', '--quiet', '--initial-branch=main')
+        git(self.root, 'add', '-A')
+        git(self.root, 'commit', '--quiet', '-m', 'release')
+        self.commit = git(self.root, 'rev-parse', 'HEAD')
+        git(self.root, 'update-ref', 'refs/remotes/origin/main', self.commit)
+        self.check_runs([('push-gate', 'success'), ('ci-passed', 'success')])
+        patch = unittest.mock.patch.dict(os.environ, {'PATH': f'{self.bin}{os.pathsep}{os.environ["PATH"]}',
+                                                      'FAKE_STATE': str(self.state)})
+        patch.start()
+        test.addCleanup(patch.stop)
+
+    def check_runs(self, runs):
+        self.state.write_text(json.dumps({'calls': [], 'check_runs': [
+            {'id': index, 'name': name, 'status': 'completed' if conclusion else 'in_progress', 'conclusion': conclusion}
+            for index, (name, conclusion) in enumerate(runs, 1)]}))
+
+    def tag(self, tag, commit=None):
+        git(self.root, 'tag', '-a', tag, '-m', tag, commit or self.commit)
+        return tag
+
+    def recorded(self):
+        return json.loads(self.state.read_text())
+
+
+class Tags(unittest.TestCase):
+    def test_a_release_tag_is_a_version_or_a_go_module_directory_and_a_version(self):
+        self.assertEqual(release.parse_tag('v0.0.1'), (None, '0.0.1'))
+        self.assertEqual(release.parse_tag('v10.20.30'), (None, '10.20.30'))
+        self.assertEqual(release.parse_tag('go/v0.0.1'), ('go', '0.0.1'))
+        for tag in ('v1.0', '1.0.0', 'v01.0.0', 'v1.0.0-rc.1', 'vX.Y.Z', 'go/1.0.0'):
+            with self.subTest(tag=tag), self.assertRaisesRegex(release.Stop, 'a release tag is vX.Y.Z'):
+                release.parse_tag(tag)
+        with self.assertRaisesRegex(release.Stop, r"other/v1.0.0: other is not a Go module directory; the Go modules "
+                                                  r"are \['go'\]"):
+            release.parse_tag('other/v1.0.0')
+
+
+class Versions(unittest.TestCase):
+    def test_every_manifest_at_the_version_and_the_changelog_section_pass(self):
+        sandbox = Sandbox(self)
+        self.assertEqual(release.versions(sandbox.root, 'v0.0.1'), '0.0.1')
+
+    def test_a_version_mismatch_names_the_file_and_both_values(self):
+        sandbox = Sandbox(self)
+        cargo = sandbox.root / 'rust/Cargo.toml'
+        cargo.write_text(cargo.read_text().replace('version = "0.0.1"', 'version = "0.0.2"'))
+        package = sandbox.root / 'js/package.json'
+        package.write_text(package.read_text().replace('"0.0.1"', '"0.1.0"'))
+        with self.assertRaises(release.Stop) as stopped:
+            release.versions(sandbox.root, 'v0.0.1')
+        self.assertEqual(str(stopped.exception), 'js/package.json: version 0.1.0, the tag v0.0.1 is 0.0.1; '
+                                                 'rust/Cargo.toml: version 0.0.2, the tag v0.0.1 is 0.0.1')
+
+    def test_a_composer_manifest_without_a_version_takes_the_tag_and_one_with_a_version_is_compared(self):
+        sandbox = Sandbox(self)
+        composer = sandbox.root / 'php/composer.json'
+        self.assertNotIn('version', json.loads(composer.read_text()))
+        self.assertEqual(release.versions(sandbox.root, 'v0.0.1'), '0.0.1')
+        composer.write_text(json.dumps({'name': 'polyspec/ordered-json', 'version': '0.0.2'}))
+        with self.assertRaisesRegex(release.Stop, r'^php/composer.json: version 0.0.2, the tag v0.0.1 is 0.0.1$'):
+            release.versions(sandbox.root, 'v0.0.1')
+
+    def test_a_missing_changelog_section_fails(self):
+        sandbox = Sandbox(self, version='0.0.2')
+        with self.assertRaisesRegex(release.Stop, r'^CHANGELOG.md: no section ## 0.0.2 for the tag v0.0.2$'):
+            release.versions(sandbox.root, 'v0.0.2')
+        empty = Sandbox(self, changelog='# Changelog\n\n## Unreleased\n\n## 0.0.1\n\n<a id="x"></a>\n## 0.0.0\n')
+        with self.assertRaisesRegex(release.Stop, r'^CHANGELOG.md: the section ## 0.0.1 has no entry for the tag v0.0.1$'):
+            release.versions(empty.root, 'v0.0.1')
+
+    def test_a_go_tag_requires_the_module_path_of_its_directory_and_the_changelog_section(self):
+        sandbox = Sandbox(self, version='9.9.9')
+        self.assertEqual(release.versions(sandbox.root, 'go/v0.0.1'), '0.0.1')
+        (sandbox.root / 'go/go.mod').write_text('module github.com/polyspec/ordered-json\n')
+        with self.assertRaisesRegex(release.Stop, r'^go/go.mod: module github.com/polyspec/ordered-json, the tag '
+                                                  r'go/v0.0.1 is github.com/polyspec/ordered-json/go$'):
+            release.versions(sandbox.root, 'go/v0.0.1')
+
+    def test_the_section_is_the_release_notes_without_the_anchor_of_the_next_section(self):
+        sandbox = Sandbox(self)
+        self.assertEqual(release.changelog_section(sandbox.root, '0.0.1'),
+                         '- The first entry of 0.0.1.\n- The second entry of 0.0.1.\n')
+        self.assertEqual(release.changelog_section(sandbox.root, 'Unreleased'), '- A change after the release.\n')
+
+
+class Verify(unittest.TestCase):
+    def test_a_commit_of_main_with_both_checks_passed_is_verified(self):
+        sandbox = Sandbox(self)
+        commit, checks = release.verify(sandbox.root, sandbox.tag('v0.0.1'), REPOSITORY)
+        self.assertEqual((commit, checks), (sandbox.commit, ['push-gate', 'ci-passed']))
+        self.assertEqual(sandbox.recorded()['calls'], [
+            ['api', '--paginate', f'repos/{REPOSITORY}/commits/{sandbox.commit}/check-runs?per_page=100',
+             '--jq', '.check_runs[] | [.id, .name, .status, .conclusion] | @json']])
+
+    def test_a_commit_that_is_not_on_main_fails(self):
+        sandbox = Sandbox(self)
+        git(sandbox.root, 'commit', '--quiet', '--allow-empty', '-m', 'outside main')
+        outside = git(sandbox.root, 'rev-parse', 'HEAD')
+        with self.assertRaisesRegex(release.Stop, f'^v0.0.1: the commit {outside} is not on origin/main; '):
+            release.verify(sandbox.root, sandbox.tag('v0.0.1', outside), REPOSITORY)
+        self.assertEqual(sandbox.recorded()['calls'], [])
+
+    def test_a_missing_or_failed_check_is_named(self):
+        cases = {
+            'missing': ([('push-gate', 'success')], 'the check ci-passed is missing'),
+            'failed': ([('push-gate', 'failure'), ('ci-passed', 'success')],
+                       'the check push-gate is completed with the conclusion failure, not success'),
+            'running': ([('push-gate', 'success'), ('ci-passed', None)],
+                        'the check ci-passed is in_progress with the conclusion None, not success'),
+            'both': ([], 'the check push-gate is missing; the check ci-passed is missing'),
+        }
+        for case, (runs, message) in cases.items():
+            with self.subTest(case=case):
+                sandbox = Sandbox(self)
+                sandbox.check_runs(runs)
+                with self.assertRaises(release.Stop) as stopped:
+                    release.verify(sandbox.root, sandbox.tag('v0.0.1'), REPOSITORY)
+                self.assertEqual(str(stopped.exception), f'v0.0.1: the commit {sandbox.commit}: {message}')
+
+    def test_the_latest_run_of_a_check_decides(self):
+        sandbox = Sandbox(self)
+        sandbox.check_runs([('push-gate', 'success'), ('ci-passed', 'failure'), ('ci-passed', 'success')])
+        self.assertEqual(release.verify(sandbox.root, sandbox.tag('v0.0.1'), REPOSITORY)[0], sandbox.commit)
+        sandbox.check_runs([('push-gate', 'success'), ('ci-passed', 'success'), ('ci-passed', 'failure')])
+        with self.assertRaisesRegex(release.Stop, 'the check ci-passed is completed with the conclusion failure'):
+            release.verify(sandbox.root, 'v0.0.1', REPOSITORY)
+
+    def test_without_the_repository_the_step_fails_before_any_request(self):
+        sandbox = Sandbox(self)
+        with self.assertRaisesRegex(release.Stop, 'GITHUB_REPOSITORY is not set'):
+            release.verify(sandbox.root, sandbox.tag('v0.0.1'), None)
+
+
+class Assets(unittest.TestCase):
+    def test_an_asset_is_named_after_its_package_and_version(self):
+        self.assertEqual(release.asset_name('@polyspec/ordered-json', '0.0.1', 'tgz'), 'polyspec-ordered-json-0.0.1.tgz')
+        self.assertEqual(release.asset_name('polyspec/ordered-json-extension', '1.2.3', 'zip'),
+                         'polyspec-ordered-json-extension-1.2.3.zip')
+        self.assertEqual(release.asset_name('polyspec-ordered-json', '0.0.1', 'crate'), 'polyspec-ordered-json-0.0.1.crate')
+        self.assertEqual(release.asset_names('v0.0.1'), [
+            'polyspec-ordered-json-0.0.1.tgz', 'polyspec-ordered-json-0.0.1.zip',
+            'polyspec-ordered-json-extension-0.0.1.zip', 'polyspec-ordered-json-0.0.1.crate'])
+        self.assertEqual(release.asset_names('go/v0.0.1'), [])
+
+    def test_assets_builds_one_archive_per_package(self):
+        sandbox = Sandbox(self)
+        names = release.assets(sandbox.root, sandbox.tag('v0.0.1'))
+        built = sorted(path.name for path in (sandbox.root / release.ASSETS).iterdir())
+        self.assertEqual(built, sorted(names))
+        self.assertEqual(sorted(names), sorted(release.asset_names('v0.0.1')))
+        with zipfile.ZipFile(sandbox.root / release.ASSETS / 'polyspec-ordered-json-0.0.1.zip') as archive:
+            self.assertEqual(sorted(archive.namelist()), ['composer.json', 'src/', 'src/OrderedJson.php'])
+
+    def test_a_go_tag_builds_no_archive(self):
+        sandbox = Sandbox(self)
+        self.assertEqual(release.assets(sandbox.root, sandbox.tag('go/v0.0.1')), [])
+        self.assertEqual(list((sandbox.root / release.ASSETS).iterdir()), [])
+
+
+class Publish(unittest.TestCase):
+    def test_publish_creates_the_release_with_the_notes_and_the_archives(self):
+        sandbox = Sandbox(self)
+        tag = sandbox.tag('v0.0.1')
+        release.assets(sandbox.root, tag)
+        self.assertEqual(release.publish(sandbox.root, tag), release.asset_names(tag))
+        recorded = sandbox.recorded()
+        call = recorded['calls'][-1]
+        notes = call[call.index('--notes-file') + 1]
+        self.assertEqual(call, ['release', 'create', 'v0.0.1', '--verify-tag', '--title', 'v0.0.1', '--notes-file', notes,
+                                *[str(sandbox.root / release.ASSETS / name) for name in release.asset_names(tag)]])
+        self.assertEqual(recorded['notes'], '- The first entry of 0.0.1.\n- The second entry of 0.0.1.\n')
+
+    def test_a_go_tag_creates_a_release_without_archives(self):
+        sandbox = Sandbox(self)
+        tag = sandbox.tag('go/v0.0.1')
+        self.assertEqual(release.publish(sandbox.root, tag), [])
+        call = sandbox.recorded()['calls'][-1]
+        self.assertEqual(call[:7], ['release', 'create', 'go/v0.0.1', '--verify-tag', '--title', 'go/v0.0.1', '--notes-file'])
+        self.assertEqual(len(call), 8)
+
+    def test_publish_without_the_archives_fails_before_any_request(self):
+        sandbox = Sandbox(self)
+        with self.assertRaisesRegex(release.Stop, r'var/release/assets lacks \[.*\]; make release-assets builds them'):
+            release.publish(sandbox.root, sandbox.tag('v0.0.1'))
+        self.assertEqual(sandbox.recorded()['calls'], [])
+
+
+class Repository(unittest.TestCase):
+    def test_the_declarations_cover_every_tracked_manifest(self):
+        tracked = subprocess.run(['git', 'ls-files'], cwd=ROOT, check=True, capture_output=True, text=True).stdout.split()
+        manifests = sorted(path for path in tracked
+                           if Path(path).name in ('package.json', 'composer.json', 'Cargo.toml', 'VERSION', 'pyproject.toml'))
+        self.assertEqual(manifests, sorted(release.MANIFESTS))
+        modules = sorted(str(Path(path).parent) for path in tracked if Path(path).name == 'go.mod')
+        self.assertEqual(modules, sorted(release.GO_MODULES))
+        for kind, path, name in release.PACKAGES:
+            manifest = {'npm': 'package.json', 'composer': 'composer.json', 'cargo': 'Cargo.toml'}[kind]
+            text = (ROOT / path / manifest).read_text()
+            declared = (json.loads(text)['name'] if kind != 'cargo'
+                        else re.search(r'(?m)^name = "([^"]+)"', text).group(1))
+            self.assertEqual(declared, name, path)
+
+    def test_the_released_versions_pass_the_version_check(self):
+        self.assertEqual(release.versions(ROOT, 'v0.0.1'), '0.0.1')
+        self.assertEqual(release.versions(ROOT, 'go/v0.0.1'), '0.0.1')
+
+    def test_make_runs_each_step_with_the_tag_of_the_environment(self):
+        environment = {name: value for name, value in os.environ.items()
+                       if name not in ('MAKEFLAGS', 'MFLAGS', 'MAKELEVEL', 'TAG', 'PYTHON')}
+        for step in ('verify', 'versions', 'assets', 'publish'):
+            with self.subTest(step=step):
+                listed = subprocess.run(['make', '-n', f'release-{step}', 'PYTHON=python3'], cwd=ROOT,
+                                        env={**environment, 'TAG': 'v0.0.1'}, capture_output=True, text=True)
+                self.assertEqual(listed.returncode, 0, listed.stderr)
+                self.assertEqual(listed.stdout.splitlines(), [f'python3 scripts/release.py {step} "$TAG"'])
+                missing = subprocess.run(['make', f'release-{step}'], cwd=ROOT, env=environment, capture_output=True,
+                                         text=True)
+                self.assertNotEqual(missing.returncode, 0)
+                self.assertIn(f'make release-{step} needs TAG=<tag>', missing.stderr)
+
+
+if __name__ == '__main__':
+    unittest.main()

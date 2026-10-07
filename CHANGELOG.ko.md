@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: ef9ece801b7e5df87e947ac50f73f7bac842ae3a4957f33d8eaffb1de0623c21 -->
+<!-- source-sha256: 8241083c7610c9dd8627939bdcd04797bc425f3c2e78847a190cce3c1ea4e23f -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,12 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- `main`의 commit에 붙인 tag가 그 commit을 릴리스합니다(T1.21-3). `.github/workflows/release.yml`은 권한
+  `contents: write`로 tag `v*` 또는 `*/v*`의 push에서 실행됩니다. `make release-verify`는 tag된 commit이
+  `origin/main`에 있고 check run `push-gate`와 `ci-passed`가 `success`로 끝났는지, `make release-versions`는 모든
+  manifest에 tag의 버전이 있고 `CHANGELOG.md`에 section `## X.Y.Z`가 있는지 확인하고, `make release-assets`는 npm,
+  Composer, Cargo archive를 만들며, `make release-publish`는 section을 notes로 GitHub Release를 만듭니다
+  (`scripts/release.py`, `scripts/tests/test_release.py`). AGENTS가 릴리스 절차를 적습니다.
 - ruleset `main`은 정확히 check `push-gate`와 `ci-passed`를 요구합니다(T1.21-2). `ci.yml`의 마지막 job `ci-passed`는
   다른 모든 job을 need로 가지고, `if: ${{ always() }}`로 그 모든 job 뒤에 실행되며, need로 가진 job의 결과가 모두
   `success`가 아니면 실패하는 `make ci-passed`를 실행합니다. `ci.yml`에 추가한 job은 `needs`에 들어가면 요구됩니다.
