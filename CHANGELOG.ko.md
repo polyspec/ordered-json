@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 792fce00fd37ccefebee09291c8e06aa7e15d1a8665bba11063ede1259b07c1e -->
+<!-- source-sha256: ef9ece801b7e5df87e947ac50f73f7bac842ae3a4957f33d8eaffb1de0623c21 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,11 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- ruleset `main`은 정확히 check `push-gate`와 `ci-passed`를 요구합니다(T1.21-2). `ci.yml`의 마지막 job `ci-passed`는
+  다른 모든 job을 need로 가지고, `if: ${{ always() }}`로 그 모든 job 뒤에 실행되며, need로 가진 job의 결과가 모두
+  `success`가 아니면 실패하는 `make ci-passed`를 실행합니다. `ci.yml`에 추가한 job은 `needs`에 들어가면 요구됩니다.
+  `test_workflow_rules`는 job이 없거나, 마지막이 아니거나, `if: ${{ always() }}`가 없거나, 다른 모든 job을 need로
+  가지지 않거나, 다른 runner에서 실행되거나, 다른 step을 실행하면 실패합니다.
 - changelog는 릴리스된 버전 위에 `## Unreleased` section을 둡니다(T1.21-1). tag `v0.0.1`의 항목은 `## 0.0.1` section을
   이루고, 각 패키지의 changelog도 같은 두 section을 가지며, 모든 변경은 항목을 `## Unreleased` 아래에 추가합니다.
 - 각 workflow는 trigger를 정확히 선언합니다(T1.20): `ci.yml`은 `pull_request`, `merge_group`, `workflow_dispatch`에서,

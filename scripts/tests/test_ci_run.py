@@ -156,5 +156,55 @@ class CiRun(unittest.TestCase):
         self.assertIn('make ci needs CI_JOB=suite or CI_JOB=docs', unknown.stderr)
 
 
+# The JSON of `needs` that GitHub writes into the step of the job ci-passed: one entry per needed job with its result.
+NEEDS = """{
+  "ci": {
+    "result": "%s",
+    "outputs": {}
+  }
+}"""
+
+
+class CiPassed(unittest.TestCase):
+    """make ci-passed, the last job of ci.yml: it passes only when every job it needs has the result success."""
+
+    def passed(self, text):
+        printed = io.StringIO()
+        return ci_run.passed(text, printed), printed.getvalue()
+
+    def test_every_needed_job_with_the_result_success_passes(self):
+        status, printed = self.passed(NEEDS % 'success')
+        self.assertEqual(status, 0, printed)
+        self.assertIn('[ci-passed] ci: success', printed)
+        self.assertIn('[ci-passed] every needed job passed: ci', printed)
+
+    def test_a_failed_skipped_or_cancelled_job_fails_with_its_name_and_result(self):
+        for result in ('failure', 'skipped', 'cancelled'):
+            with self.subTest(result=result):
+                text = json.dumps({'ci': {'result': 'success', 'outputs': {}}, 'other': {'result': result, 'outputs': {}}})
+                status, printed = self.passed(text)
+                self.assertEqual(status, 1, printed)
+                self.assertIn(f'[ci-passed] failed: other ({result}); every needed job must have the result success',
+                              printed)
+
+    def test_results_that_name_no_job_or_are_not_json_fail_with_the_cause(self):
+        for text, cause in ((None, 'RESULTS is not set'), ('', 'RESULTS is not JSON'), ('{', 'RESULTS is not JSON'),
+                            ('{}', 'RESULTS names no job'), ('[]', 'RESULTS names no job'),
+                            ('{"ci": "success"}', 'ci: no result')):
+            with self.subTest(text=text):
+                status, printed = self.passed(text)
+                self.assertEqual(status, 1, printed)
+                self.assertIn(cause, printed)
+
+    def test_make_ci_passed_reads_the_multi_line_json_of_needs(self):
+        environment = {name: value for name, value in os.environ.items() if name not in MAKE_INPUTS}
+        for result, status in (('success', 0), ('failure', 2)):
+            with self.subTest(result=result):
+                ran = subprocess.run(['make', 'ci-passed', f'PYTHON={sys.executable}', f'RESULTS={NEEDS % result}'],
+                                     cwd=ROOT, env=environment, capture_output=True, text=True)
+                self.assertEqual(ran.returncode, status, ran.stdout + ran.stderr)
+                self.assertIn(f'[ci-passed] ci: {result}', ran.stdout)
+
+
 if __name__ == '__main__':
     unittest.main()

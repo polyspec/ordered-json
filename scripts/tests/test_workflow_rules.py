@@ -3,7 +3,10 @@
 Every step that runs a command runs a make target, never a script or a tool directly, so the environment and the
 prechecks of the Makefile apply (offline checks, pinned tools). Every job of a matrix runs with fail-fast false, and
 every job that runs make ci writes its summary and uploads its report after a failure too. No job or step has
-timeout-minutes. The workflows are read as text with their two-space indentation; Python 3.9 has no YAML parser.
+timeout-minutes. The last job of ci.yml is ci-passed, the check of ci.yml that the ruleset of main requires: it runs
+after every other job (`if: ${{ always() }}`), needs every other job of the workflow, runs on their runner and runs
+`make ci-passed` with the JSON of `needs`, so it passes only when every other job passed. The workflows are read as
+text with their two-space indentation; Python 3.9 has no YAML parser.
 """
 from pathlib import Path
 import re
@@ -58,6 +61,41 @@ def jobs(text):
     return found
 
 
+CI_PASSED = 'ci-passed'
+CI_PASSED_RUN = "make ci-passed RESULTS='${{ toJSON(needs) }}'"
+
+
+def job_keys(body):
+    """The keys of a job at its own level (`runs-on`, `if`, `needs`), with their values as written."""
+    return dict(line.strip().partition(':')[::2] for line in body['lines']
+                if len(line) - len(line.lstrip(' ')) == 4 and ':' in line)
+
+
+def ci_passed_violations(name, parsed):
+    """Each broken rule of the job ci-passed of ci.yml."""
+    if CI_PASSED not in parsed:
+        return [f'{name}: the job {CI_PASSED} is missing; the ruleset of main requires it as the check of {name}']
+    found = []
+    others = [job for job in parsed if job != CI_PASSED]
+    keys = {job: job_keys(parsed[job]) for job in parsed}
+    if list(parsed)[-1] != CI_PASSED:
+        found.append(f'{name}: the job {CI_PASSED} is not the last job; the jobs are {list(parsed)}')
+    if keys[CI_PASSED].get('if', '').strip() != '${{ always() }}':
+        found.append(f"{name}: the job {CI_PASSED} has if: {keys[CI_PASSED].get('if', '').strip()!r}, not "
+                     "'${{ always() }}'; it must run after a failed, skipped or cancelled job too")
+    needs = [job.strip() for job in keys[CI_PASSED].get('needs', '').strip().strip('[]').split(',') if job.strip()]
+    if sorted(needs) != sorted(others):
+        found.append(f'{name}: the job {CI_PASSED} needs {needs}, not every other job {others}')
+    runners = sorted({keys[job].get('runs-on', '').strip() for job in others})
+    if [keys[CI_PASSED].get('runs-on', '').strip()] != runners:
+        found.append(f"{name}: the job {CI_PASSED} runs on {keys[CI_PASSED].get('runs-on', '').strip()!r}, not on the "
+                     f'runner of the other jobs {runners}')
+    runs = [step['run'] for step in parsed[CI_PASSED]['steps'] if 'run' in step]
+    if runs != [CI_PASSED_RUN] or parsed[CI_PASSED]['steps'][-1].get('run') != CI_PASSED_RUN:
+        found.append(f'{name}: the job {CI_PASSED} runs {runs}, not the last step {CI_PASSED_RUN!r}')
+    return found
+
+
 def violations(name, text):
     """Each broken rule of the workflow `text`, named with the file, the job and the step."""
     found = []
@@ -87,6 +125,8 @@ def violations(name, text):
     declared = 'on:\n' + trigger.group(1).rstrip('\n') + '\n' if trigger else ''
     if name in TRIGGERS and declared != TRIGGERS[name]:
         found.append(f'{name}: the on: block is {declared!r}, not {TRIGGERS[name]!r}')
+    if name == 'ci.yml':
+        found += ci_passed_violations(name, parsed)
     for job, body in parsed.items():
         steps = body['steps']
         if not steps:
@@ -211,6 +251,34 @@ class WorkflowRules(unittest.TestCase):
         self.assertTrue(any(issue.startswith('ci.yml: the on: block is') for issue in violations('ci.yml', manual)))
         pushed = text.replace('  merge_group:\n', '  merge_group:\n  push:\n', 1)
         self.assertTrue(any(issue.startswith('ci.yml: the on: block is') for issue in violations('ci.yml', pushed)))
+
+    def test_ci_passed_is_the_last_job_and_needs_every_other_job(self):
+        text = (WORKFLOWS / 'ci.yml').read_text()
+        self.assertEqual(ci_passed_violations('ci.yml', jobs(text)), [])
+        self.assertEqual(list(jobs(text))[-1], CI_PASSED)
+        head, tail = text.split('\n  ci-passed:\n')
+        broken = {
+            'missing': head + '\n',
+            'not last': head.replace('\njobs:\n', '\njobs:\n  ci-passed:\n' + tail.rstrip('\n') + '\n', 1) + '\n',
+            'not always': text.replace('    if: ${{ always() }}\n', '    if: ${{ success() }}\n'),
+            'needs no job': text.replace('    needs: [ci]\n', '    needs: []\n'),
+            'another runner': text.replace('    needs: [ci]\n    runs-on: ubuntu-24.04\n',
+                                           '    needs: [ci]\n    runs-on: ubuntu-26.04\n'),
+            'another step': text.replace(CI_PASSED_RUN, 'make ci-passed'),
+        }
+        expected = {
+            'missing': 'the job ci-passed is missing',
+            'not last': 'the job ci-passed is not the last job',
+            'not always': "the job ci-passed has if: '${{ success() }}'",
+            'needs no job': "the job ci-passed needs [], not every other job ['ci']",
+            'another runner': "the job ci-passed runs on 'ubuntu-26.04', not on the runner of the other jobs",
+            'another step': "the job ci-passed runs ['make ci-passed'], not the last step",
+        }
+        for case, broken_text in broken.items():
+            with self.subTest(case=case):
+                self.assertNotEqual(broken_text, text)
+                self.assertTrue(any(expected[case] in issue for issue in violations('ci.yml', broken_text)),
+                                violations('ci.yml', broken_text))
 
     def test_a_step_that_does_not_run_after_a_failure_fails(self):
         text = (WORKFLOWS / 'ci.yml').read_text()

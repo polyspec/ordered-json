@@ -22,7 +22,7 @@ ONLINE := env -u CARGO_NET_OFFLINE -u GOPROXY -u npm_config_offline -u COMPOSER_
 export PATH := $(NPM_DIRECTORY)/bin:$(PATH)
 
 .PHONY: check rerun-failed test docs-check pie-check benchmark hooks hooks-check push-gate tools toolchains-check owner-check \
-	owner-validate ci ci-summary clippy go-vet github-ruleset github-ruleset-check
+	owner-validate ci ci-summary ci-passed clippy go-vet github-ruleset github-ruleset-check
 
 # scripts/full_run.py runs the full verification once per committed tree, when no feature of
 # docs/features.md is partial, and records its result in var/full-run.json.
@@ -68,6 +68,12 @@ ci-summary:
 	$(if $(CI_TARGETS_$(CI_JOB)),,$(error make ci-summary needs CI_JOB=suite or CI_JOB=docs; CI_JOB is '$(CI_JOB)'))
 	$(PYTHON) scripts/ci_run.py summary --job $(CI_JOB)
 
+# ci-passed is the step of the job ci-passed, the last job of ci.yml and its check that the ruleset of main requires:
+# it fails unless every job of RESULTS, the JSON of needs, has the result success. make passes a variable of its command
+# line to the environment of the recipe, so the script reads RESULTS there and the JSON never becomes shell text.
+ci-passed:
+	$(PYTHON) scripts/ci_run.py passed
+
 # owner-validate checks only the map of scripts/owner-checks.json, as the pre-commit hook does.
 owner-validate:
 	$(PYTHON) scripts/owner_check.py --validate
@@ -107,7 +113,7 @@ toolchains-check:
 
 # The GitHub ruleset of main and the merge settings, declared in .github/ruleset.json (scripts/github_ruleset.py,
 # docs/operations/validation.md#publish): every change reaches main through a pull request and the merge queue, which
-# requires the checks push-gate, suite and docs. github-ruleset creates or updates the ruleset of the declared name and the
+# requires the checks push-gate and ci-passed. github-ruleset creates or updates the ruleset of the declared name and the
 # settings; github-ruleset-check fails when the live ruleset or a setting differs from the declaration.
 github-ruleset:
 	$(PYTHON) scripts/github_ruleset.py apply

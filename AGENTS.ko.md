@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: ff1524c09cb9305741c4172b73b20ad16199762b5621e27dce648611c3e19a5c -->
+<!-- source-sha256: 1bef1814d34de0a923aa8e36f31ccba5cbc6d776825cc5601b5f097ebd9a54ce -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -66,7 +66,7 @@ gh pr create --base main --head <branch> --fill
 gh pr merge <branch> --auto --rebase
 ~~~
 
-`.github/ruleset.json`에 선언된 GitHub ruleset `main`은 pull request(승인 없음), merge method `REBASE`인 merge queue, linear history, GitHub Actions의 check `push-gate`, `suite`, `docs`를 요구하고, `main`의 force-push와 삭제를 거부하며, bypass actor가 없습니다. 그래서 GitHub는 관리자의 push도 포함해 `main`으로의 직접 push를 거부합니다. merge queue는 queue에 들어간 pull request를 `main` 위에 rebase해 merge group을 만들고, 그 commit에서 필수 check를 실행해 통과하면 `main`을 그 commit으로 옮깁니다. check가 실패하면 pull request를 queue에서 뺍니다. branch push에서 pre-push hook이 실행되고, job `push-gate`는 pull request와 merge group에서 `[~]` 작업을 거부합니다. rebase는 merge된 commit에 새 hash를 주므로, `git pull --rebase`가 queue가 merge한 local commit을 버립니다. `make github-ruleset`은 ruleset과 선언된 저장소 설정을 만들거나 갱신하고, `make github-ruleset-check`는 둘이 선언과 다르면 실패합니다([main 공개](docs/operations/validation.ko.md#publish)).
+`.github/ruleset.json`에 선언된 GitHub ruleset `main`은 pull request(승인 없음), merge method `REBASE`인 merge queue, linear history, 정확히 GitHub Actions의 check `push-gate`와 `ci-passed`(`.github/workflows/ci.yml`의 마지막 job으로, 그 workflow의 다른 모든 job이 통과했을 때만 통과)를 요구하고, `main`의 force-push와 삭제를 거부하며, bypass actor가 없습니다. 그래서 GitHub는 관리자의 push도 포함해 `main`으로의 직접 push를 거부합니다. merge queue는 queue에 들어간 pull request를 `main` 위에 rebase해 merge group을 만들고, 그 commit에서 필수 check를 실행해 통과하면 `main`을 그 commit으로 옮깁니다. check가 실패하면 pull request를 queue에서 뺍니다. branch push에서 pre-push hook이 실행되고, job `push-gate`는 pull request와 merge group에서 `[~]` 작업을 거부합니다. rebase는 merge된 commit에 새 hash를 주므로, `git pull --rebase`가 queue가 merge한 local commit을 버립니다. `make github-ruleset`은 ruleset과 선언된 저장소 설정을 만들거나 갱신하고, `make github-ruleset-check`는 둘이 선언과 다르면 실패합니다([main 공개](docs/operations/validation.ko.md#publish)).
 
 문서만 검토할 때는 `make docs-check`를 실행합니다. 이 검사는 검증 기록을 소스와 비교하지 않습니다. commit의 근거는 커밋된 파일이 아니라 그것을 검증하는 실행입니다. `make pie-check`는 PIE 기록 `var/records/pie-verification.json`을, `make check`는 통합 기록 `var/records/verification.json`을 쓰며 Git은 이를 무시하고, `make check` 마지막의 문서 검사는 두 기록을 현재 소스와 대조합니다([기록](docs/operations/validation.ko.md#records)). 기록은 모든 추적 파일을 해시하므로 커밋된 기록은 commit마다 오래된 기록이 됩니다. 어떤 기록도 커밋하지 않으며, 어떤 guard도 기록이 없다는 이유로 거부하지 않습니다. 검사를 통과시키기 위해 검증 결과나 소스 해시를 직접 수정하지 않습니다.
 
