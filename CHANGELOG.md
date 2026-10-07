@@ -6,6 +6,12 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- A release body has at most 125000 characters, the limit of GitHub (T1.23). `make release-publish` uses the section
+  `## X.Y.Z` of `CHANGELOG.md` as notes when it has at most 125000 characters, and otherwise the one line
+  `The changes of X.Y.Z are listed in [CHANGELOG.md](<URL>).`, whose URL is `CHANGELOG.md` at the tag with the anchor
+  of the section. `test_release` covers a section over the limit, with and without an `<a id>` anchor, and a section
+  of exactly the limit.
+
 <a id="0-0-2"></a>
 ## 0.0.2
 

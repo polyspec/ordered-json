@@ -21,8 +21,10 @@ the directory. `assets` builds one archive per package, named `<package name>-<v
 as `scope-` and `vendor/` as `vendor-`: `npm pack` (.tgz) and a zip of the directory of a Composer package from `git
 archive` of the tagged commit (.zip). The Cargo package is not released as an archive; it is consumed by git tag,
 because `cargo package` rewrites git dependencies into crates.io requirements that do not resolve. A Go tag builds and
-attaches nothing. `publish` runs `gh release create TAG --verify-tag --title TAG --notes-file <the section X.Y.Z>`
-with the archives of `assets`. Each failure names the tag, the file or check and both values, and exits with status
+attaches nothing. `publish` runs `gh release create TAG --verify-tag --title TAG --notes-file <notes>`
+with the archives of `assets`; the notes are the section X.Y.Z when it has at most NOTES_LIMIT (125000) characters,
+the limit of GitHub, and otherwise the one line `The changes of X.Y.Z are listed in [CHANGELOG.md](<URL>).`, whose URL
+is CHANGELOG.md at the tag with the anchor of the section. Each failure names the tag, the file or check and both values, and exits with status
 1.
 """
 import json
@@ -33,6 +35,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from urllib.parse import quote
 
 from toolchains import environment
 
@@ -41,6 +44,9 @@ MAIN = 'origin/main'
 CHECKS = ('push-gate', 'ci-passed')
 CHANGELOG = 'CHANGELOG.md'
 ASSETS = 'var/release/assets'
+REPOSITORY = 'polyspec/ordered-json'
+# GitHub refuses the body of a release over this many characters.
+NOTES_LIMIT = 125000
 # The packages that a tag vX.Y.Z releases as archives, one archive each: (kind, directory, package name). The release
 # assets are npm tarballs and Composer zips only.
 PACKAGES = (
@@ -161,6 +167,27 @@ def changelog_section(root, version):
     return '\n'.join(body) + '\n'
 
 
+def changelog_anchor(root, version):
+    """The anchor of the section `## version`: the id of the `<a id>` line above the heading, or the anchor that GitHub
+    generates for the heading, the version without its dots."""
+    lines = (Path(root) / CHANGELOG).read_text(encoding='utf-8').splitlines()
+    above = [line.strip() for line in lines[:lines.index(f'## {version}')] if line.strip()]
+    explicit = re.fullmatch(r'<a id="([^"]*)"></a>', above[-1]) if above else None
+    return explicit.group(1) if explicit else version.replace('.', '')
+
+
+def release_notes(root, tag):
+    """The section of the version of the tag when it fits NOTES_LIMIT characters, otherwise one line that links the
+    section in CHANGELOG.md at the tag."""
+    _, version = parse_tag(tag)
+    section = changelog_section(root, version)
+    if len(section) <= NOTES_LIMIT:
+        return section
+    url = (f'https://github.com/{REPOSITORY}/blob/{quote(tag, safe="/")}/{CHANGELOG}'
+           f'#{changelog_anchor(root, version)}')
+    return f'The changes of {version} are listed in [{CHANGELOG}]({url}).\n'
+
+
 def versions(root, tag):
     """Every manifest of the tag declares its version, and CHANGELOG.md has the section of the version."""
     root = Path(root)
@@ -222,10 +249,9 @@ def assets(root, tag):
 
 
 def publish(root, tag):
-    """Create the GitHub Release of the tag with the section of CHANGELOG.md as notes and the archives of assets."""
+    """Create the GitHub Release of the tag with release_notes as notes and the archives of assets."""
     root = Path(root)
-    _, version = parse_tag(tag)
-    notes = changelog_section(root, version)
+    notes = release_notes(root, tag)
     names = asset_names(tag)
     target = root / ASSETS
     missing = [name for name in names if not (target / name).is_file()]
