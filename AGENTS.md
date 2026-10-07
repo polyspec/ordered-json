@@ -75,6 +75,15 @@ All language adapters use [official.json](examples/official.json) and [scripts/v
 
 Rust code passes `cargo clippy --all-targets -- -D warnings` in `rust/` and Go code passes `go vet ./...` in `go/`: `make check` runs both as targets of their own after the verification (`scripts/lint.py`, also `make clippy` and `make go-vet`), so hosted CI runs them on every pull request and every merge group. Rebuild the PHP extension when native code changes. Never treat old binaries or prior results as verification of changed code.
 
+<a id="release"></a>
+## Release
+
+Every change reaches `main` through the merge queue with the required checks, so every commit of `main` passed the full suite. A release is a tag of a commit of `main`, and only the maintainer creates, moves or pushes a tag; a tag is never raised through a pull request.
+
+1. The version-bump pull request `Release X.Y.Z`, whose commit names its checklist task, sets the version X.Y.Z in every manifest of the repository (`package.json`, `js/package.json`, `rust/Cargo.toml`; a `composer.json` has no `version` field and takes the version from the tag) and renames `## Unreleased` of every changelog to `## X.Y.Z`, with a new empty `## Unreleased` above it.
+2. The maintainer tags the merged commit of `main` `vX.Y.Z`, and `go/vX.Y.Z` for the Go module of `go/`, and pushes the tag.
+3. The tag push runs `.github/workflows/release.yml`: it requires the tagged commit on `main` with the checks `push-gate` and `ci-passed` passed, the version of the tag in every manifest and the section `## X.Y.Z` in `CHANGELOG.md`, builds the package archives and creates the GitHub Release ([tag releases](docs/operations/distribution.md#tag-release)).
+
 <a id="idempotency"></a>
 ## Idempotency
 

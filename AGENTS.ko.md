@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 1bef1814d34de0a923aa8e36f31ccba5cbc6d776825cc5601b5f097ebd9a54ce -->
+<!-- source-sha256: 8d2cc8ab0e4305eb832486b74777da46c386ee0d9726779fe663da58d686810e -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -75,6 +75,15 @@ gh pr merge <branch> --auto --rebase
 모든 언어 어댑터는 [official.json](examples/official.json)과 [scripts/verify.py](scripts/verify.py)를 사용합니다. 공통 사례는 해당 파일이나 `fixtures/`에 추가합니다. 언어별로 다른 예제나 기대 결과를 만들지 않습니다.
 
 Rust 코드는 `rust/`에서 `cargo clippy --all-targets -- -D warnings`를, Go 코드는 `go/`에서 `go vet ./...`을 통과합니다. `make check`는 검증 뒤에 둘을 각각의 target으로 실행하므로(`scripts/lint.py`, `make clippy`와 `make go-vet`으로도 실행) hosted CI가 모든 pull request와 모든 merge group에서 이를 실행합니다. 네이티브 코드를 변경하면 PHP 확장을 다시 빌드합니다. 이전 바이너리나 이전 결과를 변경된 코드의 검증 근거로 사용하지 않습니다.
+
+<a id="release"></a>
+## 릴리스
+
+모든 변경은 필수 check와 함께 merge queue로 `main`에 도달하므로, `main`의 모든 commit은 전체 suite를 통과했습니다. 릴리스는 `main`의 commit에 붙인 tag이고, tag를 만들고 옮기고 push하는 것은 메인테이너뿐입니다. tag는 pull request로 올리지 않습니다.
+
+1. 버전 올림 pull request `Release X.Y.Z`는 commit에 체크리스트 작업을 적고, 저장소의 모든 manifest(`package.json`, `js/package.json`, `rust/Cargo.toml`. `composer.json`에는 `version` field가 없고 버전을 tag에서 받습니다)의 버전을 X.Y.Z로 정하며, 모든 changelog의 `## Unreleased`를 `## X.Y.Z`로 바꾸고 그 위에 비어 있는 새 `## Unreleased`를 둡니다.
+2. 메인테이너는 merge된 `main`의 commit에 `vX.Y.Z` tag를, `go/`의 Go 모듈에는 `go/vX.Y.Z` tag를 붙이고 tag를 push합니다.
+3. tag push는 `.github/workflows/release.yml`을 실행합니다. 이 workflow는 tag된 commit이 `main`에 있고 check `push-gate`와 `ci-passed`를 통과했는지, 모든 manifest에 tag의 버전이 있고 `CHANGELOG.md`에 section `## X.Y.Z`가 있는지 확인하고, 패키지 archive를 만들어 GitHub Release를 생성합니다([tag 릴리스](docs/operations/distribution.ko.md#tag-release)).
 
 <a id="idempotency"></a>
 ## 멱등성

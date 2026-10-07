@@ -22,7 +22,8 @@ ONLINE := env -u CARGO_NET_OFFLINE -u GOPROXY -u npm_config_offline -u COMPOSER_
 export PATH := $(NPM_DIRECTORY)/bin:$(PATH)
 
 .PHONY: check rerun-failed test docs-check pie-check benchmark hooks hooks-check push-gate tools toolchains-check owner-check \
-	owner-validate ci ci-summary ci-passed clippy go-vet github-ruleset github-ruleset-check
+	owner-validate ci ci-summary ci-passed clippy go-vet github-ruleset github-ruleset-check \
+	release-verify release-versions release-assets release-publish
 
 # scripts/full_run.py runs the full verification once per committed tree, when no feature of
 # docs/features.md is partial, and records its result in var/full-run.json.
@@ -120,3 +121,12 @@ github-ruleset:
 
 github-ruleset-check:
 	$(PYTHON) scripts/github_ruleset.py check
+
+# The steps of .github/workflows/release.yml for the tag TAG (scripts/release.py), in this order: release-verify requires
+# the tagged commit on origin/main with the checks push-gate and ci-passed passed, release-versions the version of the
+# tag in every manifest and its section in CHANGELOG.md, release-assets builds the package archives into
+# var/release/assets, and release-publish creates the GitHub Release. The workflow sets TAG in the environment, and the
+# recipe passes it as "$$TAG", so the name of a tag never becomes shell text.
+release-verify release-versions release-assets release-publish:
+	$(if $(TAG),,$(error make $@ needs TAG=<tag>, a tag vX.Y.Z or go/vX.Y.Z))
+	$(PYTHON) scripts/release.py $(@:release-%=%) "$$TAG"
