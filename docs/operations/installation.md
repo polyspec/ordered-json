@@ -34,6 +34,39 @@ The clone contains every implementation package. Use the package directory or a 
 - Go: use a local `replace` for module `github.com/polyspec/ordered-json/go` pointing to `go/`.
 - PHP: require `php/src/OrderedJson.php` or use `php/` as a Composer path repository.
 
+<a id="release-assets"></a>
+## Release assets
+
+Each GitHub Release `vX.Y.Z` carries `polyspec-ordered-json-X.Y.Z.tgz`, `polyspec-ordered-json-X.Y.Z.zip` and `polyspec-ordered-json-extension-X.Y.Z.zip`. Each archive carries the manifest of its package unchanged: `package.json` of `js/` and `composer.json` of `php/` and `php-extension/`, each with `version` X.Y.Z, without `repositories` and without `@dev`.
+
+npm installs the tarball by its path:
+
+~~~sh
+mkdir app && cd app
+npm init -y
+npm install ./polyspec-ordered-json-X.Y.Z.tgz
+~~~
+
+Composer installs the zips from an artifact repository, a directory that holds them. With the zips in `assets/` next to `composer.json`:
+
+~~~json
+{
+  "repositories": [
+    {"type": "artifact", "url": "assets"},
+    {"packagist.org": false}
+  ],
+  "require": {"polyspec/ordered-json": "X.Y.Z"}
+}
+~~~
+
+~~~sh
+composer install
+~~~
+
+Composer reads both zips. It does not install `polyspec/ordered-json-extension`, a package of the type `php-ext`; PIE builds and installs it ([native PHP](#native-php)).
+
+The packages of this repository depend on no other package, so the repository has no npm workspaces and no private development manifest: the root `package.json` and `composer.json` declare the same packages as `js/` and `php/` for an install from a checkout, with the same `version` and no `repositories`. `scripts/tests/test_release.py` builds the archives and installs them in a temporary project outside the repository: npm with an empty cache and the scope `@polyspec` pointed at an unreachable registry, and Composer with an empty `COMPOSER_HOME` and `COMPOSER_CACHE_DIR` and the artifact repository of the zips.
+
 <a id="native-php"></a>
 ## Native PHP
 

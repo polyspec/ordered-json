@@ -15,11 +15,13 @@ releases the Go module of that directory (GO_MODULES), which needs no archive. N
 --is-ancestor`) and reads the check runs of the commit from the GitHub API (`gh api
 repos/<repository>/commits/<sha>/check-runs`, the repository of GITHUB_REPOSITORY): the latest run of each of
 push-gate and ci-passed must be completed with the conclusion success. `versions` compares X.Y.Z with the version of
-every manifest of MANIFESTS (a composer.json without a `version` field takes its version from the tag, as Composer
-does) and requires the section `## X.Y.Z` in CHANGELOG.md; for a Go tag it requires the module path of the go.mod of
+every manifest of MANIFESTS (a composer.json declares `version`, because a Composer artifact repository reads the
+version of the manifest) and requires the section `## X.Y.Z` in CHANGELOG.md; for a Go tag it requires the module path of the go.mod of
 the directory. `assets` builds one archive per package, named `<package name>-<version>.<ext>` with `@scope/` written
 as `scope-` and `vendor/` as `vendor-`: `npm pack` (.tgz) and a zip of the directory of a Composer package from `git
-archive` of the tagged commit (.zip). The Cargo package is not released as an archive; it is consumed by git tag,
+archive` of the tagged commit (.zip). Before it packs, the published manifests of the tagged commit must be in the
+standard form of `manifest_issues`; after it packs, the manifest of each archive must equal the manifest of the tagged
+commit byte for byte, because no step rewrites a manifest. The Cargo package is not released as an archive; it is consumed by git tag,
 because `cargo package` rewrites git dependencies into crates.io requirements that do not resolve. A Go tag builds and
 attaches nothing. `publish` runs `gh release create TAG --verify-tag --title TAG --notes-file <notes>`
 with the archives of `assets`; the notes are the section X.Y.Z when it has at most NOTES_LIMIT (125000) characters,
@@ -34,8 +36,10 @@ import re
 import shutil
 import subprocess
 import sys
+import tarfile
 import tempfile
 from urllib.parse import quote
+import zipfile
 
 from toolchains import environment
 
@@ -68,6 +72,10 @@ MANIFESTS = {
     'php-extension/composer.json': ARCHIVE,
     'rust/Cargo.toml': GIT_TAG,
 }
+# A dependency on a polyspec package of a published manifest is one exact version.
+EXACT = re.compile(r'(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)')
+NPM_DEPENDENCIES = ('dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies')
+COMPOSER_DEPENDENCIES = ('require', 'require-dev')
 # The Go modules: a tag <directory>/vX.Y.Z releases the module of that directory.
 GO_MODULES = {'go': 'github.com/polyspec/ordered-json/go'}
 TAG = re.compile(r'(?:(?P<directory>[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*)/)?v(?P<version>(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))')
@@ -135,7 +143,7 @@ def verify(root, tag, repository):
 
 
 def manifest_version(path):
-    """The version that a manifest declares, or None for a composer.json without one."""
+    """The version that a manifest declares, or None for a manifest without one."""
     text = path.read_text(encoding='utf-8')
     if path.name in ('package.json', 'composer.json'):
         data = json.loads(text)
@@ -147,6 +155,56 @@ def manifest_version(path):
         found = section and re.search(r'(?m)^version\s*=\s*"([^"]*)"', section.group(1))
         return found.group(1) if found else None
     raise Stop(f'{path.name}: not a manifest of a release')
+
+
+def manifest_issues(texts):
+    """The ways in which the published manifests of texts, {manifest path: text}, leave the standard form: a
+    composer.json declares `version` and no `repositories`, no constraint holds `@dev`, a package.json declares no
+    `overrides` and no `file:`, `link:`, `workspace:`, URL or git dependency, and every dependency on a polyspec
+    package is one exact version."""
+    issues = []
+    for name, text in texts.items():
+        data = json.loads(text)
+        if Path(name).name == 'composer.json':
+            if not isinstance(data.get('version'), str) or not EXACT.fullmatch(data['version']):
+                issues.append(f'{name}: no version X.Y.Z; a Composer artifact repository reads the version of the '
+                              f'manifest, so a published composer.json declares it')
+            if 'repositories' in data:
+                issues.append(f'{name}: declares repositories; a published composer.json resolves only by name and '
+                              f'version')
+            sections, scope = COMPOSER_DEPENDENCIES, 'polyspec/'
+        else:
+            if 'overrides' in data:
+                issues.append(f'{name}: declares overrides; a published package.json resolves only by name and version')
+            sections, scope = NPM_DEPENDENCIES, '@polyspec/'
+        for section in sections:
+            for package, constraint in (data.get(section) or {}).items():
+                if '@dev' in constraint:
+                    issues.append(f'{name}: {section} {package} is {constraint!r}, a constraint with @dev')
+                elif re.match(r'(?:file|link|workspace|git|git\+[a-z]+|https?):', constraint):
+                    issues.append(f'{name}: {section} {package} is {constraint!r}, not a registry version')
+                elif package.startswith(scope) and not EXACT.fullmatch(constraint):
+                    issues.append(f'{name}: {section} {package} is {constraint!r}, not one exact version X.Y.Z')
+    return issues
+
+
+def published_manifests(root, commit=None):
+    """{manifest path: text} of every package.json and composer.json of MANIFESTS, from the working tree or, with
+    commit, from that commit."""
+    names = [name for name in MANIFESTS if Path(name).name in ('package.json', 'composer.json')]
+    if commit is None:
+        return {name: (Path(root) / name).read_text(encoding='utf-8') for name in names}
+    return {name: run(['git', 'show', f'{commit}:{name}'], root) for name in names}
+
+
+def packed_manifest(archive):
+    """The text of the manifest that a package archive carries: package/package.json of an npm tarball, composer.json
+    at the root of a Composer zip."""
+    if archive.suffix == '.tgz':
+        with tarfile.open(archive) as packed:
+            return packed.extractfile('package/package.json').read().decode('utf-8')
+    with zipfile.ZipFile(archive) as packed:
+        return packed.read('composer.json').decode('utf-8')
 
 
 def changelog_section(root, version):
@@ -196,7 +254,9 @@ def versions(root, tag):
     if directory is None:
         for name in MANIFESTS:
             declared = manifest_version(root / name)
-            if declared is not None and declared != version:
+            if declared is None and Path(name).name == 'composer.json':
+                problems.append(f'{name}: no version, the tag {tag} is {version}')
+            elif declared != version:
                 problems.append(f'{name}: version {declared}, the tag {tag} is {version}')
     else:
         found = re.search(r'(?m)^module\s+(\S+)\s*$', (root / directory / 'go.mod').read_text(encoding='utf-8'))
@@ -235,8 +295,19 @@ def assets(root, tag):
     target.mkdir(parents=True)
     if directory is not None:
         return []
-    commit = tagged_commit(root, tag)
+    return build_assets(root, tagged_commit(root, tag), version, target)
+
+
+def build_assets(root, commit, version, target):
+    """Build the archive of every package of version from commit into target, which exists and is empty; the names of
+    the archives. The manifests of commit must be in the standard form (manifest_issues), and each archive must carry
+    the manifest of its package at commit byte for byte: no step rewrites a manifest."""
+    root, target = Path(root), Path(target)
+    issues = manifest_issues(published_manifests(root, commit))
+    if issues:
+        raise Stop('; '.join(issues))
     env = environment(root)
+    tag = f'v{version}'
     for (kind, path, name), expected in zip(PACKAGES, asset_names(tag)):
         if kind == 'npm':
             run(['npm', 'pack', '--pack-destination', str(target)], root / path, env)
@@ -244,7 +315,12 @@ def assets(root, tag):
             run(['git', 'archive', '--format=zip', f'--output={target / expected}', f'{commit}:{path}'], root)
     present = sorted(item.name for item in target.iterdir())
     if present != sorted(asset_names(tag)):
-        raise Stop(f'{ASSETS} holds {present}, not the archives {sorted(asset_names(tag))}')
+        raise Stop(f'{target} holds {present}, not the archives {sorted(asset_names(tag))}')
+    for (kind, path, _), expected in zip(PACKAGES, asset_names(tag)):
+        manifest = f"{path}/{'package.json' if kind == 'npm' else 'composer.json'}"
+        if packed_manifest(target / expected) != run(['git', 'show', f'{commit}:{manifest}'], root):
+            raise Stop(f'{expected}: its manifest differs from {manifest} of the commit {commit}; the archive '
+                       f'carries the manifest unchanged')
     return asset_names(tag)
 
 
