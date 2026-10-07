@@ -1,5 +1,5 @@
 <!-- doc-id: distribution -->
-<!-- source-sha256: dc18040b14c3c41f524dec784fa820178b02b53e87064a7179581028e79c2cd0 -->
+<!-- source-sha256: 09488dbe6d708a6693e20edf0c8c65a1432659ed079a34290cc3362aabf10a83 -->
 # 배포
 
 [English](distribution.md)
@@ -31,7 +31,7 @@ gh pr merge <branch> --auto --rebase
 <a id="tag-release"></a>
 ## Tag 릴리스
 
-릴리스는 `main`의 commit에 붙인 tag입니다([릴리스 절차](../../AGENTS.ko.md#release)). `vX.Y.Z`는 `js/`의 npm 패키지, `php/`와 `php-extension/`의 Composer 패키지, `rust/`의 Cargo 패키지를 버전 X.Y.Z로 릴리스하고, `go/vX.Y.Z`는 Go 모듈 `github.com/polyspec/ordered-json/go`를 릴리스합니다. tag의 push는 `.github/workflows/release.yml`(`on: push: tags: ['v*', '*/v*']`, 권한 `contents: write`)을 실행하며, 그 step은 다음 순서로 `scripts/release.py`를 실행하고 첫 실패에서 멈춥니다.
+릴리스는 `main`의 commit에 붙인 tag입니다([릴리스 절차](../../AGENTS.ko.md#release)). `vX.Y.Z`는 `js/`의 npm 패키지와 `php/`, `php-extension/`의 Composer 패키지를 버전 X.Y.Z로 릴리스하고, `go/vX.Y.Z`는 Go 모듈 `github.com/polyspec/ordered-json/go`를 릴리스합니다. `rust/`의 Cargo 패키지는 archive로 릴리스하지 않고 git tag로 사용합니다. `cargo package`는 git 의존성을 해석되지 않는 crates.io 요구로 바꾸기 때문입니다. tag의 push는 `.github/workflows/release.yml`(`on: push: tags: ['v*', '**/v*']`, 권한 `contents: write`. tag filter에서 `*`는 `/`와 맞지 않으므로 `**/v*`가 어느 깊이의 Go 모듈 tag든 포함합니다)을 실행하며, 그 step은 다음 순서로 `scripts/release.py`를 실행하고 첫 실패에서 멈춥니다.
 
 ~~~sh
 make release-verify
@@ -42,10 +42,10 @@ make release-publish
 
 1. `make release-verify`는 tag된 commit이 `origin/main`의 조상이고(`git merge-base --is-ancestor`), 그 commit의 최신 check run `push-gate`와 `ci-passed`(`gh api repos/<repository>/commits/<sha>/check-runs`)가 결론 `success`로 완료되었는지 확인합니다. 없거나 실패한 check의 이름을 적으며 테스트를 다시 실행하지 않습니다.
 2. `make release-versions`는 `package.json`, `js/package.json`, `rust/Cargo.toml`에 X.Y.Z가 있고(`version` field가 없는 `composer.json`은 Composer처럼 버전을 tag에서 받습니다) `CHANGELOG.md`에 section `## X.Y.Z`가 있는지 확인하며, 다른 파일마다 그 버전과 tag의 버전을 적습니다. `go/vX.Y.Z`에는 `go/go.mod`의 모듈 경로와 section을 확인합니다.
-3. `make release-assets`는 `var/release/assets`를 만듭니다. `polyspec-ordered-json-X.Y.Z.tgz`(`js/`의 `npm pack`), `polyspec-ordered-json-X.Y.Z.zip`과 `polyspec-ordered-json-extension-X.Y.Z.zip`(tag된 commit의 `php/`와 `php-extension/`의 `git archive`), `polyspec-ordered-json-X.Y.Z.crate`(`rust/`의 `cargo package --no-verify --locked`)입니다. archive 이름은 `<package name>-<version>.<ext>`이고 `@scope/`와 `vendor/`는 `scope-`와 `vendor-`로 씁니다. Go tag는 archive를 만들지 않습니다.
+3. `make release-assets`는 `var/release/assets`를 만듭니다. `polyspec-ordered-json-X.Y.Z.tgz`(`js/`의 `npm pack`), `polyspec-ordered-json-X.Y.Z.zip`과 `polyspec-ordered-json-extension-X.Y.Z.zip`(tag된 commit의 `php/`와 `php-extension/`의 `git archive`)입니다. 릴리스 asset은 npm tarball과 Composer zip뿐입니다. archive 이름은 `<package name>-<version>.<ext>`이고 `@scope/`와 `vendor/`는 `scope-`와 `vendor-`로 씁니다. Go tag는 아무것도 만들거나 첨부하지 않습니다.
 4. `make release-publish`는 archive와 함께 `gh release create <tag> --verify-tag --title <tag> --notes-file <section X.Y.Z>`를 실행합니다.
 
-tag는 환경 변수 `TAG`로 step에 전달됩니다. `scripts/tests/test_release.py`는 `gh`, `npm`, `cargo`의 fake로 각 step을 실행하고, `scripts/tests/test_workflow_rules.py`는 trigger, 권한, step의 순서를 요구합니다.
+tag는 환경 변수 `TAG`로 step에 전달됩니다. `scripts/tests/test_release.py`는 `gh`, `npm`의 fake로 각 step을 실행하고, `scripts/tests/test_workflow_rules.py`는 trigger, 권한, step의 순서를 요구합니다.
 
 <a id="releases"></a>
 ## 레지스트리와 릴리스 기록

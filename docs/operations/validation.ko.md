@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: a173a54111b3b743b6bb46a69416a9c26b579c8b37669b92f98b30cff1846e2d -->
+<!-- source-sha256: 0a3b7f20c2a6f0ff82e4387cb57249dbec2ab40b9251315588275731ba0c3e4e -->
 # 검증
 
 [English](validation.md)
@@ -79,7 +79,7 @@ PIE 기록 `var/records/pie-verification.json`은 PIE 버전과 PHAR 해시, 실
 <a id="ci"></a>
 ## Hosted CI
 
-`.github/workflows/ci.yml`은 모든 pull request, [merge queue](#publish)의 모든 merge group, 모든 수동 실행(`workflow_dispatch`)에서 전체 suite를 실행합니다. 하나의 matrix에 두 job이 있고 `fail-fast: false`이므로 한 job이 다른 job을 취소하지 않습니다. `.github/workflows/push-gate.yml`은 merge queue의 branch가 아닌 branch로의 모든 push(`branches-ignore: ['gh-readonly-queue/**']`), 모든 pull request, 모든 merge group에서 실행되고, `.github/workflows/release.yml`은 tag `v*` 또는 `*/v*`의 push에서만 실행되며([tag 릴리스](distribution.ko.md#tag-release)), 다른 workflow는 없습니다.
+`.github/workflows/ci.yml`은 모든 pull request, [merge queue](#publish)의 모든 merge group, 모든 수동 실행(`workflow_dispatch`)에서 전체 suite를 실행합니다. 하나의 matrix에 두 job이 있고 `fail-fast: false`이므로 한 job이 다른 job을 취소하지 않습니다. `.github/workflows/push-gate.yml`은 merge queue의 branch가 아닌 branch로의 모든 push(`branches-ignore: ['gh-readonly-queue/**']`), 모든 pull request, 모든 merge group에서 실행되고, `.github/workflows/release.yml`은 tag `v*` 또는 `**/v*`의 push에서만 실행되며([tag 릴리스](distribution.ko.md#tag-release)), 다른 workflow는 없습니다.
 
 ~~~sh
 make tools

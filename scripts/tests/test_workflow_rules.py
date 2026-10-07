@@ -17,11 +17,12 @@ WORKFLOWS = ROOT / '.github/workflows'
 ALWAYS = '${{ !cancelled() }}'
 # The `on:` block of each workflow: ci.yml runs the checks on every pull request, every merge group and every manual
 # run; push-gate.yml runs the gate on every push to a branch other than those of the merge queue, every pull request
-# and every merge group; release.yml runs on the push of a tag vX.Y.Z or <directory>/vX.Y.Z. No other workflow exists.
+# and every merge group; release.yml runs on the push of a tag vX.Y.Z or <directory>/vX.Y.Z at any depth (in a tag
+# filter * does not match /, so **/v* covers the tags of the Go modules). No other workflow exists.
 TRIGGERS = {
     'ci.yml': 'on:\n  pull_request:\n  merge_group:\n  workflow_dispatch:\n',
     'push-gate.yml': "on:\n  push:\n    branches-ignore: ['gh-readonly-queue/**']\n  pull_request:\n  merge_group:\n",
-    'release.yml': "on:\n  push:\n    tags: ['v*', '*/v*']\n",
+    'release.yml': "on:\n  push:\n    tags: ['v*', '**/v*']\n",
 }
 # The workflows whose checks the ruleset of main requires; they run on every pull request and every merge group.
 CHECK_WORKFLOWS = ('ci.yml', 'push-gate.yml')
@@ -321,7 +322,8 @@ class WorkflowRules(unittest.TestCase):
             'read only': (text.replace('  contents: write\n', '  contents: read\n'), 'not exactly contents: write'),
             'no tag': (text.replace('      TAG: ${{ github.ref_name }}\n', ''), 'does not set TAG'),
             'shallow': (text.replace('          fetch-depth: 0\n', '          fetch-depth: 1\n'), 'fetch-depth: 0'),
-            'trigger': (text.replace("tags: ['v*', '*/v*']", "tags: ['v*']"), 'the on: block is'),
+            'trigger': (text.replace("tags: ['v*', '**/v*']", "tags: ['v*']"), 'the on: block is'),
+            'one level': (text.replace("tags: ['v*', '**/v*']", "tags: ['v*', '*/v*']"), 'the on: block is'),
         }
         for case, (broken_text, message) in broken.items():
             with self.subTest(case=case):

@@ -1,18 +1,19 @@
 # Release: a tag push creates the GitHub Release of the tag. Every change reaches main through the merge queue with the
 # required checks, so every commit of main passed the full suite; the maintainer releases by tagging a commit of main
-# vX.Y.Z after a version-bump pull request, or go/vX.Y.Z for the Go module of go/. The steps run in order and stop at
-# the first failure: make release-verify requires the tagged commit on origin/main with the check runs push-gate and
-# ci-passed concluded success, without running the tests again; make release-versions requires the version of the tag
-# in every manifest and its section in CHANGELOG.md; make release-assets builds the package archives (npm pack, a zip of
-# each Composer package, cargo package); make release-publish creates the GitHub Release with the section as notes and
-# the archives attached, and a Go tag creates it without archives (scripts/release.py). TAG reaches the make targets
-# through the environment, never as shell text. Each step runs a make target. The runner image and each action are
-# exact releases, as in ci.yml.
+# vX.Y.Z after a version-bump pull request, or go/vX.Y.Z for the Go module of go/. In a tag filter * does not match /,
+# so '**/v*' covers the tag of a Go module at any depth. The steps run in order and stop at the first failure: make
+# release-verify requires the tagged commit on origin/main with the check runs push-gate and ci-passed concluded
+# success, without running the tests again; make release-versions requires the version of the tag in every manifest and
+# its section in CHANGELOG.md; make release-assets builds the package archives (npm pack and a zip of each Composer
+# package; the Cargo package is not released as an archive and is consumed by git tag); make release-publish creates
+# the GitHub Release with the section as notes and the archives attached, and a Go tag builds and attaches nothing
+# (scripts/release.py). TAG reaches the make targets through the environment, never as shell text. Each step runs a
+# make target. The runner image and each action are exact releases, as in ci.yml.
 name: release
 
 on:
   push:
-    tags: ['v*', '*/v*']
+    tags: ['v*', '**/v*']
 
 permissions:
   contents: write
