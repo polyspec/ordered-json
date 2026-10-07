@@ -1,11 +1,14 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: bc061f1182f613f70472a0561428ec2045c6177691e7c5f9128b3a5b68c6bab6 -->
+<!-- source-sha256: 0b4186c96f895963221ae3132355c430c57ad61e0aa8e5ba38a5d8db25dc727c -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
-## 미릴리스
+## Unreleased
+
+<a id="0-0-1"></a>
+## 0.0.1
 
 - Cargo 패키지는 `polyspec-ordered-json`, 라이브러리는 `polyspec_ordered_json`으로 polyspec 관례를 따릅니다.
   이전에는 `ordered-json`과 `ordered_json`이었습니다.
@@ -26,4 +29,4 @@
 - 패키지 자체의 개발 절차, 변경 기록, Makefile, 문서 목록을 추가했습니다.
 - 영어와 한국어 사용 방법, 개발 절차, 변경 기록을 추가했습니다.
 
-공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 저장소 루트의 [검증 기록](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.ko.md#records)에서 설명합니다. 여기서는 레지스트리 게시와 버전 릴리스를 선언하지 않습니다.
+공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 저장소 루트의 [검증 기록](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.ko.md#records)에서 설명합니다. 여기서는 레지스트리 게시를 선언하지 않습니다.
