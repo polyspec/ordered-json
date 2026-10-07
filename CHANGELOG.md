@@ -9,6 +9,13 @@
 <a id="0-0-3"></a>
 ## 0.0.3
 
+- The release asset install test installs as a consumer does (T1.26): `scripts/tests/install` holds a `package.json`
+  with its `package-lock.json` and a `composer.json` with its `composer.lock`, which pin the archives by their hashes,
+  and `test_release` runs `npm ci` with an empty cache and the scope `@polyspec` pointed at an unreachable registry and
+  `composer install` with an empty `COMPOSER_HOME` and `COMPOSER_CACHE_DIR`, without the offline settings.
+  `make install-fixtures` writes the fixtures and their locks. A Composer zip has stored entries, a fixed entry time
+  and `TZ=UTC`, so its bytes and its shasum are the same on every machine. AGENTS states that a check makes no
+  registry query whose result depends on time and that a download pinned by a lock is installation.
 - Release 0.0.3 (T1.25): `package.json`, `js/package.json`, `composer.json`, `php/composer.json`,
   `php-extension/composer.json`, `rust/Cargo.toml` and the package entry of `rust/Cargo.lock` declare 0.0.3, the
   changelogs hold the section `## 0.0.3` under an empty `## Unreleased`, the installation table names 0.0.3, and

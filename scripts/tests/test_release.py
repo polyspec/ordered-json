@@ -4,13 +4,12 @@ Each case builds a Git repository in a temporary directory with the manifests of
 origin/main and the tag, and puts fakes of gh and npm first on PATH. The fake gh answers the check runs of the GitHub
 API from a JSON state file and records each call; the fake npm writes a tarball that carries package.json as npm pack
 does. No case of a sandbox reaches GitHub or a registry. InstallFromAssets builds the archives of the repository with the
-real npm and git, and installs them in a temporary project outside the repository with npm and Composer.
+real npm and git, and installs them with `npm ci` and `composer install` from the committed consumer fixtures of
+scripts/tests/install in a temporary directory outside the repository.
 """
-import io
 import json
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -20,6 +19,7 @@ import unittest.mock
 import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import install_fixtures
 import release
 from test import timeout
 
@@ -320,42 +320,50 @@ class Assets(unittest.TestCase):
 
 
 class InstallFromAssets(unittest.TestCase):
-    """The archives of the repository install from the archives alone, in a temporary project outside the repository.
+    """The archives of the repository install as a consumer installs them, from the committed fixtures of
+    scripts/tests/install (make install-fixtures), in a temporary directory outside the repository.
 
-    npm runs with an empty cache and the scope @polyspec pointed at an unreachable registry, so a polyspec package can
-    come only from its tarball. Composer runs with an empty COMPOSER_HOME and COMPOSER_CACHE_DIR, an artifact repository
-    of the zips and Packagist disabled. Composer reads the extension zip but does not install a package of the type
-    php-ext, which PIE installs, so the project installs the library and lists the extension of the artifact
-    repository."""
+    The fixtures are a package.json with its package-lock.json, which depends on the tarball by its release name, and a
+    composer.json with its composer.lock, which requires the library from an artifact repository of the zips with
+    Packagist disabled; each lock pins its archive by its hash. `npm ci` runs with an empty cache and the scope
+    @polyspec pointed at an unreachable registry, so a polyspec package can come only from its tarball, and `composer
+    install` with an empty COMPOSER_HOME and COMPOSER_CACHE_DIR. Neither runs offline: a third-party package of a lock
+    is downloaded at its locked version and hash. Composer reads the extension zip but does not install a package of
+    the type php-ext, which PIE installs, so the fixture requires the library, and the extension zip is listed from the
+    artifact repository."""
 
     @classmethod
     def setUpClass(cls):
         folder = tempfile.TemporaryDirectory(prefix='ordered-json-install-')
         cls.addClassCleanup(folder.cleanup)
         cls.folder = Path(folder.name)
-        cls.version = json.loads((ROOT / 'js/package.json').read_text())['version']
+        cls.version = install_fixtures.version()
         # The working tree as a commit, without changing the checkout: git stash create prints nothing for a clean tree.
         commit = git(ROOT, 'stash', 'create') or git(ROOT, 'rev-parse', 'HEAD')
-        cls.assets = cls.folder / 'assets'
-        cls.assets.mkdir()
-        release.build_assets(ROOT, commit, cls.version, cls.assets)
+        assets = cls.folder / 'assets'
+        assets.mkdir()
+        release.build_assets(ROOT, commit, cls.version, assets)
+        install_fixtures.stage(cls.folder / 'work', assets)
+        cls.work = cls.folder / 'work'
 
     def run_in(self, command, cwd, env):
         result = subprocess.run(command, cwd=cwd, env=env, capture_output=True, text=True)
-        self.assertEqual(result.returncode, 0, f'{" ".join(command)}:\n{result.stdout}\n{result.stderr}')
+        self.assertEqual(result.returncode, 0, f'{" ".join(command)}:\n{result.stdout}\n{result.stderr}\n'
+                                               f'make install-fixtures writes the fixtures of the working tree')
         return result.stdout
 
+    def test_the_fixtures_are_those_of_the_version(self):
+        for path, text in install_fixtures.manifests(self.version).items():
+            with self.subTest(fixture=path):
+                self.assertEqual((install_fixtures.FIXTURES / path).read_text(), text,
+                                 'make install-fixtures writes the fixtures of the version')
+
     @timeout(120)
-    def test_npm_installs_the_tarball(self):
-        project = self.folder / 'npm'
-        project.mkdir()
-        (project / 'package.json').write_text(json.dumps({'name': 'install-check', 'private': True, 'type': 'module'}))
-        env = release.environment(ROOT)
-        env.pop('npm_config_offline', None)
-        tarball = self.assets / release.asset_name('@polyspec/ordered-json', self.version, 'tgz')
-        self.run_in(['npm', 'install', '--cache', str(self.folder / 'npm-cache'),
-                     '--@polyspec:registry=http://127.0.0.1:9/', '--no-audit', '--no-fund', f'file:{tarball}'],
-                    project, env)
+    def test_npm_ci_installs_the_tarball_of_the_lock(self):
+        project = self.work / 'npm'
+        env = install_fixtures.npm_environment()
+        self.run_in(['npm', 'ci', '--cache', str(self.folder / 'npm-cache'),
+                     f'--@polyspec:registry={install_fixtures.UNREACHABLE}', '--no-audit', '--no-fund'], project, env)
         installed = json.loads((project / 'node_modules/@polyspec/ordered-json/package.json').read_text())
         self.assertEqual(installed['version'], self.version)
         output = self.run_in(['node', '--input-type=module', '-e',
@@ -364,15 +372,13 @@ class InstallFromAssets(unittest.TestCase):
         self.assertEqual(output.strip(), '{"b":1,"a":2}')
 
     @timeout(120)
-    def test_composer_installs_from_an_artifact_repository_of_the_zips(self):
-        project = self.folder / 'composer'
-        project.mkdir()
-        (project / 'composer.json').write_text(json.dumps({
-            'repositories': [{'type': 'artifact', 'url': str(self.assets)}, {'packagist.org': False}],
-            'require': {'polyspec/ordered-json': self.version}}))
-        env = {**os.environ, 'COMPOSER_HOME': str(self.folder / 'composer-home'),
-               'COMPOSER_CACHE_DIR': str(self.folder / 'composer-cache')}
+    def test_composer_install_installs_the_zip_of_the_lock(self):
+        project = self.work / 'composer'
+        env = install_fixtures.composer_environment(self.folder)
         self.run_in(['composer', 'install', '--no-interaction', '--no-progress'], project, env)
+        installed = json.loads((project / 'vendor/composer/installed.json').read_text())
+        self.assertEqual([(entry['name'], entry['version']) for entry in installed['packages']],
+                         [('polyspec/ordered-json', self.version)])
         listed = json.loads(self.run_in(['composer', 'show', '--available', '--format=json',
                                          'polyspec/ordered-json-extension'], project, env))
         self.assertEqual(listed['versions'], [self.version])
@@ -441,8 +447,8 @@ class Publish(unittest.TestCase):
 class Repository(unittest.TestCase):
     def test_the_declarations_cover_every_tracked_manifest(self):
         tracked = subprocess.run(['git', 'ls-files'], cwd=ROOT, check=True, capture_output=True, text=True).stdout.split()
-        manifests = sorted(path for path in tracked
-                           if Path(path).name in ('package.json', 'composer.json', 'Cargo.toml', 'VERSION', 'pyproject.toml'))
+        manifests = sorted(path for path in tracked if not path.startswith('scripts/tests/install/')
+                           and Path(path).name in ('package.json', 'composer.json', 'Cargo.toml', 'VERSION', 'pyproject.toml'))
         self.assertEqual(manifests, sorted(release.MANIFESTS))
         modules = sorted(str(Path(path).parent) for path in tracked if Path(path).name == 'go.mod')
         self.assertEqual(modules, sorted(release.GO_MODULES))

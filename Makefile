@@ -23,7 +23,7 @@ export PATH := $(NPM_DIRECTORY)/bin:$(PATH)
 
 .PHONY: check rerun-failed test docs-check pie-check benchmark hooks hooks-check push-gate tools toolchains-check owner-check \
 	owner-validate ci ci-summary ci-passed clippy go-vet github-ruleset github-ruleset-check \
-	release-verify release-versions release-assets release-publish
+	release-verify release-versions release-assets release-publish install-fixtures
 
 # scripts/full_run.py runs the full verification once per committed tree, when no feature of
 # docs/features.md is partial, and records its result in var/full-run.json.
@@ -130,3 +130,10 @@ github-ruleset-check:
 release-verify release-versions release-assets release-publish:
 	$(if $(TAG),,$(error make $@ needs TAG=<tag>, a tag vX.Y.Z or go/vX.Y.Z))
 	$(PYTHON) scripts/release.py $(@:release-%=%) "$$TAG"
+
+# install-fixtures writes the consumer fixtures of the release asset install test of scripts/tests/test_release.py:
+# the manifests and the locks of scripts/tests/install for the version of js/package.json, from the archives of the
+# working tree (scripts/install_fixtures.py). A lock pins each archive by its hash, so a change of a package or of the
+# version runs this target; the release commit runs it. Writing a lock resolves dependencies, so it runs with $(ONLINE).
+install-fixtures:
+	$(ONLINE) $(PYTHON) scripts/install_fixtures.py

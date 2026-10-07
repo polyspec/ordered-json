@@ -1,0 +1,8 @@
+{
+  "name": "ordered-json-install-check",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@polyspec/ordered-json": "file:polyspec-ordered-json-0.0.3.tgz"
+  }
+}
