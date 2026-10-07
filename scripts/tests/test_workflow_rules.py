@@ -12,6 +12,13 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOWS = ROOT / '.github/workflows'
 ALWAYS = '${{ !cancelled() }}'
+# The `on:` block of each workflow: ci.yml runs the checks on every pull request, every merge group and every manual
+# run; push-gate.yml runs the gate on every push to a branch other than those of the merge queue, every pull request
+# and every merge group. No other workflow exists.
+TRIGGERS = {
+    'ci.yml': 'on:\n  pull_request:\n  merge_group:\n  workflow_dispatch:\n',
+    'push-gate.yml': "on:\n  push:\n    branches-ignore: ['gh-readonly-queue/**']\n  pull_request:\n  merge_group:\n",
+}
 
 
 def jobs(text):
@@ -77,6 +84,9 @@ def violations(name, text):
     if 'push' in events and "branches-ignore: ['gh-readonly-queue/**']" not in trigger.group(1):
         found.append(f"{name}: the push trigger lacks branches-ignore: ['gh-readonly-queue/**']; the merge group runs the "
                      'workflow already')
+    declared = 'on:\n' + trigger.group(1).rstrip('\n') + '\n' if trigger else ''
+    if name in TRIGGERS and declared != TRIGGERS[name]:
+        found.append(f'{name}: the on: block is {declared!r}, not {TRIGGERS[name]!r}')
     for job, body in parsed.items():
         steps = body['steps']
         if not steps:
@@ -188,6 +198,19 @@ class WorkflowRules(unittest.TestCase):
         self.assertNotEqual(queue, gate)
         self.assertTrue(any("lacks branches-ignore: ['gh-readonly-queue/**']" in issue
                             for issue in violations('push-gate.yml', queue)))
+
+    def test_each_workflow_declares_exactly_its_triggers(self):
+        self.assertEqual(sorted(path.name for path in WORKFLOWS.glob('*.yml')), sorted(TRIGGERS))
+        for name, block in TRIGGERS.items():
+            with self.subTest(workflow=name):
+                text = (WORKFLOWS / name).read_text()
+                self.assertIn('\n' + block + '\n', text)
+        text = (WORKFLOWS / 'ci.yml').read_text()
+        manual = text.replace('  workflow_dispatch:\n', '', 1)
+        self.assertNotEqual(manual, text)
+        self.assertTrue(any(issue.startswith('ci.yml: the on: block is') for issue in violations('ci.yml', manual)))
+        pushed = text.replace('  merge_group:\n', '  merge_group:\n  push:\n', 1)
+        self.assertTrue(any(issue.startswith('ci.yml: the on: block is') for issue in violations('ci.yml', pushed)))
 
     def test_a_step_that_does_not_run_after_a_failure_fails(self):
         text = (WORKFLOWS / 'ci.yml').read_text()

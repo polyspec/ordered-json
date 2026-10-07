@@ -6,6 +6,9 @@
 <a id="unreleased"></a>
 ## Unreleased — 2026-09-07
 
+- Each workflow declares its triggers exactly (T1.20): `ci.yml` runs on `pull_request`, `merge_group` and
+  `workflow_dispatch`, and `push-gate.yml` on `push` with `branches-ignore: ['gh-readonly-queue/**']`,
+  `pull_request` and `merge_group`. `test_workflow_rules` fails when the `on:` block of a workflow differs.
 - The development procedure of each package names the required checks of the repository root (T1.19): development
   runs unit tests only, `make check` of a package runs the shared verifier for that package alone, and hosted CI runs
   the full suite after the push.

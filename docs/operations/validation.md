@@ -78,7 +78,7 @@ The PIE record `var/records/pie-verification.json` records the PIE version and P
 <a id="ci"></a>
 ## Hosted CI
 
-`.github/workflows/ci.yml` runs the full suite on every pull request and every merge group of the [merge queue](#publish), in two jobs of one matrix with `fail-fast: false`, so one job does not cancel the other:
+`.github/workflows/ci.yml` runs the full suite on every pull request, every merge group of the [merge queue](#publish) and every manual run (`workflow_dispatch`), in two jobs of one matrix with `fail-fast: false`, so one job does not cancel the other. `.github/workflows/push-gate.yml` runs on every push to a branch other than those of the merge queue (`branches-ignore: ['gh-readonly-queue/**']`), every pull request and every merge group, and no other workflow runs on a push, a pull request or a merge group:
 
 ~~~sh
 make tools
