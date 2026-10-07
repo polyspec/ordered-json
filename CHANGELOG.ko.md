@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 8241083c7610c9dd8627939bdcd04797bc425f3c2e78847a190cce3c1ea4e23f -->
+<!-- source-sha256: b1764094269deec7a7f53527a0528418bb872064aea1dd8c149cdaacdd3e6152 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,11 +7,16 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- tag의 릴리스는 어느 깊이의 Go 모듈 tag든 포함하고, 그 asset은 npm tarball과 Composer zip뿐입니다(T1.21-4).
+  `.github/workflows/release.yml`의 trigger는 `tags: ['v*', '**/v*']`입니다. tag filter에서 `*`는 `/`와 맞지
+  않으므로 `**/v*`가 `go/vX.Y.Z`와 어느 깊이의 Go 모듈 tag든 포함합니다. `rust/`의 Cargo 패키지는 archive로
+  릴리스하지 않고 git tag로 사용합니다. `cargo package`는 git 의존성을 해석되지 않는 crates.io 요구로 바꾸기
+  때문입니다. `scripts/release.py`는 manifest 목록에 이를 적고, `test_release`는 Cargo archive가 있으면 실패합니다.
 - `main`의 commit에 붙인 tag가 그 commit을 릴리스합니다(T1.21-3). `.github/workflows/release.yml`은 권한
-  `contents: write`로 tag `v*` 또는 `*/v*`의 push에서 실행됩니다. `make release-verify`는 tag된 commit이
+  `contents: write`로 tag `v*` 또는 `**/v*`의 push에서 실행됩니다. `make release-verify`는 tag된 commit이
   `origin/main`에 있고 check run `push-gate`와 `ci-passed`가 `success`로 끝났는지, `make release-versions`는 모든
   manifest에 tag의 버전이 있고 `CHANGELOG.md`에 section `## X.Y.Z`가 있는지 확인하고, `make release-assets`는 npm,
-  Composer, Cargo archive를 만들며, `make release-publish`는 section을 notes로 GitHub Release를 만듭니다
+  Composer archive를 만들며, `make release-publish`는 section을 notes로 GitHub Release를 만듭니다
   (`scripts/release.py`, `scripts/tests/test_release.py`). AGENTS가 릴리스 절차를 적습니다.
 - ruleset `main`은 정확히 check `push-gate`와 `ci-passed`를 요구합니다(T1.21-2). `ci.yml`의 마지막 job `ci-passed`는
   다른 모든 job을 need로 가지고, `if: ${{ always() }}`로 그 모든 job 뒤에 실행되며, need로 가진 job의 결과가 모두

@@ -18,10 +18,12 @@ push-gate and ci-passed must be completed with the conclusion success. `versions
 every manifest of MANIFESTS (a composer.json without a `version` field takes its version from the tag, as Composer
 does) and requires the section `## X.Y.Z` in CHANGELOG.md; for a Go tag it requires the module path of the go.mod of
 the directory. `assets` builds one archive per package, named `<package name>-<version>.<ext>` with `@scope/` written
-as `scope-` and `vendor/` as `vendor-`: `npm pack` (.tgz), a zip of the directory of a Composer package from `git
-archive` of the tagged commit (.zip) and `cargo package --no-verify --locked` (.crate). `publish` runs `gh release
-create TAG --verify-tag --title TAG --notes-file <the section X.Y.Z>` with the archives of `assets`. Each failure
-names the tag, the file or check and both values, and exits with status 1.
+as `scope-` and `vendor/` as `vendor-`: `npm pack` (.tgz) and a zip of the directory of a Composer package from `git
+archive` of the tagged commit (.zip). The Cargo package is not released as an archive; it is consumed by git tag,
+because `cargo package` rewrites git dependencies into crates.io requirements that do not resolve. A Go tag builds and
+attaches nothing. `publish` runs `gh release create TAG --verify-tag --title TAG --notes-file <the section X.Y.Z>`
+with the archives of `assets`. Each failure names the tag, the file or check and both values, and exits with status
+1.
 """
 import json
 import os
@@ -39,17 +41,27 @@ MAIN = 'origin/main'
 CHECKS = ('push-gate', 'ci-passed')
 CHANGELOG = 'CHANGELOG.md'
 ASSETS = 'var/release/assets'
-# The packages that a tag vX.Y.Z releases, one archive each: (kind, directory, package name).
+# The packages that a tag vX.Y.Z releases as archives, one archive each: (kind, directory, package name). The release
+# assets are npm tarballs and Composer zips only.
 PACKAGES = (
     ('npm', 'js', '@polyspec/ordered-json'),
     ('composer', 'php', 'polyspec/ordered-json'),
     ('composer', 'php-extension', 'polyspec/ordered-json-extension'),
-    ('cargo', 'rust', 'polyspec-ordered-json'),
 )
-# The manifests whose version a tag vX.Y.Z sets: those of the packages and those of the repository root, which install
-# the same packages from a checkout of the repository.
-MANIFESTS = ('package.json', 'js/package.json', 'composer.json', 'php/composer.json', 'php-extension/composer.json',
-             'rust/Cargo.toml')
+ARCHIVE = 'released as an archive'
+CHECKOUT = 'installs the packages from a checkout of the repository'
+GIT_TAG = 'not released as an archive; consumed by git tag'
+# The manifests whose version a tag vX.Y.Z sets, each with how the tag releases it: the archive of its package, the
+# manifests of the repository root, which install the same packages from a checkout, and the Cargo package, which is
+# consumed by git tag because `cargo package` rewrites git dependencies into crates.io requirements that do not resolve.
+MANIFESTS = {
+    'package.json': CHECKOUT,
+    'js/package.json': ARCHIVE,
+    'composer.json': CHECKOUT,
+    'php/composer.json': ARCHIVE,
+    'php-extension/composer.json': ARCHIVE,
+    'rust/Cargo.toml': GIT_TAG,
+}
 # The Go modules: a tag <directory>/vX.Y.Z releases the module of that directory.
 GO_MODULES = {'go': 'github.com/polyspec/ordered-json/go'}
 TAG = re.compile(r'(?:(?P<directory>[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*)/)?v(?P<version>(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))')
@@ -182,7 +194,7 @@ def asset_names(tag):
     directory, version = parse_tag(tag)
     if directory is not None:
         return []
-    extensions = {'npm': 'tgz', 'composer': 'zip', 'cargo': 'crate'}
+    extensions = {'npm': 'tgz', 'composer': 'zip'}
     return [asset_name(name, version, extensions[kind]) for kind, _, name in PACKAGES]
 
 
@@ -201,16 +213,8 @@ def assets(root, tag):
     for (kind, path, name), expected in zip(PACKAGES, asset_names(tag)):
         if kind == 'npm':
             run(['npm', 'pack', '--pack-destination', str(target)], root / path, env)
-        elif kind == 'composer':
+        else:
             run(['git', 'archive', '--format=zip', f'--output={target / expected}', f'{commit}:{path}'], root)
-        elif kind == 'cargo':
-            with tempfile.TemporaryDirectory(prefix='release-cargo-') as build:
-                run(['cargo', 'package', '--no-verify', '--locked'], root / path, {**env, 'CARGO_TARGET_DIR': build})
-                built = Path(build) / 'package' / expected
-                if not built.is_file():
-                    found = sorted(item.name for item in (Path(build) / 'package').glob('*.crate'))
-                    raise Stop(f'cargo package in {path} wrote {found}, not {expected}')
-                shutil.copy2(built, target / expected)
     present = sorted(item.name for item in target.iterdir())
     if present != sorted(asset_names(tag)):
         raise Stop(f'{ASSETS} holds {present}, not the archives {sorted(asset_names(tag))}')

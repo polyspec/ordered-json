@@ -30,7 +30,7 @@ Keep authentication information in the system credential store. Keep publication
 <a id="tag-release"></a>
 ## Tag releases
 
-A release is a tag of a commit of `main` ([release procedure](../../AGENTS.md#release)): `vX.Y.Z` releases the npm package of `js/`, the Composer packages of `php/` and `php-extension/` and the Cargo package of `rust/` at version X.Y.Z, and `go/vX.Y.Z` releases the Go module `github.com/polyspec/ordered-json/go`. The push of the tag runs `.github/workflows/release.yml` (`on: push: tags: ['v*', '*/v*']`, permission `contents: write`), whose steps run `scripts/release.py` in this order and stop at the first failure:
+A release is a tag of a commit of `main` ([release procedure](../../AGENTS.md#release)): `vX.Y.Z` releases the npm package of `js/` and the Composer packages of `php/` and `php-extension/` at version X.Y.Z, and `go/vX.Y.Z` releases the Go module `github.com/polyspec/ordered-json/go`. The Cargo package of `rust/` is not released as an archive; it is consumed by git tag, because `cargo package` rewrites git dependencies into crates.io requirements that do not resolve. The push of the tag runs `.github/workflows/release.yml` (`on: push: tags: ['v*', '**/v*']`, permission `contents: write`; in a tag filter `*` does not match `/`, so `**/v*` covers the tag of a Go module at any depth), whose steps run `scripts/release.py` in this order and stop at the first failure:
 
 ~~~sh
 make release-verify
@@ -41,10 +41,10 @@ make release-publish
 
 1. `make release-verify` requires the tagged commit to be an ancestor of `origin/main` (`git merge-base --is-ancestor`) and the latest check runs `push-gate` and `ci-passed` of that commit (`gh api repos/<repository>/commits/<sha>/check-runs`) to be completed with the conclusion `success`; it names a missing or failed check and does not run the tests again.
 2. `make release-versions` requires X.Y.Z in `package.json`, `js/package.json` and `rust/Cargo.toml` (a `composer.json` without a `version` field takes the version from the tag, as Composer does) and the section `## X.Y.Z` in `CHANGELOG.md`, and names each file with its version and the version of the tag; for `go/vX.Y.Z` it requires the module path of `go/go.mod` and the section.
-3. `make release-assets` builds `var/release/assets`: `polyspec-ordered-json-X.Y.Z.tgz` (`npm pack` of `js/`), `polyspec-ordered-json-X.Y.Z.zip` and `polyspec-ordered-json-extension-X.Y.Z.zip` (`git archive` of `php/` and `php-extension/` of the tagged commit) and `polyspec-ordered-json-X.Y.Z.crate` (`cargo package --no-verify --locked` of `rust/`). An archive is named `<package name>-<version>.<ext>`, with `@scope/` and `vendor/` written as `scope-` and `vendor-`. A Go tag builds none.
+3. `make release-assets` builds `var/release/assets`: `polyspec-ordered-json-X.Y.Z.tgz` (`npm pack` of `js/`), `polyspec-ordered-json-X.Y.Z.zip` and `polyspec-ordered-json-extension-X.Y.Z.zip` (`git archive` of `php/` and `php-extension/` of the tagged commit): the release assets are npm tarballs and Composer zips only. An archive is named `<package name>-<version>.<ext>`, with `@scope/` and `vendor/` written as `scope-` and `vendor-`. A Go tag builds and attaches nothing.
 4. `make release-publish` runs `gh release create <tag> --verify-tag --title <tag> --notes-file <the section X.Y.Z>` with the archives.
 
-The tag reaches the steps through the environment variable `TAG`. `scripts/tests/test_release.py` runs each step against fakes of `gh`, `npm` and `cargo`, and `scripts/tests/test_workflow_rules.py` requires the trigger, the permission and the order of the steps.
+The tag reaches the steps through the environment variable `TAG`. `scripts/tests/test_release.py` runs each step against fakes of `gh` and `npm`, and `scripts/tests/test_workflow_rules.py` requires the trigger, the permission and the order of the steps.
 
 <a id="releases"></a>
 ## Registry and release records

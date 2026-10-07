@@ -6,11 +6,17 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The release of a tag covers the Go module tags at any depth, and its assets are npm tarballs and Composer zips only
+  (T1.21-4). The trigger of `.github/workflows/release.yml` is `tags: ['v*', '**/v*']`: in a tag filter `*` does not
+  match `/`, so `**/v*` covers `go/vX.Y.Z` and the tag of a Go module at any depth. The Cargo package of `rust/` is
+  not released as an archive; it is consumed by git tag, because `cargo package` rewrites git dependencies into
+  crates.io requirements that do not resolve. `scripts/release.py` lists it so in its manifests, and
+  `test_release` fails on a Cargo archive.
 - A tag of a commit of `main` releases it (T1.21-3). `.github/workflows/release.yml` runs on the push of a tag `v*` or
-  `*/v*` with the permission `contents: write`; `make release-verify` requires the tagged commit on `origin/main` with
+  `**/v*` with the permission `contents: write`; `make release-verify` requires the tagged commit on `origin/main` with
   the check runs `push-gate` and `ci-passed` concluded `success`, `make release-versions` the version of the tag in
-  every manifest and the section `## X.Y.Z` in `CHANGELOG.md`, `make release-assets` builds the npm, Composer and
-  Cargo archives, and `make release-publish` creates the GitHub Release with the section as notes (`scripts/release.py`,
+  every manifest and the section `## X.Y.Z` in `CHANGELOG.md`, `make release-assets` builds the npm and Composer
+  archives, and `make release-publish` creates the GitHub Release with the section as notes (`scripts/release.py`,
   `scripts/tests/test_release.py`). AGENTS states the release procedure.
 - The ruleset `main` requires exactly the checks `push-gate` and `ci-passed` (T1.21-2). `ci-passed`, the last job of
   `ci.yml`, needs every other job, runs after each of them under `if: ${{ always() }}` and runs `make ci-passed`, which

@@ -1,15 +1,13 @@
 """The release of a tag (scripts/release.py, .github/workflows/release.yml).
 
 Each case builds a Git repository in a temporary directory with the manifests of the release, a changelog, a branch
-origin/main and the tag, and puts fakes of gh, npm and cargo first on PATH. The fake gh answers the check runs of the
-GitHub API from a JSON state file and records each call; the fakes of npm and cargo write the archive that the real tool
-writes. No case reaches GitHub or a registry.
+origin/main and the tag, and puts fakes of gh and npm first on PATH. The fake gh answers the check runs of the GitHub
+API from a JSON state file and records each call; the fake npm writes the archive that npm pack writes. No case reaches
+GitHub or a registry.
 """
 import json
 import os
 from pathlib import Path
-import re
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -47,17 +45,6 @@ manifest = json.load(open('package.json'))
 name = manifest['name'].lstrip('@').replace('/', '-')
 open(os.path.join(args[args.index('--pack-destination') + 1], f"{name}-{manifest['version']}.tgz"), 'w').write('npm')
 '''
-FAKE_CARGO = r'''
-import os, re, sys
-args = sys.argv[1:]
-assert args[:3] == ['package', '--no-verify', '--locked'], args
-text = open('Cargo.toml').read()
-name = re.search(r'(?m)^name = "([^"]+)"', text).group(1)
-version = re.search(r'(?m)^version = "([^"]+)"', text).group(1)
-folder = os.path.join(os.environ['CARGO_TARGET_DIR'], 'package')
-os.makedirs(folder, exist_ok=True)
-open(os.path.join(folder, f'{name}-{version}.crate'), 'w').write('crate')
-'''
 CHANGELOG = '''# Changelog
 
 <a id="unreleased"></a>
@@ -89,7 +76,7 @@ class Sandbox:
         self.state = Path(folder.name) / 'state.json'
         self.root.mkdir()
         self.bin.mkdir()
-        for name, source in (('gh', FAKE_GH), ('npm', FAKE_NPM), ('cargo', FAKE_CARGO)):
+        for name, source in (('gh', FAKE_GH), ('npm', FAKE_NPM)):
             (self.bin / name).write_text(f'#!{sys.executable}\n{source}')
             (self.bin / name).chmod(0o755)
         names = {path: name for _, path, name in release.PACKAGES}
@@ -102,7 +89,7 @@ class Sandbox:
             elif path.name == 'composer.json':
                 path.write_text(json.dumps({'name': package.lstrip('@')}))
             else:
-                path.write_text(f'[package]\nname = "{package}"\nversion = "{version}"\n\n[dependencies]\n')
+                path.write_text(f'[package]\nname = "polyspec-ordered-json"\nversion = "{version}"\n\n[dependencies]\n')
         (self.root / 'php/src').mkdir()
         (self.root / 'php/src/OrderedJson.php').write_text('<?php\n')
         for directory, module in release.GO_MODULES.items():
@@ -247,10 +234,9 @@ class Assets(unittest.TestCase):
         self.assertEqual(release.asset_name('@polyspec/ordered-json', '0.0.1', 'tgz'), 'polyspec-ordered-json-0.0.1.tgz')
         self.assertEqual(release.asset_name('polyspec/ordered-json-extension', '1.2.3', 'zip'),
                          'polyspec-ordered-json-extension-1.2.3.zip')
-        self.assertEqual(release.asset_name('polyspec-ordered-json', '0.0.1', 'crate'), 'polyspec-ordered-json-0.0.1.crate')
         self.assertEqual(release.asset_names('v0.0.1'), [
             'polyspec-ordered-json-0.0.1.tgz', 'polyspec-ordered-json-0.0.1.zip',
-            'polyspec-ordered-json-extension-0.0.1.zip', 'polyspec-ordered-json-0.0.1.crate'])
+            'polyspec-ordered-json-extension-0.0.1.zip'])
         self.assertEqual(release.asset_names('go/v0.0.1'), [])
 
     def test_assets_builds_one_archive_per_package(self):
@@ -305,11 +291,24 @@ class Repository(unittest.TestCase):
         modules = sorted(str(Path(path).parent) for path in tracked if Path(path).name == 'go.mod')
         self.assertEqual(modules, sorted(release.GO_MODULES))
         for kind, path, name in release.PACKAGES:
-            manifest = {'npm': 'package.json', 'composer': 'composer.json', 'cargo': 'Cargo.toml'}[kind]
-            text = (ROOT / path / manifest).read_text()
-            declared = (json.loads(text)['name'] if kind != 'cargo'
-                        else re.search(r'(?m)^name = "([^"]+)"', text).group(1))
-            self.assertEqual(declared, name, path)
+            manifest = {'npm': 'package.json', 'composer': 'composer.json'}[kind]
+            self.assertEqual(json.loads((ROOT / path / manifest).read_text())['name'], name, path)
+
+    def test_the_assets_are_npm_tarballs_and_composer_zips_and_a_crate_is_consumed_by_git_tag(self):
+        self.assertEqual(sorted({kind for kind, _, _ in release.PACKAGES}), ['composer', 'npm'])
+        archived = sorted(f"{path}/{'package.json' if kind == 'npm' else 'composer.json'}"
+                          for kind, path, _ in release.PACKAGES)
+        self.assertEqual(sorted(name for name, how in release.MANIFESTS.items() if how == release.ARCHIVE), archived)
+        for name, how in release.MANIFESTS.items():
+            with self.subTest(manifest=name):
+                self.assertIn(how, (release.ARCHIVE, release.CHECKOUT, release.GIT_TAG))
+                if Path(name).name == 'Cargo.toml':
+                    self.assertEqual(how, 'not released as an archive; consumed by git tag')
+                if how == release.CHECKOUT:
+                    self.assertEqual(Path(name).parent, Path('.'))
+        source = (ROOT / 'scripts/release.py').read_text()
+        self.assertNotIn("'cargo', 'package'", source)
+        self.assertNotIn('.crate', source)
 
     def test_the_released_versions_pass_the_version_check(self):
         self.assertEqual(release.versions(ROOT, 'v0.0.1'), '0.0.1')
