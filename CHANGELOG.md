@@ -6,6 +6,10 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- CI runs the Python package on both supported minors (T1.27-4): the job `python` of `ci.yml` has the matrix
+  3.11 and the minor release of `.python-version` and runs `make ci CI_JOB=python`, the package tests, the case
+  listing and the symbol report with the interpreter of the job (`scripts/python_check.py`, which checks no
+  tool pin because the floor minor is below it); `ci-passed` requires the job.
 - A Python implementation package covers the JSON contract (T1.27-2): `python/` holds `polyspec-ordered-json` under
   the import name `polyspec.ordered_json`, and the registry, the package test standard and the owner map of the
   repository cover it; `verify.py --only python` passes the official examples, the 98 shared fixtures and the

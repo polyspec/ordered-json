@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 39b174f4a5be3c3aaf287b97edcfd197fff17937f527b3551467b0bfa102f10b -->
+<!-- source-sha256: 1e0905e5b614ac85bd3cbe63c47b5df136240f7aa6cdc0d3afa6ba519b49b7d4 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,10 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- CI가 지원하는 두 minor에서 Python 패키지를 실행합니다 (T1.27-4). `ci.yml`의 job `python`은 3.11과
+  `.python-version`의 minor release를 matrix로 가지고, job의 interpreter로 패키지 test, 사례 목록, symbol
+  보고를 실행하는 `make ci CI_JOB=python`을 실행합니다(`scripts/python_check.py`. 바닥 minor가 핀보다
+  낮으므로 이 진입점은 도구 핀을 검사하지 않습니다). `ci-passed`가 이 job을 요구합니다.
 - Python 구현 패키지가 JSON 계약을 다룹니다 (T1.27-2). `python/`이 import 이름 `polyspec.ordered_json`의
   `polyspec-ordered-json`을 담고, 저장소의 registry, 패키지 test 표준, owner map이 이를 다룹니다.
   `verify.py --only python`가 공식 예시, 공유 fixture 98건, 패키지 test를 통과하고, 거부 위치와 kind가 다른

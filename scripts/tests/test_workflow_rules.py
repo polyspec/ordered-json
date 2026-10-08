@@ -291,16 +291,16 @@ class WorkflowRules(unittest.TestCase):
             'missing': head + '\n',
             'not last': head.replace('\njobs:\n', '\njobs:\n  ci-passed:\n' + tail.rstrip('\n') + '\n', 1) + '\n',
             'not always': text.replace('    if: ${{ always() }}\n', '    if: ${{ success() }}\n'),
-            'needs no job': text.replace('    needs: [ci]\n', '    needs: []\n'),
-            'another runner': text.replace('    needs: [ci]\n    runs-on: ubuntu-24.04\n',
-                                           '    needs: [ci]\n    runs-on: ubuntu-26.04\n'),
+            'needs no job': text.replace('    needs: [ci, python]\n', '    needs: []\n'),
+            'another runner': text.replace('    needs: [ci, python]\n    runs-on: ubuntu-24.04\n',
+                                           '    needs: [ci, python]\n    runs-on: ubuntu-26.04\n'),
             'another step': text.replace(CI_PASSED_RUN, 'make ci-passed'),
         }
         expected = {
             'missing': 'the job ci-passed is missing',
             'not last': 'the job ci-passed is not the last job',
             'not always': "the job ci-passed has if: '${{ success() }}'",
-            'needs no job': "the job ci-passed needs [], not every other job ['ci']",
+            'needs no job': "the job ci-passed needs [], not every other job ['ci', 'python']",
             'another runner': "the job ci-passed runs on 'ubuntu-26.04', not on the runner of the other jobs",
             'another step': "the job ci-passed runs ['make ci-passed'], not the last step",
         }

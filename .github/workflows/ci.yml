@@ -91,12 +91,45 @@ jobs:
           name: ci-${{ matrix.job }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: var/ci/${{ matrix.job }}/
           if-no-files-found: error
+  # The Python package supports the floor minor 3.11 as well as the minor release of .python-version. The
+  # job runs its package tests, its case listing and its symbol report with the interpreter of the matrix
+  # (make ci CI_JOB=python, scripts/python_check.py), which the suite job cannot do for a minor below the
+  # pin of the repository tools; the second entry of the matrix stays equal to .python-version.
+  python:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        # Keep 3.14 equal to the minor release of .python-version.
+        python: ['3.11', '3.14']
+    steps:
+      # actions/checkout v6.1.0
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      # actions/setup-python v6.3.0: the interpreter of the matrix, the floor minor and the pinned minor.
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        if: ${{ !cancelled() }}
+        with:
+          python-version: ${{ matrix.python }}
+      - name: make ci
+        if: ${{ !cancelled() }}
+        run: make ci CI_JOB=python
+      - name: make ci-summary
+        if: ${{ !cancelled() }}
+        run: make ci-summary CI_JOB=python
+      # actions/upload-artifact v7.0.1: the report of this job, var/ci/python-<minor>.
+      - name: report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6c0a
+        with:
+          name: ci-python-${{ matrix.python }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: var/ci/python-${{ matrix.python }}/
+          if-no-files-found: error
   # The check of this workflow that the ruleset of main requires. It runs after every other job, also after a failed,
   # skipped or cancelled one (if: always()), and make ci-passed fails unless every job of needs has the result success,
   # so a new job of this workflow is required once it is listed in needs. It installs Python as the job push-gate does.
   ci-passed:
     if: ${{ always() }}
-    needs: [ci]
+    needs: [ci, python]
     runs-on: ubuntu-24.04
     steps:
       # actions/checkout v6.1.0

@@ -22,7 +22,7 @@ ONLINE := env -u CARGO_NET_OFFLINE -u GOPROXY -u npm_config_offline -u COMPOSER_
 export PATH := $(NPM_DIRECTORY)/bin:$(PATH)
 
 .PHONY: check rerun-failed test docs-check pie-check benchmark hooks hooks-check push-gate tools toolchains-check owner-check \
-	owner-validate ci ci-summary ci-passed clippy go-vet github-ruleset github-ruleset-check \
+	owner-validate ci ci-summary ci-passed clippy go-vet github-ruleset github-ruleset-check python-package-check \
 	release-verify release-versions release-assets release-publish install-fixtures
 
 # scripts/full_run.py runs the full verification once per committed tree, when no feature of
@@ -56,17 +56,25 @@ owner-check:
 # make check checks both. The docs job runs the checks that need only Python.
 CI_TARGETS_suite := hooks pie-check check
 CI_TARGETS_docs := docs-check owner-validate
+CI_TARGETS_python := python-package-check
+
+# python-package-check runs the declared package checks of the Python implementation with the running
+# interpreter (scripts/python_check.py). The job python of the hosted CI runs it on the floor minor 3.11
+# as well, which the pin of the repository tools does not name; the suite job runs the package under the
+# pinned interpreter through the registry.
+python-package-check:
+	$(PYTHON) scripts/python_check.py
 
 # ci runs every target of the job CI_JOB to its end, past failures, with a log per target and var/ci/$(CI_JOB)/summary.json
 # (scripts/ci_run.py); ci-summary writes the summary of the job with the first failure lines of each failed target and
 # copies the records into the report var/ci/$(CI_JOB), which the workflow uploads. Variables such as JSON_TEST_SUITE
 # reach the targets through MAKEFLAGS.
 ci:
-	$(if $(CI_TARGETS_$(CI_JOB)),,$(error make ci needs CI_JOB=suite or CI_JOB=docs; CI_JOB is '$(CI_JOB)'))
+	$(if $(CI_TARGETS_$(CI_JOB)),,$(error make ci needs CI_JOB=docs, python or suite; CI_JOB is '$(CI_JOB)'))
 	$(PYTHON) scripts/ci_run.py run --job $(CI_JOB) -- $(CI_TARGETS_$(CI_JOB))
 
 ci-summary:
-	$(if $(CI_TARGETS_$(CI_JOB)),,$(error make ci-summary needs CI_JOB=suite or CI_JOB=docs; CI_JOB is '$(CI_JOB)'))
+	$(if $(CI_TARGETS_$(CI_JOB)),,$(error make ci-summary needs CI_JOB=docs, python or suite; CI_JOB is '$(CI_JOB)'))
 	$(PYTHON) scripts/ci_run.py summary --job $(CI_JOB)
 
 # ci-passed is the step of the job ci-passed, the last job of ci.yml and its check that the ruleset of main requires:

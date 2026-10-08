@@ -153,7 +153,7 @@ class CiRun(unittest.TestCase):
                          ['python3 scripts/ci_run.py summary --job docs'])
         unknown = make('ci', 'CI_JOB=other')
         self.assertNotEqual(unknown.returncode, 0)
-        self.assertIn('make ci needs CI_JOB=suite or CI_JOB=docs', unknown.stderr)
+        self.assertIn('make ci needs CI_JOB=docs, python or suite', unknown.stderr)
 
 
 # The JSON of `needs` that GitHub writes into the step of the job ci-passed: one entry per needed job with its result.
