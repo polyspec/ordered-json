@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: e378d45d338bd5a0d95d202912f6312c4ebc31d953550a532331017a51f75365 -->
+<!-- source-sha256: 878add5d6758ac45a4a40a06dfc30adcf55bdc61f8b3321154ff6f63fed15122 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -78,7 +78,7 @@ Rust 코드는 `packages/ordered-json-rust/`에서 `cargo clippy --all-targets -
 릴리스는 CI 실행이 `ci-passed` 성공으로 끝난 `main`의 commit에 붙인 tag입니다. tag를 만들고 옮기고 push하는 것은 메인테이너뿐입니다.
 
 1. 버전 올림 commit `Release X.Y.Z`는 `ci-passed`가 성공한 push 뒤에 오며 체크리스트 작업을 적고, 저장소의 모든 manifest(`package.json`, `packages/ordered-json-npm/package.json`, `composer.json`, `packages/ordered-json-php/composer.json`, `packages/ordered-json-php-ext/composer.json`, `packages/ordered-json-rust/Cargo.toml`, `packages/ordered-json-python/pyproject.toml`, `package-lock.json`의 루트 항목, `packages/ordered-json-rust/Cargo.lock`의 package 항목)의 버전을 X.Y.Z로 정하고, 검토 기록이 각 lock의 hash를 담으므로 `make dependency-review RECORD=1`로 의존성 검토를 다시 기록하고, `make release-consumer-lock TAG=vX.Y.Z`로 그 버전의 consumer lock을 쓰며, 모든 changelog의 `## Unreleased`를 `## X.Y.Z`로 바꾸고 그 위에 비어 있는 새 `## Unreleased`를 둡니다.
-2. 메인테이너는 merge된 `main`의 commit에 `vX.Y.Z` tag를, `packages/ordered-json-go/`의 Go 모듈에는 `packages/ordered-json-go/vX.Y.Z` tag를 붙이고 tag를 push합니다.
+2. 메인테이너는 merge된 `main`의 commit에 `vX.Y.Z` tag를, `packages/ordered-json-go/`의 Go 모듈에는 `packages/ordered-json-go/vX.Y.Z` tag를 붙이고, tag를 한 번의 `git push`로 또는 Go tag를 먼저 push합니다. `vX.Y.Z`의 실행이 그 commit의 Go tag를 요구하기 때문입니다(`make release-go-tags`). Go tag의 실행은 archive를 만들지 않고 archive 없는 release를 만듭니다.
 3. tag push는 `.github/workflows/release.yml`을 실행합니다. 이 workflow는 tag된 commit이 `main`에 있고 check `push-gate`와 `ci-passed`를 통과했는지, 모든 manifest에 tag의 버전이 있고 `CHANGELOG.md`에 section `## X.Y.Z`가 있는지 확인하고, 패키지 archive를 만들어 GitHub Release를 생성합니다([tag 릴리스](docs/operations/distribution.ko.md#tag-release)).
 
 이 저장소의 package가 다른 저장소의 package를 고정할 때(`git+https://github.com/polyspec/<repository>@vX.Y.Z`)는 GitHub에 실제로 존재하는 tag만 씁니다. 그 tag를 push한 뒤에 고정하며, 아직 release되지 않은 tag를 가리키는 고정은 쓰지 않습니다.

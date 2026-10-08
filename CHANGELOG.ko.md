@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 4b839119b3ab07c541a33639fa7dca68c6c53060c7550a8c2ea93d04c5e8a7d4 -->
+<!-- source-sha256: b92e05782e4722d0ad523e1b8a76b5296a2a7132342c07bba974407b55102065 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+## 0.0.7
 
 - T1.29-1: push gate, full-run guard, owner 검사, CI 보고서는 kit v0.0.4의 vendored 도구(`scripts/kit/`, `tests/kit/`, `.kit/kit.lock.json`)이며 `config/checklist.json`과 `config/owner-checks.json`으로 설정합니다. `push_gate.py`, `full_run.py`, `owner_check.py`, `ci_run.py`와 그 test를 제거했습니다. `ci.yml`과 `push-gate.yml`의 job은 `make ci-targets`를 실행하고, `test_workflow_rules`는 `CHECK_TARGETS`의 모든 target이 job 하나에서만 실행되도록 요구합니다. `partial` 기능은 더 이상 push나 전체 실행을 막지 않습니다.
 - T1.29-2: release step은 kit 도구 `scripts/kit/release.mjs`이며 `config/release.json`으로 설정합니다. `release.py`, `install_fixtures.py`, `test_release.py`를 제거했습니다. `packages/ordered-json-npm/`의 npm 패키지와 `packages/ordered-json-php/`, `packages/ordered-json-php-ext/`의 Composer 패키지 archive 이름은 `polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip`, `polyspec-ordered-json-extension-php-X.Y.Z.zip`입니다. `make release-coverage`는 모든 package 파일이 분류되도록 요구하고, `make release-config-check`는 `packages/ordered-json-npm/package.json` 버전에 대한 step `versions`를 실행합니다. archive의 consumer project는 `tests/release-consumer`에 있으며, `make release-consumer-lock`이 release commit에서 그 lock을 씁니다. Go 모듈 tag는 `packages/ordered-json-go/vX.Y.Z`이고, `make release-verify`는 이 tag가 `vX.Y.Z`와 같은 commit에 있도록 요구합니다.
@@ -17,6 +19,7 @@
 - T1.29-8: `config/toolchain.json`은 Composer 2.10.3을 선언합니다. `ci.yml`의 job `docs`는 `make dependency-policy-check`를 위해 PHP와 그 Composer release를 설정하고, `make kit-test`는 job `suite`에서 실행합니다.
 - T1.29-9: kit의 vendored 도구는 v0.0.8입니다.
 - T1.29-10: `make dependency-policy-mutation-check`는 CI에서 실행되며 통과합니다. `make install`은 도구보다 Rust toolchain을 먼저 설치하고, release workflow는 npm만 설치합니다.
+- T1.30: test `test_both_tag_shapes_start_the_release_and_the_release_steps_handle_both`는 release workflow의 tag filter가 `vX.Y.Z`와 `packages/ordered-json-go/vX.Y.Z`에 맞도록 요구하고, AGENTS는 Go tag를 먼저 또는 `vX.Y.Z`와 함께 push한다고 적습니다.
 
 ## 0.0.6
 
