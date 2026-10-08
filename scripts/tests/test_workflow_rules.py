@@ -205,6 +205,17 @@ class WorkflowRules(unittest.TestCase):
                                 'make ci-summary CI_JOB=${{ matrix.job }}'])
         self.assertEqual(body['steps'][-1]['with.path'], 'var/ci/${{ matrix.job }}/')
 
+    def test_each_report_path_is_the_directory_its_make_target_writes(self):
+        for job, body in jobs((WORKFLOWS / 'ci.yml').read_text()).items():
+            runs = [step['run'] for step in body['steps'] if step.get('run', '').startswith('make ci ')]
+            if not runs:
+                continue
+            written = re.search(r'CI_JOB=(\$\{\{[^}]*\}\}|\S+)', runs[0]).group(1)
+            uploads = [step['with.path'] for step in body['steps']
+                       if step.get('uses', '').startswith('actions/upload-artifact@')]
+            with self.subTest(job=job):
+                self.assertEqual(uploads, [f'var/ci/{written}/'])
+
     def test_a_job_without_the_report_step_fails(self):
         text = (WORKFLOWS / 'ci.yml').read_text()
         without = re.sub(r'\n      # actions/upload-artifact[^\n]*\n      - name: report\n(?:        .*\n)+', '\n', text + '\n')
