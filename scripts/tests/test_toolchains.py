@@ -185,7 +185,7 @@ class Pins(unittest.TestCase):
                     self.assertIn('--locked', command)
         self.assertIn('"--locked"', (ROOT / 'benchmarks/run.py').read_text().split('"cargo", "run"', 1)[1].split(']')[0])
 
-    def test_ci_runs_on_a_fixed_image_with_actions_and_python_at_exact_versions(self):
+    def test_ci_runs_on_a_fixed_image_with_actions_and_the_pinned_python(self):
         text = WORKFLOW.read_text()
         self.assertEqual(re.findall(r'runs-on: (\S+)', text), ['ubuntu-24.04'])
         uses = re.findall(r'uses: (\S+)', text)
@@ -194,7 +194,7 @@ class Pins(unittest.TestCase):
             with self.subTest(action=action):
                 self.assertRegex(action, r'^[\w-]+/[\w-]+@[0-9a-f]{40}$', 'an action is pinned to a commit')
         self.assertIn('actions/setup-python@', text)
-        self.assertRegex(text, r"python-version: '\d+\.\d+\.\d+'")
+        self.assertIn('python-version-file: .python-version', text)
 
 
 class Check(unittest.TestCase):
@@ -476,13 +476,17 @@ class PythonPin(unittest.TestCase):
                 return toolchains.problems(root)
 
     def test_another_patch_release_of_the_pinned_minor_passes(self):
-        self.assertEqual(self.problems('3.9.25'), [])
-        self.assertEqual(self.problems('3.9.6'), [])
+        minor = (ROOT / '.python-version').read_text().strip()
+        self.assertEqual(self.problems(f'{minor}.99'), [])
+        self.assertEqual(self.problems(f'{minor}.0'), [])
 
     def test_another_minor_release_fails_with_both_versions(self):
-        problems = self.problems('3.10.0')
+        major, minor = (ROOT / '.python-version').read_text().strip().split('.')
+        other = f'{major}.{int(minor) + 1}.0'
+        problems = self.problems(other)
         self.assertEqual(len(problems), 1, problems)
-        self.assertTrue(problems[0].startswith('python: expected 3.9 (.python-version, major.minor), actual 3.10.0 ('),
+        self.assertTrue(problems[0].startswith(f'python: expected {major}.{minor} (.python-version, major.minor), '
+                                               f'actual {other} ('),
                         problems[0])
 
     def test_another_php_patch_release_passes(self):
@@ -501,8 +505,13 @@ class PythonPin(unittest.TestCase):
             self.assertEqual(toolchains.problems(root), [])
 
     def test_the_ci_python_is_the_pinned_minor(self):
-        ci = re.search(r"python-version: '(\d+\.\d+)\.\d+'", WORKFLOW.read_text())[1]
-        self.assertEqual(ci, (ROOT / '.python-version').read_text().strip())
+        # Every job that installs Python reads the pin file, so the workflow names no release of its own.
+        workflow = WORKFLOW.read_text()
+        for line in workflow.splitlines():
+            if line.lstrip().startswith('#') or 'python-version' not in line:
+                continue
+            if 'python-version-file: .python-version' not in line:
+                self.fail(f'a setup-python step names a release instead of the pin file: {line.strip()}')
 
 
 class EntryPoints(unittest.TestCase):

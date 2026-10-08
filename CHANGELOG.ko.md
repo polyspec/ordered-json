@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 7d1735d58a57105907afe70183ef60477bd002b08b5cba2954dda7f0ccadb0dc -->
+<!-- source-sha256: 5416b7e6e2fc1e8c521f296ea57225eec0b98187b782b0eafb737b89e2326b8f -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,9 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- 저장소 도구가 Python 3.14에서 실행됩니다 (T1.27-1). `.python-version`이 3.14를 적고, 검증기의 단위 test가
+  그 위에서 통과하며, Python을 설치하는 모든 workflow가 자기 release 대신 핀 파일을 읽고, 모든 패키지 README의
+  설치 문단이 핀 파일을 밝힙니다.
 - 사용자의 언어로 보고하는 git은 work tree가 아님으로 읽힙니다 (T1.28). `tracked_files`가 work tree의 부재를
   git 오류의 영문 텍스트로 판정했으므로, 현지화된 git은 원본 tree의 기록, 문서 검사, 공통 사례를 오류로 만들었습니다.
   `git rev-parse --is-inside-work-tree` 호출을 `LC_ALL=C`로 실행하고, AGENTS가 검사가 출력 텍스트를 판정하는

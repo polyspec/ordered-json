@@ -88,8 +88,8 @@ def pins(root=ROOT):
         'node': read('.node-version', r'\A(\d+\.\d+\.\d+)\s*\Z'),
         'rust': read('rust-toolchain.toml', r'^channel\s*=\s*"(\d+\.\d+\.\d+)"\s*$'),
         'go': read('go/go.mod', r'^toolchain\s+(go\d+\.\d+\.\d+)\s*$', 'go/go.mod toolchain'),
-        # Python is pinned by minor release: actions/python-versions builds no 3.9.6 for the CI image, so
-        # no patch release is available both locally and on CI. The running patch release is recorded.
+        # Python is pinned by minor release: setup-python installs the latest patch release of the minor,
+        # which need not be the one installed locally, and each record names the running patch release.
         'python': read('.python-version', r'\A(\d+\.\d+)\s*\Z'),
         # PHP is pinned by minor release as well: setup-php installs the latest patch release of the minor, and
         # the records name the running patch release.

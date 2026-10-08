@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: d11e4c1ccf8c642d4b8df15ec991821123c7b9f25a0d98bdc0ff40506aaebdad -->
+<!-- source-sha256: 5e5850b499b458f7f4862813387b4d14489fd36f590d9cb283cefc9305916254 -->
 # ordered-json for Go
 
 [English](README.md)
@@ -27,7 +27,7 @@ _ = output
 <a id="verification"></a>
 ## 검증
 
-Python >= 3.9, Git, make, 해당 구현의 런타임·빌드 도구를 설치하고 이 체크아웃에서 실행합니다.
+`.python-version`이 지정한 minor release의 Python, Git, make, 해당 구현의 런타임·빌드 도구를 설치하고 이 체크아웃에서 실행합니다.
 
 ~~~sh
 make check

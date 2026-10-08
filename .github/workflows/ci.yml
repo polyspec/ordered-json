@@ -12,10 +12,9 @@
 # their own deadline.
 # Every step runs a make target, never a script or a tool directly, so the environment and the prechecks of the
 # Makefile apply: checks run offline and make tools is the only step that downloads. A tool that only the suite
-# job needs is installed only there. The runner image is ubuntu-24.04, which push-gate.yml also uses:
-# actions/python-versions builds no Python 3.9 for ubuntu-26.04, and .python-version pins 3.9. Each action is
-# pinned to the commit of a release; Python and PHP come from the minor releases of .python-version and
-# .php-version, and the records name the patch releases that ran.
+# job needs is installed only there. The runner image is ubuntu-24.04, which push-gate.yml also uses. Each
+# action is pinned to the commit of a release; Python and PHP come from the minor releases of .python-version
+# and .php-version, and the records name the patch releases that ran.
 name: ci
 
 on:
@@ -102,10 +101,9 @@ jobs:
     steps:
       # actions/checkout v6.1.0
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-      # actions/setup-python v6.3.0. .python-version pins the minor release 3.9; 3.9.25 is the last 3.9
-      # release that actions/python-versions builds for ubuntu-24.04.
+      # actions/setup-python v6.3.0: the latest patch release of the minor release of .python-version.
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
-          python-version: '3.9.25'
+          python-version-file: .python-version
       - name: make ci-passed
         run: make ci-passed RESULTS='${{ toJSON(needs) }}'
