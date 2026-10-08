@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The toolchain download tests run a fake `cargo` on `PATH` for a failed fetch, a successful fetch and a missing `cargo`, so their results do not depend on the `cargo` installed on the machine (T1.27-8).
 - The Python documents state the current facts only (T1.27-7): the installation document and the README show the placeholder `vX.Y.Z` for the first tag that contains `python/`, and the checklist row T1.27-3 names the Python registry state `not-verified` that `docs/distribution.json` records.
 - The `python` job of CI pins `actions/upload-artifact` to a commit that GitHub holds, and `scripts/tests/test_workflow_rules.py` requires every action of every workflow to keep one full commit id (T1.27-6).
 - The README and the installation document name the Python package (T1.27-5): the README(.ko) lists it in its intro, its package table and its start section, which runs the example from `python/src`; the pip install line and the installation document show the placeholder `vX.Y.Z` for the first tag that contains `python/`, and no released tag contains it yet.
