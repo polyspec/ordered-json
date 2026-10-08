@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The push-gate job passes on the committed tree: its exit status 2 came from `make docs-check` in the job, which read the stale translation revisions that T1.27-10 synced, so `scripts/push_gate.py` and `.github/workflows/push-gate.yml` are unchanged (T1.27-12).
 - The test test_the_job_fails_on_a_commit_whose_documentation_check_fails passes on the committed tree: its failure came from the stale translation revisions that T1.27-10 fixed, so neither the test nor the code under test changed (T1.27-11).
 - The translations of AGENTS, the execution checklist and the changelog state the revision of their English documents again, so the documentation check of the docs job passes: the commit of T1.27-9 changed the English documents without updating the revision (T1.27-10).
 - The toolchain download tests run a fake `cargo` on `PATH` for a failed fetch, a successful fetch and a missing `cargo`, so their results do not depend on the `cargo` installed on the machine (T1.27-8).
