@@ -19,7 +19,7 @@ fails: a missing or unreadable summary.json, log or record is named in the summa
 status 0, so the report of a job whose runner stopped is still written and uploaded.
 
 `passed` is the step of the job ci-passed, the last job of ci.yml, which runs after every other job of the workflow
-(`if: ${{ always() }}`) and is the check of ci.yml that the ruleset of main requires. It reads the environment
+(`if: ${{ always() }}`) and is the check of ci.yml that the release workflow requires on the tagged commit. It reads the environment
 variable RESULTS, the JSON of `needs` (`{"<job>": {"result": "success", "outputs": {}}}`), prints the result of each
 job and exits with status 1 unless every job has the result `success`: a failed, skipped or cancelled job fails it,
 and so do RESULTS that is unset, is not JSON or names no job.

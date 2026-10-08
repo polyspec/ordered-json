@@ -1,7 +1,6 @@
-# CI: the full suite of every pull request, of every merge group of the merge queue, of every push to main and of every
-# manual run (workflow_dispatch). The ruleset of main requires the job ci-passed, the last job, which passes only when every other
-# job of this workflow passed, and the merge queue moves main to the merge group commit only after it passed on it, so
-# the run of the merge group is the evidence of the commit that main receives (AGENTS): the suite job runs make pie-check and make check, which write the PIE record and the aggregate
+# CI: the full suite of every pull request, of every push to main and of every manual run (workflow_dispatch). The
+# release workflow requires the job ci-passed, the last job, on the tagged commit; it passes only when every other job of
+# this workflow passed, so the run of a push to main is the evidence of the commit that main receives (AGENTS): the suite job runs make pie-check and make check, which write the PIE record and the aggregate
 # record into var/records and check both with the documentation check of make check, and uploads both in its
 # report. A failure never stops the run: every setup step and the step make ci run whatever the earlier steps did
 # (if: !cancelled()), make ci runs every target of the job to its end (scripts/ci_run.py), and the summary and the
@@ -19,14 +18,12 @@ name: ci
 
 on:
   pull_request:
-  merge_group:
   push:
     branches: [main]
   workflow_dispatch:
 
-# Runners are few: a new push to a pull request cancels the run of its previous push. Each merge group has a ref of its
-# own (gh-readonly-queue/main/pr-<number>-<sha>), and its run is never cancelled. push-gate.yml has no such group, so the
-# gate of every commit runs to its end.
+# Runners are few: a new push to a pull request cancels the run of its previous push. A push to main has a ref of its
+# own, and its run is never cancelled.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -126,7 +123,7 @@ jobs:
           name: ci-python-${{ matrix.python }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: var/ci/python/
           if-no-files-found: error
-  # The check of this workflow that the ruleset of main requires. It runs after every other job, also after a failed,
+  # The check of this workflow that the release workflow requires on the tagged commit. It runs after every other job, also after a failed,
   # skipped or cancelled one (if: always()), and make ci-passed fails unless every job of needs has the result success,
   # so a new job of this workflow is required once it is listed in needs. It installs Python as the job push-gate does.
   ci-passed:

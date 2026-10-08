@@ -78,7 +78,7 @@ The PIE record `var/records/pie-verification.json` records the PIE version and P
 <a id="ci"></a>
 ## Hosted CI
 
-`.github/workflows/ci.yml` runs the full suite on every pull request, every merge group of the [merge queue](#publish) and every manual run (`workflow_dispatch`), in two jobs of one matrix with `fail-fast: false`, so one job does not cancel the other. `.github/workflows/push-gate.yml` runs on every push to a branch other than those of the merge queue (`branches-ignore: ['gh-readonly-queue/**']`), every pull request and every merge group, `.github/workflows/release.yml` runs only on the push of a tag `v*` or `**/v*` ([tag releases](distribution.md#tag-release)), and no other workflow exists:
+`.github/workflows/ci.yml` runs the full suite on every pull request, every push to `main` and every manual run (`workflow_dispatch`), in two jobs of one matrix with `fail-fast: false`, so one job does not cancel the other. `.github/workflows/push-gate.yml` runs on every push and every pull request, `.github/workflows/release.yml` runs only on the push of a tag `v*` or `**/v*` ([tag releases](distribution.md#tag-release)), and no other workflow exists:
 
 ~~~sh
 make tools
@@ -89,29 +89,18 @@ make ci-summary CI_JOB=suite
 
 The job `suite` installs Python, Node.js, Go and PHP from the pin files, runs `make tools`, the only step that downloads, and runs the targets `hooks`, `pie-check` and `check`: `make pie-check` writes the PIE record, `make check` writes the aggregate record and its documentation check checks both. The job `docs` installs only Python and runs `docs-check` and `owner-validate`. The job `python` installs the interpreter of its matrix, the floor minor 3.11 and the minor release of `.python-version`, and runs `python-package-check`, the package tests, the case listing and the symbol report of the Python implementation with that interpreter (`scripts/python_check.py`), which the suite job cannot do for a minor below the pin of the repository tools. Every step runs a make target and runs after a failed step (`if: !cancelled()`); `make ci` (`scripts/ci_run.py`) runs every target of the job to its end, prints its output as it arrives, writes it to `var/ci/<job>/logs/<target>.log` and records the status, the exit status and the time of each target in `var/ci/<job>/summary.json`. `make ci-summary` writes `var/ci/<job>/summary.md` with each target, its status and its time and the first failure lines of each failed target, copies the records of `var/records` into `var/ci/<job>/records`, appends the summary to the job summary of GitHub and never fails. The step `report` uploads `var/ci/<job>/` as the artifact `ci-<job>-<run id>-<attempt>`, also after a failure. No step has a time limit. The jobs run on `ubuntu-24.04`, as the push gate does; the records name the Python and PHP patch releases that ran.
 
-The last job of `ci.yml`, `ci-passed`, is the check of the workflow that the [ruleset](#publish) requires. It needs every other job of the workflow, runs after each of them also when one failed, was skipped or was cancelled (`if: ${{ always() }}`), and runs `make ci-passed RESULTS='${{ toJSON(needs) }}'`: `scripts/ci_run.py passed` prints the result of every needed job and fails unless each one is `success`. A job added to `ci.yml` is listed in `needs`, so the required check covers it; `scripts/tests/test_workflow_rules.py` fails when `ci-passed` is missing, is not the last job, lacks `if: ${{ always() }}`, does not need every other job, runs on another runner or runs another step.
+The last job of `ci.yml`, `ci-passed`, is the check of the workflow that the release workflow requires on the tagged commit ([publishing main](#publish)). It needs every other job of the workflow, runs after each of them also when one failed, was skipped or was cancelled (`if: ${{ always() }}`), and runs `make ci-passed RESULTS='${{ toJSON(needs) }}'`: `scripts/ci_run.py passed` prints the result of every needed job and fails unless each one is `success`. A job added to `ci.yml` is listed in `needs`, so the required check covers it; `scripts/tests/test_workflow_rules.py` fails when `ci-passed` is missing, is not the last job, lacks `if: ${{ always() }}`, does not need every other job, runs on another runner or runs another step.
 
 <a id="publish"></a>
 ## Publishing main
 
-Every change reaches `main` through a pull request and the merge queue; no command of this repository pushes `main`. Publish a branch with the standard commands of GitHub, or with the GitHub UI:
+While the version is 0.x, the work of a checklist row is committed locally, and `main` receives the commits in one push, when every row of the checklist is `[o]` (AGENTS.md). The pre-push hook `.githooks/pre-push` runs the push gate before the push:
 
 ~~~sh
-git push origin HEAD:refs/heads/<branch>
-gh pr create --base main --head <branch> --fill
-gh pr merge <branch> --auto --rebase
+git push origin HEAD:main
 ~~~
 
-The GitHub ruleset `main` of `.github/ruleset.json` applies to `refs/heads/main` with enforcement `active` and no bypass actor, so it binds administrators too. Its rules:
-
-- `pull_request`: a change arrives through a pull request; no approval is required, and every merge method is allowed: the merge queue merges with its own method, and `gh pr merge --auto` asks for auto-merge with a method of its own choice, so a rule that allows only `rebase` leaves the pull request out of the queue;
-- `merge_queue`: the merge queue merges with the method `REBASE`, so each commit of a pull request lands on `main` as a commit of its own, with the grouping strategy `ALLGREEN`, at most 5 entries built and merged at once and no wait for more entries; `check_response_timeout_minutes` is 360, the maximum of GitHub, so a long suite is never cut by it;
-- `required_linear_history`, `non_fast_forward` and `deletion`: no merge commit, no force-push and no deletion of `main`;
-- `required_status_checks`: exactly the checks `push-gate` and `ci-passed` of the GitHub Actions app (integration 15368): the job of `.github/workflows/push-gate.yml`, which runs `make push-gate` and `make docs-check`, and the last job of `.github/workflows/ci.yml`, which passes only when every job of the full suite passed.
-
-A direct `git push origin <commit>:main` is refused with `GH013: Repository rule violations found`. `gh pr merge --auto` adds the pull request to the merge queue once its required checks pass on the pull request. The queue rebases it onto `main` as a merge group on the branch `gh-readonly-queue/main/pr-<number>-<sha>`, both workflows run on that commit (`merge_group`), and the queue moves `main` to exactly that commit when the checks pass; a failed check removes the pull request from the queue, and `main` does not move. The run of `ci.yml` for a merge group is never cancelled: each group has a ref of its own, and `cancel-in-progress` holds only for pull requests. The branch of a merged pull request is deleted (`delete_branch_on_merge`). The rebase gives the merged commits new hashes; `git pull --rebase` drops the local commits that the queue merged.
-
-`make github-ruleset` changes the repository settings of the declaration (`allow_rebase_merge`, `allow_auto_merge`, `delete_branch_on_merge`) and creates the ruleset of the declared name, or updates it, where they differ, and compares again; `make github-ruleset-check` changes nothing and fails, naming each field with its live and its declared value, when a setting differs or the live ruleset is missing or differs from the declaration. Both need an authenticated `gh` with administration access to the repository. `scripts/tests/test_github_ruleset.py` runs the script against a fake `gh`.
+The push runs `ci.yml`, and its job `ci-passed` is the check that the release workflow requires on the tagged commit. A version-bump commit follows on `main`, and the tag `vX.Y.Z` goes on a commit whose run concluded `ci-passed` success ([tag releases](distribution.md#tag-release)).
 
 <a id="documentation-checks"></a>
 ## Documentation checks
@@ -122,7 +111,7 @@ make docs-check
 
 The [checker](../../scripts/docs_check.py) validates each document manifest, links, translation pairs and revision hashes, section and code-block parity, and feature state. With `--records`, which `make check` passes after it writes the aggregate record, it also checks that the [records](#records) of the checkout match the current sources; `make docs-check` omits that comparison. The common manifest registers only common documents. Each package directory is checked with its own manifest.
 
-Review English and Korean prose against code and tests before updating a Korean `source-sha256` marker. Matching hashes do not prove translation accuracy. External links are syntax-checked, not fetched. [Hosted CI](#ci) runs these checks on every pull request and every merge group.
+Review English and Korean prose against code and tests before updating a Korean `source-sha256` marker. Matching hashes do not prove translation accuracy. External links are syntax-checked, not fetched. [Hosted CI](#ci) runs these checks on every pull request and every push to `main`.
 
 <a id="limits"></a>
 ## Limits

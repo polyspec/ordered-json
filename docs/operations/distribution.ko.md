@@ -1,5 +1,5 @@
 <!-- doc-id: distribution -->
-<!-- source-sha256: 19d271d21c86c5e1cad41111a29348d072698af6a3ed53acc4bf3e876f0337f8 -->
+<!-- source-sha256: 39882666ddc43eeb2a2aab47f5e7c4c8ad8ded4350ecb05761f3f7d76d601dd8 -->
 # 배포
 
 [English](distribution.md)
@@ -16,15 +16,13 @@ npm, crates.io, Packagist, Go, PHP 확장의 레지스트리 게시는 검증되
 <a id="source-publication"></a>
 ## 소스 게시
 
-변경한 패키지의 필수 검사를 실행하고 공통 계약과 함께 커밋합니다. 모든 변경은 pull request와 merge queue를 거쳐 `main`에 들어갑니다([main 게시](validation.ko.md#publish)).
+변경한 패키지의 필수 검사를 실행하고 공통 계약과 함께 커밋합니다. 모든 변경은 체크리스트가 모두 `[o]`일 때의 push로 `main`에 들어갑니다([main 게시](validation.ko.md#publish)).
 
 ~~~sh
-git push origin HEAD:refs/heads/<branch>
-gh pr create --base main --head <branch> --fill
-gh pr merge <branch> --auto --rebase
+git push origin HEAD:main
 ~~~
 
-호스팅 CI가 pull request와 merge group에서 통합 검사와 PIE 검사를 실행하고, merge queue는 필수 검사를 통과한 commit으로 `main`을 옮깁니다. 깨끗한 복제가 게시된 리비전에서 모든 패키지를 빌드하는지 확인합니다. 공통 계약 변경은 검증기, fixture와 관련 패키지를 같은 리비전으로 게시합니다.
+호스팅 CI가 pull request와 모든 push to `main`에서 통합 검사와 PIE 검사를 실행하고, release workflow는 tag된 commit에 check `ci-passed`를 요구합니다. 깨끗한 복제가 게시된 리비전에서 모든 패키지를 빌드하는지 확인합니다. 공통 계약 변경은 검증기, fixture와 관련 패키지를 같은 리비전으로 게시합니다.
 
 인증 정보는 시스템 인증 저장소에서 관리합니다. 게시 관측과 테스트 결과를 구분합니다.
 

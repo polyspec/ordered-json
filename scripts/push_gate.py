@@ -29,8 +29,7 @@ HOOK = '.githooks/pre-push'
 HOOKS = (HOOK, '.githooks/pre-commit')
 SHORT = 12
 RULE = ('A push happens only when no feature is partial and no task is in progress (AGENTS.md): work in progress '
-        'does not reach the remote, where hosted CI runs the full suite on every pull request and every merge group '
-        'of the merge queue.')
+        'does not reach the remote, where hosted CI runs the full suite on every push to main and every pull request.')
 FIX = ('Complete each feature and set its implementation to implemented, and complete each task and set it to [o], '
        'in a commit with its documentation, tests and changelog entry; then push again.')
 

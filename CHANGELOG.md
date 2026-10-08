@@ -10,6 +10,7 @@
 - T1.27-19: the CI workflow runs on every push to main, so each main commit has the check ci-passed that the release workflow requires.
 - T1.27-21: AGENTS.md states the 0.x rule: a change is committed to main after its owning unit test passes locally, and the CI push trigger gives the ci-passed check of each main commit.
 - T1.27-22: AGENTS.md states the pin rule: a pin of another repository's package names only a tag that exists on GitHub.
+- T1.27-23: the GitHub ruleset and the merge queue are removed; the workflows run on push and pull_request, and the release requires ci-passed on the tagged commit.
 - T1.27-17: the consumer fixtures of the release asset install test name the 0.0.4 archives, written by `make install-fixtures`.
 ## 0.0.4
 

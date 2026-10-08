@@ -6,8 +6,8 @@
     python3 scripts/release.py assets TAG     build the archive of every package of the tag into var/release/assets
     python3 scripts/release.py publish TAG    create the GitHub Release of the tag with its notes and archives
 
-Every change reaches main through the merge queue with the required checks, so every commit of main passed the full
-suite; the maintainer releases by tagging a commit of main after a version-bump pull request, and a tag push runs
+Every commit of main passed the full suite on its push; the maintainer releases by tagging a commit of main after a
+version-bump commit, and a tag push runs
 these steps in order. A tag `vX.Y.Z` releases the packages of PACKAGES at version X.Y.Z; a tag `<directory>/vX.Y.Z`
 releases the Go module of that directory (GO_MODULES), which needs no archive. No step reruns the tests.
 
