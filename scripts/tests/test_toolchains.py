@@ -131,11 +131,14 @@ class Pins(unittest.TestCase):
     def test_no_recipe_runs_a_pinned_tool_by_name(self):
         # GNU Make 3.81 looks a simple recipe command up on its own PATH, not the exported PATH, so a
         # recipe that named npm would run the npm of the machine.
+        # The tools of scripts/kit are started with node, whose release .node-version pins and make toolchain-check compares.
         recipes = [line.strip() for line in (ROOT / 'Makefile').read_text().splitlines() if line.startswith('\t')]
         self.assertTrue(recipes)
         for line in recipes:
             with self.subTest(recipe=line):
-                self.assertNotRegex(line, r'(^|[\s;&|(])(node|npm|npx|go|cargo|rustc|rustup)(\s|$)')
+                # The word after --only names an implementation, not a tool.
+                self.assertNotRegex(re.sub(r'--only \S+', '', line), r'(^|[\s;&|(])(npm|npx|go|cargo|rustc|rustup)(\s|$)')
+                self.assertNotRegex(line, r'^node (?!scripts/kit/)')
 
     def test_make_runs_the_checkout_npm_ahead_of_an_npm_on_the_path_of_make(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -151,6 +154,8 @@ class Pins(unittest.TestCase):
             root = pinned_root(Path(folder) / 'checkout', python=minor)
             (root / 'scripts').mkdir()
             shutil.copy2(ROOT / 'Makefile', root / 'Makefile')
+            (root / 'scripts/kit').mkdir()
+            shutil.copy2(ROOT / 'scripts/kit/kit.mk', root / 'scripts/kit/kit.mk')
             shutil.copy2(ROOT / 'scripts/toolchains.py', root / 'scripts/toolchains.py')
             environment = {key: value for key, value in os.environ.items()
                            if key not in ('MAKEFLAGS', 'GNUMAKEFLAGS', 'MFLAGS', 'MAKEFILES', 'MAKELEVEL', 'PYTHON')}

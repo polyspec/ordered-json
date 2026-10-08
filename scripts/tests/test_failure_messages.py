@@ -15,7 +15,6 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'benchmarks'))
 import check_pie
-import push_gate
 import run as benchmark
 from docs_check import check_pie_verification, check_verification
 from registry import REGISTRY, load_registry, repository_paths, runtime_versions
@@ -95,10 +94,6 @@ class FailureMessages(unittest.TestCase):
         self.assertEqual(process.returncode, 1, process.stdout + process.stderr)
         self.assertIn("phpversion('ordered_json') false", process.stderr)
         self.assertIn('ORDERED_JSON_VERSION 9.9.9', process.stderr)
-
-    def test_the_push_rule_states_that_ci_runs_the_full_suite(self):
-        self.assertNotIn('CI does not run the verification', push_gate.RULE)
-        self.assertIn('hosted CI runs the full suite on every push to main and every pull request', push_gate.RULE)
 
     def test_each_package_script_runs_a_file_that_exists(self):
         for manifest in ('package.json', 'js/package.json', 'php/composer.json'):

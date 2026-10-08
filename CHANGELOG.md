@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.29-1: the push gate, the full-run guard, the owner check and the CI report are the vendored tools of kit v0.0.4 (`scripts/kit/`, `tests/kit/`, `.kit/kit.lock.json`), configured in `config/checklist.json` and `config/owner-checks.json`. `push_gate.py`, `full_run.py`, `owner_check.py`, `ci_run.py` and their tests are removed. The jobs of `ci.yml` and `push-gate.yml` run `make ci-targets`, and `test_workflow_rules` requires every target of `CHECK_TARGETS` to run in exactly one job. A `partial` feature no longer stops a push or a full run.
+
 ## 0.0.6
 
 - T1.27-25: the release archives are named `<package>-<language>-<version>.<ext>`: the npm archive `polyspec-ordered-json-npm-X.Y.Z.tgz`, the PHP archives `polyspec-ordered-json-php-X.Y.Z.zip` and `polyspec-ordered-json-extension-php-X.Y.Z.zip`.

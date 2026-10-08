@@ -1,0 +1,217 @@
+{
+  "schema": 1,
+  "comment": "The checks that own each tracked path, read by scripts/kit/owner-check.mjs: make owner-check runs the owners of the changed paths, never the full suite, and the pre-commit hook runs make owner-validate. test-scripts runs the verifier unit tests (TESTS selects test files) and verify-<language> verifies one implementation.",
+  "owners": [
+    {
+      "paths": [
+        "**/*.md",
+        "**/docs/documentation-manifest.json",
+        "docs/*.json",
+        "docs/reports/*.json"
+      ],
+      "targets": [
+        "docs-check"
+      ]
+    },
+    {
+      "paths": [
+        "docs/features.md",
+        "docs/features.ko.md",
+        "docs/plans/execution-checklist.md",
+        "docs/plans/execution-checklist.ko.md"
+      ],
+      "targets": [
+        "test-scripts",
+        "push-gate-commit"
+      ]
+    },
+    {
+      "paths": [
+        "scripts/tests/test_*.py"
+      ],
+      "targets": [
+        "test-scripts"
+      ],
+      "variable": "TESTS"
+    },
+    {
+      "paths": [
+        "scripts/registry.py",
+        "scripts/verify.py",
+        "implementations.json",
+        "package-tests.json",
+        "examples/official.json",
+        "fixtures/**"
+      ],
+      "targets": [
+        "test-scripts",
+        "verify-js",
+        "verify-rust",
+        "verify-go",
+        "verify-php",
+        "verify-php-extension",
+        "verify-python"
+      ]
+    },
+    {
+      "paths": [
+        "scripts/test.py",
+        "scripts/verification_record.py",
+        "scripts/docs_check.py",
+        "scripts/check_pie.py",
+        "scripts/compare_ojson.py",
+        "scripts/comparison/*",
+        "scripts/python_check.py",
+        "scripts/toolchains.py",
+        ".gitignore",
+        "Makefile"
+      ],
+      "targets": [
+        "test-scripts"
+      ]
+    },
+    {
+      "paths": [
+        "scripts/lint.py"
+      ],
+      "targets": [
+        "test-scripts",
+        "clippy",
+        "go-vet"
+      ]
+    },
+    {
+      "paths": [
+        "benchmarks/run.py"
+      ],
+      "targets": [
+        "test-scripts",
+        "benchmark-check"
+      ]
+    },
+    {
+      "paths": [
+        "benchmarks/*.{mjs,php,json}",
+        "benchmarks/fixtures/*.json",
+        "rust/examples/benchmark.rs",
+        "go/internal/benchmark/*.go"
+      ],
+      "targets": [
+        "benchmark-check"
+      ]
+    },
+    {
+      "paths": [
+        ".node-version",
+        ".python-version",
+        ".php-version",
+        "rust-toolchain.toml",
+        "external-inputs.json",
+        "package.json",
+        "composer.json",
+        "js/package.json",
+        "php/composer.json",
+        "php-extension/composer.json",
+        "rust/Cargo.toml",
+        "go/go.mod",
+        "python/pyproject.toml",
+        "CHANGELOG.md"
+      ],
+      "targets": [
+        "test-scripts"
+      ]
+    },
+    {
+      "paths": [
+        ".github/workflows/*.yml"
+      ],
+      "targets": [
+        "test-scripts"
+      ]
+    },
+    {
+      "paths": [
+        "scripts/release.py",
+        "scripts/install_fixtures.py",
+        "scripts/tests/install/**"
+      ],
+      "targets": [
+        "test-scripts"
+      ]
+    },
+    {
+      "paths": [
+        ".githooks/pre-commit",
+        ".githooks/pre-push",
+        "config/checklist.json",
+        "config/owner-checks.json"
+      ],
+      "targets": [
+        "hooks-check",
+        "owner-validate",
+        "push-gate-commit"
+      ]
+    },
+    {
+      "paths": [
+        "kit.json",
+        ".kit/**",
+        "scripts/kit/**",
+        "tests/kit/**"
+      ],
+      "targets": [
+        "kit-check",
+        "kit-test"
+      ]
+    },
+    {
+      "paths": [
+        "js/**"
+      ],
+      "targets": [
+        "verify-js"
+      ]
+    },
+    {
+      "paths": [
+        "rust/**"
+      ],
+      "targets": [
+        "verify-rust"
+      ]
+    },
+    {
+      "paths": [
+        "go/**"
+      ],
+      "targets": [
+        "verify-go"
+      ]
+    },
+    {
+      "paths": [
+        "php/**"
+      ],
+      "targets": [
+        "verify-php",
+        "verify-php-extension"
+      ]
+    },
+    {
+      "paths": [
+        "php-extension/**"
+      ],
+      "targets": [
+        "verify-php-extension"
+      ]
+    },
+    {
+      "paths": [
+        "python/**"
+      ],
+      "targets": [
+        "verify-python"
+      ]
+    }
+  ]
+}

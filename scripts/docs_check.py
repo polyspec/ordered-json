@@ -122,7 +122,7 @@ FEATURE_HEADER = '| ID |'
 def feature_table(text):
     """The cells of each row of the feature table, the table whose header starts with `| ID |`.
 
-    The tracker readers (this check, scripts/full_run.py and scripts/push_gate.py) all read the
+    The tracker reader (this check) reads the
     rows here, so a tracker that reads no row cannot pass: ValueError names a missing table, a table
     without rows and a row whose ID is not a feature ID. A cell may contain an escaped `\\|`."""
     lines = text.splitlines()
@@ -185,7 +185,7 @@ def checklist_rows(text):
     """The cells of each task row of the execution checklist, the rows of every table whose header starts with
     `| ID |`. The last cell is the state of the task.
 
-    The guards (scripts/full_run.py and scripts/push_gate.py) read the tasks in progress here, so a checklist
+    The checklist check reads the tasks here, so a checklist
     that reads no row cannot pass: ValueError names a checklist without task rows, a row whose ID is not a task
     ID, a row whose last cell is not a task state and an ID with more than one row."""
     lines = text.splitlines()
@@ -222,8 +222,8 @@ STATE_CELL = re.compile(r'\|\s*(' + '|'.join(STATES) + r')\s*(?=\|)')
 
 def tracker_errors(name, text):
     """Locate implementation states outside the Implementation cell of a feature row and other lines in the
-    section of the feature table. docs/features.md is the tracker of this repository: scripts/full_run.py reads the
-    Implementation cells as its active work, so a state word stands only there, and AGENTS.md defines the states.
+    section of the feature table. docs/features.md is the feature record of this repository: a state word stands only in the
+    Implementation cell, and AGENTS.md defines the states.
     A state word in prose is ordinary English and is not read as a state; a state is a code span or a table cell
     whose whole content is the state word. Lines and columns count from 1."""
     lines = text.splitlines()

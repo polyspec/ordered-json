@@ -2,7 +2,8 @@
 
 Every step that runs a command runs a make target, never a script or a tool directly, so the environment and the
 prechecks of the Makefile apply (offline checks, pinned tools). Every job of a matrix runs with fail-fast false, and
-every job that runs make ci writes its summary and uploads its report after a failure too. No job or step has
+every job that runs make ci-targets uploads its report after a failure too. Every target of CHECK_TARGETS, the full
+suite of make check, runs in exactly one job of ci.yml and push-gate.yml, and those jobs run no other target. No job or step has
 timeout-minutes. The last job of ci.yml is ci-passed, the check of ci.yml that the release workflow requires: it runs
 after every other job (`if: ${{ always() }}`), needs every other job of the workflow, runs on their runner and runs
 `make ci-passed` with the JSON of `needs`, so it passes only when every other job passed. The workflows are read as
@@ -14,6 +15,9 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOWS = ROOT / '.github/workflows'
+REPORT = 'var/report/ci-targets/'
+# The targets of the jobs that are not part of the full suite: the gate that make check itself applies before it runs.
+GATE_TARGETS = {'push-gate-commit'}
 ALWAYS = '${{ !cancelled() }}'
 # The `on:` block of each workflow: ci.yml runs the checks on every pull request, every push to main and every manual
 # run; push-gate.yml runs the gate on every push and every pull request; release.yml runs on the push of a tag vX.Y.Z or <directory>/vX.Y.Z at any depth (in a tag
@@ -25,7 +29,7 @@ TRIGGERS = {
 }
 # The workflows whose checks the release workflow requires on the tagged commit; they run on every push.
 CHECK_WORKFLOWS = ('ci.yml', 'push-gate.yml')
-# The steps of release.yml in their order (scripts/release.py): verify the tagged commit, check the versions, build the
+# The steps of release.yml in their order (scripts/kit/release.mjs): verify the tagged commit, check the versions, build the
 # archives, create the release.
 RELEASE_STEPS = ['make release-verify', 'make release-versions', 'make release-assets', 'make release-publish']
 
@@ -131,10 +135,10 @@ def violations(name, text):
     parsed = jobs(text)
     # Runners are few, so a new push to a pull request cancels the run of its previous push. A push to main has a ref of
     # its own, and its run is never cancelled: the commit that main receives keeps its run.
-    if any(step.get('run', '').startswith('make ci ') for body in parsed.values() for step in body['steps']) and not re.search(
+    if name == 'ci.yml' and not re.search(
             r"(?m)^concurrency:\n  group: \$\{\{ github\.workflow \}\}-\$\{\{ github\.ref \}\}\n"
             r"  cancel-in-progress: \$\{\{ github\.event_name == 'pull_request' \}\}$", text):
-        found.append(f'{name}: a workflow that runs make ci lacks concurrency with group '
+        found.append(f'{name}: a workflow that runs make ci-targets lacks concurrency with group '
                      "${{ github.workflow }}-${{ github.ref }} and cancel-in-progress: ${{ github.event_name == "
                      "'pull_request' }}; a new push to a pull request cancels its previous run and no push to main run "
                      'is cancelled')
@@ -169,19 +173,30 @@ def violations(name, text):
         if any('strategy:' in line for line in body['lines']) and not any(
                 re.fullmatch(r'\s+fail-fast: false', line) for line in body['lines']):
             found.append(f'{name}: job {job} has a matrix without fail-fast: false; one failed job would cancel the others')
-        if not any(step.get('run', '').startswith('make ci ') for step in steps):
+        if not any(step.get('run', '').startswith('make ci-targets ') for step in steps):
             continue
-        summary = [step for step in steps if step.get('run', '').startswith('make ci-summary')]
         upload = [step for step in steps if step.get('uses', '').startswith('actions/upload-artifact@')]
-        if not summary or summary[0].get('if') != ALWAYS:
-            found.append(f'{name}: job {job} runs make ci without the step make ci-summary under if: {ALWAYS}')
-        if not upload or upload[0].get('if') != ALWAYS or not upload[0].get('with.path', '').startswith('var/ci/'):
-            found.append(f'{name}: job {job} runs make ci without the report step: actions/upload-artifact of var/ci/<job>/ '
+        if not upload or upload[0].get('if') != ALWAYS or upload[0].get('with.path') != REPORT:
+            found.append(f'{name}: job {job} runs make ci-targets without the report step: actions/upload-artifact of {REPORT} '
                          f'under if: {ALWAYS}')
         for index, step in enumerate(steps[1:], 2):
-            if step.get('if', '').replace(' && matrix.toolchains', '') != ALWAYS:
+            if step.get('if', '') != ALWAYS:
                 found.append(f'{name}: job {job} step {index} does not run after a failed step (if: {ALWAYS})')
     return found
+
+
+def make_variable(name, text):
+    """The words of the variable `name` that the Makefile assigns with :=."""
+    found = re.search(rf'(?m)^{name} := (.*)$', text)
+    return found.group(1).split() if found else []
+
+
+def ci_targets(text):
+    """The targets of every `make ci-targets TARGETS="..."` step of a workflow, per job."""
+    return {job: [target for step in body['steps']
+                  for target in (re.search(r'TARGETS="([^"]*)"', step['run']).group(1).split()
+                                 if step.get('run', '').startswith('make ci-targets ') else [])]
+            for job, body in jobs(text).items()}
 
 
 class WorkflowRules(unittest.TestCase):
@@ -193,48 +208,58 @@ class WorkflowRules(unittest.TestCase):
                 self.assertEqual(violations(path.name, path.read_text()), [])
 
     def test_the_ci_jobs_are_parsed_with_their_report_steps(self):
-        body = jobs((WORKFLOWS / 'ci.yml').read_text())['ci']
+        body = jobs((WORKFLOWS / 'ci.yml').read_text())['suite']
         runs = [step['run'] for step in body['steps'] if 'run' in step]
-        self.assertEqual(runs, ['make tools', 'make ci CI_JOB=${{ matrix.job }} JSON_TEST_SUITE=.cache/JSONTestSuite',
-                                'make ci-summary CI_JOB=${{ matrix.job }}'])
-        self.assertEqual(body['steps'][-1]['with.path'], 'var/ci/${{ matrix.job }}/')
+        self.assertEqual(runs, ['make tools', 'make ci-targets TARGETS="verify-all clippy go-vet pie-check"'])
+        self.assertEqual(body['steps'][-1]['with.path'], REPORT)
 
-    def test_each_report_path_is_the_directory_its_make_target_writes(self):
-        for job, body in jobs((WORKFLOWS / 'ci.yml').read_text()).items():
-            runs = [step['run'] for step in body['steps'] if step.get('run', '').startswith('make ci ')]
-            if not runs:
-                continue
-            written = re.search(r'CI_JOB=(\$\{\{[^}]*\}\}|\S+)', runs[0]).group(1)
-            uploads = [step['with.path'] for step in body['steps']
-                       if step.get('uses', '').startswith('actions/upload-artifact@')]
-            with self.subTest(job=job):
-                self.assertEqual(uploads, [f'var/ci/{written}/'])
+    def test_each_report_is_the_directory_that_make_ci_targets_writes(self):
+        makefile = (ROOT / 'scripts/kit/kit.mk').read_text()
+        self.assertIn(f'CI_REPORT ?= {REPORT.rstrip("/")}\n', makefile)
+        for name in ('ci.yml', 'push-gate.yml'):
+            for job, body in jobs((WORKFLOWS / name).read_text()).items():
+                if not any(step.get('run', '').startswith('make ci-targets ') for step in body['steps']):
+                    continue
+                uploads = [step['with.path'] for step in body['steps'] if step.get('uses', '').startswith('actions/upload-artifact@')]
+                with self.subTest(workflow=name, job=job):
+                    self.assertEqual(uploads, [REPORT])
+
+    def test_every_target_of_the_full_suite_runs_in_exactly_one_job(self):
+        suite = make_variable('CHECK_TARGETS', (ROOT / 'Makefile').read_text())
+        self.assertTrue(suite)
+        run = [target for name in ('ci.yml', 'push-gate.yml')
+               for targets in ci_targets((WORKFLOWS / name).read_text()).values() for target in targets]
+        self.assertEqual(sorted(set(suite)), sorted(suite), 'CHECK_TARGETS lists a target twice')
+        for target in suite:
+            with self.subTest(target=target):
+                self.assertEqual(run.count(target), 1, f'{target} runs {run.count(target)} times in the jobs of the workflows')
+        self.assertEqual(sorted(set(run) - set(suite)), sorted(GATE_TARGETS), 'a job runs a target that is not in CHECK_TARGETS')
+        self.assertEqual(len(run), len(set(run)))
 
     def test_a_job_without_the_report_step_fails(self):
         text = (WORKFLOWS / 'ci.yml').read_text()
         without = re.sub(r'\n      # actions/upload-artifact[^\n]*\n      - name: report\n(?:        .*\n)+', '\n', text + '\n')
-        self.assertNotIn('upload-artifact@', without)
-        self.assertIn('ci.yml: job ci runs make ci without the report step: actions/upload-artifact of var/ci/<job>/ '
-                      f'under if: {ALWAYS}', violations('ci.yml', without))
+        message = (f'ci.yml: job docs runs make ci-targets without the report step: actions/upload-artifact of {REPORT} '
+                   f'under if: {ALWAYS}')
+        self.assertNotEqual(without, text)
+        self.assertIn(message, violations('ci.yml', without))
         unguarded = text.replace("      - name: report\n        if: ${{ !cancelled() }}\n", '      - name: report\n')
-        self.assertIn('ci.yml: job ci runs make ci without the report step: actions/upload-artifact of var/ci/<job>/ '
-                      f'under if: {ALWAYS}', violations('ci.yml', unguarded))
-        summary = text.replace('run: make ci-summary CI_JOB=${{ matrix.job }}', 'run: make help')
-        self.assertIn(f'ci.yml: job ci runs make ci without the step make ci-summary under if: {ALWAYS}',
-                      violations('ci.yml', summary))
+        self.assertIn(message, violations('ci.yml', unguarded))
+        elsewhere = text.replace(f'          path: {REPORT}\n', '          path: var/other/\n', 1)
+        self.assertIn(message, violations('ci.yml', elsewhere))
 
     def test_a_step_that_runs_a_script_or_a_tool_directly_fails(self):
         text = (WORKFLOWS / 'push-gate.yml').read_text()
-        for command in ('python3 scripts/push_gate.py commit "${{ github.sha }}"', 'cargo test', 'make check && cargo test',
+        for command in ('node scripts/kit/push-gate.mjs commit "${{ github.sha }}"', 'cargo test', 'make check && cargo test',
                         '|'):
             with self.subTest(command=command):
-                broken = re.sub(r'run: make push-gate .*', f'run: {command}', text)
+                broken = re.sub(r'run: make ci-targets .*', f'run: {command}', text)
                 self.assertTrue(any('a step runs one make target, never a script or a tool directly' in issue
                                     for issue in violations('push-gate.yml', broken)), command)
 
     def test_a_matrix_without_fail_fast_false_and_a_timeout_fail(self):
         text = (WORKFLOWS / 'ci.yml').read_text()
-        self.assertIn('ci.yml: job ci has a matrix without fail-fast: false; one failed job would cancel the others',
+        self.assertIn('ci.yml: job python has a matrix without fail-fast: false; one failed job would cancel the others',
                       violations('ci.yml', text.replace('fail-fast: false', 'fail-fast: true')))
         timed = text.replace('    runs-on: ubuntu-24.04\n', '    runs-on: ubuntu-24.04\n    timeout-minutes: 60\n')
         self.assertTrue(any('timeout-minutes' in issue for issue in violations('ci.yml', timed)))
@@ -244,15 +269,14 @@ class WorkflowRules(unittest.TestCase):
         tracked = [name for name in ('package-lock.json', 'npm-shrinkwrap.json', 'yarn.lock') if (ROOT / name).exists()]
         self.assertEqual(tracked, [])
         text = (WORKFLOWS / 'ci.yml').read_text()
-        broken = text.replace('          package-manager-cache: false\n', '')
-        self.assertIn('ci.yml: job ci step 3 (setup-node) lacks package-manager-cache: false; the repository has no npm '
-                      'lock file to cache', violations('ci.yml', broken))
+        broken = text.replace('          package-manager-cache: false\n', '', 1)
+        self.assertTrue(any('(setup-node) lacks package-manager-cache: false' in issue for issue in violations('ci.yml', broken)))
 
     def test_a_new_push_cancels_the_previous_run_of_ci_only(self):
         text = (WORKFLOWS / 'ci.yml').read_text()
         alone = re.sub(r'\nconcurrency:\n(?:  .*\n)+', '\n', text)
         self.assertNotIn('cancel-in-progress', alone)
-        message = ("ci.yml: a workflow that runs make ci lacks concurrency with group ${{ github.workflow }}-${{ github.ref }} "
+        message = ("ci.yml: a workflow that runs make ci-targets lacks concurrency with group ${{ github.workflow }}-${{ github.ref }} "
                    "and cancel-in-progress: ${{ github.event_name == 'pull_request' }}; a new push to a pull request "
                    'cancels its previous run and no push to main run is cancelled')
         self.assertIn(message, violations('ci.yml', alone))
@@ -291,16 +315,16 @@ class WorkflowRules(unittest.TestCase):
             'missing': head + '\n',
             'not last': head.replace('\njobs:\n', '\njobs:\n  ci-passed:\n' + tail.rstrip('\n') + '\n', 1) + '\n',
             'not always': text.replace('    if: ${{ always() }}\n', '    if: ${{ success() }}\n'),
-            'needs no job': text.replace('    needs: [ci, python]\n', '    needs: []\n'),
-            'another runner': text.replace('    needs: [ci, python]\n    runs-on: ubuntu-24.04\n',
-                                           '    needs: [ci, python]\n    runs-on: ubuntu-26.04\n'),
+            'needs no job': text.replace('    needs: [docs, suite, python]\n', '    needs: []\n'),
+            'another runner': text.replace('    needs: [docs, suite, python]\n    runs-on: ubuntu-24.04\n',
+                                           '    needs: [docs, suite, python]\n    runs-on: ubuntu-26.04\n'),
             'another step': text.replace(CI_PASSED_RUN, 'make ci-passed'),
         }
         expected = {
             'missing': 'the job ci-passed is missing',
             'not last': 'the job ci-passed is not the last job',
             'not always': "the job ci-passed has if: '${{ success() }}'",
-            'needs no job': "the job ci-passed needs [], not every other job ['ci', 'python']",
+            'needs no job': "the job ci-passed needs [], not every other job ['docs', 'suite', 'python']",
             'another runner': "the job ci-passed runs on 'ubuntu-26.04', not on the runner of the other jobs",
             'another step': "the job ci-passed runs ['make ci-passed'], not the last step",
         }
@@ -333,8 +357,17 @@ class WorkflowRules(unittest.TestCase):
 
     def test_a_step_that_does_not_run_after_a_failure_fails(self):
         text = (WORKFLOWS / 'ci.yml').read_text()
-        broken = text.replace('      - name: make ci\n        if: ${{ !cancelled() }}\n', '      - name: make ci\n')
+        broken = text.replace('      - name: make ci-targets\n        if: ${{ !cancelled() }}\n', '      - name: make ci-targets\n', 1)
+        self.assertNotEqual(broken, text)
         self.assertTrue(any('does not run after a failed step' in issue for issue in violations('ci.yml', broken)))
+
+    def test_ci_runs_on_a_fixed_image_with_actions_pinned_by_commit(self):
+        for path in sorted(WORKFLOWS.glob('*.yml')):
+            text = path.read_text()
+            with self.subTest(workflow=path.name):
+                self.assertEqual(set(re.findall(r'runs-on: (\S+)', text)), {'ubuntu-24.04'})
+                for action in re.findall(r'uses: (\S+)', text):
+                    self.assertRegex(action, r'^[\w-]+/[\w-]+@[0-9a-f]{40}$', 'an action is pinned to a commit')
 
     def test_each_action_keeps_one_pinned_commit(self):
         """Every `uses:` line names a full commit id, and an action keeps one commit id in every workflow."""
