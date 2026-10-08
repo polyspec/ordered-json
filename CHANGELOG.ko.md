@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: eaf3d8bfbe72e9fdcd5ff4224e754e7f2ebd5eab224c0b9c59f3a7ce0b23c39d -->
+<!-- source-sha256: c88bb54c153723c73a2c8036c8a72a773e20b43467202e0bd621f6ca9be8bdad -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.27-18: release version test가 고정된 tag v0.0.3 대신 `js/package.json`이 선언한 version의 tag를 검사합니다. 0.0.4 bump로 고정 tag가 오래되었기 때문입니다.
 - T1.27-17: release asset 설치 test의 consumer fixture가 `make install-fixtures`로 쓴 0.0.4 아카이브를 가리킵니다.
 ## 0.0.4
 
