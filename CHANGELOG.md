@@ -6,6 +6,10 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- A Python implementation package covers the JSON contract (T1.27-2): `python/` holds `polyspec-ordered-json` under
+  the import name `polyspec.ordered_json`, and the registry, the package test standard and the owner map of the
+  repository cover it; `verify.py --only python` passes the official examples, the 98 shared fixtures and the
+  package tests, and the rejection positions and kinds agree with every other implementation.
 - The repository tools run on Python 3.14 (T1.27-1): `.python-version` names 3.14, the unit tests of the verifier
   pass on it, every workflow that installs Python reads the pin file instead of a release of its own, and the setup
   section of every package README names the pin file.

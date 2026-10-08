@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 5416b7e6e2fc1e8c521f296ea57225eec0b98187b782b0eafb737b89e2326b8f -->
+<!-- source-sha256: ee0c8ad55d0b8c5b69c7cc13e50a3825c6daf11d6c49ca357accf5cb672f1b8f -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,10 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Python 구현 패키지가 JSON 계약을 다룹니다 (T1.27-2). `python/`이 import 이름 `polyspec.ordered_json`의
+  `polyspec-ordered-json`을 담고, 저장소의 registry, 패키지 test 표준, owner map이 이를 다룹니다.
+  `verify.py --only python`가 공식 예시, 공유 fixture 98건, 패키지 test를 통과하고, 거부 위치와 kind가 다른
+  모든 구현과 일치합니다.
 - 저장소 도구가 Python 3.14에서 실행됩니다 (T1.27-1). `.python-version`이 3.14를 적고, 검증기의 단위 test가
   그 위에서 통과하며, Python을 설치하는 모든 workflow가 자기 release 대신 핀 파일을 읽고, 모든 패키지 README의
   설치 문단이 핀 파일을 밝힙니다.
