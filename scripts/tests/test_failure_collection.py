@@ -13,7 +13,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import test as test_runner
+import verification as test_runner
 from registry import load_registry, prepare, repository_paths
 from verify import verify_adapters
 
@@ -63,10 +63,10 @@ class FailureCollection(unittest.TestCase):
 
         error = RuntimeError('rust package tests failed\ngo package tests failed')
         output, errors = io.StringIO(), io.StringIO()
-        with patch('toolchains.problems', return_value=[]), patch.dict('os.environ'), \
-                patch('test.run_unit_tests', return_value=Failed()), patch('test.verify', side_effect=error) as verify, \
-                patch('test.runtime_versions', return_value={}), patch('test.write_record') as write, \
-                patch.object(sys, 'argv', ['test.py']), redirect_stdout(output), redirect_stderr(errors):
+        with \
+                patch('verification.run_unit_tests', return_value=Failed()), patch('verification.verify', side_effect=error) as verify, \
+                patch('verification.runtime_versions', return_value={}), patch('verification.write_record') as write, \
+                patch.object(sys, 'argv', ['verification.py']), redirect_stdout(output), redirect_stderr(errors):
             status = test_runner.main()
         self.assertEqual(status, 1)
         self.assertTrue(verify.called, 'failing unit tests must not skip the verification')

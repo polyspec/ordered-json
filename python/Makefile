@@ -1,10 +1,7 @@
-PYTHON ?= python3
-JSON_TEST_SUITE ?=
-
 .PHONY: check test docs-check
 
 check:
-	$(PYTHON) ../scripts/verify.py --only python $(if $(JSON_TEST_SUITE),--suite "$(JSON_TEST_SUITE)")
+	$(MAKE) -C .. verify-python
 
 test: check
 

@@ -55,15 +55,16 @@
     },
     {
       "paths": [
-        "scripts/test.py",
         "scripts/verification_record.py",
         "scripts/check_pie.py",
         "scripts/compare_ojson.py",
         "scripts/comparison/*",
         "scripts/python_check.py",
-        "scripts/toolchains.py",
         ".gitignore",
-        "Makefile"
+        "Makefile",
+        "scripts/verification.py",
+        "scripts/unit_tests.py",
+        "scripts/external_inputs.py"
       ],
       "targets": [
         "test-scripts"
@@ -101,10 +102,6 @@
     },
     {
       "paths": [
-        ".node-version",
-        ".python-version",
-        ".php-version",
-        "rust-toolchain.toml",
         "external-inputs.json",
         "package.json",
         "composer.json",
@@ -233,6 +230,29 @@
       ],
       "targets": [
         "commits-check"
+      ]
+    },
+    {
+      "paths": [
+        ".node-version",
+        ".python-version",
+        ".php-version",
+        "rust-toolchain.toml",
+        "config/toolchain.json",
+        "go/go.mod",
+        "package.json"
+      ],
+      "targets": [
+        "test-scripts",
+        "toolchain-check"
+      ]
+    },
+    {
+      "paths": [
+        "rust/Cargo.lock"
+      ],
+      "targets": [
+        "cargo-downloads-check"
       ]
     }
   ]

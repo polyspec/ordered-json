@@ -29,7 +29,7 @@ class Lints(unittest.TestCase):
             calls.append((label, command, Path(cwd).relative_to(ROOT).as_posix(), env['CARGO_TARGET_DIR']))
             return subprocess.CompletedProcess(command, status, stdout='')
 
-        with patch('lint.require', return_value=True), patch('lint.run_streamed', side_effect=run), \
+        with patch('lint.run_streamed', side_effect=run), \
                 redirect_stdout(io.StringIO()) as printed:
             result = lint.main([name])
         return result, calls, printed.getvalue()

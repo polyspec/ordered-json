@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 54d5c137a4dd5f40e8f242687bcb1d10b83767e070b3303ba4dba4959b3ffcbd -->
+<!-- source-sha256: d38cf89e730deaf0650a2a41baf147aa21bf663f93298d0cb9a3a35ff98af3db -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -10,6 +10,7 @@
 - T1.29-1: push gate, full-run guard, owner 검사, CI 보고서는 kit v0.0.4의 vendored 도구(`scripts/kit/`, `tests/kit/`, `.kit/kit.lock.json`)이며 `config/checklist.json`과 `config/owner-checks.json`으로 설정합니다. `push_gate.py`, `full_run.py`, `owner_check.py`, `ci_run.py`와 그 test를 제거했습니다. `ci.yml`과 `push-gate.yml`의 job은 `make ci-targets`를 실행하고, `test_workflow_rules`는 `CHECK_TARGETS`의 모든 target이 job 하나에서만 실행되도록 요구합니다. `partial` 기능은 더 이상 push나 전체 실행을 막지 않습니다.
 - T1.29-2: release step은 kit 도구 `scripts/kit/release.mjs`이며 `config/release.json`으로 설정합니다. `release.py`, `install_fixtures.py`, `test_release.py`를 제거했습니다. `js/`의 npm 패키지와 `php/`, `php-extension/`의 Composer 패키지 archive 이름은 `polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip`, `polyspec-ordered-json-extension-php-X.Y.Z.zip`입니다. `make release-coverage`는 모든 package 파일이 분류되도록 요구하고, `make release-config-check`는 `js/package.json` 버전에 대한 step `versions`를 실행합니다. archive의 consumer project는 `tests/release-consumer`에 있으며, `make release-consumer-lock`이 release commit에서 그 lock을 씁니다. Go 모듈 tag는 `go/vX.Y.Z`이고, `make release-verify`는 이 tag가 `vX.Y.Z`와 같은 commit에 있도록 요구합니다.
 - T1.29-3: 문서는 `scripts/kit/check-documents.mjs`(`make documents-check`, `config/documents.json`)가, commit message는 `scripts/kit/check-commits.mjs`(`make commits-check`, `config/commits.json`)가 검사합니다. 문서 목록(manifest)을 제거했습니다. 표지 하나가 저장소의 문서 하나를 가리키므로 패키지 문서의 `doc-id` 표지는 `npm-`, `php-`, `php-ext-`, `python-`, `rust-`, `go-`로 시작합니다. `docs_check.py`는 `scripts/check_evidence.py`(`make evidence-check`)가 되며 기능 행과 그 근거, 배포 관측, 벤치마크 결과, 검증 기록, JSON 보고서의 검사를 유지하고, `test_docs_check.py`는 `test_check_evidence.py`가 됩니다. 체크리스트 행은 상태를 말로 씁니다.
+- T1.29-4: toolchain은 `config/toolchain.json`, `.node-version`, `package.json`의 `packageManager`, `rust-toolchain.toml`, `.php-version`, `.python-version`에 선언하고 `make toolchain-check`와 `make cargo-downloads-check`(kit 도구)로 검사합니다. `make install`은 npm과 Go(`var/tools`), Rust toolchain, crate, `external-inputs.json`의 PIE PHAR와 추가 사례를 설치하며 내려받는 유일한 target입니다. `toolchains.py`와 `test.py`를 제거했습니다. 외부 입력의 설치는 `scripts/external_inputs.py`, 검증기 unit test 실행기는 `scripts/unit_tests.py`(`make test-scripts`), 통합 검증은 `scripts/verification.py`(`make verify-all`)입니다. flag `--build-extension`을 제거했습니다. workflow는 `make install`을 실행하고, release workflow는 Node.js만으로 `make install-tools`를 실행합니다.
 
 ## 0.0.6
 

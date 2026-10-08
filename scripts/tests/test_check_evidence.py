@@ -16,7 +16,7 @@ from check_evidence import check_evidence, feature_rows
 from registry import REGISTRY
 from verification_record import (AGGREGATE_RECORD, IMPLEMENTATIONS, PIE_RECORD, create_record, sha256, source_manifest,
                                  write_record)
-from test import build_extension
+from verification import build_extension
 
 
 class FeatureStateChecks(unittest.TestCase):
@@ -151,9 +151,9 @@ class EvidenceChecks(unittest.TestCase):
         alone = subprocess.run([sys.executable, script, '--root', str(self.root)],
                                capture_output=True, text=True)
         self.assertEqual(alone.returncode, 0, alone.stderr)
-        from test import DOCS_CHECK
-        self.assertEqual(DOCS_CHECK[1:], [script, '--records'])
-        recorded = subprocess.run(DOCS_CHECK + ['--root', str(self.root)], capture_output=True, text=True)
+        from verification import EVIDENCE_CHECK
+        self.assertEqual(EVIDENCE_CHECK[1:], [script, '--records'])
+        recorded = subprocess.run(EVIDENCE_CHECK + ['--root', str(self.root)], capture_output=True, text=True)
         self.assertEqual(recorded.returncode, 1)
         self.assertIn('Verification is stale', recorded.stderr)
 

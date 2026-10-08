@@ -63,7 +63,7 @@ class AtomicPublish(unittest.TestCase):
         results.write_text(PREVIOUS)
         module = self.folder / 'ordered_json.so'
         module.write_text('')
-        with patch('toolchains.problems', return_value=[]), patch.dict(os.environ), \
+        with \
                 patch('run.RESULTS', results), patch('run.prepare', return_value=[]), \
                 patch('run.artifact_paths', return_value=[module]), patch('run.run', side_effect=rows), \
                 patch('run.environment', return_value={'system': 'fixture'}), \
@@ -76,7 +76,7 @@ class AtomicPublish(unittest.TestCase):
             except OSError:
                 pass
         self.assertEqual(whole(results)['comparison'], {'status': 'baseline-updated'})
-        with patch('toolchains.problems', return_value=[]), patch.dict(os.environ), \
+        with \
                 patch('run.RESULTS', results), patch('run.prepare', return_value=[]), \
                 patch('run.artifact_paths', return_value=[module]), patch('run.run', side_effect=rows), \
                 patch('run.environment', return_value={'system': 'fixture'}), \

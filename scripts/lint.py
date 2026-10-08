@@ -5,7 +5,7 @@
     python3 scripts/lint.py go-vet   go vet ./... in go/
 
 make check runs each lint as a target of its own after the verification, so hosted CI runs them on every pull
-request and merge group, and make clippy and make go-vet run one. The tools are the pinned ones (scripts/toolchains.py) and run
+request and every push to main, and make clippy and make go-vet run one. The tools are the pinned ones (make toolchain-check) and run
 offline. cargo builds into a target directory of this run, which is removed when the run ends, so no target
 directory of another checkout or run decides the result. A lint prints its output as it arrives and fails with
 its command, its directory and its exit status; it has no time limit.
@@ -16,7 +16,6 @@ import sys
 import tempfile
 
 from registry import ROOT, run_streamed
-from toolchains import require
 
 LINTS = {
     'clippy': ('rust', ['cargo', 'clippy', '--locked', '--all-targets', '--', '-D', 'warnings']),
@@ -29,8 +28,6 @@ def main(argv):
         print(f"unknown lint {' '.join(argv) or '(none)'}; the lints are {', '.join(LINTS)}", file=sys.stderr)
         return 2
     name = argv[0]
-    if not require():
-        return 1
     folder, command = LINTS[name]
     with tempfile.TemporaryDirectory(prefix=f'ordered-json-{name}-') as target:
         process = run_streamed(name, command, Path(ROOT) / folder, env=dict(os.environ, CARGO_TARGET_DIR=target))

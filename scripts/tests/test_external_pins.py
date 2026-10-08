@@ -15,7 +15,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import check_pie
-import test as test_runner
+import verification as test_runner
 from verification_record import sha256, supplementary_manifest
 
 
@@ -40,7 +40,7 @@ class ExternalPins(unittest.TestCase):
 
     def run_main(self, main, argv):
         output, errors = io.StringIO(), io.StringIO()
-        with patch('toolchains.problems', return_value=[]), patch.dict(os.environ), patch.object(sys, 'argv', argv), \
+        with patch.object(sys, 'argv', argv), \
                 redirect_stdout(output), redirect_stderr(errors):
             status = main()
         return status, output.getvalue() + errors.getvalue()
@@ -69,8 +69,8 @@ class ExternalPins(unittest.TestCase):
 
     def test_the_full_run_refuses_a_suite_other_than_the_pin_before_the_unit_tests(self):
         checkout = suite(self.folder)
-        with patch('test.run_unit_tests') as unit:
-            status, text = self.run_main(test_runner.main, ['test.py', '--suite', str(checkout)])
+        with patch('verification.run_unit_tests') as unit:
+            status, text = self.run_main(test_runner.main, ['verification.py', '--suite', str(checkout)])
         self.assertEqual(status, 1, text)
         self.assertFalse(unit.called)
         self.assertIn('revision: expected 1ef36fa01286573e846ac449e8683f8833c5b26a, actual', text)

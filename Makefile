@@ -2,68 +2,80 @@ PYTHON ?= python3
 JSON_TEST_SUITE ?=
 PIE ?= .cache/pie/pie.phar
 
-# The tools of every run are the releases that the tracked pin files name (scripts/toolchains.py):
-# .node-version, rust-toolchain.toml, the toolchain line of go/go.mod, .python-version, .php-version and the
-# packageManager field of package.json. No command installs or selects a toolchain on demand; make
-# tools installs the Rust toolchain and npm once, npm into .cache/tools/npm of this checkout, which
-# comes first on PATH, so no npm of the machine is used or changed.
-NPM_DIRECTORY := $(CURDIR)/.cache/tools/npm
+# The tools of every run are the releases that the tracked declaration files name: Node.js in .node-version, npm in the
+# packageManager of package.json, Rust in rust-toolchain.toml, Go in the toolchain line of go/go.mod (config/toolchain.json),
+# Python in .python-version and PHP in .php-version. No command installs or selects a toolchain on demand: make install
+# installs npm and Go into var/tools (scripts/kit/install-tools.mjs), which comes first on PATH, so no npm or Go of the
+# machine is used or changed, and make toolchain-check compares every tool with its declaration.
+export PATH := $(CURDIR)/var/tools/bin:$(PATH)
 export GOTOOLCHAIN := local
 export RUSTUP_AUTO_INSTALL := 0
-# A check reads no network: make tools downloads what the checks read, and every other recipe and the scripts it
+# A check reads no network: make install downloads what the checks read, and every other recipe and the scripts it
 # starts run cargo, go, npm and Composer offline, so a missing download fails at once instead of reaching a registry
-# in one run and not in another (scripts/toolchains.py sets the same for every entry point). make tools runs its
-# command with $(ONLINE).
+# in one run and not in another. The recipes that download run their command with $(ONLINE).
 export CARGO_NET_OFFLINE := true
 export GOPROXY := off
 export npm_config_offline := true
 export COMPOSER_DISABLE_NETWORK := 1
 ONLINE := env -u CARGO_NET_OFFLINE -u GOPROXY -u npm_config_offline -u COMPOSER_DISABLE_NETWORK
-export PATH := $(NPM_DIRECTORY)/bin:$(PATH)
+# Each checkout builds its Rust crates into their own target; cargo judges freshness by modification times, so a target of
+# another checkout would let it take binaries built from other sources as fresh.
+unexport CARGO_TARGET_DIR
 
 # The shared targets of kit (scripts/kit/kit.mk, vendored by make kit-sync): the gates, the document, owner and CI report
-# tools, the release steps. They read the configuration in config/*.json.
+# tools, the toolchains, the release steps. They read the configuration in config/*.json.
 include scripts/kit/kit.mk
 
 # The targets of the full suite that make check runs through the guard of scripts/kit/full-run.mjs and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
-CHECK_TARGETS := kit-check kit-test hooks-check owner-validate release-coverage release-config-check documents-check evidence-check commits-check verify-all clippy go-vet pie-check python-package-check
+CHECK_TARGETS := kit-check kit-test hooks-check owner-validate release-coverage release-config-check documents-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check python-package-check
 
 .PHONY: check test-scripts verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
-	benchmark benchmark-check clippy go-vet python-package-check tools toolchains-check release-config-check
+	benchmark benchmark-check clippy go-vet python-package-check release-config-check install install-rust install-external
 
 # check runs the full suite once per committed tree, when no task of docs/plans/execution-checklist.md is [~]
 # (scripts/kit/full-run.mjs); it records its result in var/full-run.json. rerun-failed (kit.mk) reruns the targets that failed.
 check:
 	node scripts/kit/full-run.mjs run $(CHECK_TARGETS)
 
+# install makes every download that the checks read: npm and Go (config/toolchain.json), the Rust toolchain of
+# rust-toolchain.toml, the crates of rust/Cargo.lock, and the PIE PHAR and the supplementary suite of external-inputs.json.
+# It is the only target that downloads, besides dependency-review and release-consumer-lock.
+install: install-tools install-rust cargo-downloads-fetch install-external
+
+install-rust:
+	$(ONLINE) rustup toolchain install --no-self-update
+
+install-external:
+	$(ONLINE) $(PYTHON) scripts/external_inputs.py
+
 # test-scripts runs the verifier unit tests of scripts/tests: every module, or the files of TESTS.
 test-scripts:
-	$(PYTHON) scripts/test.py --unit $(if $(TESTS),$(basename $(notdir $(TESTS))),$(basename $(notdir $(wildcard scripts/tests/test_*.py))))
+	$(PYTHON) scripts/unit_tests.py $(if $(TESTS),$(basename $(notdir $(TESTS))),$(basename $(notdir $(wildcard scripts/tests/test_*.py))))
 
-# verify-all builds and verifies every implementation, runs the verifier unit tests and writes var/records/verification.json
-# (scripts/test.py); verify-<language> verifies one implementation and writes no record (scripts/verify.py).
-verify-all:
-	$(PYTHON) scripts/test.py$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
+# verify-all runs the verifier unit tests, builds and verifies every implementation and writes var/records/verification.json
+# (scripts/verification.py); verify-<language> verifies one implementation and writes no record (scripts/verify.py).
+verify-all: toolchain-check cargo-downloads-check
+	$(PYTHON) scripts/verification.py$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
 
-verify-js:
-	$(PYTHON) scripts/verify.py --only js
-verify-rust:
-	$(PYTHON) scripts/verify.py --only rust
-verify-go:
-	$(PYTHON) scripts/verify.py --only go
-verify-php:
-	$(PYTHON) scripts/verify.py --only php
-verify-php-extension:
-	$(PYTHON) scripts/verify.py --only php-extension
-verify-python:
-	$(PYTHON) scripts/verify.py --only python
+verify-js: toolchain-check cargo-downloads-check
+	$(PYTHON) scripts/verify.py --only js$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
+verify-rust: toolchain-check cargo-downloads-check
+	$(PYTHON) scripts/verify.py --only rust$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
+verify-go: toolchain-check cargo-downloads-check
+	$(PYTHON) scripts/verify.py --only go$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
+verify-php: toolchain-check cargo-downloads-check
+	$(PYTHON) scripts/verify.py --only php$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
+verify-php-extension: toolchain-check cargo-downloads-check
+	$(PYTHON) scripts/verify.py --only php-extension$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
+verify-python: toolchain-check cargo-downloads-check
+	$(PYTHON) scripts/verify.py --only python$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
 
 # clippy and go-vet run one lint of AGENTS (scripts/lint.py).
-clippy:
+clippy: toolchain-check cargo-downloads-check
 	$(PYTHON) scripts/lint.py clippy
 
-go-vet:
+go-vet: toolchain-check cargo-downloads-check
 	$(PYTHON) scripts/lint.py go-vet
 
 # evidence-check checks the feature rows against the evidence they name, the distribution observations and the JSON reports
@@ -83,23 +95,12 @@ python-package-check:
 release-config-check:
 	node scripts/kit/release.mjs versions "v$$(node -p "require('./js/package.json').version")"
 
-pie-check:
+pie-check: toolchain-check cargo-downloads-check
 	$(PYTHON) scripts/check_pie.py --pie "$(PIE)" $(if $(JSON_TEST_SUITE),--suite "$(JSON_TEST_SUITE)")
 
-benchmark:
+benchmark: toolchain-check cargo-downloads-check
 	$(PYTHON) benchmarks/run.py
 
 # benchmark-check measures the benchmark without replacing the committed result.
-benchmark-check:
+benchmark-check: toolchain-check cargo-downloads-check
 	$(PYTHON) benchmarks/run.py --check
-
-# tools installs the pinned Rust toolchain of rust-toolchain.toml, the pinned npm into .cache/tools/npm, the crates
-# of rust/Cargo.lock, and the PIE PHAR and the supplementary suite of external-inputs.json into .cache/pie/pie.phar
-# and .cache/JSONTestSuite (scripts/toolchains.py install); toolchains-check compares every tool with its pin.
-# No recipe runs a pinned tool by name: GNU Make 3.81 looks a simple recipe command up on its own
-# PATH, not the exported one, so each tool runs from a script that sets the PATH of the run.
-tools:
-	$(ONLINE) $(PYTHON) scripts/toolchains.py install
-
-toolchains-check:
-	$(PYTHON) scripts/toolchains.py
