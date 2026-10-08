@@ -37,6 +37,7 @@
     {"paths": ["go/**"], "languages": ["go"]},
     {"paths": ["php/**"], "tests": ["test_release"], "languages": ["php", "php-extension"]},
     {"paths": ["php-extension/**"], "languages": ["php-extension"]},
-    {"paths": ["python/**"], "languages": ["python"]}
+    {"paths": ["python/**"], "languages": ["python"]},
+    {"paths": ["python/pyproject.toml"], "tests": ["test_release"]}
   ]
 }

@@ -72,6 +72,7 @@ MANIFESTS = {
     'php/composer.json': ARCHIVE,
     'php-extension/composer.json': ARCHIVE,
     'rust/Cargo.toml': GIT_TAG,
+    'python/pyproject.toml': GIT_TAG,
 }
 # The time of every entry of a Composer zip, the time that npm pack gives every entry of a tarball. With it, stored
 # entries (-0) and TZ=UTC, the zip of a tree has the same bytes on every machine and at every time.
@@ -154,8 +155,9 @@ def manifest_version(path):
         if path.name == 'composer.json' and 'version' not in data:
             return None
         return data.get('version')
-    if path.name == 'Cargo.toml':
-        section = re.search(r'(?ms)^\[package\]\s*$(.*?)(?=^\[|\Z)', text)
+    if path.name in ('Cargo.toml', 'pyproject.toml'):
+        heading = 'package' if path.name == 'Cargo.toml' else 'project'
+        section = re.search(rf'(?ms)^\[{heading}\]\s*$(.*?)(?=^\[|\Z)', text)
         found = section and re.search(r'(?m)^version\s*=\s*"([^"]*)"', section.group(1))
         return found.group(1) if found else None
     raise Stop(f'{path.name}: not a manifest of a release')

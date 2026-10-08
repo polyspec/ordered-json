@@ -16,6 +16,7 @@ The repository owns the JSON specification, official inputs and expected results
 | go | go | Go |
 | php | php | Pure PHP and the PHP Value API |
 | php-extension | php-extension | Native PHP extension |
+| python | python | Python |
 
 The repository records one revision for the common contract and all implementations. The implementation directories do not contain nested Git repositories. Pure PHP and the extension retain separate package metadata and build processes, but their source changes are reviewed and verified in the same repository revision. The native implementation is tested against the PHP Value API in that same revision.
 
@@ -49,4 +50,4 @@ PIE package recognition, a local PIE build, and the shared JSON check against th
 <a id="state"></a>
 ## Implementation state
 
-The five implementation packages are maintained in this repository. [Feature state](../features.md) records completion and evidence separately from this contract.
+The six implementation packages are maintained in this repository. [Feature state](../features.md) records completion and evidence separately from this contract.

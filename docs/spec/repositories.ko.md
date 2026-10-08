@@ -1,5 +1,5 @@
 <!-- doc-id: repositories -->
-<!-- source-sha256: 0e4f824911af44eafdd884685e187ec84f7f4c633afc06218f9d489412223b45 -->
+<!-- source-sha256: c976a5ceedc073c00ebc5120b94754f8d0a801f8e3b56907786de9b79833d116 -->
 # 저장소 계약
 
 [English](repositories.md)
@@ -17,6 +17,7 @@
 | go | go | Go |
 | php | php | 순수 PHP와 PHP Value API |
 | php-extension | php-extension | 네이티브 PHP 확장 |
+| python | python | Python |
 
 저장소는 공통 계약과 모든 구현체에 하나의 리비전을 사용합니다. 구현 디렉터리에는 중첩 Git 저장소를 두지 않습니다. 순수 PHP와 확장은 패키지 메타데이터와 빌드 절차를 별도로 유지하지만, 소스 변경은 같은 저장소 리비전에서 검토하고 검사합니다. 네이티브 구현은 같은 리비전의 PHP Value API와 함께 검사합니다.
 
@@ -50,4 +51,4 @@ PIE 호환성을 기록하기 전에 PIE 패키지 인식, 로컬 PIE 빌드, PI
 <a id="state"></a>
 ## 구현 상태
 
-다섯 구현 패키지는 이 저장소에서 관리합니다. [기능 상태](../features.ko.md)에 이 계약과 별도로 완료 여부와 근거를 기록합니다.
+여섯 구현 패키지는 이 저장소에서 관리합니다. [기능 상태](../features.ko.md)에 이 계약과 별도로 완료 여부와 근거를 기록합니다.
