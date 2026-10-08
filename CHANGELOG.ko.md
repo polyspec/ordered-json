@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 49d69c9ab60cf0b6c17fe7566e996555d7e91593a2fc0e7172d864a51ad6439d -->
+<!-- source-sha256: 683efa880ac331142a875d0280c57799fb304d928f228816d09a6e0d99f555ef -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -13,6 +13,7 @@
 - T1.29-4: toolchain은 `config/toolchain.json`, `.node-version`, `package.json`의 `packageManager`, `rust-toolchain.toml`, `.php-version`, `.python-version`에 선언하고 `make toolchain-check`와 `make cargo-downloads-check`(kit 도구)로 검사합니다. `make install`은 npm과 Go(`var/tools`), Rust toolchain, crate, `external-inputs.json`의 PIE PHAR와 추가 사례를 설치하며 내려받는 유일한 target입니다. `toolchains.py`와 `test.py`를 제거했습니다. 외부 입력의 설치는 `scripts/external_inputs.py`, 검증기 unit test 실행기는 `scripts/unit_tests.py`(`make test-scripts`), 통합 검증은 `scripts/verification.py`(`make verify-all`)입니다. flag `--build-extension`을 제거했습니다. workflow는 `make install`을 실행하고, release workflow는 Node.js만으로 `make install-tools`를 실행합니다.
 - T1.29-5: 의존성은 `make dependency-policy-check`(`scripts/kit/check-dependency-policy.mjs`)가 `config/dependency-policy.json`과 `make dependency-review RECORD=1`이 쓰는 검토 기록 `config/dependency-review.json`에 대해 gate합니다. 루트 `package.json`에는 lock `package-lock.json`이 있습니다. `package.json`, `packages/ordered-json-npm/package.json`, `packages/ordered-json-php/composer.json`의 script `test`는 `make verify-js`, `make verify-php`를 실행합니다. AGENTS가 의존성 규칙을 적습니다. `make dependency-policy-mutation-check`는 이 저장소에 변형이 바꿀 npm registry 의존성과 Composer platform이 없어 TypeError로 실패합니다.
 - T1.29-6: 패키지는 `packages/ordered-json-npm`, `packages/ordered-json-php`, `packages/ordered-json-php-ext`, `packages/ordered-json-python`, `packages/ordered-json-rust`, `packages/ordered-json-go`에 있습니다. Go 모듈 경로는 `github.com/polyspec/ordered-json/packages/ordered-json-go`이고 tag는 `packages/ordered-json-go/vX.Y.Z`입니다.
+- T1.29-7: AGENTS는 `scripts/kit/`과 `tests/kit/`의 도구가 polyspec/kit에서만 바뀌고, 이 저장소가 다른 polyspec 저장소와 `config/*.json` 및 자기 제품 코드에서만 다르며, pull request, merge queue, ruleset이 없는 0.x 규칙과 archive 이름 `<package>-<language>-<version>.<ext>`를 적습니다. 릴리스 0.0.7을 준비했습니다. manifest는 올리지 않았고 tag는 없으며, `make release-config-check`, `make release-coverage`, `make dependency-policy-check`는 `packages/` 배치에서 통과합니다.
 
 ## 0.0.6
 

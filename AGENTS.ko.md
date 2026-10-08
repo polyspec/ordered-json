@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 9807a87f4b7e53ccd9eba61cac2288ee1c9a171d0e578eaf081c25e996316850 -->
+<!-- source-sha256: 0bf15dbb7522eff7aad7123728a59c8f7b351df0418ec6945b7b67d55aafe5a4 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -58,10 +58,9 @@ make check JSON_TEST_SUITE=.cache/JSONTestSuite
 
 push는 `[~]` 작업이 없을 때만 합니다. pre-push hook `.githooks/pre-push`는 `scripts/kit/push-gate.mjs hook`을 실행합니다. 이 명령은 push되는 commit이나 working tree의 `docs/plans/execution-checklist.md`에 `[~]` 작업이 있으면 각 ref, commit, ID, 작업을 밝히며 push를 거부하고, 체크리스트를 읽을 수 없으면 거부합니다. Makefile을 읽는 것은 모든 make 호출이 `.githooks`로 설정하는 `core.hooksPath` 외에는 설정을 쓰지 않습니다. `make hooks`는 hook을 설치하고 검사하며, `make hooks-check`는 `core.hooksPath`가 `.githooks`가 아니거나 `config/checklist.json`의 hook이 없거나 실행 가능하지 않거나 바뀌었으면 실패합니다. hook이 없는 checkout에서 한 push는 hook을 실행하지 않으므로, `.github/workflows/push-gate.yml`의 job `push-gate`가 모든 branch에 push된 commit과 모든 pull request의 head commit에 `make ci-targets TARGETS="push-gate-commit documents-check evidence-check commits-check"`를 실행합니다. `make push-gate-commit`은 `scripts/kit/push-gate.mjs commit`을 실행하여 작업이 `[~]`이면 실패하고, `.githooks/pre-push`나 `.githooks/pre-commit`이 mode 100755로 추적되지 않으면 실패합니다. 다른 target은 gate가 실패해도 실행됩니다. 그래서 문서, 체크리스트, 기능 기록, 메시지가 자체 검사에 실패하는 commit은 release가 요구하는 check에 실패합니다. 이 job은 local checkout의 설정을 검사할 수 없습니다.
 
-0.x 동안 변경은 소유 unit test가 로컬에서 통과한 뒤 `main`에 바로 commit합니다. pull request와 merge queue는 쓰지 않습니다.
-CI workflow는 `main`에 push될 때마다 전체 suite를 실행하며, 그 job `ci-passed`가 release workflow가 tag된 commit에 요구하는 check입니다. pre-push hook은 push 전에 push gate를 실행합니다.
+0.x 동안 변경은 소유 unit test가 로컬에서 통과한 뒤 `main`에 바로 commit합니다. pull request, merge queue, GitHub ruleset은 쓰지 않습니다. CI workflow는 `main`에 push될 때마다 전체 suite를 실행하며, 그 job `ci-passed`가 release workflow가 tag된 commit에 요구하는 check입니다. pre-push hook은 push 전에 push gate를 실행합니다.
 
-0.x 버전의 작업 단위는 체크리스트 행 하나이고, 그 행의 `[o]`는 그 행을 끝내는 commit에 들어갑니다. 작업은 로컬에 commit하고, 체크리스트의 모든 행이 `[o]`일 때 `main`에 한 번 push합니다. 그러므로 진행 중인 행이 있는 push는 없습니다. 그 push의 CI 실행은 `ci-passed` 성공으로 끝나야 하며, 그 뒤에 버전 올림 commit을 `main`에 넣고 CI가 통과한 commit에만 tag `vX.Y.Z`를 붙입니다.
+0.x 버전의 작업 단위는 체크리스트 행 하나이고, 그 행의 `[o]`는 그 행을 끝내는 commit에 들어갑니다. 작업은 로컬에 commit하고, 체크리스트의 모든 행이 `[o]`일 때 `main`에 한 번 push합니다. 그러므로 진행 중인 행이 있는 push는 없습니다. 그 push의 CI 실행은 `ci-passed` 성공으로 끝나야 하며, 그 뒤에 버전 올림 commit을 `main`에 넣고 CI가 통과한 commit에만 tag `vX.Y.Z`를 붙입니다. 릴리스 archive의 이름은 `<package>-<language>-<version>.<ext>`입니다(`polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip`, `polyspec-ordered-json-extension-php-X.Y.Z.zip`).
 
 
 
@@ -83,6 +82,11 @@ Rust 코드는 `packages/ordered-json-rust/`에서 `cargo clippy --all-targets -
 3. tag push는 `.github/workflows/release.yml`을 실행합니다. 이 workflow는 tag된 commit이 `main`에 있고 check `push-gate`와 `ci-passed`를 통과했는지, 모든 manifest에 tag의 버전이 있고 `CHANGELOG.md`에 section `## X.Y.Z`가 있는지 확인하고, 패키지 archive를 만들어 GitHub Release를 생성합니다([tag 릴리스](docs/operations/distribution.ko.md#tag-release)).
 
 이 저장소의 package가 다른 저장소의 package를 고정할 때(`git+https://github.com/polyspec/<repository>@vX.Y.Z`)는 GitHub에 실제로 존재하는 tag만 씁니다. 그 tag를 push한 뒤에 고정하며, 아직 release되지 않은 tag를 가리키는 고정은 쓰지 않습니다.
+
+<a id="tools"></a>
+## 공유 도구
+
+모든 polyspec 저장소가 공유하는 도구는 polyspec/kit의 vendored 사본입니다. `scripts/kit/`과 `tests/kit/`이며 `kit.json`에 나열되고 `.kit/kit.lock.json`에 고정됩니다. 공유 도구의 변경은 polyspec/kit에서 하고 `make kit-sync KIT_TAG=<tag>`로 이곳에 복사합니다. vendored 파일이 lock과 다르면 `make kit-check`가 실패하며, 도구는 이 저장소에서 수정하거나, 다른 이름으로 복사하거나, 끄지 않습니다. 이 저장소가 다른 polyspec 저장소와 다른 곳은 `config/*.json`(checklist, commits, 의존성 정책과 검토, documents, owner 검사, release, toolchain)과 이 저장소 고유의 제품 코드(`packages/`의 패키지, `scripts/*.py`의 검증기, benchmark)뿐입니다. `make kit-test`는 vendored 도구의 test를 실행합니다.
 
 <a id="dependencies"></a>
 ## 의존성
