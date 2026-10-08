@@ -1,29 +1,29 @@
 <!-- doc-id: api -->
-<!-- source-sha256: c9b6047cadc1c5f3ea0c5f65388a5cab4ef8a2bcae33ebf98ef79fbba37f4636 -->
+<!-- source-sha256: e79266c89c6b46a8ac198da6ec6e0449e292fb1e77688e8668d4a4d48f25d6ce -->
 # API 계약
 
 [English](api.md)
 
 [JSON 계약](json-contract.ko.md)은 모든 구현의 공통 동작을 정의합니다. 이 문서는 현재 언어별 API를 정의합니다. 현재 식별자는 [설치 문서](../operations/installation.ko.md)에 작성합니다.
 
-프로젝트는 `ordered-json`이고 모든 패키지 이름은 polyspec 관례를 따릅니다. JavaScript는 npm 패키지 `@polyspec/ordered-json`을 사용합니다. Rust는 Cargo 패키지 `polyspec-ordered-json`을 사용하며 `polyspec_ordered_json`으로 가져옵니다. Go는 `github.com/polyspec/ordered-json/go` 모듈과 `orderedjson` 패키지를 사용합니다. PHP는 `polyspec/ordered-json` Composer 패키지, `Polyspec\OrderedJson` 네임스페이스, PIE 패키지 `polyspec/ordered-json-extension`의 `ordered_json` 확장을 사용하며, 확장은 `Polyspec\OrderedJson\NativeParseError`를 발생시킵니다. 네이티브 함수와 상수 접두사는 `ordered_json_`과 `ORDERED_JSON_`입니다.
+프로젝트는 `ordered-json`이고 모든 패키지 이름은 polyspec 관례를 따릅니다. JavaScript는 npm 패키지 `@polyspec/ordered-json`을 사용합니다. Rust는 Cargo 패키지 `polyspec-ordered-json`을 사용하며 `polyspec_ordered_json`으로 가져옵니다. Go는 `github.com/polyspec/ordered-json/go` 모듈과 `orderedjson` 패키지를 사용합니다. PHP는 `polyspec/ordered-json` Composer 패키지, `Polyspec\OrderedJson` 네임스페이스, PIE 패키지 `polyspec/ordered-json-extension`의 `ordered_json` 확장을 사용하며, 확장은 `Polyspec\OrderedJson\NativeParseError`를 발생시킵니다. 네이티브 함수와 상수 접두사는 `ordered_json_`과 `ORDERED_JSON_`입니다. Python은 패키지 `polyspec-ordered-json`을 사용하며 `polyspec` 아래 namespace package인 `polyspec.ordered_json`으로 가져옵니다.
 
 <a id="values"></a>
 ## 값과 파싱
 
 파싱된 `Value` 객체는 라이브러리 API로 변경할 수 없습니다. 생성자는 문자열, 숫자 토큰, 불리언, null, 배열, 객체를 생성합니다. 생성자는 라이브러리 parser를 통해 값을 검사합니다. 종류가 맞지 않는 접근은 접근자에 따라 값 없음 또는 오류를 반환하며 잘못된 생성 인자는 언어별 오류를 발생시킵니다. 핵심 parser와 serializer는 JSON 동작을 host JSON API에 위임하지 않습니다.
 
-| 동작 | JavaScript | Rust | Go | PHP |
-| --- | --- | --- | --- | --- |
-| 텍스트 파싱 | `parse(source, options)` | `parse(source)` | `Parse(source)` | `parse(source, maxDepth)` |
-| UTF-8 바이트 | `parseBytes(bytes, options)` | `parse_bytes(bytes)` | `ParseBytes(bytes)` / `ParseBytesBorrowed(bytes)` | `parse(source)` |
-| 깊이 한도 | `options.maxDepth` | `parse_with_max_depth(source, limit)` | `ParseWithMaxDepth(source, limit)` | `maxDepth` |
-| 기본 출력 | `stringify(value)` | `stringify(&value)` | `Stringify(value)` | `stringify($value)` |
-| compact 출력 | `stringify(value)` | `value.compact()` | `value.Compact()` | `$value->compact()` |
-| 원문 조회 | `value.raw` | `value.raw()` | `value.Raw()` | `$value->raw()` |
-| 종류 | `value.kind` | `value.kind()` | `value.Kind()` | `$value->kind()` |
+| 동작 | JavaScript | Rust | Go | PHP | Python |
+| --- | --- | --- | --- | --- | --- |
+| 텍스트 파싱 | `parse(source, options)` | `parse(source)` | `Parse(source)` | `parse(source, maxDepth)` | `parse(source, options)` |
+| UTF-8 바이트 | `parseBytes(bytes, options)` | `parse_bytes(bytes)` | `ParseBytes(bytes)` / `ParseBytesBorrowed(bytes)` | `parse(source)` | `parse_bytes(data, options)` |
+| 깊이 한도 | `options.maxDepth` | `parse_with_max_depth(source, limit)` | `ParseWithMaxDepth(source, limit)` | `maxDepth` | `options.max_depth` |
+| 기본 출력 | `stringify(value)` | `stringify(&value)` | `Stringify(value)` | `stringify($value)` | `stringify(value)` |
+| compact 출력 | `stringify(value)` | `value.compact()` | `value.Compact()` | `$value->compact()` | `value.compact()` |
+| 원문 조회 | `value.raw` | `value.raw()` | `value.Raw()` | `$value->raw()` | `value.raw` |
+| 종류 | `value.kind` | `value.kind()` | `value.Kind()` | `$value->kind()` | `value.kind` |
 
-JavaScript 파싱 오류는 UTF-16 위치를 반환합니다. Rust, Go, PHP 파싱 오류는 UTF-8 바이트 위치를 반환합니다. 잘못된 UTF-8 오류는 모든 바인딩에서 첫 잘못된 바이트의 바이트 위치를 반환합니다. 그 시점에는 해석된 텍스트가 없으므로 JavaScript도 같으며, JavaScript 메시지는 그 단위를 함께 적습니다. Go `Value`의 영값은 유효하지 않습니다. Rust와 Go의 빈 `OrderedMap`은 유효한 객체 입력입니다.
+JavaScript 파싱 오류는 UTF-16 위치를 반환합니다. Rust, Go, PHP, Python 파싱 오류는 UTF-8 바이트 위치를 반환합니다. 잘못된 UTF-8 오류는 모든 바인딩에서 첫 잘못된 바이트의 바이트 위치를 반환합니다. 그 시점에는 해석된 텍스트가 없으므로 JavaScript도 같으며, JavaScript 메시지는 그 단위를 함께 적습니다. Go `Value`의 영값은 유효하지 않습니다. Rust와 Go의 빈 `OrderedMap`은 유효한 객체 입력입니다.
 
 <a id="bindings"></a>
 ## 바인딩 확장
@@ -36,6 +36,8 @@ JavaScript 바인딩은 `parse(source, options)`와 `parseBytes(bytes, options)`
 
 PHP 바인딩은 `Value::parseRejectDuplicates(source)`를 제공합니다. 일반 문법과 기본 깊이 한도로 UTF-8 텍스트를 파싱하지만 어느 깊이든 해석된 객체 키가 반복되면 거부합니다. 이스케이프 표기가 같은 UTF-16 키를 만드는 경우를 포함하여 `Duplicate object key at byte N` 메시지와 `duplicate_object_key` 종류의 `Polyspec\OrderedJson\ParseError`를 발생시키며, `N`은 두 번째 키 토큰의 첫 바이트 위치입니다. 네이티브 scanner는 공통 중복 키 동작을 유지하므로 `ordered_json` 확장이 로드되어 있어도 순수 PHP parser로 파싱합니다. 반환한 값은 조회와 직렬화에 로드된 backend를 사용합니다. `Value::parse`는 공통 중복 키 동작을 유지합니다. 그 밖의 유효한 값과 오류 및 위치는 바뀌지 않습니다.
 
+Python 바인딩은 `parse(source, options)`와 `parse_bytes(data, options)`의 `ParseOptions`에서 JavaScript 옵션의 snake case 표기인 `reject_duplicates=True`를 받습니다. 이 옵션이 있으면 이스케이프 표기가 같은 UTF-16 키를 만드는 경우를 포함하여 어느 깊이든 해석된 객체 키가 반복될 때 두 번째 키 토큰의 첫 바이트 위치에서 `duplicate_object_key` 종류의 `ParseError`로 거부합니다. text 입력은 source text의 문자 그대로 된 짝 없는 surrogate도 그 문자의 UTF-8 인코딩이 가질 위치의 바이트 위치에서 `unescaped_lone_surrogate` 종류로 거부합니다. 그 위치에 유효한 UTF-8 인코딩이 없기 때문입니다. `Value.string_value()`는 surrogate pair를 한 문자로, 짝 없는 surrogate를 자기 문자 그대로 돌려주며, 이는 JavaScript 바인딩과 같습니다. 그 밖의 유효한 값과 오류 및 위치는 바뀌지 않습니다.
+
 Rust `serde` 모듈은 Serde `Serialize`와 소유한 `Deserialize` 타입에 `to_string(&value)`, `from_str(text)`, `from_slice(bytes)`를 제공합니다. 인코딩은 구조체 필드를 선언 순서로 기록하고 Serde 필드 이름과 생략 속성을 적용하며 compact JSON을 기록합니다. `Value`는 두 Serde trait을 구현하여 포함된 JSON의 객체 순서와 숫자 토큰을 유지합니다. map 키는 문자열로 직렬화되어야 하며 반복 키, 유한하지 않은 숫자, 256개보다 깊은 컨테이너는 오류로 처리합니다. 디코딩은 라이브러리 파서로 UTF-8과 JSON을 검사하고 해석된 반복 키를 거부한 뒤 대상 Serde 타입을 적용합니다. 알 수 없는 필드와 뒤따르는 입력은 버리지 않고 오류로 처리합니다. 타입 오류도 오류로 유지합니다. wire와 manifest 패키지 fixture가 정확한 출력 바이트를 정합니다.
 
 Go 바인딩은 `Marshal(value)`을 제공합니다. 내보낸 구조체 필드를 선언 순서로 인코딩하고, `json` 이름이 없는 익명 필드는 그 필드들을 펼쳐 넣으며, 이름이 겹치는 필드와 파서 한도보다 깊은 값은 오류로 거부하고, `json` 필드 이름과 생략 옵션을 적용하며 바이트 슬라이스를 base64 문자열로 인코딩합니다. nil `*Value`와 타입이 `MarshalJSON`을 구현하는 다른 nil 포인터를 포함해 nil 포인터와 nil 인터페이스는 `null`로 기록하고, 인터페이스는 그 안에 담긴 값으로 인코딩합니다. `MarshalJSON() ([]byte, error)` 경계를 구현한 타입을 허용하고 사용자 정의 결과를 ordered-json parser로 검증합니다. 네이티브 map 순서가 정의되지 않았으므로 Go map 키는 정렬합니다. 결과는 compact JSON이며 typed 인코딩을 host JSON 인코더에 위임하지 않습니다.
@@ -43,12 +45,12 @@ Go 바인딩은 `Marshal(value)`을 제공합니다. 내보낸 구조체 필드�
 <a id="objects"></a>
 ## 연관 객체
 
-| 동작 | JavaScript | Rust | Go | PHP |
-| --- | --- | --- | --- | --- |
-| 멤버 연관배열 | `value.members` | `value.members()` | `value.Members()` | `$value->members()` |
-| 문자열 키 조회 | `value.get(key)` | `value.get(key)` | `value.Get(key)` | `$value->get($key)` |
-| 코드 단위 조회 | `value.get(key)` | `value.get_units(units)` | `value.GetUnits(units)` | `$value->getUnits($units)` |
-| 객체 생성 | `Value.object(entries)` | `Value::object(&map)` | `Object(map)` | `Value::object($map)` |
+| 동작 | JavaScript | Rust | Go | PHP | Python |
+| --- | --- | --- | --- | --- | --- |
+| 멤버 연관배열 | `value.members` | `value.members()` | `value.Members()` | `$value->members()` | `value.members()` |
+| 문자열 키 조회 | `value.get(key)` | `value.get(key)` | `value.Get(key)` | `$value->get($key)` | `value.get(key)` |
+| 코드 단위 조회 | `value.get(key)` | `value.get_units(units)` | `value.GetUnits(units)` | `$value->getUnits($units)` | `value.get_units(units)` |
+| 객체 생성 | `Value.object(entries)` | `Value::object(&map)` | `Object(map)` | `Value::object($map)` | `Value.object(entries)` |
 
 JavaScript는 복사된 `Map<string, Value>`를 반환하며 TypeScript에는 `ReadonlyMap`으로 노출합니다. `value.keys`는 첫 번째로 파싱된 키 토큰을 순서대로 반환합니다. 객체 생성자는 `[string or Value, Value]` 항목의 iterable을 받습니다.
 
@@ -56,13 +58,13 @@ Rust는 불변 `OrderedMap` 참조를 반환합니다. `OrderedMap::insert(key, 
 
 Go는 독립적인 `OrderedMap` 복사본을 반환합니다. `Set(key, value)`는 문자열 `Value` 키를 받으며 `Keys()`는 등록 순서대로 키 값을 반환합니다. `Get`과 `GetUnits`는 값 포인터 또는 nil을 반환합니다. `ParseBytes`는 입력을 복사합니다. `ParseBytesBorrowed`는 명시적인 zero-copy API이며 반환된 값이 살아 있는 동안 호출자는 바이트 슬라이스를 변경하면 안 됩니다.
 
-PHP는 `Value` 객체의 연관배열을 반환합니다. 객체 생성자는 해당 연관배열을 받습니다. 키가 없으면 PHP는 null, JavaScript는 undefined, Rust는 `None`, Go는 nil을 반환합니다.
+PHP는 `Value` 객체의 연관배열을 반환합니다. 객체 생성자는 해당 연관배열을 받습니다. Python은 읽기 전용 mapping 복사본을 반환하며, 객체 생성자는 문자열 또는 문자열 `Value` 키를 가진 mapping이나 쌍의 iterable을 받습니다. 키가 없으면 PHP는 null, JavaScript는 undefined, Rust와 Python은 `None`, Go는 nil을 반환합니다.
 
 <a id="scalars"></a>
 ## 배열과 스칼라
 
-| 동작 | JavaScript | Rust | Go | PHP |
-| --- | --- | --- | --- | --- |
+| 동작 | JavaScript | Rust | Go | PHP | Python |
+| --- | --- | --- | --- | --- | --- |
 | 배열 생성 | `Value.array(items)` | `Value::array(items)` | `Array(items)` | `Value::array($items)` |
 | 배열 원소 | `value.items` | `value.items()` | `value.Items()` | `$value->items()` |
 | 문자열 생성 | `Value.string(text)` | `Value::string(text)` | `String(text)` | `Value::string($text)` |
@@ -75,7 +77,7 @@ PHP는 `Value` 객체의 연관배열을 반환합니다. 객체 생성자는 �
 | 불리언 조회 | `booleanValue()` | `boolean_value()` | `BooleanValue()` | `booleanValue()` |
 | null 생성 | `Value.null()` | `Value::null()` | `Null()` | `Value::null()` |
 
-JavaScript는 기존 UTF-16 텍스트로 문자열을 생성할 수 있습니다. Rust와 Go는 UTF-16 단위를 슬라이스로 제공하며 PHP는 정수 코드 단위 목록을 요구합니다. 배열 조회는 불변 데이터 또는 독립적인 복사본을 반환합니다.
+JavaScript는 기존 UTF-16 텍스트로 문자열을 생성할 수 있습니다. Rust와 Go는 UTF-16 단위를 슬라이스로 제공하며 PHP와 Python은 정수 코드 단위의 iterable을 받고 Python은 단위를 list로 돌려줍니다. 배열 조회는 불변 데이터 또는 독립적인 복사본을 반환합니다.
 
 <a id="php"></a>
 ## PHP 파서

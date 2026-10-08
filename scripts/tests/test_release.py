@@ -95,6 +95,8 @@ class Sandbox:
                 path.write_text(json.dumps({'name': package, 'version': version}))
             elif path.name == 'composer.json':
                 path.write_text(json.dumps({'name': package.lstrip('@'), 'version': version}))
+            elif path.name == 'pyproject.toml':
+                path.write_text(f'[project]\nname = "polyspec-ordered-json"\nversion = "{version}"\n')
             else:
                 path.write_text(f'[package]\nname = "polyspec-ordered-json"\nversion = "{version}"\n\n[dependencies]\n')
         (self.root / 'php/src').mkdir()
@@ -474,7 +476,7 @@ class Repository(unittest.TestCase):
         for name, how in release.MANIFESTS.items():
             with self.subTest(manifest=name):
                 self.assertIn(how, (release.ARCHIVE, release.CHECKOUT, release.GIT_TAG))
-                if Path(name).name == 'Cargo.toml':
+                if Path(name).name in ('Cargo.toml', 'pyproject.toml'):
                     self.assertEqual(how, 'not released as an archive; consumed by git tag')
                 if how == release.CHECKOUT:
                     self.assertEqual(Path(name).parent, Path('.'))

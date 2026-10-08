@@ -343,7 +343,7 @@ def check_distribution(record, features):
     if not isinstance(record.get('github_releases'), list) or not isinstance(record.get('version_tags'), list):
         raise ValueError('Release and tag observations are required')
     registries = record['registries']
-    if set(registries) != {'npm', 'crates.io', 'packagist', 'go', 'php-extension'}:
+    if set(registries) != {'npm', 'crates.io', 'packagist', 'go', 'php-extension', 'pypi'}:
         raise ValueError('Registry observations are incomplete')
     published = set()
     for registry, observation in registries.items():
