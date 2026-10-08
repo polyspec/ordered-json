@@ -6,7 +6,6 @@
 <a id="unreleased"></a>
 ## Unreleased
 
-- T1.27-20: while the version is 0.x, the maintainer pushes `main` directly, and the workflow `ci` on each push is the gate of the commit; agents keep the pull request and the merge queue.
 - T1.27-19: the CI workflow runs on every push to main, so each main commit has the check ci-passed that the release workflow requires.
 - T1.27-18: the release version test checks the tag of the version that `js/package.json` declares, instead of the fixed tag v0.0.3, which the 0.0.4 bump had made stale.
 - T1.27-17: the consumer fixtures of the release asset install test name the 0.0.4 archives, written by `make install-fixtures`.

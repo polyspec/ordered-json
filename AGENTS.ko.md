@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: ea32eaaa9ea0d0047c37f26e2089eb0e7ca642f0e42693a1494312c67c1262b2 -->
+<!-- source-sha256: 42a440a4964add3c0b1bf32695ba4132169679cb1fd123b43f5a7b41b9c0bb8e -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -58,7 +58,7 @@ make check JSON_TEST_SUITE=.cache/JSONTestSuite
 
 push는 `partial` 기능과 `[~]` 작업이 없을 때만 합니다. pre-push hook `.githooks/pre-push`는 `scripts/push_gate.py hook`을 실행합니다. 이 명령은 push되는 commit이나 working tree의 `docs/features.md`에 `partial` 행이 있거나 `docs/plans/execution-checklist.md`에 `[~]` 작업이 있으면 각 ref, commit, ID, 기능이나 작업을 밝히며 push를 거부하고, 두 file 중 하나를 읽을 수 없으면 거부합니다. Makefile을 읽는 것은 설정을 쓰지 않습니다. `make hooks`는 값이 다를 때만 `core.hooksPath`를 `.githooks`로 설정하고 hook을 검사하며, `make hooks-check`는 `core.hooksPath`가 `.githooks`가 아니거나 `.githooks/pre-push`나 `.githooks/pre-commit`이 실행 가능하지 않으면 실패합니다. hook이 없는 checkout에서 한 push는 hook을 실행하지 않으므로, `.github/workflows/push-gate.yml`의 job `push-gate`가 모든 branch에 push된 commit과 모든 pull request의 head commit에 `scripts/push_gate.py commit`을 실행하는 `make push-gate COMMIT=<commit>`을 실행합니다. 이 job은 기능이 `partial`이거나 작업이 `[~]`이면 실패하고, `.githooks/pre-push`나 `.githooks/pre-commit`이 mode 100755로 추적되지 않으면 실패합니다. 같은 job은 이어서 `make docs-check`를 실행하고, gate가 실패해도 실행합니다. 그래서 문서, 기능 tracker, 체크리스트가 자체 검사에 실패하는 commit은 `main`이 요구하는 check에 실패합니다. 이 job은 local checkout의 설정을 검사할 수 없습니다.
 
-버전이 `0.x`인 동안 메인테이너는 `main`에 직접 push할 수 있습니다. workflow `ci`는 `main`에 push될 때마다 실행되고, 그 commit의 검사는 job `ci-passed`입니다. agent의 변경은 여전히 pull request와 merge queue를 거쳐 `main`에 들어가며, 이 저장소의 어떤 명령도 `main`을 push하지 않습니다. branch는 GitHub의 표준 명령이나 GitHub UI로 공개합니다.
+모든 변경은 owner의 변경이든 agent의 변경이든 pull request와 merge queue를 거쳐 `main`에 들어갑니다. 이 저장소의 어떤 명령도 `main`을 push하지 않습니다. branch는 GitHub의 표준 명령이나 GitHub UI로 공개합니다.
 
 ~~~sh
 git push origin HEAD:refs/heads/<branch>
