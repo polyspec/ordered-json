@@ -1,0 +1,28 @@
+{
+  "name": "@polyspec/ordered-json",
+  "version": "0.0.6",
+  "description": "Strict JSON with insertion-ordered associative objects and exact number preservation",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "README.md",
+    "README.ko.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "make -C ../.. verify-js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/polyspec/ordered-json.git"
+  }
+}

@@ -63,7 +63,7 @@ class Environment(unittest.TestCase):
 
     def test_make_install_makes_every_download_of_the_checks(self):
         # The npm, Go and Composer releases of config/toolchain.json and package.json, the Rust toolchain, the crates of
-        # rust/Cargo.lock, the PIE PHAR and the supplementary suite.
+        # packages/ordered-json-rust/Cargo.lock, the PIE PHAR and the supplementary suite.
         prerequisites = [item for kind, items in recipes(makefile())['install'] if kind == 'prerequisites' for item in items]
         self.assertEqual(prerequisites, ['install-tools', 'install-rust', 'cargo-downloads-fetch', 'install-external'])
         downloads = dict(recipes(makefile()))
@@ -90,7 +90,7 @@ class Environment(unittest.TestCase):
         self.assertRegex((ROOT / 'rust-toolchain.toml').read_text(), r'(?m)^channel = "\d+\.\d+\.\d+"$')
         manager = json.loads((ROOT / 'package.json').read_text())['packageManager']
         self.assertRegex(manager, r'^npm@\d+\.\d+\.\d+\+sha512\.[0-9a-f]{128}$')
-        self.assertRegex((ROOT / 'go/go.mod').read_text(), r'(?m)^toolchain go\d+\.\d+\.\d+$')
+        self.assertRegex((ROOT / 'packages/ordered-json-go/go.mod').read_text(), r'(?m)^toolchain go\d+\.\d+\.\d+$')
 
     def test_no_recipe_runs_a_pinned_tool_by_name(self):
         # The tools of scripts/kit are started with node, whose release .node-version pins and make toolchain-check compares;

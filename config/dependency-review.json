@@ -9,7 +9,7 @@
       "advisories": []
     },
     {
-      "lock": "rust/Cargo.lock",
+      "lock": "packages/ordered-json-rust/Cargo.lock",
       "sha256": "91a2f39f73e97edb9156b41a35cbdc465f6a665899a641738501b9e9f01f7c2c",
       "advisories": []
     }
@@ -17,7 +17,7 @@
   "dependencies": [
     {
       "ecosystem": "pypi",
-      "manifest": "python/pyproject.toml",
+      "manifest": "packages/ordered-json-python/pyproject.toml",
       "package": "setuptools",
       "version": "84.0.0",
       "latest": "84.0.0"

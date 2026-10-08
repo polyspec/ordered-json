@@ -5,25 +5,25 @@
   "changelogTranslations": ["CHANGELOG.ko.md"],
   "checks": ["push-gate", "ci-passed"],
   "packages": [
-    { "kind": "npm", "directory": "js", "name": "@polyspec/ordered-json" },
-    { "kind": "composer", "directory": "php", "name": "polyspec/ordered-json" },
-    { "kind": "composer", "directory": "php-extension", "name": "polyspec/ordered-json-extension" }
+    { "kind": "npm", "directory": "packages/ordered-json-npm", "name": "@polyspec/ordered-json" },
+    { "kind": "composer", "directory": "packages/ordered-json-php", "name": "polyspec/ordered-json" },
+    { "kind": "composer", "directory": "packages/ordered-json-php-ext", "name": "polyspec/ordered-json-extension" }
   ],
   "manifests": {
     "package.json": "version",
-    "js/package.json": "archive",
+    "packages/ordered-json-npm/package.json": "archive",
     "composer.json": "version",
-    "php/composer.json": "archive",
-    "php-extension/composer.json": "archive",
-    "rust/Cargo.toml": "git-tag",
-    "python/pyproject.toml": "git-tag"
+    "packages/ordered-json-php/composer.json": "archive",
+    "packages/ordered-json-php-ext/composer.json": "archive",
+    "packages/ordered-json-rust/Cargo.toml": "git-tag",
+    "packages/ordered-json-python/pyproject.toml": "git-tag"
   },
   "notReleased": {
     "tests/release-consumer/npm/package.json": "the npm consumer project of the release archives",
     "tests/release-consumer/composer/composer.json": "the Composer consumer project of the release archives"
   },
   "goModules": {
-    "go": "github.com/polyspec/ordered-json/go"
+    "packages/ordered-json-go": "github.com/polyspec/ordered-json/packages/ordered-json-go"
   },
   "consumers": {
     "npm": {
@@ -50,12 +50,12 @@
   },
   "proof": {
     "gitTag": {
-      "python/pyproject.toml": {
+      "packages/ordered-json-python/pyproject.toml": {
         "kind": "python",
         "name": "polyspec-ordered-json",
         "smoke": ["python", "-c", "import polyspec.ordered_json"]
       },
-      "rust/Cargo.toml": {
+      "packages/ordered-json-rust/Cargo.toml": {
         "kind": "rust",
         "name": "polyspec-ordered-json",
         "smoke": ["cargo", "check"]

@@ -6,17 +6,17 @@
 <a id="ownership"></a>
 ## Ownership
 
-The repository owns the JSON specification, official inputs and expected results, shared verifier, implementation registry, aggregate verification records, and all implementation source. Each language directory owns its source, adapter, package metadata, documentation, and package build configuration within the same Git revision.
+The repository owns the JSON specification, official inputs and expected results, shared verifier, implementation registry, aggregate verification records, and all implementation source. Each package directory owns its source, adapter, package metadata, documentation, and package build configuration within the same Git revision. The package directories are `packages/ordered-json-<language>`, with the language `npm`, `php`, `php-ext`, `python`, `rust` or `go`, in the same layout as the other polyspec repositories.
 
 | Package | Checkout path | Implementation |
 | --- | --- | --- |
 | common | . | Contract, fixtures, verification and registry |
-| javascript | js | JavaScript |
-| rust | rust | Rust |
-| go | go | Go |
-| php | php | Pure PHP and the PHP Value API |
-| php-extension | php-extension | Native PHP extension |
-| python | python | Python |
+| javascript | packages/ordered-json-npm | JavaScript |
+| rust | packages/ordered-json-rust | Rust |
+| go | packages/ordered-json-go | Go |
+| php | packages/ordered-json-php | Pure PHP and the PHP Value API |
+| php-extension | packages/ordered-json-php-ext | Native PHP extension |
+| python | packages/ordered-json-python | Python |
 
 The repository records one revision for the common contract and all implementations. The implementation directories do not contain nested Git repositories. Pure PHP and the extension retain separate package metadata and build processes, but their source changes are reviewed and verified in the same repository revision. The native implementation is tested against the PHP Value API in that same revision.
 
@@ -34,7 +34,7 @@ Each verification run, aggregate check, selected check, PIE check, benchmark, or
 <a id="documents"></a>
 ## Documents and changes
 
-Each package registers its own English documents and Korean translations. Shared contracts and aggregate feature state are referenced from implementation documents. The common documentation check also checks the documents of every package in this repository.
+Each package has its own English documents and Korean translations. Shared contracts and aggregate feature state are referenced from implementation documents. `config/documents.json` selects the documents of the common root and of every package, and `make documents-check` checks them together.
 
 For a shared contract change, update the verifier, affected implementations, and conformance fixtures in one change, run package and aggregate checks, then publish the resulting repository revision. Test success and source or package publication remain separate observations.
 

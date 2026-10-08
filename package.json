@@ -5,11 +5,11 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./js/index.d.ts",
-      "import": "./js/index.js"
+      "types": "./packages/ordered-json-npm/index.d.ts",
+      "import": "./packages/ordered-json-npm/index.js"
     }
   },
-  "files": ["js"],
+  "files": ["packages/ordered-json-npm"],
   "engines": {"node": ">=20"},
   "packageManager": "npm@12.2.0+sha512.66c2632a94e796649738b2d7894d710c2cc2e1696893823066687f6b0d8a52e5f2b54eeaeaa32ffdc513ecca1e49ff794a5c2ec3f9515d879f1b3182b291cf35",
   "repository": {"type": "git", "url": "https://github.com/polyspec/ordered-json.git"},

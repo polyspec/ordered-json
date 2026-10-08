@@ -8,15 +8,15 @@
 
 | Component | Declared requirement | Current identifier | Metadata |
 | --- | --- | --- | --- |
-| JavaScript | Node.js >= 20, ESM | `@polyspec/ordered-json`, 0.0.3 | [package.json](https://github.com/polyspec/ordered-json/blob/main/js/package.json) |
-| Rust | Rust >= 1.71, edition 2021 | `polyspec-ordered-json`, 0.0.3 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/rust/Cargo.toml) |
-| Go | Go >= 1.22 | `github.com/polyspec/ordered-json/go` module, `orderedjson` package | [go.mod](https://github.com/polyspec/ordered-json/blob/main/go/go.mod) |
-| PHP | PHP >= 8.2, JSON and PCRE extensions | `polyspec/ordered-json`, `Polyspec\OrderedJson` namespace | [composer.json](https://github.com/polyspec/ordered-json/blob/main/php/composer.json) |
-| Python | Python >= 3.11 | `polyspec-ordered-json`, `polyspec.ordered_json` import, 0.0.3 | [pyproject.toml](https://github.com/polyspec/ordered-json/blob/main/python/pyproject.toml) |
-| Native PHP | Matching PHP development headers, C compiler, phpize, make | `ordered_json` extension, 0.0.3 | [extension source](https://github.com/polyspec/ordered-json/blob/main/php-extension/src/ordered_json.c) |
+| JavaScript | Node.js >= 20, ESM | `@polyspec/ordered-json`, 0.0.3 | [package.json](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-npm/package.json) |
+| Rust | Rust >= 1.71, edition 2021 | `polyspec-ordered-json`, 0.0.3 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-rust/Cargo.toml) |
+| Go | Go >= 1.22 | `github.com/polyspec/ordered-json/packages/ordered-json-go` module, `orderedjson` package | [go.mod](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-go/go.mod) |
+| PHP | PHP >= 8.2, JSON and PCRE extensions | `polyspec/ordered-json`, `Polyspec\OrderedJson` namespace | [composer.json](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-php/composer.json) |
+| Python | Python >= 3.11 | `polyspec-ordered-json`, `polyspec.ordered_json` import, 0.0.3 | [pyproject.toml](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-python/pyproject.toml) |
+| Native PHP | Matching PHP development headers, C compiler, phpize, make | `ordered_json` extension, 0.0.3 | [extension source](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-php-ext/src/ordered_json.c) |
 | Repository checks | The pinned Python, Node.js, Rust, Go and npm releases, Git, make, PHP above | `make install`, `make check` | [verification](validation.md) |
 
-The repository checks run with the exact releases that tracked files pin: Node.js in `.node-version`, Rust in `rust-toolchain.toml`, Go in the `toolchain` line of `go/go.mod`, Python by its minor release in `.python-version`, PHP by its minor release in `.php-version`, and npm with the SHA-512 of its registry tarball in the `packageManager` field of `package.json`. `make install` installs that Rust toolchain with rustup, that npm and the Go release into `var/tools` of the checkout (`scripts/kit/install-tools.mjs`, declared in `config/toolchain.json`), which Git ignores and the Makefile puts first on `PATH`; no npm or Go of the machine is used or changed. `make toolchain-check` compares every tool with its declaration, every target that runs a tool depends on it, and it fails with the expected and the actual version of each tool that differs. `GOTOOLCHAIN=local` and `RUSTUP_AUTO_INSTALL=0` keep go and rustup from downloading or installing another toolchain during a run, and every cargo command uses `--locked`.
+The repository checks run with the exact releases that tracked files pin: Node.js in `.node-version`, Rust in `rust-toolchain.toml`, Go in the `toolchain` line of `packages/ordered-json-go/go.mod`, Python by its minor release in `.python-version`, PHP by its minor release in `.php-version`, and npm with the SHA-512 of its registry tarball in the `packageManager` field of `package.json`. `make install` installs that Rust toolchain with rustup, that npm and the Go release into `var/tools` of the checkout (`scripts/kit/install-tools.mjs`, declared in `config/toolchain.json`), which Git ignores and the Makefile puts first on `PATH`; no npm or Go of the machine is used or changed. `make toolchain-check` compares every tool with its declaration, every target that runs a tool depends on it, and it fails with the expected and the actual version of each tool that differs. `GOTOOLCHAIN=local` and `RUSTUP_AUTO_INSTALL=0` keep go and rustup from downloading or installing another toolchain during a run, and every cargo command uses `--locked`.
 
 The table lists declared minimum versions, not a claim that every minimum version was tested. Actual versions are recorded in the [records](validation.md#records) of the run that verifies a commit. JavaScript, Rust, Go and Python have no external runtime library dependencies.
 
@@ -30,11 +30,11 @@ cd ordered-json
 
 The clone contains every implementation package. Use the package directory or a published package when available. Registry installation and publication are not verified; see [distribution](distribution.md).
 
-- JavaScript: import from `js/index.js`. TypeScript declarations are in `js/index.d.ts`.
-- Rust: set a local Cargo dependency with `path` pointing to `rust/`.
-- Go: use a local `replace` for module `github.com/polyspec/ordered-json/go` pointing to `go/`.
-- PHP: require `php/src/OrderedJson.php` or use `php/` as a Composer path repository.
-- Python: install the package of a tag with pip, or put `python/src` on the import path.
+- JavaScript: import from `packages/ordered-json-npm/index.js`. TypeScript declarations are in `packages/ordered-json-npm/index.d.ts`.
+- Rust: set a local Cargo dependency with `path` pointing to `packages/ordered-json-rust/`.
+- Go: use a local `replace` for module `github.com/polyspec/ordered-json/packages/ordered-json-go` pointing to `packages/ordered-json-go/`.
+- PHP: require `packages/ordered-json-php/src/OrderedJson.php` or use `packages/ordered-json-php/` as a Composer path repository.
+- Python: install the package of a tag with pip, or put `packages/ordered-json-python/src` on the import path.
 
 ~~~sh
 pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@vX.Y.Z#subdirectory=python"
@@ -43,7 +43,7 @@ pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-jso
 <a id="release-assets"></a>
 ## Release assets
 
-Each GitHub Release `vX.Y.Z` carries `polyspec-ordered-json-X.Y.Z.tgz`, `polyspec-ordered-json-X.Y.Z.zip` and `polyspec-ordered-json-extension-X.Y.Z.zip`. Each archive carries the manifest of its package unchanged: `package.json` of `js/` and `composer.json` of `php/` and `php-extension/`, each with `version` X.Y.Z, without `repositories` and without `@dev`. The Python package ships no archive: pip installs it from the tag of the repository itself, with `#subdirectory=python` naming the package directory.
+Each GitHub Release `vX.Y.Z` carries `polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip` and `polyspec-ordered-json-extension-php-X.Y.Z.zip`. Each archive carries the manifest of its package unchanged: `package.json` of `packages/ordered-json-npm/` and `composer.json` of `packages/ordered-json-php/` and `packages/ordered-json-php-ext/`, each with `version` X.Y.Z, without `repositories` and without `@dev`. The Python package ships no archive: pip installs it from the tag of the repository itself, with `#subdirectory=python` naming the package directory.
 
 npm installs the tarball by its path:
 
@@ -71,7 +71,7 @@ composer install
 
 Composer reads both zips. It does not install `polyspec/ordered-json-extension`, a package of the type `php-ext`; PIE builds and installs it ([native PHP](#native-php)).
 
-The packages of this repository depend on no other package, so the repository has no npm workspaces and no private development manifest: the root `package.json` and `composer.json` declare the same packages as `js/` and `php/` for an install from a checkout, with the same `version` and no `repositories`. `make release-consumer TAG=<tag>` (`scripts/kit/release-consumer.mjs`) installs the archives of `var/release/assets` as a consumer does, in a temporary directory outside the repository, from the committed consumer projects of `tests/release-consumer`: a `package.json` with its `package-lock.json`, which depends on the tarball by its release name, and a `composer.json` with its `composer.lock`, which requires the library from the artifact repository of the zips. The archives are built in the run, so each lock records them by name and version only, without `integrity` and with an empty `shasum`; a third-party package is recorded by version and hash. `npm ci` runs with an empty cache and the scope `@polyspec` pointed at an unreachable registry, and `composer install` with an empty `COMPOSER_HOME` and `COMPOSER_CACHE_DIR`. `make release-consumer-lock TAG=<tag>` writes the manifests and locks from the archives; a change of a release version or of a dependency runs it, and the release commit runs it.
+The packages of this repository depend on no other package, so the repository has no npm workspaces and no private development manifest: the root `package.json` and `composer.json` declare the same packages as `packages/ordered-json-npm/` and `packages/ordered-json-php/` for an install from a checkout, with the same `version` and no `repositories`. `make release-consumer TAG=<tag>` (`scripts/kit/release-consumer.mjs`) installs the archives of `var/release/assets` as a consumer does, in a temporary directory outside the repository, from the committed consumer projects of `tests/release-consumer`: a `package.json` with its `package-lock.json`, which depends on the tarball by its release name, and a `composer.json` with its `composer.lock`, which requires the library from the artifact repository of the zips. The archives are built in the run, so each lock records them by name and version only, without `integrity` and with an empty `shasum`; a third-party package is recorded by version and hash. `npm ci` runs with an empty cache and the scope `@polyspec` pointed at an unreachable registry, and `composer install` with an empty `COMPOSER_HOME` and `COMPOSER_CACHE_DIR`. `make release-consumer-lock TAG=<tag>` writes the manifests and locks from the archives; a change of a release version or of a dependency runs it, and the release commit runs it.
 
 <a id="native-php"></a>
 ## Native PHP
@@ -79,7 +79,7 @@ The packages of this repository depend on no other package, so the repository ha
 Build against the PHP runtime that will load the extension:
 
 ~~~sh
-cd php-extension/src
+cd packages/ordered-json-php-ext/src
 if test -f Makefile; then make distclean; fi
 phpize --clean
 phpize
@@ -87,10 +87,10 @@ phpize
 make -j2
 ~~~
 
-The current Unix build produces `php-extension/src/modules/ordered_json.so`. From the repository root:
+The current Unix build produces `packages/ordered-json-php-ext/src/modules/ordered_json.so`. From the repository root:
 
 ~~~sh
-php -n -d extension="$PWD/php-extension/src/modules/ordered_json.so" script.php
+php -n -d extension="$PWD/packages/ordered-json-php-ext/src/modules/ordered_json.so" script.php
 ~~~
 
 `script.php` is any PHP script that uses the extension. `php -n` ignores php.ini; required built-in JSON and PCRE support must still be available. The source includes `config.w32`, but Windows and ZTS builds have not been verified. PIE requires its build tools, including `pkg-config`; on macOS the Homebrew package is `pkgconf`. See the [PIE artifact check](validation.md#pie) for the reproducible PIE build and shared verification procedure.

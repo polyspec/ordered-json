@@ -16,8 +16,8 @@ ROOT = Path(__file__).resolve().parents[2]
 class Lints(unittest.TestCase):
     def test_the_lints_are_the_commands_of_agents(self):
         self.assertEqual(lint.LINTS, {
-            'clippy': ('rust', ['cargo', 'clippy', '--locked', '--all-targets', '--', '-D', 'warnings']),
-            'go-vet': ('go', ['go', 'vet', './...'])})
+            'clippy': ('packages/ordered-json-rust', ['cargo', 'clippy', '--locked', '--all-targets', '--', '-D', 'warnings']),
+            'go-vet': ('packages/ordered-json-go', ['go', 'vet', './...'])})
         agents = (ROOT / 'AGENTS.md').read_text()
         self.assertIn('cargo clippy --all-targets -- -D warnings', agents)
         self.assertIn('go vet ./...', agents)
@@ -47,7 +47,7 @@ class Lints(unittest.TestCase):
     def test_a_lint_that_reports_fails_with_its_command(self):
         result, _, printed = self.run_lint('clippy', 101)
         self.assertEqual(result, 1)
-        self.assertIn('clippy: cargo clippy --locked --all-targets -- -D warnings in rust/ failed with exit 101', printed)
+        self.assertIn('clippy: cargo clippy --locked --all-targets -- -D warnings in packages/ordered-json-rust/ failed with exit 101', printed)
 
     def test_an_unknown_lint_fails_by_name(self):
         with redirect_stdout(io.StringIO()), patch('sys.stderr', io.StringIO()) as errors:

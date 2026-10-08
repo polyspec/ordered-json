@@ -1,6 +1,6 @@
 # Release: a tag push creates the GitHub Release of the tag. Every commit of main passed the full suite on its push; the
 # maintainer releases by tagging a commit of main
-# vX.Y.Z after a version-bump pull request, or go/vX.Y.Z for the Go module of go/. In a tag filter * does not match /,
+# vX.Y.Z after a version-bump pull request, or packages/ordered-json-go/vX.Y.Z for the Go module of packages/ordered-json-go/. In a tag filter * does not match /,
 # so '**/v*' covers the tag of a Go module at any depth. The steps run in order and stop at the first failure: make
 # release-verify requires the tagged commit on origin/main with the check runs push-gate and ci-passed concluded
 # success, without running the tests again; make release-versions requires the version of the tag in every manifest and

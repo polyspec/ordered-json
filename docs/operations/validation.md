@@ -58,7 +58,7 @@ cd ordered-json
 make check
 ~~~
 
-Each package has an independent build target, while the root registry and verifier define the shared test commands. The native extension is built from a copy of the source files that Git tracks in `php-extension/`, in the run's temporary directory, and is tested with the sibling PHP package in the same checkout. Each run prints its run directory and removes it when it ends, so runs of one checkout do not share build output. Every cargo command of a run, and the `cargo run` of the benchmark, sets `CARGO_TARGET_DIR` to a directory inside that run, so a target directory that the environment names or that another checkout filled never provides the Rust probe, the package tests or the benchmark binary.
+Each package has an independent build target, while the root registry and verifier define the shared test commands. The native extension is built from a copy of the source files that Git tracks in `packages/ordered-json-php-ext/`, in the run's temporary directory, and is tested with the sibling PHP package in the same checkout. Each run prints its run directory and removes it when it ends, so runs of one checkout do not share build output. Every cargo command of a run, and the `cargo run` of the benchmark, sets `CARGO_TARGET_DIR` to a directory inside that run, so a target directory that the environment names or that another checkout filled never provides the Rust probe, the package tests or the benchmark binary.
 
 Run `make check JSON_TEST_SUITE=/path/to/JSONTestSuite` for supplementary inputs.
 

@@ -22,17 +22,17 @@ Run JavaScript with an official input from the repository root:
 ~~~sh
 node --input-type=module <<'JS'
 import {readFileSync} from 'node:fs';
-import {parse, stringify} from './js/index.js';
+import {parse, stringify} from './packages/ordered-json-npm/index.js';
 const {cases} = JSON.parse(readFileSync('examples/official.json', 'utf8'));
 const example = cases.find(example => example.id === 'document-order');
 console.log(stringify(parse(example.input)));
 JS
 ~~~
 
-Python runs the same example from `python/src` without installation:
+Python runs the same example from `packages/ordered-json-python/src` without installation:
 
 ~~~sh
-PYTHONPATH=python/src python3 - <<'PY'
+PYTHONPATH=packages/ordered-json-python/src python3 - <<'PY'
 import json
 from polyspec.ordered_json import parse, stringify
 with open('examples/official.json', encoding='utf8') as f:
@@ -42,7 +42,7 @@ print(stringify(parse(example['input'])))
 PY
 ~~~
 
-Install the Python package from a tag that contains `python/`, with pip ([installation](docs/operations/installation.md)). The first such tag is not released yet, so `X.Y.Z` stands for its version:
+Install the Python package from a tag that contains `packages/ordered-json-python/`, with pip ([installation](docs/operations/installation.md)). The first such tag is not released yet, so `X.Y.Z` stands for its version:
 
 ~~~sh
 pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@vX.Y.Z#subdirectory=python"
@@ -50,12 +50,12 @@ pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-jso
 
 | Package | Contents | Path |
 | --- | --- | --- |
-| JavaScript | JavaScript and TypeScript declarations | `js/` |
-| Rust | Rust crate | `rust/` |
-| Go | Go package | `go/` |
-| PHP | Pure PHP and the Value API | `php/` |
-| PHP extension | Native PHP extension with PIE metadata | `php-extension/` |
-| Python | Python package `polyspec-ordered-json`, import `polyspec.ordered_json` | `python/` |
+| JavaScript | JavaScript and TypeScript declarations | `packages/ordered-json-npm/` |
+| Rust | Rust crate | `packages/ordered-json-rust/` |
+| Go | Go package | `packages/ordered-json-go/` |
+| PHP | Pure PHP and the Value API | `packages/ordered-json-php/` |
+| PHP extension | Native PHP extension with PIE metadata | `packages/ordered-json-php-ext/` |
+| Python | Python package `polyspec-ordered-json`, import `polyspec.ordered_json` | `packages/ordered-json-python/` |
 
 <a id="verification"></a>
 ## Verification

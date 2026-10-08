@@ -19,11 +19,11 @@ AGGREGATE_RECORD = 'var/records/verification.json'
 PIE_RECORD = 'var/records/pie-verification.json'
 
 SOURCE_PATTERNS = (
-    'Makefile', 'js/*.js', 'js/*.ts', 'js/test/**/*.mjs', 'js/package.json',
-    'rust/src/**/*.rs', 'rust/examples/**/*.rs', 'rust/Cargo.toml', 'rust/Cargo.lock',
-    'go/**/*.go', 'go/go.mod', 'go/go.sum', 'php/src/**/*.php', 'php/tests/**/*.php',
-    'php/composer.json', 'php-extension/src/*.c', 'php-extension/src/*.h', 'php-extension/src/*.stub.php',
-    'php-extension/src/config.m4', 'php-extension/src/config.w32', 'scripts/**/*.py', 'scripts/**/*.erl',
+    'Makefile', 'packages/ordered-json-npm/*.js', 'packages/ordered-json-npm/*.ts', 'packages/ordered-json-npm/test/**/*.mjs', 'packages/ordered-json-npm/package.json',
+    'packages/ordered-json-rust/src/**/*.rs', 'packages/ordered-json-rust/examples/**/*.rs', 'packages/ordered-json-rust/Cargo.toml', 'packages/ordered-json-rust/Cargo.lock',
+    'packages/ordered-json-go/**/*.go', 'packages/ordered-json-go/go.mod', 'packages/ordered-json-go/go.sum', 'packages/ordered-json-php/src/**/*.php', 'packages/ordered-json-php/tests/**/*.php',
+    'packages/ordered-json-php/composer.json', 'packages/ordered-json-php-ext/src/*.c', 'packages/ordered-json-php-ext/src/*.h', 'packages/ordered-json-php-ext/src/*.stub.php',
+    'packages/ordered-json-php-ext/src/config.m4', 'packages/ordered-json-php-ext/src/config.w32', 'scripts/**/*.py', 'scripts/**/*.erl',
     'examples/official.json', 'examples/README*.md', 'fixtures/**/*.json', 'docs/spec/*.md',
     'implementations.json', 'package-tests.json',
 )

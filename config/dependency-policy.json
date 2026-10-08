@@ -1,6 +1,6 @@
 {
   "schema": 1,
   "composerPlatforms": [],
-  "pythonManifests": ["python/pyproject.toml"],
+  "pythonManifests": ["packages/ordered-json-python/pyproject.toml"],
   "exceptions": []
 }

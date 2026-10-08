@@ -93,8 +93,8 @@
       "paths": [
         "benchmarks/*.{mjs,php,json}",
         "benchmarks/fixtures/*.json",
-        "rust/examples/benchmark.rs",
-        "go/internal/benchmark/*.go"
+        "packages/ordered-json-rust/examples/benchmark.rs",
+        "packages/ordered-json-go/internal/benchmark/*.go"
       ],
       "targets": [
         "benchmark-check"
@@ -105,12 +105,12 @@
         "external-inputs.json",
         "package.json",
         "composer.json",
-        "js/package.json",
-        "php/composer.json",
-        "php-extension/composer.json",
-        "rust/Cargo.toml",
-        "go/go.mod",
-        "python/pyproject.toml"
+        "packages/ordered-json-npm/package.json",
+        "packages/ordered-json-php/composer.json",
+        "packages/ordered-json-php-ext/composer.json",
+        "packages/ordered-json-rust/Cargo.toml",
+        "packages/ordered-json-go/go.mod",
+        "packages/ordered-json-python/pyproject.toml"
       ],
       "targets": [
         "test-scripts",
@@ -153,7 +153,7 @@
     },
     {
       "paths": [
-        "js/**"
+        "packages/ordered-json-npm/**"
       ],
       "targets": [
         "verify-js"
@@ -161,7 +161,7 @@
     },
     {
       "paths": [
-        "rust/**"
+        "packages/ordered-json-rust/**"
       ],
       "targets": [
         "verify-rust"
@@ -169,7 +169,7 @@
     },
     {
       "paths": [
-        "go/**"
+        "packages/ordered-json-go/**"
       ],
       "targets": [
         "verify-go"
@@ -177,7 +177,7 @@
     },
     {
       "paths": [
-        "php/**"
+        "packages/ordered-json-php/**"
       ],
       "targets": [
         "verify-php",
@@ -186,7 +186,7 @@
     },
     {
       "paths": [
-        "php-extension/**"
+        "packages/ordered-json-php-ext/**"
       ],
       "targets": [
         "verify-php-extension"
@@ -194,7 +194,7 @@
     },
     {
       "paths": [
-        "python/**"
+        "packages/ordered-json-python/**"
       ],
       "targets": [
         "verify-python"
@@ -239,7 +239,7 @@
         ".php-version",
         "rust-toolchain.toml",
         "config/toolchain.json",
-        "go/go.mod",
+        "packages/ordered-json-go/go.mod",
         "package.json"
       ],
       "targets": [
@@ -249,7 +249,7 @@
     },
     {
       "paths": [
-        "rust/Cargo.lock"
+        "packages/ordered-json-rust/Cargo.lock"
       ],
       "targets": [
         "cargo-downloads-check"
@@ -260,15 +260,15 @@
         "config/dependency-policy.json",
         "config/dependency-review.json",
         "package-lock.json",
-        "rust/Cargo.lock",
-        "rust/Cargo.toml",
-        "python/pyproject.toml",
-        "go/go.mod",
+        "packages/ordered-json-rust/Cargo.lock",
+        "packages/ordered-json-rust/Cargo.toml",
+        "packages/ordered-json-python/pyproject.toml",
+        "packages/ordered-json-go/go.mod",
         "package.json",
         "composer.json",
-        "php/composer.json",
-        "php-extension/composer.json",
-        "js/package.json"
+        "packages/ordered-json-php/composer.json",
+        "packages/ordered-json-php-ext/composer.json",
+        "packages/ordered-json-npm/package.json"
       ],
       "targets": [
         "dependency-policy-check"
