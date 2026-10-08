@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 0bf15dbb7522eff7aad7123728a59c8f7b351df0418ec6945b7b67d55aafe5a4 -->
+<!-- source-sha256: e378d45d338bd5a0d95d202912f6312c4ebc31d953550a532331017a51f75365 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -91,7 +91,7 @@ Rust 코드는 `packages/ordered-json-rust/`에서 `cargo clippy --all-targets -
 <a id="dependencies"></a>
 ## 의존성
 
-의존성은 선언된 runtime 범위를 지원하는 최신 stable release를 씁니다. 의존성을 고르거나 갱신할 때 알려진 최신 release입니다. 시험판은 stable이 아닙니다. 의존성은 `make dependency-review UPDATE=1`로 고르고 갱신하며, 바뀐 manifest나 lock은 `make dependency-review RECORD=1`이 쓰는 검토 기록 `config/dependency-review.json`과 함께 commit합니다. `make dependency-policy-check`(`scripts/kit/check-dependency-policy.mjs`)는 manifest와 lock을 그 기록 및 `config/dependency-policy.json`과 비교하며 registry를 질의하지 않으므로, 한 tree는 언제나 한 결과를 냅니다. 더 오래된 release는 재현 가능한 사유, pin을 없애는 조건, 검증 명령을 적은 `config/dependency-policy.json`의 예외로만 고정합니다. 검토 시점에 advisory가 있는 lock은 gate에 실패합니다.
+의존성은 선언된 runtime 범위를 지원하는 최신 stable release를 씁니다. 의존성을 고르거나 갱신할 때 알려진 최신 release입니다. 시험판은 stable이 아닙니다. 의존성은 `make dependency-review UPDATE=1`로 고르고 갱신하며, 바뀐 manifest나 lock은 `make dependency-review RECORD=1`이 쓰는 검토 기록 `config/dependency-review.json`과 함께 commit합니다. `make dependency-policy-check`(`scripts/kit/check-dependency-policy.mjs`)는 manifest와 lock을 그 기록 및 `config/dependency-policy.json`과 비교하며 registry를 질의하지 않으므로, 한 tree는 언제나 한 결과를 냅니다. `make dependency-policy-mutation-check`는 gate가 checkout의 알려진 변형을 각각 거부함을 보입니다. 더 오래된 release는 재현 가능한 사유, pin을 없애는 조건, 검증 명령을 적은 `config/dependency-policy.json`의 예외로만 고정합니다. 검토 시점에 advisory가 있는 lock은 gate에 실패합니다.
 
 <a id="idempotency"></a>
 ## 멱등성

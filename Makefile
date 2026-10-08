@@ -28,7 +28,7 @@ include scripts/kit/kit.mk
 
 # The targets of the full suite that make check runs through the guard of scripts/kit/full-run.mjs and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
-CHECK_TARGETS := kit-check kit-test hooks-check owner-validate release-coverage release-config-check dependency-policy-check documents-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check python-package-check
+CHECK_TARGETS := kit-check kit-test hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check documents-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check python-package-check
 
 .PHONY: check test-scripts verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
 	benchmark benchmark-check clippy go-vet python-package-check release-config-check install install-rust install-external
@@ -40,8 +40,9 @@ check:
 
 # install makes every download that the checks read: npm and Go (config/toolchain.json), the Rust toolchain of
 # rust-toolchain.toml, the crates of packages/ordered-json-rust/Cargo.lock, and the PIE PHAR and the supplementary suite of external-inputs.json.
+# The Rust toolchain comes first because the build of cargo-audit in install-tools needs it.
 # It is the only target that downloads, besides dependency-review and release-consumer-lock.
-install: install-tools install-rust cargo-downloads-fetch install-external
+install: install-rust install-tools cargo-downloads-fetch install-external
 
 install-rust:
 	$(ONLINE) rustup toolchain install --no-self-update
