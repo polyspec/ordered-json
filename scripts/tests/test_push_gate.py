@@ -269,8 +269,8 @@ class PushGateChecks(unittest.TestCase):
 
     def test_the_workflow_runs_the_gate_on_every_push_and_pull_request(self):
         text = WORKFLOW.read_text()
-        # Every branch but those of the merge queue, every pull request and every merge group of the merge queue.
-        self.assertIn("on:\n  push:\n    branches-ignore: ['gh-readonly-queue/**']\n  pull_request:\n  merge_group:\n", text)
+        # Every push and every pull request.
+        self.assertIn("on:\n  push:\n  pull_request:\n", text)
         self.assertIn('\n  push-gate:\n', text)
         # A step runs its make target, never a script directly, so the environment and the prechecks of the
         # Makefile apply.
@@ -298,7 +298,7 @@ class PushGateChecks(unittest.TestCase):
         self.assertIn('make push-gate needs COMMIT=<commit>', missing.stdout + missing.stderr)
 
     def test_the_job_fails_on_a_commit_whose_documentation_check_fails(self):
-        """The check push-gate is what the ruleset of main requires, so a commit that fails its own documentation and
+        """The check push-gate is what the release workflow requires on the tagged commit, so a commit that fails its own documentation and
         checklist checks must fail it. Each step of the job runs in a clone of this checkout that holds the tracked
         files of the working tree; a state of the Korean checklist that is no task state passes the gate itself, which
         reads only the English checklist."""

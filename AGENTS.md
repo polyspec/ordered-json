@@ -47,7 +47,7 @@ git diff --check
 
 `scripts/verify.py --only` builds the selected implementation and runs its case and symbol listings, its declared package tests, and the shared cases; it writes no record. `scripts/test.py --unit` runs the named verifier unit tests and writes no record; a name that selects no test, such as a module without tests, fails with `selected 0 tests` and the name before any test runs.
 
-`make check` is the full suite that hosted CI runs on every pull request and every merge group of the merge queue; a local run is optional and happens at most once per tree, after every active item is complete. With the supplementary suite, that run is:
+`make check` is the full suite that hosted CI runs on every pull request and every push to `main`; a local run is optional and happens at most once per tree, after every active item is complete. With the supplementary suite, that run is:
 
 ~~~sh
 make check JSON_TEST_SUITE=.cache/JSONTestSuite
@@ -61,7 +61,7 @@ While the version is 0.x, a change is committed to `main` directly after its own
 pull request or merge queue is used. The CI workflow runs the full suite on every push to `main`; its job `ci-passed` is the
 check that the release workflow requires on the tagged commit. The pre-push hook runs the push gate before each push.
 
-The ruleset declaration `.github/ruleset.json` is not applied during 0.x; its removal with its `make` targets is a checklist task.
+While the version is 0.x, a unit of work is one checklist row, with the row marked `[o]` in its commit. Work is committed locally and pushed to `main` once, when every row of the checklist is `[o]`, so no push carries a row in progress. The CI run of that push must conclude with `ci-passed` success; then the version-bump commit goes on `main`, and only a commit whose CI run passed gets the tag `vX.Y.Z`.
 
 Run `make docs-check` for documentation-only review; it does not compare verification records with the sources. The evidence of a commit is the run that verifies it, not a committed file: `make pie-check` writes the PIE record `var/records/pie-verification.json` and `make check` the aggregate record `var/records/verification.json`, which Git ignores, and the documentation check at the end of `make check` checks both against the current sources ([records](docs/operations/validation.md#records)). A record hashes every tracked file, so a committed record would go stale with every commit; no record is committed, and no guard refuses because a record is missing. Do not edit verification results or source hashes to make checks pass.
 
@@ -76,8 +76,8 @@ Rust code passes `cargo clippy --all-targets -- -D warnings` in `rust/` and Go c
 
 A release is a tag of a commit of `main` whose CI run concluded with `ci-passed` success. Only the maintainer creates, moves or pushes a tag.
 
-1. The version-bump pull request `Release X.Y.Z`, whose commit names its checklist task, sets the version X.Y.Z in every manifest of the repository (`package.json`, `js/package.json`, `composer.json`, `php/composer.json`, `php-extension/composer.json`, `rust/Cargo.toml`, `python/pyproject.toml` and the package entry of `rust/Cargo.lock`), writes the install fixtures of the version with `make install-fixtures` and renames `## Unreleased` of every changelog to `## X.Y.Z`, with a new empty `## Unreleased` above it.
-2. The maintainer tags the merged commit of `main` `vX.Y.Z`, and `go/vX.Y.Z` for the Go module of `go/`, and pushes the tag.
+1. The version-bump commit `Release X.Y.Z`, which follows the push whose `ci-passed` succeeded and names its checklist task, sets the version X.Y.Z in every manifest of the repository (`package.json`, `js/package.json`, `composer.json`, `php/composer.json`, `php-extension/composer.json`, `rust/Cargo.toml`, `python/pyproject.toml` and the package entry of `rust/Cargo.lock`), writes the install fixtures of the version with `make install-fixtures` and renames `## Unreleased` of every changelog to `## X.Y.Z`, with a new empty `## Unreleased` above it.
+2. The maintainer tags the commit of `main` whose CI run concluded `ci-passed` success as `vX.Y.Z`, and `go/vX.Y.Z` for the Go module of `go/`, and pushes the tag.
 3. The tag push runs `.github/workflows/release.yml`: it requires the tagged commit on `main` with the checks `push-gate` and `ci-passed` passed, the version of the tag in every manifest and the section `## X.Y.Z` in `CHANGELOG.md`, builds the package archives and creates the GitHub Release ([tag releases](docs/operations/distribution.md#tag-release)).
 
 A package of this repository that pins a package of another repository (`git+https://github.com/polyspec/<repository>@vX.Y.Z`) names only a tag that exists on GitHub: the pin is written after that tag is pushed, and no pin names a tag that is not released.

@@ -1,9 +1,9 @@
 # The push gate in CI. The pre-push hook .githooks/pre-push refuses a push while a feature of
 # docs/features.md is partial, but a push from a checkout without the hook does not run it. This job
 # runs the same gate, make push-gate (scripts/push_gate.py), on the pushed commit of every branch, on the head commit
-# of every pull request and on every merge group of the merge queue, the commit that main receives: it fails while a feature is partial or a task of
+# of every pull request, the commit that main receives: it fails while a feature is partial or a task of
 # docs/plans/execution-checklist.md is [~], naming each one, and when .githooks/pre-push or
-# .githooks/pre-commit is not tracked with mode 100755. The ruleset main of .github/ruleset.json requires this job, so
+# .githooks/pre-commit is not tracked with mode 100755. The release workflow requires this job on the tagged commit, so
 # it also runs the documentation check, make docs-check (scripts/docs_check.py), which reads only Python and Git: a
 # commit whose documents, feature tracker or checklist fail their own checks does not reach main. That check runs
 # also after a failed gate. A step runs its make target, never a script
@@ -14,9 +14,7 @@ name: push-gate
 
 on:
   push:
-    branches-ignore: ['gh-readonly-queue/**']
   pull_request:
-  merge_group:
 
 permissions:
   contents: read

@@ -3,7 +3,7 @@
 Every step that runs a command runs a make target, never a script or a tool directly, so the environment and the
 prechecks of the Makefile apply (offline checks, pinned tools). Every job of a matrix runs with fail-fast false, and
 every job that runs make ci writes its summary and uploads its report after a failure too. No job or step has
-timeout-minutes. The last job of ci.yml is ci-passed, the check of ci.yml that the ruleset of main requires: it runs
+timeout-minutes. The last job of ci.yml is ci-passed, the check of ci.yml that the release workflow requires: it runs
 after every other job (`if: ${{ always() }}`), needs every other job of the workflow, runs on their runner and runs
 `make ci-passed` with the JSON of `needs`, so it passes only when every other job passed. The workflows are read as
 text with their two-space indentation; Python 3.9 has no YAML parser.
@@ -15,16 +15,15 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOWS = ROOT / '.github/workflows'
 ALWAYS = '${{ !cancelled() }}'
-# The `on:` block of each workflow: ci.yml runs the checks on every pull request, every merge group and every manual
-# run; push-gate.yml runs the gate on every push to a branch other than those of the merge queue, every pull request
-# and every merge group; release.yml runs on the push of a tag vX.Y.Z or <directory>/vX.Y.Z at any depth (in a tag
+# The `on:` block of each workflow: ci.yml runs the checks on every pull request, every push to main and every manual
+# run; push-gate.yml runs the gate on every push and every pull request; release.yml runs on the push of a tag vX.Y.Z or <directory>/vX.Y.Z at any depth (in a tag
 # filter * does not match /, so **/v* covers the tags of the Go modules). No other workflow exists.
 TRIGGERS = {
-    'ci.yml': "on:\n  pull_request:\n  merge_group:\n  push:\n    branches: [main]\n  workflow_dispatch:\n",
-    'push-gate.yml': "on:\n  push:\n    branches-ignore: ['gh-readonly-queue/**']\n  pull_request:\n  merge_group:\n",
+    'ci.yml': "on:\n  pull_request:\n  push:\n    branches: [main]\n  workflow_dispatch:\n",
+    'push-gate.yml': "on:\n  push:\n  pull_request:\n",
     'release.yml': "on:\n  push:\n    tags: ['v*', '**/v*']\n",
 }
-# The workflows whose checks the ruleset of main requires; they run on every pull request and every merge group.
+# The workflows whose checks the release workflow requires on the tagged commit; they run on every push.
 CHECK_WORKFLOWS = ('ci.yml', 'push-gate.yml')
 # The steps of release.yml in their order (scripts/release.py): verify the tagged commit, check the versions, build the
 # archives, create the release.
@@ -81,7 +80,7 @@ def job_keys(body):
 def ci_passed_violations(name, parsed):
     """Each broken rule of the job ci-passed of ci.yml."""
     if CI_PASSED not in parsed:
-        return [f'{name}: the job {CI_PASSED} is missing; the ruleset of main requires it as the check of {name}']
+        return [f'{name}: the job {CI_PASSED} is missing; the release workflow requires it as the check of {name}']
     found = []
     others = [job for job in parsed if job != CI_PASSED]
     keys = {job: job_keys(parsed[job]) for job in parsed}
@@ -130,28 +129,21 @@ def violations(name, text):
     if re.search(r'(?m)^\s*timeout-minutes:', text):
         found.append(f'{name}: timeout-minutes gives a long operation a deadline; the log shows its progress instead')
     parsed = jobs(text)
-    # Runners are few, so a new push to a pull request cancels the run of its previous push. A merge group has a ref of
-    # its own, and its run is never cancelled: the merge queue merges only a group whose checks completed. The push gate
-    # keeps every run.
+    # Runners are few, so a new push to a pull request cancels the run of its previous push. A push to main has a ref of
+    # its own, and its run is never cancelled: the commit that main receives keeps its run.
     if any(step.get('run', '').startswith('make ci ') for body in parsed.values() for step in body['steps']) and not re.search(
             r"(?m)^concurrency:\n  group: \$\{\{ github\.workflow \}\}-\$\{\{ github\.ref \}\}\n"
             r"  cancel-in-progress: \$\{\{ github\.event_name == 'pull_request' \}\}$", text):
         found.append(f'{name}: a workflow that runs make ci lacks concurrency with group '
                      "${{ github.workflow }}-${{ github.ref }} and cancel-in-progress: ${{ github.event_name == "
-                     "'pull_request' }}; a new push to a pull request cancels its previous run and no merge group run "
+                     "'pull_request' }}; a new push to a pull request cancels its previous run and no push to main run "
                      'is cancelled')
-    # The ruleset of main requires the checks of every workflow, and the merge queue runs them on the merge group, the
-    # commit that main receives; a push to a branch of the merge queue would run them a second time.
+    # The release workflow requires the checks of these workflows on the tagged commit of main, so each runs on a push.
     trigger = re.search(r'(?ms)^on:\n(.*?)^\S', text)
     events = re.findall(r'(?m)^  ([\w-]+):', trigger.group(1)) if trigger else []
-    if name in CHECK_WORKFLOWS and ('merge_group' not in events or 'pull_request' not in events):
-        found.append(f'{name}: the workflow runs on {events}, not on pull_request and merge_group; the ruleset of main '
-                     'requires its checks on every pull request and every merge group')
-    # A push trigger names main alone, which no merge group ref matches, or it excludes the merge group refs.
-    push_filtered = "branches-ignore: ['gh-readonly-queue/**']" in trigger.group(1) or 'branches: [main]' in trigger.group(1)
-    if 'push' in events and 'tags:' not in trigger.group(1) and not push_filtered:
-        found.append(f"{name}: the push trigger lacks branches-ignore: ['gh-readonly-queue/**'] or branches: [main]; the merge "
-                     'group runs the workflow already')
+    if name in CHECK_WORKFLOWS and 'push' not in events:
+        found.append(f'{name}: the workflow runs on {events}, not on push; the release workflow requires its checks on the '
+                     'tagged commit of main')
     declared = 'on:\n' + trigger.group(1).rstrip('\n') + '\n' if trigger else ''
     if name in TRIGGERS and declared != TRIGGERS[name]:
         found.append(f'{name}: the on: block is {declared!r}, not {TRIGGERS[name]!r}')
@@ -262,7 +254,7 @@ class WorkflowRules(unittest.TestCase):
         self.assertNotIn('cancel-in-progress', alone)
         message = ("ci.yml: a workflow that runs make ci lacks concurrency with group ${{ github.workflow }}-${{ github.ref }} "
                    "and cancel-in-progress: ${{ github.event_name == 'pull_request' }}; a new push to a pull request "
-                   'cancels its previous run and no merge group run is cancelled')
+                   'cancels its previous run and no push to main run is cancelled')
         self.assertIn(message, violations('ci.yml', alone))
         always = text.replace("cancel-in-progress: ${{ github.event_name == 'pull_request' }}", 'cancel-in-progress: true')
         self.assertNotEqual(always, text)
@@ -270,17 +262,12 @@ class WorkflowRules(unittest.TestCase):
         self.assertNotIn('concurrency', (WORKFLOWS / 'push-gate.yml').read_text(),
                          'the push gate of every pushed commit runs to its end')
 
-    def test_every_workflow_runs_on_pull_requests_and_merge_groups(self):
-        for name in ('ci.yml', 'push-gate.yml'):
+    def test_every_check_workflow_runs_on_push(self):
+        for name in CHECK_WORKFLOWS:
             text = (WORKFLOWS / name).read_text()
-            without = text.replace('  merge_group:\n', '')
+            without = text.replace('\n  push:\n', '\n', 1)
             self.assertNotEqual(without, text, name)
-            self.assertTrue(any('not on pull_request and merge_group' in issue for issue in violations(name, without)), name)
-        gate = (WORKFLOWS / 'push-gate.yml').read_text()
-        queue = gate.replace("    branches-ignore: ['gh-readonly-queue/**']\n", '')
-        self.assertNotEqual(queue, gate)
-        self.assertTrue(any("lacks branches-ignore: ['gh-readonly-queue/**']" in issue
-                            for issue in violations('push-gate.yml', queue)))
+            self.assertTrue(any('not on push' in issue for issue in violations(name, without)), name)
 
     def test_each_workflow_declares_exactly_its_triggers(self):
         self.assertEqual(sorted(path.name for path in WORKFLOWS.glob('*.yml')), sorted(TRIGGERS))
@@ -292,8 +279,8 @@ class WorkflowRules(unittest.TestCase):
         manual = text.replace('  workflow_dispatch:\n', '', 1)
         self.assertNotEqual(manual, text)
         self.assertTrue(any(issue.startswith('ci.yml: the on: block is') for issue in violations('ci.yml', manual)))
-        pushed = text.replace('  merge_group:\n', '  merge_group:\n  push:\n', 1)
-        self.assertTrue(any(issue.startswith('ci.yml: the on: block is') for issue in violations('ci.yml', pushed)))
+        merged = text.replace('  workflow_dispatch:\n', '  workflow_dispatch:\n  merge_group:\n', 1)
+        self.assertTrue(any(issue.startswith('ci.yml: the on: block is') for issue in violations('ci.yml', merged)))
 
     def test_ci_passed_is_the_last_job_and_needs_every_other_job(self):
         text = (WORKFLOWS / 'ci.yml').read_text()

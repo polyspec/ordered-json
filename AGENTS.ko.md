@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 5780ebbbe5fcdb48f92a7595da85d8da17fcc9d44d165972bc0d099c88701d9c -->
+<!-- source-sha256: 13ccc0b6e0248f9f6d2a5f4375555ce3060e91e724c77ef8302f49f5fd08763e -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -48,7 +48,7 @@ git diff --check
 
 `scripts/verify.py --only`는 선택한 구현을 빌드하고 그 구현의 케이스·심볼 목록, 선언된 패키지 테스트, 공통 사례를 실행하며 기록을 쓰지 않습니다. `scripts/test.py --unit`은 지정한 검증기 unit test를 실행하며 기록을 쓰지 않습니다. test가 없는 module처럼 test를 하나도 고르지 않는 이름은 어떤 test도 실행하기 전에 `selected 0 tests`와 그 이름을 출력하며 실패합니다.
 
-`make check`는 hosted CI가 모든 pull request와 merge queue의 모든 merge group에서 실행하는 전체 suite입니다. 로컬 실행은 선택이며, 활성 항목이 모두 끝난 뒤 tree마다 많아야 한 번 합니다. 추가 사례를 포함하면 그 실행은 다음과 같습니다.
+`make check`는 hosted CI가 모든 pull request와 모든 push to `main`에서 실행하는 전체 suite입니다. 로컬 실행은 선택이며, 활성 항목이 모두 끝난 뒤 tree마다 많아야 한 번 합니다. 추가 사례를 포함하면 그 실행은 다음과 같습니다.
 
 ~~~sh
 make check JSON_TEST_SUITE=.cache/JSONTestSuite
@@ -61,8 +61,9 @@ push는 `partial` 기능과 `[~]` 작업이 없을 때만 합니다. pre-push ho
 0.x 동안 변경은 소유 unit test가 로컬에서 통과한 뒤 `main`에 바로 commit합니다. pull request와 merge queue는 쓰지 않습니다.
 CI workflow는 `main`에 push될 때마다 전체 suite를 실행하며, 그 job `ci-passed`가 release workflow가 tag된 commit에 요구하는 check입니다. pre-push hook은 push 전에 push gate를 실행합니다.
 
+0.x 버전의 작업 단위는 체크리스트 행 하나이고, 그 행의 `[o]`는 그 행을 끝내는 commit에 들어갑니다. 작업은 로컬에 commit하고, 체크리스트의 모든 행이 `[o]`일 때 `main`에 한 번 push합니다. 그러므로 진행 중인 행이 있는 push는 없습니다. 그 push의 CI 실행은 `ci-passed` 성공으로 끝나야 하며, 그 뒤에 버전 올림 commit을 `main`에 넣고 CI가 통과한 commit에만 tag `vX.Y.Z`를 붙입니다.
 
-`.github/ruleset.json`에 선언된 ruleset은 0.x 동안 적용하지 않습니다. 선언과 그 `make` target의 제거는 체크리스트 작업입니다.
+
 
 문서만 검토할 때는 `make docs-check`를 실행합니다. 이 검사는 검증 기록을 소스와 비교하지 않습니다. commit의 근거는 커밋된 파일이 아니라 그것을 검증하는 실행입니다. `make pie-check`는 PIE 기록 `var/records/pie-verification.json`을, `make check`는 통합 기록 `var/records/verification.json`을 쓰며 Git은 이를 무시하고, `make check` 마지막의 문서 검사는 두 기록을 현재 소스와 대조합니다([기록](docs/operations/validation.ko.md#records)). 기록은 모든 추적 파일을 해시하므로 커밋된 기록은 commit마다 오래된 기록이 됩니다. 어떤 기록도 커밋하지 않으며, 어떤 guard도 기록이 없다는 이유로 거부하지 않습니다. 검사를 통과시키기 위해 검증 결과나 소스 해시를 직접 수정하지 않습니다.
 
@@ -77,7 +78,7 @@ Rust 코드는 `rust/`에서 `cargo clippy --all-targets -- -D warnings`를, Go 
 
 릴리스는 CI 실행이 `ci-passed` 성공으로 끝난 `main`의 commit에 붙인 tag입니다. tag를 만들고 옮기고 push하는 것은 메인테이너뿐입니다.
 
-1. 버전 올림 pull request `Release X.Y.Z`는 commit에 체크리스트 작업을 적고, 저장소의 모든 manifest(`package.json`, `js/package.json`, `composer.json`, `php/composer.json`, `php-extension/composer.json`, `rust/Cargo.toml`, `python/pyproject.toml`, `rust/Cargo.lock`의 package 항목)의 버전을 X.Y.Z로 정하고, `make install-fixtures`로 그 버전의 설치 fixture를 쓰며, 모든 changelog의 `## Unreleased`를 `## X.Y.Z`로 바꾸고 그 위에 비어 있는 새 `## Unreleased`를 둡니다.
+1. 버전 올림 commit `Release X.Y.Z`는 `ci-passed`가 성공한 push 뒤에 오며 체크리스트 작업을 적고, 저장소의 모든 manifest(`package.json`, `js/package.json`, `composer.json`, `php/composer.json`, `php-extension/composer.json`, `rust/Cargo.toml`, `python/pyproject.toml`, `rust/Cargo.lock`의 package 항목)의 버전을 X.Y.Z로 정하고, `make install-fixtures`로 그 버전의 설치 fixture를 쓰며, 모든 changelog의 `## Unreleased`를 `## X.Y.Z`로 바꾸고 그 위에 비어 있는 새 `## Unreleased`를 둡니다.
 2. 메인테이너는 merge된 `main`의 commit에 `vX.Y.Z` tag를, `go/`의 Go 모듈에는 `go/vX.Y.Z` tag를 붙이고 tag를 push합니다.
 3. tag push는 `.github/workflows/release.yml`을 실행합니다. 이 workflow는 tag된 commit이 `main`에 있고 check `push-gate`와 `ci-passed`를 통과했는지, 모든 manifest에 tag의 버전이 있고 `CHANGELOG.md`에 section `## X.Y.Z`가 있는지 확인하고, 패키지 archive를 만들어 GitHub Release를 생성합니다([tag 릴리스](docs/operations/distribution.ko.md#tag-release)).
 

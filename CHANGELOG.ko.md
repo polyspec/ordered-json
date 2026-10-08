@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 5dc2e2ce2c999dc769d14855d192281719d2a0afc1a209f5342d670ca2986dc0 -->
+<!-- source-sha256: 8be7b34ef29dff90e182bf4a3ff5aa5522af546a1233abd1c1beba3d249760cc -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -11,6 +11,7 @@
 - T1.27-19: CI workflow가 main에 push될 때마다 실행되어, main의 모든 commit에 release workflow가 요구하는 check ci-passed가 붙습니다.
 - T1.27-21: AGENTS.md에 0.x 규칙을 적었습니다. 변경은 소유 unit test가 로컬에서 통과한 뒤 main에 commit하며, CI push trigger가 main의 각 commit에 ci-passed check를 만듭니다.
 - T1.27-22: AGENTS.md에 pin 규칙을 적었습니다. 다른 저장소 package의 pin은 GitHub에 존재하는 tag만 가리킵니다.
+- T1.27-23: GitHub ruleset과 merge queue를 제거했습니다. workflow는 push와 pull_request에서 실행되고, release는 tag된 commit에 check ci-passed를 요구합니다.
 - T1.27-17: release asset 설치 test의 consumer fixture가 `make install-fixtures`로 쓴 0.0.4 아카이브를 가리킵니다.
 ## 0.0.4
 
