@@ -50,7 +50,7 @@ jobs:
           coverage: none
       - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci-targets TARGETS="kit-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check"
+        run: make ci-targets TARGETS="kit-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check"
       # actions/upload-artifact v7.0.1: the report of this job, var/report/ci-targets.
       - name: report
         if: ${{ !cancelled() }}

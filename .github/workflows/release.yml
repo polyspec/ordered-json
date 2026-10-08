@@ -9,7 +9,7 @@
 # the GitHub Release with the section as notes and the archives attached, and a Go tag builds and attaches nothing
 # (scripts/kit/release.mjs, config/release.json). TAG reaches the make targets through the environment. Each step runs a
 # make target. The runner image and each action are exact releases, as in ci.yml. The release builds the archives with the npm
-# that package.json declares, which make install-tools installs into var/tools.
+# that package.json declares, which make install-tools TOOLS="npm" installs into var/tools.
 name: release
 
 on:
@@ -37,7 +37,7 @@ jobs:
           node-version-file: .node-version
           package-manager-cache: false
       - name: make install-tools
-        run: make install-tools
+        run: make install-tools TOOLS="npm"
       - name: verify the tagged commit
         run: make release-verify
       - name: check the versions

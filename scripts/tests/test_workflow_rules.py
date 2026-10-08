@@ -340,7 +340,7 @@ class WorkflowRules(unittest.TestCase):
         text = (WORKFLOWS / 'release.yml').read_text()
         self.assertEqual(release_violations('release.yml', text, jobs(text)), [])
         runs = [step['run'] for step in jobs(text)['release']['steps'] if 'run' in step]
-        self.assertEqual(runs, ['make install-tools'] + RELEASE_STEPS)
+        self.assertEqual(runs, ['make install-tools TOOLS="npm"'] + RELEASE_STEPS)
         broken = {
             'order': (text.replace('run: make release-versions', 'run: make release-swap')
                       .replace('run: make release-verify', 'run: make release-versions')

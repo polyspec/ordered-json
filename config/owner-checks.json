@@ -271,7 +271,8 @@
         "packages/ordered-json-npm/package.json"
       ],
       "targets": [
-        "dependency-policy-check"
+        "dependency-policy-check",
+        "dependency-policy-mutation-check"
       ]
     }
   ]

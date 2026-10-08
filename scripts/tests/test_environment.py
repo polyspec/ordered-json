@@ -65,7 +65,7 @@ class Environment(unittest.TestCase):
         # The npm, Go and Composer releases of config/toolchain.json and package.json, the Rust toolchain, the crates of
         # packages/ordered-json-rust/Cargo.lock, the PIE PHAR and the supplementary suite.
         prerequisites = [item for kind, items in recipes(makefile())['install'] if kind == 'prerequisites' for item in items]
-        self.assertEqual(prerequisites, ['install-tools', 'install-rust', 'cargo-downloads-fetch', 'install-external'])
+        self.assertEqual(prerequisites, ['install-rust', 'install-tools', 'cargo-downloads-fetch', 'install-external'])
         downloads = dict(recipes(makefile()))
         self.assertEqual([line for kind, line in downloads['install-external'] if kind == 'recipe'],
                          ['$(ONLINE) $(PYTHON) scripts/external_inputs.py'])
