@@ -8,6 +8,7 @@
 
 - T1.27-18: the release version test checks the tag of the version that `js/package.json` declares, instead of the fixed tag v0.0.3, which the 0.0.4 bump had made stale.
 - T1.27-19: the CI workflow runs on every push to main, so each main commit has the check ci-passed that the release workflow requires.
+- T1.27-21: AGENTS.md states the 0.x rule: a change is committed to main after its owning unit test passes locally, and the CI push trigger gives the ci-passed check of each main commit.
 - T1.27-17: the consumer fixtures of the release asset install test name the 0.0.4 archives, written by `make install-fixtures`.
 ## 0.0.4
 

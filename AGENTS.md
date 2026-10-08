@@ -57,15 +57,11 @@ make check JSON_TEST_SUITE=.cache/JSONTestSuite
 
 A push happens only when no feature is `partial` and no task is `[~]`. The pre-push hook `.githooks/pre-push` runs `scripts/push_gate.py hook`, which refuses the push while `docs/features.md` of a pushed commit or of the working tree has a `partial` row or its `docs/plans/execution-checklist.md` has a `[~]` task, naming each ref, commit, ID and feature or task, and refuses when it cannot read either file. Reading the Makefile writes no configuration; `make hooks` sets `core.hooksPath` to `.githooks` only when the value differs and checks the hook, and `make hooks-check` fails when `core.hooksPath` is not `.githooks` or `.githooks/pre-push` or `.githooks/pre-commit` is not executable. A push from a checkout without the hook does not run it, so the job `push-gate` of `.github/workflows/push-gate.yml` runs `make push-gate COMMIT=<commit>`, which runs `scripts/push_gate.py commit`, on the pushed commit of every branch and on the head commit of every pull request: it fails while a feature is `partial` or a task is `[~]`, and when `.githooks/pre-push` or `.githooks/pre-commit` is not tracked with mode 100755. The same job then runs `make docs-check`, also after a failed gate, so a commit whose documents, feature tracker or checklist fail their own checks fails the check that `main` requires. That job cannot check the configuration of a local checkout.
 
-Every change reaches `main` through a pull request and the merge queue, the owner's and every agent's alike; no command of this repository pushes `main`. Publish a branch with the standard commands of GitHub, or with the GitHub UI:
+While the version is 0.x, a change is committed to `main` directly after its owning unit test passes locally, and no
+pull request or merge queue is used. The CI workflow runs the full suite on every push to `main`; its job `ci-passed` is the
+check that the release workflow requires on the tagged commit. The pre-push hook runs the push gate before each push.
 
-~~~sh
-git push origin HEAD:refs/heads/<branch>
-gh pr create --base main --head <branch> --fill
-gh pr merge <branch> --auto --rebase
-~~~
-
-The GitHub ruleset `main`, declared in `.github/ruleset.json`, requires a pull request (no approval), the merge queue with the merge method `REBASE`, a linear history and exactly the checks `push-gate` and `ci-passed` of GitHub Actions (`ci-passed`, the last job of `.github/workflows/ci.yml`, passes only when every other job of that workflow passed), refuses a force-push and a deletion of `main`, and has no bypass actor, so GitHub refuses a direct push to `main`, from an administrator too. The merge queue rebases each queued pull request onto `main` as a merge group, runs the required checks on that commit, and moves `main` to it when they pass; a failed check removes the pull request from the queue. The pre-push hook runs on the push of the branch, and the job `push-gate` refuses a `[~]` task on the pull request and in the merge group. The rebase gives the merged commits new hashes, so `git pull --rebase` drops the local commits that the queue merged. `make github-ruleset` creates or updates the ruleset and the declared repository settings, and `make github-ruleset-check` fails when they differ from the declaration ([publishing main](docs/operations/validation.md#publish)).
+The ruleset declaration `.github/ruleset.json` is not applied during 0.x; its removal with its `make` targets is a checklist task.
 
 Run `make docs-check` for documentation-only review; it does not compare verification records with the sources. The evidence of a commit is the run that verifies it, not a committed file: `make pie-check` writes the PIE record `var/records/pie-verification.json` and `make check` the aggregate record `var/records/verification.json`, which Git ignores, and the documentation check at the end of `make check` checks both against the current sources ([records](docs/operations/validation.md#records)). A record hashes every tracked file, so a committed record would go stale with every commit; no record is committed, and no guard refuses because a record is missing. Do not edit verification results or source hashes to make checks pass.
 
@@ -78,7 +74,7 @@ Rust code passes `cargo clippy --all-targets -- -D warnings` in `rust/` and Go c
 <a id="release"></a>
 ## Release
 
-Every change reaches `main` through the merge queue with the required checks, so every commit of `main` passed the full suite. A release is a tag of a commit of `main`, and only the maintainer creates, moves or pushes a tag; a tag is never raised through a pull request.
+A release is a tag of a commit of `main` whose CI run concluded with `ci-passed` success. Only the maintainer creates, moves or pushes a tag.
 
 1. The version-bump pull request `Release X.Y.Z`, whose commit names its checklist task, sets the version X.Y.Z in every manifest of the repository (`package.json`, `js/package.json`, `composer.json`, `php/composer.json`, `php-extension/composer.json`, `rust/Cargo.toml`, `python/pyproject.toml` and the package entry of `rust/Cargo.lock`), writes the install fixtures of the version with `make install-fixtures` and renames `## Unreleased` of every changelog to `## X.Y.Z`, with a new empty `## Unreleased` above it.
 2. The maintainer tags the merged commit of `main` `vX.Y.Z`, and `go/vX.Y.Z` for the Go module of `go/`, and pushes the tag.
