@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'benchmarks'))
 import check_pie
 import run as benchmark
-from docs_check import check_pie_verification, check_verification
+from check_evidence import check_pie_verification, check_verification
 from registry import REGISTRY, load_registry, repository_paths, runtime_versions
 from verification_record import source_manifest
 

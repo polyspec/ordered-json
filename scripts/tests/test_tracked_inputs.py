@@ -13,7 +13,7 @@ import unittest
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from docs_check import authored_markdown, report_paths
+from check_evidence import report_paths
 from registry import fixture_paths
 from verification_record import source_manifest
 
@@ -47,11 +47,9 @@ class TrackedInputs(unittest.TestCase):
         self.assertEqual(sorted(before['files']), ['README.md', 'docs/report.json',
                                                     'fixtures/valid/object.json', 'scripts/tool.py'])
 
-    def test_an_untracked_document_report_or_fixture_is_not_read(self):
-        self.write('draft.md', '# Draft\n')
+    def test_an_untracked_report_or_fixture_is_not_read(self):
         self.write('docs/draft.json', '{"draft": true}\n')
         self.write('fixtures/valid/draft.json', '[]')
-        self.assertEqual(authored_markdown(self.root), {'README.md'})
         self.assertEqual([path.relative_to(self.root).as_posix() for path in report_paths(self.root)],
                          ['docs/report.json'])
         self.assertEqual([path.name for path in fixture_paths(self.root, 'valid')], ['object.json'])
@@ -61,10 +59,8 @@ class TrackedInputs(unittest.TestCase):
         plain = self.root / 'archive'
         (plain / 'fixtures/valid').mkdir(parents=True)
         (plain / 'fixtures/valid/a.json').write_text('1')
-        (plain / 'readme.md').write_text('# A\n')
         subprocess.run(['rm', '-rf', str(self.root / '.git')], check=True)
         self.assertEqual([path.name for path in fixture_paths(plain, 'valid')], ['a.json'])
-        self.assertEqual(authored_markdown(plain), {'readme.md'})
 
     def test_a_localized_git_message_still_reads_as_no_work_tree(self):
         # Git reports a missing repository in the locale of the user; the check reads

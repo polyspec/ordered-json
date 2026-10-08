@@ -1,5 +1,5 @@
 <!-- doc-id: documentation-plan -->
-<!-- source-sha256: 818d698a51e76282b4b8f761ea1e160ba9043e0446aaf2ff6d8e0653ca5001d0 -->
+<!-- source-sha256: 3ce069ee1fca129f454dd6c437d3626185cb5d7a236fff0b39f62d602a046d0f -->
 # 문서 관리
 
 [English](documentation-plan.md)
@@ -9,7 +9,7 @@
 <a id="ownership"></a>
 ## 정본 문서
 
-각 주제에는 영어 정본 하나와 `.ko.md` 번역 하나를 관리합니다. [목록](documentation-manifest.json)은 모든 공통 Markdown 문서와 주제를 등록합니다. 각 구현 패키지는 자체 문서를 등록하며 공통 검사기는 두 단계 모두 검사합니다. 다른 문서는 같은 규칙을 반복하지 않고 정본 주제로 연결합니다.
+각 주제에는 영어 정본 하나와 `.ko.md` 번역 하나를 관리합니다. [config/documents.json](../config/documents.json)은 저장소의 Markdown 문서를 공통 문서와 패키지 문서 구분 없이 선택하며, 모든 문서는 저장소에서 자기 주제를 한 번만 가리키는 `doc-id` 표지를 가집니다. 다른 문서는 같은 규칙을 반복하지 않고 정본 주제로 연결합니다.
 
 | 위치 | 내용 |
 | --- | --- |
@@ -40,11 +40,11 @@
 <a id="checks"></a>
 ## 문서 검사
 
-`make docs-check`는 등록된 문서 쌍, 로컬 링크 대상과 앵커, 섹션 식별자 및 실행 코드 블록의 일치, 한국어 번역 기준 해시, 필수 기능 항목, 검증 근거 링크를 검사합니다. 공개 문서와 보고서에 로컬 홈 디렉터리 경로가 포함돼도 실패합니다. 검증 기록을 현재 소스와 비교하지 않으므로 문서 검토에는 전체 검증 실행이 필요하지 않습니다.
+`make documents-check`(`scripts/kit/check-documents.mjs`)는 문서 쌍, 로컬 링크 대상과 앵커, 섹션 식별자와 코드 블록의 일치, 한국어 번역 기준 해시, 체크리스트, 기능 표의 값, 변경 기록의 section을 검사합니다. 문서에 로컬 홈 디렉터리 경로가 포함돼도 실패합니다. `make evidence-check`(`scripts/check_evidence.py`)는 기능 행을 그것이 가리키는 근거와 대조하고 보고서에 로컬 홈 디렉터리 경로가 있으면 실패합니다. 둘 다 검증 기록을 현재 소스와 비교하지 않으므로 문서 검토에는 전체 검증 실행이 필요하지 않습니다.
 
 한국어 파일의 `source-sha256` 주석은 번역을 검토한 영어 개정본을 기록합니다. 번역 검토 후에만 갱신합니다. 해시 일치는 번역의 정확성을 증명하지 않습니다. 검사기는 외부 사이트의 접속 가능 여부나 문장의 의미를 검증하지 않으며, 코드와 테스트 결과를 읽고 확인해야 합니다.
 
-`make check`는 검증기와 문서 검사기 테스트, 등록된 모든 JSON 구현, `--records`를 붙인 문서 검사기를 실행합니다. 이 문서 검사기는 소스 해시가 현재 소스와 다른 체크아웃의 통합 기록이나 PIE 기록(`var/records`)도 거부합니다. [PIE 검증](operations/validation.ko.md#pie)은 별도의 빌드와 공통 사례 결과를 기록합니다. hosted CI가 이 검사들을 실행합니다. `.github/workflows/ci.yml`은 `main`에 push된 모든 commit과 모든 pull request에서 전체 suite를 실행하고([hosted CI](operations/validation.ko.md#ci)), `.github/workflows/push-gate.yml`은 기능이 `partial`이거나 작업이 `[~]`인 push된 commit을 거부합니다.
+`make check`는 검증기 테스트, 등록된 모든 JSON 구현, `--records`를 붙인 근거 검사(`make verify-all`)를 실행합니다. 이 근거 검사는 소스 해시가 현재 소스와 다른 체크아웃의 통합 기록이나 PIE 기록(`var/records`)도 거부합니다. [PIE 검증](operations/validation.ko.md#pie)은 별도의 빌드와 공통 사례 결과를 기록합니다. hosted CI가 이 검사들을 실행합니다. `.github/workflows/ci.yml`은 `main`에 push된 모든 commit과 모든 pull request에서 전체 suite를 실행하고([hosted CI](operations/validation.ko.md#ci)), `.github/workflows/push-gate.yml`은 작업이 `[~]`인 push된 commit을 거부합니다.
 
 <a id="records"></a>
 ## 기술 기록

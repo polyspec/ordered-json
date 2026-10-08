@@ -27,9 +27,9 @@ include scripts/kit/kit.mk
 
 # The targets of the full suite that make check runs through the guard of scripts/kit/full-run.mjs and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
-CHECK_TARGETS := kit-check kit-test hooks-check owner-validate release-coverage release-config-check docs-check verify-all clippy go-vet pie-check python-package-check
+CHECK_TARGETS := kit-check kit-test hooks-check owner-validate release-coverage release-config-check documents-check evidence-check commits-check verify-all clippy go-vet pie-check python-package-check
 
-.PHONY: check test-scripts verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python docs-check pie-check \
+.PHONY: check test-scripts verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
 	benchmark benchmark-check clippy go-vet python-package-check tools toolchains-check release-config-check
 
 # check runs the full suite once per committed tree, when no task of docs/plans/execution-checklist.md is [~]
@@ -66,8 +66,10 @@ clippy:
 go-vet:
 	$(PYTHON) scripts/lint.py go-vet
 
-docs-check:
-	$(PYTHON) scripts/docs_check.py
+# evidence-check checks the feature rows against the evidence they name, the distribution observations and the JSON reports
+# of docs/ (scripts/check_evidence.py); verify-all runs it again with the verification records of the run.
+evidence-check:
+	$(PYTHON) scripts/check_evidence.py
 
 # python-package-check runs the declared package checks of the Python implementation with the running interpreter
 # (scripts/python_check.py). The job python of the hosted CI runs it on the floor minor 3.11 as well, which the pin of the

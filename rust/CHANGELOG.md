@@ -1,4 +1,4 @@
-<!-- doc-id: changelog -->
+<!-- doc-id: rust-changelog -->
 # Changelog
 
 [한국어](CHANGELOG.ko.md)

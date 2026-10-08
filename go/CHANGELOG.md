@@ -1,4 +1,4 @@
-<!-- doc-id: changelog -->
+<!-- doc-id: go-changelog -->
 # Changelog
 
 [한국어](CHANGELOG.ko.md)

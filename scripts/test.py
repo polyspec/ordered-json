@@ -15,7 +15,7 @@ from registry import prepare, repository_paths, run_directory, runtime_versions
 from toolchains import SUITE_FIX, require
 
 # Only this path checks record freshness: it runs right after the record is written.
-DOCS_CHECK = [sys.executable, str(ROOT / 'scripts/docs_check.py'), '--records']
+DOCS_CHECK = [sys.executable, str(ROOT / 'scripts/check_evidence.py'), '--records']
 
 
 # Each unit test has its own deadline; there is no deadline for the whole run.
@@ -112,7 +112,7 @@ def main():
     parser.add_argument('--build-extension', action='store_true', help='Accepted for compatibility; builds always run')
     parser.add_argument('--unit', nargs='+', metavar='TEST',
                         help='Run only these verifier unit tests, such as '
-                             'test_docs_check.DocumentationChecks.test_missing_anchor_fails, and write no record')
+                             'test_check_evidence.EvidenceChecks.test_missing_feature_field_fails, and write no record')
     args = parser.parse_args()
     if args.unit:
         sys.path.insert(0, str(ROOT / 'scripts/tests'))

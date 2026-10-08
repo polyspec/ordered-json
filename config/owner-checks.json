@@ -5,12 +5,10 @@
     {
       "paths": [
         "**/*.md",
-        "**/docs/documentation-manifest.json",
-        "docs/*.json",
-        "docs/reports/*.json"
+        "config/documents.json"
       ],
       "targets": [
-        "docs-check"
+        "documents-check"
       ]
     },
     {
@@ -22,7 +20,9 @@
       ],
       "targets": [
         "test-scripts",
-        "push-gate-commit"
+        "push-gate-commit",
+        "documents-check",
+        "evidence-check"
       ]
     },
     {
@@ -57,7 +57,6 @@
       "paths": [
         "scripts/test.py",
         "scripts/verification_record.py",
-        "scripts/docs_check.py",
         "scripts/check_pie.py",
         "scripts/compare_ojson.py",
         "scripts/comparison/*",
@@ -214,6 +213,26 @@
       "targets": [
         "release-coverage",
         "release-config-check"
+      ]
+    },
+    {
+      "paths": [
+        "scripts/check_evidence.py",
+        "docs/distribution.json",
+        "docs/reports/*.json",
+        "external-inputs.json"
+      ],
+      "targets": [
+        "test-scripts",
+        "evidence-check"
+      ]
+    },
+    {
+      "paths": [
+        "config/commits.json"
+      ],
+      "targets": [
+        "commits-check"
       ]
     }
   ]

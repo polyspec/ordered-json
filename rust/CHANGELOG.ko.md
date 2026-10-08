@@ -1,5 +1,5 @@
-<!-- doc-id: changelog -->
-<!-- source-sha256: 971622fbb40bf4c6d249a97174dd27696a25376aad48fb40228430e9b7a86cb6 -->
+<!-- doc-id: rust-changelog -->
+<!-- source-sha256: 49f3a46bab18f2c6c997f8428b1ab72bb0ab707ec2bd12a0e4b3f8f6ab255b65 -->
 # 변경 기록
 
 [English](CHANGELOG.md)

@@ -9,4 +9,4 @@ check:
 test: check
 
 docs-check:
-	$(PYTHON) ../scripts/docs_check.py
+	$(MAKE) -C .. documents-check
