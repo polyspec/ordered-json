@@ -80,6 +80,8 @@ A release is a tag of a commit of `main` whose CI run concluded with `ci-passed`
 2. The maintainer tags the merged commit of `main` `vX.Y.Z`, and `go/vX.Y.Z` for the Go module of `go/`, and pushes the tag.
 3. The tag push runs `.github/workflows/release.yml`: it requires the tagged commit on `main` with the checks `push-gate` and `ci-passed` passed, the version of the tag in every manifest and the section `## X.Y.Z` in `CHANGELOG.md`, builds the package archives and creates the GitHub Release ([tag releases](docs/operations/distribution.md#tag-release)).
 
+A package of this repository that pins a package of another repository (`git+https://github.com/polyspec/<repository>@vX.Y.Z`) names only a tag that exists on GitHub: the pin is written after that tag is pushed, and no pin names a tag that is not released.
+
 <a id="idempotency"></a>
 ## Idempotency
 
