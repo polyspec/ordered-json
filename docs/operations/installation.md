@@ -12,12 +12,13 @@
 | Rust | Rust >= 1.71, edition 2021 | `polyspec-ordered-json`, 0.0.3 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/rust/Cargo.toml) |
 | Go | Go >= 1.22 | `github.com/polyspec/ordered-json/go` module, `orderedjson` package | [go.mod](https://github.com/polyspec/ordered-json/blob/main/go/go.mod) |
 | PHP | PHP >= 8.2, JSON and PCRE extensions | `polyspec/ordered-json`, `Polyspec\OrderedJson` namespace | [composer.json](https://github.com/polyspec/ordered-json/blob/main/php/composer.json) |
+| Python | Python >= 3.11 | `polyspec-ordered-json`, `polyspec.ordered_json` import, 0.0.3 | [pyproject.toml](https://github.com/polyspec/ordered-json/blob/main/python/pyproject.toml) |
 | Native PHP | Matching PHP development headers, C compiler, phpize, make | `ordered_json` extension, 0.0.3 | [extension source](https://github.com/polyspec/ordered-json/blob/main/php-extension/src/ordered_json.c) |
 | Repository checks | The pinned Python, Node.js, Rust, Go and npm releases, Git, make, PHP above | `make tools`, `make check` | [verification](validation.md) |
 
 The repository checks run with the exact releases that tracked files pin: Node.js in `.node-version`, Rust in `rust-toolchain.toml`, Go in the `toolchain` line of `go/go.mod`, Python by its minor release in `.python-version`, PHP by its minor release in `.php-version`, and npm with the SHA-512 of its registry tarball in the `packageManager` field of `package.json`. `make tools` installs that Rust toolchain with rustup and that npm into `.cache/tools/npm` of the checkout, which Git ignores; no npm of the machine is used or changed. `make toolchains-check` compares every tool with its pin, and each entry point of the checks does the same before its first step and fails with the expected and the actual version, or the error of the command, of each tool that differs. `GOTOOLCHAIN=local` and `RUSTUP_AUTO_INSTALL=0` keep go and rustup from downloading or installing another toolchain during a run, and every cargo command uses `--locked`.
 
-The table lists declared minimum versions, not a claim that every minimum version was tested. Actual versions are recorded in the [records](validation.md#records) of the run that verifies a commit. JavaScript, Rust, and Go have no external runtime library dependencies.
+The table lists declared minimum versions, not a claim that every minimum version was tested. Actual versions are recorded in the [records](validation.md#records) of the run that verifies a commit. JavaScript, Rust, Go and Python have no external runtime library dependencies.
 
 <a id="checkout"></a>
 ## Source checkout
@@ -33,11 +34,16 @@ The clone contains every implementation package. Use the package directory or a 
 - Rust: set a local Cargo dependency with `path` pointing to `rust/`.
 - Go: use a local `replace` for module `github.com/polyspec/ordered-json/go` pointing to `go/`.
 - PHP: require `php/src/OrderedJson.php` or use `php/` as a Composer path repository.
+- Python: install the package of a tag with pip, or put `python/src` on the import path.
+
+~~~sh
+pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@v0.0.3#subdirectory=python"
+~~~
 
 <a id="release-assets"></a>
 ## Release assets
 
-Each GitHub Release `vX.Y.Z` carries `polyspec-ordered-json-X.Y.Z.tgz`, `polyspec-ordered-json-X.Y.Z.zip` and `polyspec-ordered-json-extension-X.Y.Z.zip`. Each archive carries the manifest of its package unchanged: `package.json` of `js/` and `composer.json` of `php/` and `php-extension/`, each with `version` X.Y.Z, without `repositories` and without `@dev`.
+Each GitHub Release `vX.Y.Z` carries `polyspec-ordered-json-X.Y.Z.tgz`, `polyspec-ordered-json-X.Y.Z.zip` and `polyspec-ordered-json-extension-X.Y.Z.zip`. Each archive carries the manifest of its package unchanged: `package.json` of `js/` and `composer.json` of `php/` and `php-extension/`, each with `version` X.Y.Z, without `repositories` and without `@dev`. The Python package ships no archive: pip installs it from the tag of the repository itself, with `#subdirectory=python` naming the package directory.
 
 npm installs the tarball by its path:
 

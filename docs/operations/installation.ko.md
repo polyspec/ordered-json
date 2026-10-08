@@ -1,5 +1,5 @@
 <!-- doc-id: installation -->
-<!-- source-sha256: 272827b6b9a3c0b9281d56c3e20535dd2394dd816bfcaa12486676c4f2e6956e -->
+<!-- source-sha256: fd3c1af5f007815e0d2ba665ff12299ccfeeddf2b0138a2884dc74b8b1e00bd1 -->
 # 설치와 실행
 
 [English](installation.md)
@@ -13,12 +13,13 @@
 | Rust | Rust >= 1.71, edition 2021 | `polyspec-ordered-json`, 0.0.3 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/rust/Cargo.toml) |
 | Go | Go >= 1.22 | `github.com/polyspec/ordered-json/go` 모듈, `orderedjson` 패키지 | [go.mod](https://github.com/polyspec/ordered-json/blob/main/go/go.mod) |
 | PHP | PHP >= 8.2, JSON 및 PCRE 확장 | `polyspec/ordered-json`, `Polyspec\OrderedJson` 네임스페이스 | [composer.json](https://github.com/polyspec/ordered-json/blob/main/php/composer.json) |
+| Python | Python >= 3.11 | `polyspec-ordered-json`, `polyspec.ordered_json` import, 0.0.3 | [pyproject.toml](https://github.com/polyspec/ordered-json/blob/main/python/pyproject.toml) |
 | 네이티브 PHP | 일치하는 PHP 개발 헤더, C 컴파일러, phpize, make | `ordered_json` 확장, 0.0.3 | [확장 소스](https://github.com/polyspec/ordered-json/blob/main/php-extension/src/ordered_json.c) |
 | 저장소 검사 | 고정된 Python, Node.js, Rust, Go, npm release, Git, make, 위 PHP | `make tools`, `make check` | [검증](validation.ko.md) |
 
 저장소 검사는 추적 파일이 고정한 정확한 release로 실행합니다. Node.js는 `.node-version`, Rust는 `rust-toolchain.toml`, Go는 `go/go.mod`의 `toolchain` 줄, Python은 `.python-version`에 minor release로, PHP는 `.php-version`에 minor release로, npm은 `package.json`의 `packageManager` 필드에 registry tarball의 SHA-512와 함께 고정합니다. `make tools`는 그 Rust toolchain을 rustup으로 설치하고, 그 npm을 Git이 무시하는 checkout의 `.cache/tools/npm`에 설치합니다. 기계의 npm은 사용하지도 바꾸지도 않습니다. `make toolchains-check`는 모든 도구를 고정값과 비교하고, 검사의 각 진입점도 첫 단계 전에 같은 비교를 하며, 다른 도구마다 기대 버전과 실제 버전 또는 명령의 오류를 밝히며 실패합니다. `GOTOOLCHAIN=local`과 `RUSTUP_AUTO_INSTALL=0`은 실행 중에 go와 rustup이 다른 toolchain을 내려받거나 설치하지 못하게 하고, 모든 cargo 명령은 `--locked`를 사용합니다.
 
-표는 선언된 최소 버전이며 모든 최소 버전에서 테스트했다는 의미는 아닙니다. 실제 버전은 commit을 검증하는 실행의 [기록](validation.ko.md#records)에 기록합니다. JavaScript, Rust, Go는 외부 런타임 라이브러리에 의존하지 않습니다.
+표는 선언된 최소 버전이며 모든 최소 버전에서 테스트했다는 의미는 아닙니다. 실제 버전은 commit을 검증하는 실행의 [기록](validation.ko.md#records)에 기록합니다. JavaScript, Rust, Go, Python은 외부 런타임 라이브러리에 의존하지 않습니다.
 
 <a id="checkout"></a>
 ## 소스 체크아웃
@@ -34,11 +35,16 @@ cd ordered-json
 - Rust: `path`가 `rust/`를 지정하는 로컬 Cargo 의존성을 설정합니다.
 - Go: `github.com/polyspec/ordered-json/go` 모듈의 로컬 `replace`가 `go/`를 지정하도록 설정합니다.
 - PHP: `php/src/OrderedJson.php`를 require하거나 `php/`를 Composer path 저장소로 사용합니다.
+- Python: tag의 패키지를 pip로 설치하거나 `python/src`를 import 경로에 둡니다.
+
+~~~sh
+pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@v0.0.3#subdirectory=python"
+~~~
 
 <a id="release-assets"></a>
 ## 릴리스 asset
 
-GitHub Release `vX.Y.Z`마다 `polyspec-ordered-json-X.Y.Z.tgz`, `polyspec-ordered-json-X.Y.Z.zip`, `polyspec-ordered-json-extension-X.Y.Z.zip`이 있습니다. 각 archive는 자기 package의 manifest를 바꾸지 않고 담습니다. `js/`의 `package.json`, `php/`와 `php-extension/`의 `composer.json`이며, 모두 `version` X.Y.Z를 선언하고 `repositories`와 `@dev`가 없습니다.
+GitHub Release `vX.Y.Z`마다 `polyspec-ordered-json-X.Y.Z.tgz`, `polyspec-ordered-json-X.Y.Z.zip`, `polyspec-ordered-json-extension-X.Y.Z.zip`이 있습니다. 각 archive는 자기 package의 manifest를 바꾸지 않고 담습니다. `js/`의 `package.json`, `php/`와 `php-extension/`의 `composer.json`이며, 모두 `version` X.Y.Z를 선언하고 `repositories`와 `@dev`가 없습니다. Python 패키지는 archive를 만들지 않습니다. pip가 저장소의 tag에서 `#subdirectory=python`으로 패키지 디렉터리를 지정해 설치합니다.
 
 npm은 tarball을 경로로 설치합니다.
 

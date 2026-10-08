@@ -24,6 +24,9 @@
     },
     "php-extension": {
       "state": "not-verified"
+    },
+    "pypi": {
+      "state": "not-verified"
     }
   }
 }

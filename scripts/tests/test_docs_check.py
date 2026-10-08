@@ -59,7 +59,7 @@ class DocumentationChecks(unittest.TestCase):
                        'branch': 'main', 'visibility': 'public'},
             'github_releases': [], 'version_tags': [],
             'registries': {name: {'state': 'not-verified'} for name in
-                          ('npm', 'crates.io', 'packagist', 'go', 'php-extension')}}
+                          ('npm', 'crates.io', 'packagist', 'go', 'php-extension', 'pypi')}}
         self.json('docs/distribution.json', self.distribution)
         self.supplementary = {'project': 'nst/JSONTestSuite', 'revision': 'a' * 40,
                               'cases': 1, 'inputs_sha256': sha256(b'supplementary inputs')}

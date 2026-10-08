@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: ee0c8ad55d0b8c5b69c7cc13e50a3825c6daf11d6c49ca357accf5cb672f1b8f -->
+<!-- source-sha256: 39b174f4a5be3c3aaf287b97edcfd197fff17937f527b3551467b0bfa102f10b -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -11,6 +11,10 @@
   `polyspec-ordered-json`을 담고, 저장소의 registry, 패키지 test 표준, owner map이 이를 다룹니다.
   `verify.py --only python`가 공식 예시, 공유 fixture 98건, 패키지 test를 통과하고, 거부 위치와 kind가 다른
   모든 구현과 일치합니다.
+- 문서와 release 검사가 Python binding을 밝힙니다 (T1.27-3). API 계약이 모든 연산 표에 Python 열을 더하고
+  binding 확장을 적으며, repository 계약이 여섯 구현 패키지를 세고, 기능 상태와 설치·배포 문서가 Python을
+  밝히며, release version 검사가 다른 manifest와 함께 `python/pyproject.toml`을 읽습니다. 패키지는 archive를
+  만들지 않고 pip가 저장소의 tag에서 설치합니다.
 - 저장소 도구가 Python 3.14에서 실행됩니다 (T1.27-1). `.python-version`이 3.14를 적고, 검증기의 단위 test가
   그 위에서 통과하며, Python을 설치하는 모든 workflow가 자기 release 대신 핀 파일을 읽고, 모든 패키지 README의
   설치 문단이 핀 파일을 밝힙니다.

@@ -10,6 +10,11 @@
   the import name `polyspec.ordered_json`, and the registry, the package test standard and the owner map of the
   repository cover it; `verify.py --only python` passes the official examples, the 98 shared fixtures and the
   package tests, and the rejection positions and kinds agree with every other implementation.
+- The documents and the release check name the Python binding (T1.27-3): the API contract gains the Python
+  column of every operation table and states its binding extensions, the repository contract counts six
+  implementation packages, the feature state and the installation and distribution documents name Python, and the
+  release version check reads `python/pyproject.toml` with the other manifests; the package ships no archive, and
+  pip installs it from the tag of the repository.
 - The repository tools run on Python 3.14 (T1.27-1): `.python-version` names 3.14, the unit tests of the verifier
   pass on it, every workflow that installs Python reads the pin file instead of a release of its own, and the setup
   section of every package README names the pin file.
