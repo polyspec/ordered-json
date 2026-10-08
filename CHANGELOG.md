@@ -6,6 +6,10 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+## 0.0.6
+
+- T1.27-25: the release archives are named `<package>-<language>-<version>.<ext>`: the npm archive `polyspec-ordered-json-npm-X.Y.Z.tgz`, the PHP archives `polyspec-ordered-json-php-X.Y.Z.zip` and `polyspec-ordered-json-extension-php-X.Y.Z.zip`.
+
 ## 0.0.5
 
 - T1.27-18: the release version test checks the tag of the version that `js/package.json` declares, instead of the fixed tag v0.0.3, which the 0.0.4 bump had made stale.

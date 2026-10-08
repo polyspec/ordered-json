@@ -41,7 +41,7 @@ def version():
 
 def manifests(version):
     """{fixture path: text} of the consumer manifests of version."""
-    tarball = release.asset_name('@polyspec/ordered-json', version, 'tgz')
+    tarball = release.asset_name('@polyspec/ordered-json', 'npm', version, 'tgz')
     npm = {'name': NPM_PROJECT, 'private': True, 'type': 'module',
            'dependencies': {'@polyspec/ordered-json': f'file:{tarball}'}}
     composer = {'name': COMPOSER_PROJECT, 'type': 'project',
