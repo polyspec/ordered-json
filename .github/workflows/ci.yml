@@ -116,13 +116,13 @@ jobs:
       - name: make ci-summary
         if: ${{ !cancelled() }}
         run: make ci-summary CI_JOB=python
-      # actions/upload-artifact v7.0.1: the report of this job, var/ci/python-<minor>.
+      # actions/upload-artifact v7.0.1: the report of this job, var/ci/python, which make ci CI_JOB=python writes.
       - name: report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: ci-python-${{ matrix.python }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: var/ci/python-${{ matrix.python }}/
+          path: var/ci/python/
           if-no-files-found: error
   # The check of this workflow that the ruleset of main requires. It runs after every other job, also after a failed,
   # skipped or cancelled one (if: always()), and make ci-passed fails unless every job of needs has the result success,
