@@ -114,26 +114,17 @@
         "php-extension/composer.json",
         "rust/Cargo.toml",
         "go/go.mod",
-        "python/pyproject.toml",
-        "CHANGELOG.md"
+        "python/pyproject.toml"
       ],
       "targets": [
-        "test-scripts"
+        "test-scripts",
+        "release-coverage",
+        "release-config-check"
       ]
     },
     {
       "paths": [
         ".github/workflows/*.yml"
-      ],
-      "targets": [
-        "test-scripts"
-      ]
-    },
-    {
-      "paths": [
-        "scripts/release.py",
-        "scripts/install_fixtures.py",
-        "scripts/tests/install/**"
       ],
       "targets": [
         "test-scripts"
@@ -211,6 +202,18 @@
       ],
       "targets": [
         "verify-python"
+      ]
+    },
+    {
+      "paths": [
+        "config/release.json",
+        "tests/release-consumer/**",
+        "CHANGELOG.md",
+        "CHANGELOG.ko.md"
+      ],
+      "targets": [
+        "release-coverage",
+        "release-config-check"
       ]
     }
   ]

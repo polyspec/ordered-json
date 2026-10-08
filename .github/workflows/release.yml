@@ -7,7 +7,7 @@
 # its section in CHANGELOG.md; make release-assets builds the package archives (npm pack and a zip of each Composer
 # package; the Cargo package is not released as an archive and is consumed by git tag); make release-publish creates
 # the GitHub Release with the section as notes and the archives attached, and a Go tag builds and attaches nothing
-# (scripts/release.py). TAG reaches the make targets through the environment, never as shell text. Each step runs a
+# (scripts/kit/release.mjs, config/release.json). TAG reaches the make targets through the environment. Each step runs a
 # make target. The runner image and each action are exact releases, as in ci.yml.
 name: release
 

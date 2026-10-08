@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "repositoryUrl": "https://github.com/polyspec/ordered-json",
+  "changelog": "CHANGELOG.md",
+  "changelogTranslations": ["CHANGELOG.ko.md"],
+  "checks": ["push-gate", "ci-passed"],
+  "packages": [
+    { "kind": "npm", "directory": "js", "name": "@polyspec/ordered-json" },
+    { "kind": "composer", "directory": "php", "name": "polyspec/ordered-json" },
+    { "kind": "composer", "directory": "php-extension", "name": "polyspec/ordered-json-extension" }
+  ],
+  "manifests": {
+    "package.json": "version",
+    "js/package.json": "archive",
+    "composer.json": "version",
+    "php/composer.json": "archive",
+    "php-extension/composer.json": "archive",
+    "rust/Cargo.toml": "git-tag",
+    "python/pyproject.toml": "git-tag"
+  },
+  "notReleased": {
+    "tests/release-consumer/npm/package.json": "the npm consumer project of the release archives",
+    "tests/release-consumer/composer/composer.json": "the Composer consumer project of the release archives"
+  },
+  "goModules": {
+    "go": "github.com/polyspec/ordered-json/go"
+  },
+  "consumers": {
+    "npm": {
+      "directory": "tests/release-consumer/npm",
+      "smoke": {
+        "@polyspec/ordered-json": [
+          "node",
+          "--input-type=module",
+          "-e",
+          "import { parse, stringify } from '@polyspec/ordered-json'; if (stringify(parse('{\"b\":1,\"a\":2}')) !== '{\"b\":1,\"a\":2}') throw new Error('the member order is not kept');"
+        ]
+      }
+    },
+    "composer": {
+      "directory": "tests/release-consumer/composer",
+      "smoke": {
+        "polyspec/ordered-json": [
+          "php",
+          "-r",
+          "require 'vendor/autoload.php'; if (Polyspec\\OrderedJson\\stringify(Polyspec\\OrderedJson\\Value::parse('{\"b\":1,\"a\":2}')) !== '{\"b\":1,\"a\":2}') { exit(1); }"
+        ]
+      }
+    }
+  },
+  "proof": {
+    "gitTag": {
+      "python/pyproject.toml": {
+        "kind": "python",
+        "name": "polyspec-ordered-json",
+        "smoke": ["python", "-c", "import polyspec.ordered_json"]
+      },
+      "rust/Cargo.toml": {
+        "kind": "rust",
+        "name": "polyspec-ordered-json",
+        "smoke": ["cargo", "check"]
+      }
+    }
+  }
+}

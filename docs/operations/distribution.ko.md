@@ -1,5 +1,5 @@
 <!-- doc-id: distribution -->
-<!-- source-sha256: 39882666ddc43eeb2a2aab47f5e7c4c8ad8ded4350ecb05761f3f7d76d601dd8 -->
+<!-- source-sha256: 20e0b2cd031be3de1d25c541b327b3eb405c535b24af55bed460378124a581a3 -->
 # 배포
 
 [English](distribution.md)
@@ -29,7 +29,7 @@ git push origin HEAD:main
 <a id="tag-release"></a>
 ## Tag 릴리스
 
-릴리스는 `main`의 commit에 붙인 tag입니다([릴리스 절차](../../AGENTS.ko.md#release)). `vX.Y.Z`는 `js/`의 npm 패키지와 `php/`, `php-extension/`의 Composer 패키지를 버전 X.Y.Z로 릴리스하고, `go/vX.Y.Z`는 Go 모듈 `github.com/polyspec/ordered-json/go`를 릴리스합니다. `rust/`의 Cargo 패키지는 archive로 릴리스하지 않고 git tag로 사용합니다. `cargo package`는 git 의존성을 해석되지 않는 crates.io 요구로 바꾸기 때문입니다. tag의 push는 `.github/workflows/release.yml`(`on: push: tags: ['v*', '**/v*']`, 권한 `contents: write`. tag filter에서 `*`는 `/`와 맞지 않으므로 `**/v*`가 어느 깊이의 Go 모듈 tag든 포함합니다)을 실행하며, 그 step은 다음 순서로 `scripts/release.py`를 실행하고 첫 실패에서 멈춥니다.
+릴리스는 `main`의 commit에 붙인 tag입니다([릴리스 절차](../../AGENTS.ko.md#release)). `vX.Y.Z`는 `js/`의 npm 패키지와 `php/`, `php-extension/`의 Composer 패키지를 버전 X.Y.Z로 릴리스하고, `go/vX.Y.Z`는 Go 모듈 `github.com/polyspec/ordered-json/go`를 릴리스합니다. `rust/`의 Cargo 패키지와 `python/`의 Python 패키지는 archive로 릴리스하지 않고 git tag로 사용합니다(`config/release.json`, mode `git-tag`). `cargo package`는 git 의존성을 해석되지 않는 crates.io 요구로 바꾸기 때문입니다. 패키지, tag가 각 manifest를 릴리스하는 방식, 어떤 tag도 릴리스하지 않는 manifest, Go 모듈은 [config/release.json](../../config/release.json)에 선언합니다. `make release-coverage`는 checkout의 모든 package 파일이 그곳에 분류되도록 요구하고, `make release-config-check`는 `js/package.json`이 선언한 버전의 step `versions`를 실행합니다. tag의 push는 `.github/workflows/release.yml`(`on: push: tags: ['v*', '**/v*']`, 권한 `contents: write`. tag filter에서 `*`는 `/`와 맞지 않으므로 `**/v*`가 어느 깊이의 Go 모듈 tag든 포함합니다)을 실행하며, 그 step은 다음 순서로 `scripts/kit/release.mjs`를 실행하고 첫 실패에서 멈춥니다.
 
 ~~~sh
 make release-verify
@@ -38,12 +38,14 @@ make release-assets
 make release-publish
 ~~~
 
-1. `make release-verify`는 tag된 commit이 `origin/main`의 조상이고(`git merge-base --is-ancestor`), 그 commit의 최신 check run `push-gate`와 `ci-passed`(`gh api repos/<repository>/commits/<sha>/check-runs`)가 결론 `success`로 완료되었는지 확인합니다. 없거나 실패한 check의 이름을 적으며 테스트를 다시 실행하지 않습니다.
-2. `make release-versions`는 모든 manifest, 곧 `package.json`, `js/package.json`, `composer.json`, `php/composer.json`, `php-extension/composer.json`, `rust/Cargo.toml`에 X.Y.Z가 있고(Composer artifact repository는 manifest의 버전을 읽으므로 `composer.json`은 `version`을 선언합니다) `CHANGELOG.md`에 section `## X.Y.Z`가 있는지 확인하며, 다른 파일마다 그 버전과 tag의 버전을 적습니다. `go/vX.Y.Z`에는 `go/go.mod`의 모듈 경로와 section을 확인합니다.
-3. `make release-assets`는 `var/release/assets`를 만듭니다. `polyspec-ordered-json-X.Y.Z.tgz`(`js/`의 `npm pack`), `polyspec-ordered-json-X.Y.Z.zip`과 `polyspec-ordered-json-extension-X.Y.Z.zip`(tag된 commit의 `php/`와 `php-extension/`의 `git archive`)입니다. 릴리스 asset은 npm tarball과 Composer zip뿐입니다. archive 이름은 `<package name>-<version>.<ext>`이고 `@scope/`와 `vendor/`는 `scope-`와 `vendor-`로 씁니다. 압축 전에 tag된 commit의 모든 공개 manifest는 표준 형식이어야 합니다. `composer.json`은 `version`을 선언하고 `repositories`가 없으며, 어떤 제약에도 `@dev`가 없고, `package.json`에는 `overrides`와 `file:`, `link:`, `workspace:`, URL, git 의존성이 없으며, polyspec package 의존성은 정확한 버전 하나입니다. zip은 압축하지 않은 entry와 npm pack도 쓰는 entry 시각 1985-10-26T08:15:00Z를 가지며 `TZ=UTC`로 만들므로, 한 tree의 zip은 어느 기계에서 언제 만들어도 같은 byte입니다. 압축 후 각 archive의 manifest는 tag된 commit의 manifest와 byte 단위로 같아야 하며, 어떤 단계도 manifest를 다시 쓰지 않습니다. `scripts/tests/test_release.py`는 `make check`에서 tree에 같은 표준 형식을 요구합니다. Go tag는 아무것도 만들거나 첨부하지 않습니다.
+1. `make release-verify`는 tag된 commit이 `origin/main`의 조상이고(`git merge-base --is-ancestor`), Go 모듈의 tag `go/vX.Y.Z`가 같은 commit에 있고, 그 commit의 최신 check run `push-gate`와 `ci-passed`(`gh api repos/<repository>/commits/<sha>/check-runs`)가 결론 `success`로 완료되었는지 확인합니다. 없거나 실패한 check의 이름을 적으며 테스트를 다시 실행하지 않습니다.
+2. `make release-versions`는 `config/release.json`의 모든 manifest, 곧 `package.json`, `js/package.json`, `composer.json`, `php/composer.json`, `php-extension/composer.json`, `rust/Cargo.toml`, `python/pyproject.toml`에 X.Y.Z가 있고(Composer artifact repository는 manifest의 버전을 읽으므로 archive로 릴리스하는 `composer.json`은 `version`을 선언합니다), `go/go.mod`의 모듈 경로가 맞고, `CHANGELOG.md`와 `CHANGELOG.ko.md`에 section `## X.Y.Z`가 있는지 확인하며, 다른 파일마다 그 버전과 tag의 버전을 적습니다. `go/vX.Y.Z`에는 `go/go.mod`의 모듈 경로와 section을 확인합니다.
+3. `make release-assets`는 `var/release/assets`를 만듭니다. `polyspec-ordered-json-npm-X.Y.Z.tgz`(`js/`의 `npm pack`), `polyspec-ordered-json-php-X.Y.Z.zip`과 `polyspec-ordered-json-extension-php-X.Y.Z.zip`(tag된 commit의 `php/`와 `php-extension/`의 `git archive`)입니다. 릴리스 asset은 npm tarball과 Composer zip뿐입니다. archive 이름은 `<package name>-<language>-<version>.<ext>`이고 `@scope/`와 `vendor/`는 `scope-`와 `vendor-`로 씁니다. 압축 전에 tag된 commit의 모든 공개 manifest는 표준 형식이어야 합니다. `composer.json`은 tag의 버전을 선언하고 `repositories`가 없으며, 어떤 제약에도 `@dev`가 없고, `package.json`에는 `overrides`와 `file:`, `link:`, `workspace:`, URL, git 의존성이 없으며, 같은 scope의 package 의존성은 정확한 버전 하나입니다. zip은 압축하지 않은 entry와 tag된 commit의 시각을 가지며 `TZ=UTC`로 만들므로, 한 tree의 zip은 어느 기계에서 언제 만들어도 같은 byte입니다. 압축 후 각 archive의 manifest는 tag된 commit의 manifest와 byte 단위로 같아야 하며, 어떤 단계도 manifest를 다시 쓰지 않습니다. Go tag는 아무것도 만들거나 첨부하지 않습니다.
 4. `make release-publish`는 archive와 함께 `gh release create <tag> --verify-tag --title <tag> --notes-file <notes>`를 실행합니다. GitHub는 125000자를 넘는 릴리스 본문을 거부하므로, notes는 `CHANGELOG.md`의 section `## X.Y.Z`가 125000자 이하이면 그 section이고, 그렇지 않으면 한 줄 `The changes of X.Y.Z are listed in [CHANGELOG.md](https://github.com/polyspec/ordered-json/blob/<tag>/CHANGELOG.md#<anchor>).`입니다. tag는 경로 segment별로 URL 인코딩되고, anchor는 section의 `<a id>` anchor이며 없으면 점을 뺀 버전입니다.
 
-tag는 환경 변수 `TAG`로 step에 전달됩니다. `scripts/tests/test_release.py`는 `gh`, `npm`의 fake로 각 step을 실행하고, `scripts/tests/test_workflow_rules.py`는 trigger, 권한, step의 순서를 요구합니다.
+consumer project `tests/release-consumer/npm`과 `tests/release-consumer/composer`는 tag의 archive를 저장소 밖에서 설치합니다(`make release-consumer TAG=<tag>`). 두 project의 lock은 release commit에서 `make release-consumer-lock TAG=<tag>`가 tag의 버전으로 쓰며, 이 저장소의 archive를 이름과 버전만으로 기록합니다. release가 만들어진 뒤 `make release-proof TAG=<tag>`가 GitHub Release, archive, git tag로 쓰는 Cargo와 Python 패키지, Go 모듈을 checkout 밖에서 설치합니다.
+
+tag는 환경 변수 `TAG`로 step에 전달됩니다. `scripts/tests/test_workflow_rules.py`는 trigger, 권한, step의 순서를 요구합니다.
 
 <a id="releases"></a>
 ## 레지스트리와 릴리스 기록
