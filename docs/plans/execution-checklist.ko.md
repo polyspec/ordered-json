@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: 0984dd425ff0b80b123006091e102ae754a43870ecbc841ba240a14a6d2f7074 -->
+<!-- source-sha256: 79b8c46759dd828036f79681c5ce5d7438dbb9de97e1b1d57b4e184fcc9f896c -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
@@ -53,4 +53,4 @@
 | T1.27-13 | python job이 make target이 쓰는 경로를 업로드하게 합니다. `ci.yml`은 `var/ci/python-<minor>/`를 업로드하지만 `make ci CI_JOB=python`은 `var/ci/python`에 씁니다. target이 아니라 경로를 고칩니다 | `.github/workflows/ci.yml`, `scripts/tests/test_workflow_rules.py` | `python3 scripts/test.py --unit test_workflow_rules` | [o] |
 | T1.27-14 | PR에서 T1.27-10부터 T1.27-13 이후 ci-passed가 통과하는지 확인합니다. 통과하지 않으면 원인에 대해 다음 파생 ID의 새 행을 엽니다 | `docs/plans/execution-checklist.md`(.ko) | `make ci-passed` | [o] |
 | T1.27-15 | 0.0.4 릴리스: AGENTS.md의 모든 manifest(package.json, js/package.json, composer.json, php/composer.json, php-extension/composer.json, rust/Cargo.toml, rust/Cargo.lock, python/pyproject.toml)의 버전을 0.0.4로 씁니다. CHANGELOG.md와 CHANGELOG.ko.md의 Unreleased를 0.0.4로 바꿉니다. tag v0.0.4는 이 PR이 merge된 뒤 maintainer가 만들어, orm과 crudui의 Python 패키지가 설치할 수 있게 합니다 | 위 manifest, CHANGELOG.md, CHANGELOG.ko.md | `make release-versions` (CI) | [ ] |
-| T1.27-16 | v0.0.4 태그의 실패한 `release-verify` 원인을 찾습니다: `main`의 commit 471ab69에서 `push-gate` job은 실행되었지만 그 commit의 `ci` workflow 실행이 없어 check `ci-passed`가 없고, `scripts/release.py verify`가 태그를 거부합니다. 원인은 아직 확정되지 않았습니다 | `docs/plans/execution-checklist.md`(.ko), `CHANGELOG.md`(.ko), `.github/workflows/ci.yml`, `.github/workflows/release.yml`, `scripts/release.py` | `make release-verify TAG=v0.0.4` (CI) | [ ] |
+| T1.27-16 | v0.0.4 태그의 실패한 `release-verify` 원인을 찾습니다: `main`의 commit 471ab69에서 `push-gate` job은 실행되었지만 그 commit의 `ci` workflow 실행이 없어 check `ci-passed`가 없고, `scripts/release.py verify`가 태그를 거부합니다. 같은 tree의 suite는 `scripts/tests/test_release.py`(`InstallFromAssets`, `Repository`)에서 실패합니다. `scripts/tests/install/composer/`와 `scripts/tests/install/npm/`의 고정 값은 아직 0.0.3이고 릴리스는 0.0.4입니다 | `docs/plans/execution-checklist.md`(.ko), `CHANGELOG.md`(.ko), `.github/workflows/ci.yml`, `.github/workflows/release.yml`, `scripts/release.py` | `make release-verify TAG=v0.0.4` (CI) | [ ] |

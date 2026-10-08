@@ -6,7 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
-- The `release-verify` of v0.0.4 failed because the check `ci-passed` is missing for commit 471ab69 on `main`: that commit ran the `push-gate` job and no `ci` workflow run. The cause is recorded as an open row and is not yet fixed (T1.27-16).
+- The `release-verify` of v0.0.4 failed because the check `ci-passed` is missing for commit 471ab69 on `main`: that commit ran the `push-gate` job and no `ci` workflow run. The suite of the same tree fails because the install fixtures in `scripts/tests/install/` still pin 0.0.3. The cause is recorded as an open row and is not yet fixed (T1.27-16).
 
 ## 0.0.4
 

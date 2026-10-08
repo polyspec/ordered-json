@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: dec0e2858094199ff28189ffba33111ab05c8f5cb0f858570fbb8ba24df6b6a3 -->
+<!-- source-sha256: ca62eb9673bc498fbe40b86eef339f03176ba1a5b50d7d4c03ea83473eb5a7cc -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,7 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
-- v0.0.4의 `release-verify`가 실패했습니다. `main`의 commit 471ab69에 check `ci-passed`가 없습니다. 이 commit은 `push-gate` job을 실행했고 `ci` workflow 실행은 없었습니다. 원인은 열린 행으로 기록했으며 아직 고치지 않았습니다 (T1.27-16).
+- v0.0.4의 `release-verify`가 실패했습니다. `main`의 commit 471ab69에 check `ci-passed`가 없습니다. 이 commit은 `push-gate` job을 실행했고 `ci` workflow 실행은 없었습니다. 같은 tree의 suite는 `scripts/tests/install/`의 설치 고정 값이 아직 0.0.3이어서 실패합니다. 원인은 열린 행으로 기록했으며 아직 고치지 않았습니다 (T1.27-16).
 
 ## 0.0.4
 
