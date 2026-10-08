@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+## 0.0.4
+
 - On PR #1, `ci-passed` passes after the fixes of T1.27-10 to T1.27-13: the docs, python, push-gate and suite jobs pass on the same commit (T1.27-14).
 - The `python` job of CI uploads `var/ci/python/`, the report that `make ci CI_JOB=python` writes, instead of `var/ci/python-<minor>/`, which no target writes; `scripts/tests/test_workflow_rules.py` requires each report path to be the directory of its make target (T1.27-13).
 - The push-gate job passes on the committed tree: its exit status 2 came from `make docs-check` in the job, which read the stale translation revisions that T1.27-10 synced, so `scripts/push_gate.py` and `.github/workflows/push-gate.yml` are unchanged (T1.27-12).
