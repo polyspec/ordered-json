@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: 8c20b2362a4a9890d2cab0a1b4d67d6f27bb7cacc2d05fb73368b0b0f9cf30e4 -->
+<!-- source-sha256: c909eff5a4b3cc797128b2b88adf4f70f08845fd96c6f61904874a0deb630b67 -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
@@ -50,5 +50,5 @@
 | T1.27-10 | CI의 docs job이 실패하는 원인을 고칩니다. job이 종료 상태 2로 끝납니다(PR #1의 job 로그 참조) | `AGENTS.md`(.ko), `CHANGELOG.md`(.ko), `docs/plans/execution-checklist.md`(.ko) | `make docs-check` | [o] |
 | T1.27-11 | suite job의 실패한 test test_the_job_fails_on_a_commit_whose_documentation_check_fails를 고칩니다. assertion은 [0, 0]을 기대하고 실행은 [0, 2]를 냅니다. assertion이 아니라 test가 검사하는 코드의 원인을 고칩니다 | `scripts/push_gate.py`, `scripts/tests/test_push_gate.py` | `python3 scripts/test.py --unit test_push_gate.PushGateChecks.test_the_job_fails_on_a_commit_whose_documentation_check_fails` | [o] |
 | T1.27-12 | push-gate job이 실패(종료 상태 2)하는 원인을 고칩니다 | `scripts/push_gate.py`, `.github/workflows/push-gate.yml` | `make push-gate COMMIT=<commit>` | [o] |
-| T1.27-13 | python job이 make target이 쓰는 경로를 업로드하게 합니다. `ci.yml`은 `var/ci/python-<minor>/`를 업로드하지만 `make ci CI_JOB=python`은 `var/ci/python`에 씁니다. target이 아니라 경로를 고칩니다 | `.github/workflows/ci.yml`, `scripts/tests/test_workflow_rules.py` | `python3 scripts/test.py --unit test_workflow_rules` | [ ] |
+| T1.27-13 | python job이 make target이 쓰는 경로를 업로드하게 합니다. `ci.yml`은 `var/ci/python-<minor>/`를 업로드하지만 `make ci CI_JOB=python`은 `var/ci/python`에 씁니다. target이 아니라 경로를 고칩니다 | `.github/workflows/ci.yml`, `scripts/tests/test_workflow_rules.py` | `python3 scripts/test.py --unit test_workflow_rules` | [o] |
 | T1.27-14 | PR에서 T1.27-10부터 T1.27-13 이후 ci-passed가 통과하는지 확인합니다. 통과하지 않으면 원인에 대해 다음 파생 ID의 새 행을 엽니다 | `docs/plans/execution-checklist.md`(.ko) | `make ci-passed` | [ ] |
