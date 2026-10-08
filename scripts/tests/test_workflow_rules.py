@@ -357,6 +357,23 @@ class WorkflowRules(unittest.TestCase):
                 self.assertTrue(any(message in issue for issue in violations('release.yml', broken_text)),
                                 violations('release.yml', broken_text))
 
+    def test_both_tag_shapes_start_the_release_and_the_release_steps_handle_both(self):
+        # In a tag filter * does not match /, and ** matches any characters; the filters are matched as GitHub does.
+        def matches(pattern, tag):
+            expression = re.escape(pattern).replace(r'\*\*', '.*').replace(r'\*', '[^/]*')
+            return re.fullmatch(expression, tag) is not None
+
+        filters = re.search(r"tags: \[(.*)\]", (WORKFLOWS / 'release.yml').read_text()).group(1)
+        patterns = [item.strip().strip("'") for item in filters.split(',')]
+        config = json.loads((ROOT / 'config/release.json').read_text())
+        version = json.loads((ROOT / 'package.json').read_text())['version']
+        tags = [f'v{version}'] + [f'{directory}/v{version}' for directory in config['goModules']]
+        self.assertEqual(len(tags), 2)
+        for tag in tags:
+            with self.subTest(tag=tag):
+                self.assertTrue(any(matches(pattern, tag) for pattern in patterns), f'{tag} matches none of {patterns}')
+        self.assertFalse(any(matches('v*', tag) for tag in tags[1:]), 'the pattern v* alone misses the tag of a Go module')
+
     def test_a_step_that_does_not_run_after_a_failure_fails(self):
         text = (WORKFLOWS / 'ci.yml').read_text()
         broken = text.replace('      - name: make ci-targets\n        if: ${{ !cancelled() }}\n', '      - name: make ci-targets\n', 1)

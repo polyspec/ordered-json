@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+## 0.0.7
+
 - T1.29-1: the push gate, the full-run guard, the owner check and the CI report are the vendored tools of kit v0.0.4 (`scripts/kit/`, `tests/kit/`, `.kit/kit.lock.json`), configured in `config/checklist.json` and `config/owner-checks.json`. `push_gate.py`, `full_run.py`, `owner_check.py`, `ci_run.py` and their tests are removed. The jobs of `ci.yml` and `push-gate.yml` run `make ci-targets`, and `test_workflow_rules` requires every target of `CHECK_TARGETS` to run in exactly one job. A `partial` feature no longer stops a push or a full run.
 - T1.29-2: the release steps are the kit tool `scripts/kit/release.mjs`, configured in `config/release.json`; `release.py`, `install_fixtures.py` and `test_release.py` are removed. The archives of the npm package of `packages/ordered-json-npm/` and of the Composer packages of `packages/ordered-json-php/` and `packages/ordered-json-php-ext/` are named `polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip` and `polyspec-ordered-json-extension-php-X.Y.Z.zip`. `make release-coverage` requires every package file to be classified, and `make release-config-check` runs the step `versions` for the version of `packages/ordered-json-npm/package.json`. The consumer projects of the archives are in `tests/release-consumer`; `make release-consumer-lock` writes their locks on the release commit. The Go module tag is `packages/ordered-json-go/vX.Y.Z`, and `make release-verify` requires it at the commit of `vX.Y.Z`.
 - T1.29-3: the documents are checked by `scripts/kit/check-documents.mjs` (`make documents-check`, `config/documents.json`) and the commit messages by `scripts/kit/check-commits.mjs` (`make commits-check`, `config/commits.json`). The document manifests are removed; the `doc-id` marker of each package document starts with `npm-`, `php-`, `php-ext-`, `python-`, `rust-` or `go-`, because a marker names one document of the repository. `docs_check.py` is `scripts/check_evidence.py` (`make evidence-check`), which keeps the checks of the feature rows against their evidence, the distribution observations, the benchmark result, the verification records and the JSON reports, and `test_docs_check.py` is `test_check_evidence.py`. A checklist row writes the states in words.
@@ -16,6 +18,7 @@
 - T1.29-8: `config/toolchain.json` declares Composer 2.10.3. The job `docs` of `ci.yml` sets up PHP and that Composer release for `make dependency-policy-check`, and `make kit-test` runs in the job `suite`.
 - T1.29-9: the vendored tools of kit are v0.0.8.
 - T1.29-10: `make dependency-policy-mutation-check` runs in CI and passes. `make install` installs the Rust toolchain before the tools, and the release workflow installs npm only.
+- T1.30: the test `test_both_tag_shapes_start_the_release_and_the_release_steps_handle_both` requires the tag filters of the release workflow to match `vX.Y.Z` and `packages/ordered-json-go/vX.Y.Z`, and AGENTS states that the Go tag is pushed first or with `vX.Y.Z`.
 
 ## 0.0.6
 
