@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: d8bb973272f10508414afc2b730589b6016d2a288d5ee72a4a4515b2c9819dc7 -->
+<!-- source-sha256: 8fe25de645872e7aa295d34b4d7e785b4b781ba3a787f09a6e1778a9ba48d76c -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
@@ -45,4 +45,4 @@
 | T1.27-5 | README(.ko)의 소개, 패키지 표, 시작 절에 Python 패키지를 적습니다. 시작 절은 `python/src`에서 실행하는 예제와 pip 설치 줄을 보여 주며, 설치 문서와 README는 `python/`을 포함한 첫 tag의 자리표시자 `vX.Y.Z`를 씁니다. 아직 출시된 tag에는 `python/`이 없습니다 | `README.md`(.ko), `docs/operations/installation.md`(.ko) | `make docs-check` | [o] |
 | T1.27-6 | 워크플로의 각 action을 GitHub에 존재하는 commit 하나로 고정합니다. `ci.yml`은 `actions/upload-artifact`를 commit id 두 개로 고정하며, 그중 하나는 GitHub에 없어서 `python` job의 report 단계가 action을 찾지 못합니다. `scripts/tests/test_workflow_rules.py`는 모든 워크플로의 모든 action이 고정 commit 하나를 가지는지 확인합니다 | `.github/workflows/ci.yml`, `scripts/tests/test_workflow_rules.py` | `python3 scripts/test.py --unit test_workflow_rules` | [o] |
 | T1.27-7 | Python 문서는 현재 상태만 적습니다. README와 설치 문서는 `python/`을 포함한 첫 tag의 자리표시자 `vX.Y.Z`를 보여 주며, 아직 어떤 tag도 `python/`을 포함하지 않습니다. 행 T1.27-3은 `docs/distribution.json`이 기록하는 `pypi` 상태 `not-verified`를 적습니다 | `README.md`(.ko), `docs/operations/installation.md`(.ko), `docs/plans/execution-checklist.md`(.ko), `CHANGELOG.md`(.ko), `docs/distribution.json` | `make docs-check` | [o] |
-| T1.27-8 | 도구 다운로드 test가 머신에 설치된 `cargo`에 의존하지 않게 합니다. `test_missing_crates_name_the_lock_file_and_make_tools`와 `test_downloaded_crates_pass`는 실제 `cargo`를 실행하므로 `cargo`가 없는 곳에서 실패합니다. 두 test는 `PATH`에 가짜 `cargo`를 둡니다. 가짜 `cargo`는 메시지와 함께 101로 끝나거나 0으로 끝나고, 미설치 메시지는 `cargo`가 없는 `PATH`로 확인합니다 | `scripts/tests/test_toolchains.py` | `python3 scripts/test.py --unit test_toolchains` | [~] |
+| T1.27-8 | 도구 다운로드 test가 머신에 설치된 `cargo`에 의존하지 않게 합니다. test는 `PATH`에 가짜 `cargo`를 두어 실패한 fetch(메시지와 함께 종료 코드 101), 성공한 fetch(종료 코드 0)를 실행하고, `cargo`가 없는 빈 `PATH`로 미설치 경우를 실행하며, 각각 `download_problems`가 돌려주는 메시지를 기대합니다 | `scripts/tests/test_toolchains.py` | `python3 scripts/test.py --unit test_toolchains` | [o] |

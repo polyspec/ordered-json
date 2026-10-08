@@ -404,17 +404,33 @@ class MissingDownloads(unittest.TestCase):
     """A check runs offline, so a download that make tools did not make fails with the advice to run make tools,
     never with a tool's advice to retry online."""
 
-    def test_missing_crates_name_the_lock_file_and_make_tools(self):
-        with tempfile.TemporaryDirectory() as folder:
-            env = toolchains.environment(ROOT, {**os.environ, 'CARGO_HOME': folder})
-            problems = toolchains.download_problems(ROOT, env)
-        self.assertEqual(len(problems), 1, problems)
-        self.assertRegex(problems[0], r'^rust/Cargo.lock: the crates are not downloaded \(cargo fetch --locked '
-                                      r'--offline exited with \d+: .+\); run make tools, which downloads them$')
+    def path_with_cargo(self, status, message):
+        """A PATH whose only cargo is a fake that writes message to stderr and exits with status."""
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        cargo = Path(directory.name) / 'cargo'
+        cargo.write_text(f'#!/bin/sh\necho "{message}" >&2\nexit {status}\n')
+        cargo.chmod(0o755)
+        return directory.name
+
+    def download_problems_on(self, path):
+        return toolchains.download_problems(ROOT, toolchains.environment(ROOT, {**os.environ, 'PATH': path}))
+
+    def test_a_failed_fetch_names_the_lock_file_and_make_tools(self):
+        problems = self.download_problems_on(self.path_with_cargo(101, 'error: failed to fetch'))
+        self.assertEqual(problems, ['rust/Cargo.lock: the crates are not downloaded (cargo fetch --locked --offline '
+                                    'exited with 101: error: failed to fetch); run make tools, which downloads them'])
         self.assertNotIn('retry without --offline', problems[0])
 
-    def test_downloaded_crates_pass(self):
-        self.assertEqual(toolchains.download_problems(ROOT, toolchains.environment(ROOT)), [])
+    def test_a_fetch_that_succeeds_reports_no_problem(self):
+        self.assertEqual(self.download_problems_on(self.path_with_cargo(0, 'Fetched')), [])
+
+    def test_a_missing_cargo_names_the_os_error_and_make_tools(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        problems = self.download_problems_on(directory.name)
+        self.assertEqual(len(problems), 1, problems)
+        self.assertIn("exited with an error: [Errno 2] No such file or directory: 'cargo'); run make tools", problems[0])
 
     def test_require_reports_missing_downloads(self):
         errors = io.StringIO()
