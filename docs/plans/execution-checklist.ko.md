@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: b8c07756533abb59af81770a2388c32aa394fa4e767b900cd06d1ce3d0dc395f -->
+<!-- source-sha256: d3c24953c8de93a9ae8c5c162d360740c8cd8fa663d63bb7a541775fc2ae7325 -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
@@ -47,7 +47,7 @@
 | T1.27-7 | Python 문서는 현재 상태만 적습니다. README와 설치 문서는 `python/`을 포함한 첫 tag의 자리표시자 `vX.Y.Z`를 보여 주며, 아직 어떤 tag도 `python/`을 포함하지 않습니다. 행 T1.27-3은 `docs/distribution.json`이 기록하는 `pypi` 상태 `not-verified`를 적습니다 | `README.md`(.ko), `docs/operations/installation.md`(.ko), `docs/plans/execution-checklist.md`(.ko), `CHANGELOG.md`(.ko), `docs/distribution.json` | `make docs-check` | [o] |
 | T1.27-8 | 도구 다운로드 test가 머신에 설치된 `cargo`에 의존하지 않게 합니다. test는 `PATH`에 가짜 `cargo`를 두어 실패한 fetch(메시지와 함께 종료 코드 101), 성공한 fetch(종료 코드 0)를 실행하고, `cargo`가 없는 빈 `PATH`로 미설치 경우를 실행하며, 각각 `download_problems`가 돌려주는 메시지를 기대합니다 | `scripts/tests/test_toolchains.py` | `python3 scripts/test.py --unit test_toolchains` | [o] |
 | T1.27-9 | Python 패키지의 `package-data` key를 import 이름으로 맞춥니다. `python/pyproject.toml`은 `ordered_json`이라고 적었는데 `python/src` 아래에 그런 패키지가 없어서 `py.typed` 표식이 wheel에서 빠집니다. key는 `"polyspec.ordered_json"`이어야 합니다. `implementations.json`의 `package_data` 항목이 실행하는 `python/tests/package_data.py`는 모든 key가 패키지를 가리키는지와 key가 `py.typed`를 선언하는지 검사합니다 | `python/pyproject.toml`, `python/tests/package_data.py`, `implementations.json`, `scripts/python_check.py`, `AGENTS.md`, `AGENTS.ko.md` | `python3 python/tests/package_data.py` | [ ] |
-| T1.27-10 | CI의 docs job이 실패하는 원인을 고칩니다. job이 종료 상태 2로 끝납니다(PR #1의 job 로그 참조) | `AGENTS.md`(.ko), `CHANGELOG.md`(.ko), `docs/plans/execution-checklist.md`(.ko) | `make docs-check` | [ ] |
+| T1.27-10 | CI의 docs job이 실패하는 원인을 고칩니다. job이 종료 상태 2로 끝납니다(PR #1의 job 로그 참조) | `AGENTS.md`(.ko), `CHANGELOG.md`(.ko), `docs/plans/execution-checklist.md`(.ko) | `make docs-check` | [o] |
 | T1.27-11 | suite job의 실패한 test test_the_job_fails_on_a_commit_whose_documentation_check_fails를 고칩니다. assertion은 [0, 0]을 기대하고 실행은 [0, 2]를 냅니다. assertion이 아니라 test가 검사하는 코드의 원인을 고칩니다 | `scripts/push_gate.py`, `scripts/tests/test_push_gate.py` | `python3 scripts/test.py --unit test_push_gate.PushGateChecks.test_the_job_fails_on_a_commit_whose_documentation_check_fails` | [ ] |
 | T1.27-12 | push-gate job이 실패(종료 상태 2)하는 원인을 고칩니다 | `scripts/push_gate.py`, `.github/workflows/push-gate.yml` | `make push-gate COMMIT=<commit>` | [ ] |
 | T1.27-13 | python job이 make target이 쓰는 경로를 업로드하게 합니다. `ci.yml`은 `var/ci/python-<minor>/`를 업로드하지만 `make ci CI_JOB=python`은 `var/ci/python`에 씁니다. target이 아니라 경로를 고칩니다 | `.github/workflows/ci.yml`, `scripts/tests/test_workflow_rules.py` | `python3 scripts/test.py --unit test_workflow_rules` | [ ] |
