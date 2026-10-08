@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 20ebf06d7ae69fc1c3ae885e46d583a6968e5bf6d71d0c745634ec59920a5c56 -->
+<!-- source-sha256: 19a183fb3d83dcc08ea79325f08acc1b9747099286b5dedaa4e9341c481df31c -->
 # 검증
 
 [English](validation.md)
@@ -79,7 +79,7 @@ PIE 기록 `var/records/pie-verification.json`은 PIE 버전과 PHAR 해시, 실
 <a id="ci"></a>
 ## Hosted CI
 
-`.github/workflows/ci.yml`은 모든 pull request, 모든 push to `main`, 모든 수동 실행(`workflow_dispatch`)에서 전체 suite를 실행합니다. job `docs`, `suite`, `python`에서 실행합니다. `.github/workflows/push-gate.yml`은 모든 push와 모든 pull request에서 실행되고, `.github/workflows/release.yml`은 tag `v*` 또는 `**/v*`의 push에서만 실행되며([tag 릴리스](distribution.ko.md#tag-release)), 다른 workflow는 없습니다.
+`.github/workflows/ci.yml`은 모든 pull request, 모든 push to `main`, 모든 수동 실행(`workflow_dispatch`)에서 전체 suite를 실행합니다. job `docs`, `suite`, `python`에서 실행합니다. `.github/workflows/push-gate.yml`은 branch의 모든 push와 모든 pull request에서 실행되고 tag의 push에서는 실행되지 않으며(release가 검증하는 commit에서 check를 다시 실행하게 되기 때문입니다), `.github/workflows/release.yml`은 tag `v*` 또는 `**/v*`의 push에서만 실행되며([tag 릴리스](distribution.ko.md#tag-release)), 다른 workflow는 없습니다.
 
 ~~~sh
 make install

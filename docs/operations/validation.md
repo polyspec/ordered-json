@@ -78,7 +78,7 @@ The PIE record `var/records/pie-verification.json` records the PIE version and P
 <a id="ci"></a>
 ## Hosted CI
 
-`.github/workflows/ci.yml` runs the full suite on every pull request, every push to `main` and every manual run (`workflow_dispatch`), in the jobs `docs`, `suite` and `python`. `.github/workflows/push-gate.yml` runs on every push and every pull request, `.github/workflows/release.yml` runs only on the push of a tag `v*` or `**/v*` ([tag releases](distribution.md#tag-release)), and no other workflow exists:
+`.github/workflows/ci.yml` runs the full suite on every pull request, every push to `main` and every manual run (`workflow_dispatch`), in the jobs `docs`, `suite` and `python`. `.github/workflows/push-gate.yml` runs on every push to a branch and every pull request, and not on the push of a tag, which would run the check again on the commit that the release verifies, `.github/workflows/release.yml` runs only on the push of a tag `v*` or `**/v*` ([tag releases](distribution.md#tag-release)), and no other workflow exists:
 
 ~~~sh
 make install

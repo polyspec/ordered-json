@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: b92e05782e4722d0ad523e1b8a76b5296a2a7132342c07bba974407b55102065 -->
+<!-- source-sha256: 96760b5c8f35195352b31211e454663740b05aaa638f4d07e3e149a1c761942f -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -9,6 +9,7 @@
 
 ## 0.0.7
 
+- T1.31: tag의 push는 `push-gate.yml`을 시작하지 않으므로(`push: branches: ['**']`) release는 대기 중인 두 번째 실행 없이 commit의 check `push-gate`를 검증합니다. `test_a_tag_push_starts_none_of_the_workflows_whose_checks_the_release_requires`가 이를 요구합니다.
 - T1.29-1: push gate, full-run guard, owner 검사, CI 보고서는 kit v0.0.4의 vendored 도구(`scripts/kit/`, `tests/kit/`, `.kit/kit.lock.json`)이며 `config/checklist.json`과 `config/owner-checks.json`으로 설정합니다. `push_gate.py`, `full_run.py`, `owner_check.py`, `ci_run.py`와 그 test를 제거했습니다. `ci.yml`과 `push-gate.yml`의 job은 `make ci-targets`를 실행하고, `test_workflow_rules`는 `CHECK_TARGETS`의 모든 target이 job 하나에서만 실행되도록 요구합니다. `partial` 기능은 더 이상 push나 전체 실행을 막지 않습니다.
 - T1.29-2: release step은 kit 도구 `scripts/kit/release.mjs`이며 `config/release.json`으로 설정합니다. `release.py`, `install_fixtures.py`, `test_release.py`를 제거했습니다. `packages/ordered-json-npm/`의 npm 패키지와 `packages/ordered-json-php/`, `packages/ordered-json-php-ext/`의 Composer 패키지 archive 이름은 `polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip`, `polyspec-ordered-json-extension-php-X.Y.Z.zip`입니다. `make release-coverage`는 모든 package 파일이 분류되도록 요구하고, `make release-config-check`는 `packages/ordered-json-npm/package.json` 버전에 대한 step `versions`를 실행합니다. archive의 consumer project는 `tests/release-consumer`에 있으며, `make release-consumer-lock`이 release commit에서 그 lock을 씁니다. Go 모듈 tag는 `packages/ordered-json-go/vX.Y.Z`이고, `make release-verify`는 이 tag가 `vX.Y.Z`와 같은 commit에 있도록 요구합니다.
 - T1.29-3: 문서는 `scripts/kit/check-documents.mjs`(`make documents-check`, `config/documents.json`)가, commit message는 `scripts/kit/check-commits.mjs`(`make commits-check`, `config/commits.json`)가 검사합니다. 문서 목록(manifest)을 제거했습니다. 표지 하나가 저장소의 문서 하나를 가리키므로 패키지 문서의 `doc-id` 표지는 `npm-`, `php-`, `php-ext-`, `python-`, `rust-`, `go-`로 시작합니다. `docs_check.py`는 `scripts/check_evidence.py`(`make evidence-check`)가 되며 기능 행과 그 근거, 배포 관측, 벤치마크 결과, 검증 기록, JSON 보고서의 검사를 유지하고, `test_docs_check.py`는 `test_check_evidence.py`가 됩니다. 체크리스트 행은 상태를 말로 씁니다.
