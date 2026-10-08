@@ -1,11 +1,16 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: a478d777a58b762cfe11759942d03c747a5a33c6b15c1a6e8ca7fcb0ce0c523f -->
+<!-- source-sha256: 7d1735d58a57105907afe70183ef60477bd002b08b5cba2954dda7f0ccadb0dc -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- 사용자의 언어로 보고하는 git은 work tree가 아님으로 읽힙니다 (T1.28). `tracked_files`가 work tree의 부재를
+  git 오류의 영문 텍스트로 판정했으므로, 현지화된 git은 원본 tree의 기록, 문서 검사, 공통 사례를 오류로 만들었습니다.
+  `git rev-parse --is-inside-work-tree` 호출을 `LC_ALL=C`로 실행하고, AGENTS가 검사가 출력 텍스트를 판정하는
+  모든 명령의 규칙을 밝힙니다.
 
 <a id="0-0-3"></a>
 ## 0.0.3
