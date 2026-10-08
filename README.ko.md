@@ -1,14 +1,14 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: 8cecb33f6fe2d0e325905d88fb608bef6c8361598a541f4b43d4711028c6ba75 -->
+<!-- source-sha256: 4240d580af133e4bda95fe3caa9d68d910dacd439b20547553fe0c6ee82c50ce -->
 # ordered-json
 
 [English](README.md)
 
-JavaScript, Rust, Go, PHP용 JSON 라이브러리입니다. 객체는 모든 깊이에서 문서 키 순서를 유지하는 연관배열을 사용합니다. 중복 키는 최초 위치와 마지막 값을 유지합니다.
+JavaScript, Rust, Go, PHP, Python용 JSON 라이브러리입니다. 객체는 모든 깊이에서 문서 키 순서를 유지하는 연관배열을 사용합니다. 중복 키는 최초 위치와 마지막 값을 유지합니다.
 
-표준 JSON API는 객체 순서, 중복 키, 숫자 토큰 표기, 객체·배열 표현에 대해 언어를 넘나드는 하나의 동작을 제공하지 않습니다. 따라서 JSON이 JavaScript, Rust, Go, PHP, PHP 확장 사이를 이동할 때 데이터가 달라질 수 있습니다. ordered-json은 손실 없는 하나의 값 모델을 정의하고, 다섯 구현체 모두에 동일한 파서, 직렬화기, 순서 규칙, 반복 라운드트립 동작을 적용합니다. 특히 빈 객체(`{}`)와 빈 배열(`[]`)을 서로 다른 타입으로 유지합니다.
+표준 JSON API는 객체 순서, 중복 키, 숫자 토큰 표기, 객체·배열 표현에 대해 언어를 넘나드는 하나의 동작을 제공하지 않습니다. 따라서 JSON이 JavaScript, Rust, Go, PHP, PHP 확장, Python 사이를 이동할 때 데이터가 달라질 수 있습니다. ordered-json은 손실 없는 하나의 값 모델을 정의하고, 여섯 구현체 모두에 동일한 파서, 직렬화기, 순서 규칙, 반복 라운드트립 동작을 적용합니다. 특히 빈 객체(`{}`)와 빈 배열(`[]`)을 서로 다른 타입으로 유지합니다.
 
-이 저장소는 공통 명세, 공식 예제, 기대 결과, 검증기와 다섯 구현체를 모두 관리하는 단일 소스 저장소입니다. 언어별 디렉터리는 이 저장소 안에서 독립 패키지와 빌드 대상으로 동작하며, 언어별 API를 섞지 않고 하나의 리비전을 공유합니다.
+이 저장소는 공통 명세, 공식 예제, 기대 결과, 검증기와 여섯 구현 패키지를 모두 관리하는 단일 소스 저장소입니다. 언어별 디렉터리는 이 저장소 안에서 독립 패키지와 빌드 대상으로 동작하며, 언어별 API를 섞지 않고 하나의 리비전을 공유합니다.
 
 <a id="start"></a>
 ## 시작
@@ -30,6 +30,25 @@ console.log(stringify(parse(example.input)));
 JS
 ~~~
 
+설치 없이 `python/src`에서 같은 예제를 Python으로 실행합니다.
+
+~~~sh
+PYTHONPATH=python/src python3 - <<'PY'
+import json
+from polyspec.ordered_json import parse, stringify
+with open('examples/official.json', encoding='utf8') as f:
+    cases = json.load(f)['cases']
+example = next(example for example in cases if example['id'] == 'document-order')
+print(stringify(parse(example['input'])))
+PY
+~~~
+
+tag의 Python 패키지는 `pip`로 설치합니다([설치](docs/operations/installation.ko.md)). `python/`을 포함한 첫 tag는 아직 릴리스되지 않았으므로 `X.Y.Z`는 그 버전을 뜻합니다.
+
+~~~sh
+pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@vX.Y.Z#subdirectory=python"
+~~~
+
 | 패키지 | 내용 | 경로 |
 | --- | --- | --- |
 | JavaScript | JavaScript 및 TypeScript 선언 | `js/` |
@@ -37,11 +56,12 @@ JS
 | Go | Go 패키지 | `go/` |
 | PHP | 순수 PHP 및 Value API | `php/` |
 | PHP 확장 | PIE 메타데이터를 제공하는 네이티브 PHP 확장 | `php-extension/` |
+| Python | Python 패키지 `polyspec-ordered-json`, import `polyspec.ordered_json` | `python/` |
 
 <a id="verification"></a>
 ## 검증
 
-모든 구현이 같은 [공식 예제](examples/README.ko.md)와 공통 기대값을 사용합니다. 각 구현 패키지는 자체 빌드 대상을 제공하며, 루트의 `make check`는 현재 체크아웃의 다섯 패키지를 모두 검사합니다.
+모든 구현이 같은 [공식 예제](examples/README.ko.md)와 공통 기대값을 사용합니다. 각 구현 패키지는 자체 빌드 대상을 제공하며, 루트의 `make check`는 현재 체크아웃의 여섯 패키지를 모두 검사합니다.
 
 ~~~sh
 make check

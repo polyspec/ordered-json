@@ -1,5 +1,5 @@
 <!-- doc-id: installation -->
-<!-- source-sha256: fd3c1af5f007815e0d2ba665ff12299ccfeeddf2b0138a2884dc74b8b1e00bd1 -->
+<!-- source-sha256: ca345df2a3295aadc150026bd2a28630b06a69716d1a1fa803d049a56d28c115 -->
 # 설치와 실행
 
 [English](installation.md)
@@ -38,7 +38,7 @@ cd ordered-json
 - Python: tag의 패키지를 pip로 설치하거나 `python/src`를 import 경로에 둡니다.
 
 ~~~sh
-pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@v0.0.3#subdirectory=python"
+pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@vX.Y.Z#subdirectory=python"
 ~~~
 
 <a id="release-assets"></a>
