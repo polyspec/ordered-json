@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: 3deded916f7bf94c091ed62c4463cfe22dc523004c0954b062fc1cacbbf92bd2 -->
+<!-- source-sha256: c23a5079c00c054bd44ee7cdfe0c79bc6ba33a2e16225b3d260b5469e11a7502 -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
@@ -56,3 +56,4 @@
 | T1.27-17 | 0.0.4 consumer fixture를 씁니다. 0.0.4 bump가 scripts/tests/install을 0.0.3에 둬서, suite job이 0.0.3 아카이브를 읽는 "npm ci"와 "composer install"에서 실패합니다. Red: `python3 scripts/tests/test_release.py`가 0.0.3 아카이브 설치에서 실패합니다. Green: `make install-fixtures`(tag 없이 작업 트리의 아카이브를 만듦)가 0.0.4 manifest와 lock을 씁니다. | `scripts/tests/install/composer/composer.json`, `scripts/tests/install/composer/composer.lock`, `scripts/tests/install/npm/package.json`, `scripts/tests/install/npm/package-lock.json` | `make install-fixtures`, 그다음 CI (`suite`) | [ ] |
 | T1.27-18 | 릴리스 version 검사 test가 현재 저장소 version을 js/package.json에서 읽어 그 tag를 검사합니다. `test_the_released_versions_pass_the_version_check`는 v0.0.3과 0.0.3을 고정해서, 0.0.4 bump 뒤 suite가 "version 0.0.4, the tag v0.0.3 is 0.0.3"으로 실패했습니다. Go module tag go/v0.0.3의 검사는 그대로 둡니다. Red: 변경 전에는 0.0.4 manifest에서 test가 실패합니다. Green: test 통과. | `scripts/tests/test_release.py` | `python3 scripts/tests/test_release.py Repository.test_the_released_versions_pass_the_version_check` | [ ] |
 | T1.27-19 | main에 push할 때마다 전체 CI를 실행해서, release workflow가 요구하는 check ci-passed가 main의 모든 commit에 붙게 합니다. v0.0.4 release는 tag 커밋 471ab69에 ci-passed가 없어서 거부되었습니다. workflow는 pull request와 같은 job을 push to main에서도 실행합니다. Red: ci-passed가 없는 tag를 release workflow가 거부합니다(run 37790670438). Green: main에 push하면 CI workflow가 시작되고, push된 commit에서 ci-passed가 성공합니다. | `.github/workflows/ci.yml` | main에 push하면 workflow ci가 시작되고, push된 commit에서 job ci-passed가 성공합니다 | [ ] |
+| T1.27-21 | 0.x 규칙으로 AGENTS의 pull request 규칙을 바꿉니다. 변경은 소유 unit test가 로컬에서 통과한 뒤 main에 commit하고, CI push trigger(T1.27-19)가 release에 필요한 check ci-passed를 만듭니다. ruleset은 선언만 되어 있고 적용하지 않음을 명시합니다. | `AGENTS.md`(.ko) | `make docs-check` | [ ] |

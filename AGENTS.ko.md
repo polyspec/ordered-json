@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 42a440a4964add3c0b1bf32695ba4132169679cb1fd123b43f5a7b41b9c0bb8e -->
+<!-- source-sha256: 6f880de2a94fd9cb51103eac339cba9c6fe053c14504fb66e8f9dd2bc7293b66 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -58,15 +58,11 @@ make check JSON_TEST_SUITE=.cache/JSONTestSuite
 
 push는 `partial` 기능과 `[~]` 작업이 없을 때만 합니다. pre-push hook `.githooks/pre-push`는 `scripts/push_gate.py hook`을 실행합니다. 이 명령은 push되는 commit이나 working tree의 `docs/features.md`에 `partial` 행이 있거나 `docs/plans/execution-checklist.md`에 `[~]` 작업이 있으면 각 ref, commit, ID, 기능이나 작업을 밝히며 push를 거부하고, 두 file 중 하나를 읽을 수 없으면 거부합니다. Makefile을 읽는 것은 설정을 쓰지 않습니다. `make hooks`는 값이 다를 때만 `core.hooksPath`를 `.githooks`로 설정하고 hook을 검사하며, `make hooks-check`는 `core.hooksPath`가 `.githooks`가 아니거나 `.githooks/pre-push`나 `.githooks/pre-commit`이 실행 가능하지 않으면 실패합니다. hook이 없는 checkout에서 한 push는 hook을 실행하지 않으므로, `.github/workflows/push-gate.yml`의 job `push-gate`가 모든 branch에 push된 commit과 모든 pull request의 head commit에 `scripts/push_gate.py commit`을 실행하는 `make push-gate COMMIT=<commit>`을 실행합니다. 이 job은 기능이 `partial`이거나 작업이 `[~]`이면 실패하고, `.githooks/pre-push`나 `.githooks/pre-commit`이 mode 100755로 추적되지 않으면 실패합니다. 같은 job은 이어서 `make docs-check`를 실행하고, gate가 실패해도 실행합니다. 그래서 문서, 기능 tracker, 체크리스트가 자체 검사에 실패하는 commit은 `main`이 요구하는 check에 실패합니다. 이 job은 local checkout의 설정을 검사할 수 없습니다.
 
-모든 변경은 owner의 변경이든 agent의 변경이든 pull request와 merge queue를 거쳐 `main`에 들어갑니다. 이 저장소의 어떤 명령도 `main`을 push하지 않습니다. branch는 GitHub의 표준 명령이나 GitHub UI로 공개합니다.
+0.x 동안 변경은 소유 unit test가 로컬에서 통과한 뒤 `main`에 바로 commit합니다. pull request와 merge queue는 쓰지 않습니다.
+CI workflow는 `main`에 push될 때마다 전체 suite를 실행하며, 그 job `ci-passed`가 release workflow가 tag된 commit에 요구하는 check입니다. pre-push hook은 push 전에 push gate를 실행합니다.
 
-~~~sh
-git push origin HEAD:refs/heads/<branch>
-gh pr create --base main --head <branch> --fill
-gh pr merge <branch> --auto --rebase
-~~~
 
-`.github/ruleset.json`에 선언된 GitHub ruleset `main`은 pull request(승인 없음), merge method `REBASE`인 merge queue, linear history, 정확히 GitHub Actions의 check `push-gate`와 `ci-passed`(`.github/workflows/ci.yml`의 마지막 job으로, 그 workflow의 다른 모든 job이 통과했을 때만 통과)를 요구하고, `main`의 force-push와 삭제를 거부하며, bypass actor가 없습니다. 그래서 GitHub는 관리자의 push도 포함해 `main`으로의 직접 push를 거부합니다. merge queue는 queue에 들어간 pull request를 `main` 위에 rebase해 merge group을 만들고, 그 commit에서 필수 check를 실행해 통과하면 `main`을 그 commit으로 옮깁니다. check가 실패하면 pull request를 queue에서 뺍니다. branch push에서 pre-push hook이 실행되고, job `push-gate`는 pull request와 merge group에서 `[~]` 작업을 거부합니다. rebase는 merge된 commit에 새 hash를 주므로, `git pull --rebase`가 queue가 merge한 local commit을 버립니다. `make github-ruleset`은 ruleset과 선언된 저장소 설정을 만들거나 갱신하고, `make github-ruleset-check`는 둘이 선언과 다르면 실패합니다([main 공개](docs/operations/validation.ko.md#publish)).
+`.github/ruleset.json`에 선언된 ruleset은 0.x 동안 적용하지 않습니다. 선언과 그 `make` target의 제거는 체크리스트 작업입니다.
 
 문서만 검토할 때는 `make docs-check`를 실행합니다. 이 검사는 검증 기록을 소스와 비교하지 않습니다. commit의 근거는 커밋된 파일이 아니라 그것을 검증하는 실행입니다. `make pie-check`는 PIE 기록 `var/records/pie-verification.json`을, `make check`는 통합 기록 `var/records/verification.json`을 쓰며 Git은 이를 무시하고, `make check` 마지막의 문서 검사는 두 기록을 현재 소스와 대조합니다([기록](docs/operations/validation.ko.md#records)). 기록은 모든 추적 파일을 해시하므로 커밋된 기록은 commit마다 오래된 기록이 됩니다. 어떤 기록도 커밋하지 않으며, 어떤 guard도 기록이 없다는 이유로 거부하지 않습니다. 검사를 통과시키기 위해 검증 결과나 소스 해시를 직접 수정하지 않습니다.
 
@@ -79,7 +75,7 @@ Rust 코드는 `rust/`에서 `cargo clippy --all-targets -- -D warnings`를, Go 
 <a id="release"></a>
 ## 릴리스
 
-모든 변경은 필수 check와 함께 merge queue로 `main`에 도달하므로, `main`의 모든 commit은 전체 suite를 통과했습니다. 릴리스는 `main`의 commit에 붙인 tag이고, tag를 만들고 옮기고 push하는 것은 메인테이너뿐입니다. tag는 pull request로 올리지 않습니다.
+릴리스는 CI 실행이 `ci-passed` 성공으로 끝난 `main`의 commit에 붙인 tag입니다. tag를 만들고 옮기고 push하는 것은 메인테이너뿐입니다.
 
 1. 버전 올림 pull request `Release X.Y.Z`는 commit에 체크리스트 작업을 적고, 저장소의 모든 manifest(`package.json`, `js/package.json`, `composer.json`, `php/composer.json`, `php-extension/composer.json`, `rust/Cargo.toml`, `python/pyproject.toml`, `rust/Cargo.lock`의 package 항목)의 버전을 X.Y.Z로 정하고, `make install-fixtures`로 그 버전의 설치 fixture를 쓰며, 모든 changelog의 `## Unreleased`를 `## X.Y.Z`로 바꾸고 그 위에 비어 있는 새 `## Unreleased`를 둡니다.
 2. 메인테이너는 merge된 `main`의 commit에 `vX.Y.Z` tag를, `go/`의 Go 모듈에는 `go/vX.Y.Z` tag를 붙이고 tag를 push합니다.
