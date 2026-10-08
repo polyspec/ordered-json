@@ -1,5 +1,5 @@
-# CI: the full suite of every pull request, of every merge group of the merge queue and of every manual run
-# (workflow_dispatch). The ruleset of main requires the job ci-passed, the last job, which passes only when every other
+# CI: the full suite of every pull request, of every merge group of the merge queue, of every push to main and of every
+# manual run (workflow_dispatch). The ruleset of main requires the job ci-passed, the last job, which passes only when every other
 # job of this workflow passed, and the merge queue moves main to the merge group commit only after it passed on it, so
 # the run of the merge group is the evidence of the commit that main receives (AGENTS): the suite job runs make pie-check and make check, which write the PIE record and the aggregate
 # record into var/records and check both with the documentation check of make check, and uploads both in its
@@ -20,6 +20,8 @@ name: ci
 on:
   pull_request:
   merge_group:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 # Runners are few: a new push to a pull request cancels the run of its previous push. Each merge group has a ref of its
