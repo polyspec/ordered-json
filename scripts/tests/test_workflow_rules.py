@@ -20,7 +20,7 @@ ALWAYS = '${{ !cancelled() }}'
 # and every merge group; release.yml runs on the push of a tag vX.Y.Z or <directory>/vX.Y.Z at any depth (in a tag
 # filter * does not match /, so **/v* covers the tags of the Go modules). No other workflow exists.
 TRIGGERS = {
-    'ci.yml': 'on:\n  pull_request:\n  merge_group:\n  workflow_dispatch:\n',
+    'ci.yml': "on:\n  pull_request:\n  merge_group:\n  push:\n    branches: [main]\n  workflow_dispatch:\n",
     'push-gate.yml': "on:\n  push:\n    branches-ignore: ['gh-readonly-queue/**']\n  pull_request:\n  merge_group:\n",
     'release.yml': "on:\n  push:\n    tags: ['v*', '**/v*']\n",
 }
@@ -147,9 +147,11 @@ def violations(name, text):
     if name in CHECK_WORKFLOWS and ('merge_group' not in events or 'pull_request' not in events):
         found.append(f'{name}: the workflow runs on {events}, not on pull_request and merge_group; the ruleset of main '
                      'requires its checks on every pull request and every merge group')
-    if 'push' in events and 'tags:' not in trigger.group(1) and "branches-ignore: ['gh-readonly-queue/**']" not in trigger.group(1):
-        found.append(f"{name}: the push trigger lacks branches-ignore: ['gh-readonly-queue/**']; the merge group runs the "
-                     'workflow already')
+    # A push trigger names main alone, which no merge group ref matches, or it excludes the merge group refs.
+    push_filtered = "branches-ignore: ['gh-readonly-queue/**']" in trigger.group(1) or 'branches: [main]' in trigger.group(1)
+    if 'push' in events and 'tags:' not in trigger.group(1) and not push_filtered:
+        found.append(f"{name}: the push trigger lacks branches-ignore: ['gh-readonly-queue/**'] or branches: [main]; the merge "
+                     'group runs the workflow already')
     declared = 'on:\n' + trigger.group(1).rstrip('\n') + '\n' if trigger else ''
     if name in TRIGGERS and declared != TRIGGERS[name]:
         found.append(f'{name}: the on: block is {declared!r}, not {TRIGGERS[name]!r}')

@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: c88bb54c153723c73a2c8036c8a72a773e20b43467202e0bd621f6ca9be8bdad -->
+<!-- source-sha256: 9926a82d01e79981f3ce67f2e24975dce8357756abbe745a3413b7555a80aa2c -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -8,6 +8,7 @@
 ## Unreleased
 
 - T1.27-18: release version test가 고정된 tag v0.0.3 대신 `js/package.json`이 선언한 version의 tag를 검사합니다. 0.0.4 bump로 고정 tag가 오래되었기 때문입니다.
+- T1.27-19: CI workflow가 main에 push될 때마다 실행되어, main의 모든 commit에 release workflow가 요구하는 check ci-passed가 붙습니다.
 - T1.27-17: release asset 설치 test의 consumer fixture가 `make install-fixtures`로 쓴 0.0.4 아카이브를 가리킵니다.
 ## 0.0.4
 
