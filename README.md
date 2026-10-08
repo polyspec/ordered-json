@@ -3,11 +3,11 @@
 
 [한국어](README.ko.md)
 
-JSON libraries for JavaScript, Rust, Go, and PHP. Objects use associative maps that preserve document key order at every depth. Repeated keys retain the first position and the last value.
+JSON libraries for JavaScript, Rust, Go, PHP, and Python. Objects use associative maps that preserve document key order at every depth. Repeated keys retain the first position and the last value.
 
-Standard JSON APIs do not provide one portable behavior for object ordering, duplicate keys, number token spelling, or object/array representation. These differences can change data when JSON moves between JavaScript, Rust, Go, PHP, and the PHP extension. ordered-json defines one lossless value model and applies the same parser, serializer, ordering rules, and repeated-round-trip behavior to all five implementations. In particular, empty objects (`{}`) and empty arrays (`[]`) remain distinct.
+Standard JSON APIs do not provide one portable behavior for object ordering, duplicate keys, number token spelling, or object/array representation. These differences can change data when JSON moves between JavaScript, Rust, Go, PHP, the PHP extension, and Python. ordered-json defines one lossless value model and applies the same parser, serializer, ordering rules, and repeated-round-trip behavior to all six implementations. In particular, empty objects (`{}`) and empty arrays (`[]`) remain distinct.
 
-This repository is the single source repository for the common specification, official examples, expected results, verifier, and all five implementations. The language directories are independent packages and build targets inside this repository; they share one revision without sharing language-specific APIs.
+This repository is the single source repository for the common specification, official examples, expected results, verifier, and all six implementation packages. The language directories are independent packages and build targets inside this repository; they share one revision without sharing language-specific APIs.
 
 <a id="start"></a>
 ## Start
@@ -29,6 +29,25 @@ console.log(stringify(parse(example.input)));
 JS
 ~~~
 
+Python runs the same example from `python/src` without installation:
+
+~~~sh
+PYTHONPATH=python/src python3 - <<'PY'
+import json
+from polyspec.ordered_json import parse, stringify
+with open('examples/official.json', encoding='utf8') as f:
+    cases = json.load(f)['cases']
+example = next(example for example in cases if example['id'] == 'document-order')
+print(stringify(parse(example['input'])))
+PY
+~~~
+
+Install the Python package from a tag that contains `python/`, with pip ([installation](docs/operations/installation.md)). The first such tag is not released yet, so `X.Y.Z` stands for its version:
+
+~~~sh
+pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@vX.Y.Z#subdirectory=python"
+~~~
+
 | Package | Contents | Path |
 | --- | --- | --- |
 | JavaScript | JavaScript and TypeScript declarations | `js/` |
@@ -36,11 +55,12 @@ JS
 | Go | Go package | `go/` |
 | PHP | Pure PHP and the Value API | `php/` |
 | PHP extension | Native PHP extension with PIE metadata | `php-extension/` |
+| Python | Python package `polyspec-ordered-json`, import `polyspec.ordered_json` | `python/` |
 
 <a id="verification"></a>
 ## Verification
 
-All implementations use the same [official examples](examples/README.md) and shared expectations. Each implementation package provides its own build target, and the root `make check` verifies all five packages in the current checkout.
+All implementations use the same [official examples](examples/README.md) and shared expectations. Each implementation package provides its own build target, and the root `make check` verifies all six packages in the current checkout.
 
 ~~~sh
 make check

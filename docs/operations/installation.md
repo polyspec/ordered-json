@@ -37,7 +37,7 @@ The clone contains every implementation package. Use the package directory or a 
 - Python: install the package of a tag with pip, or put `python/src` on the import path.
 
 ~~~sh
-pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@v0.0.3#subdirectory=python"
+pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@vX.Y.Z#subdirectory=python"
 ~~~
 
 <a id="release-assets"></a>
