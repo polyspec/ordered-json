@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: c0b044cbceddeeb9b9cc356904f4d507886d4b5c64392a86f216b5962d567cfb -->
+<!-- source-sha256: f2c843f9f566d6e779bb2f448c087ad651b46ed5b6a62aa3905bdcd8398d79bd -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,8 +7,9 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Python 문서는 현재 사실만 적습니다 (T1.27-7). 설치 문서와 README는 `python/`을 포함한 첫 tag의 자리표시자 `vX.Y.Z`를 보여 주며, 체크리스트 행 T1.27-3은 `docs/distribution.json`이 기록하는 Python registry 상태 `not-verified`를 적습니다.
 - `python` job의 CI는 `actions/upload-artifact`를 GitHub에 있는 commit으로 고정하며, `scripts/tests/test_workflow_rules.py`는 모든 워크플로의 모든 action이 전체 commit id 하나를 유지하도록 요구합니다 (T1.27-6).
-- README와 설치 문서가 Python 패키지를 명시합니다 (T1.27-5). README(.ko)는 소개, 패키지 표, 시작 절에 Python 패키지를 적고, 시작 절은 `python/src`에서 실행하는 예제를 보여 줍니다. pip 설치 줄과 설치 문서는 `python/`을 포함한 첫 tag의 자리표시자 `vX.Y.Z`를 쓰며, tag `v0.0.3`에는 `python/`이 없습니다.
+- README와 설치 문서가 Python 패키지를 명시합니다 (T1.27-5). README(.ko)는 소개, 패키지 표, 시작 절에 Python 패키지를 적고, 시작 절은 `python/src`에서 실행하는 예제를 보여 줍니다. pip 설치 줄과 설치 문서는 `python/`을 포함한 첫 tag의 자리표시자 `vX.Y.Z`를 쓰며, 아직 출시된 tag에는 `python/`이 없습니다.
 - CI가 지원하는 두 minor에서 Python 패키지를 실행합니다 (T1.27-4). `ci.yml`의 job `python`은 3.11과
   `.python-version`의 minor release를 matrix로 가지고, job의 interpreter로 패키지 test, 사례 목록, symbol
   보고를 실행하는 `make ci CI_JOB=python`을 실행합니다(`scripts/python_check.py`. 바닥 minor가 핀보다
