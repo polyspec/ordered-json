@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The README and the installation document name the Python package (T1.27-5): the README(.ko) lists it in its intro, its package table and its start section, which runs the example from `python/src`; the pip install line and the installation document show the placeholder `vX.Y.Z` for the first tag that contains `python/`, because tag `v0.0.3` does not contain it.
 - CI runs the Python package on both supported minors (T1.27-4): the job `python` of `ci.yml` has the matrix
   3.11 and the minor release of `.python-version` and runs `make ci CI_JOB=python`, the package tests, the case
   listing and the symbol report with the interpreter of the job (`scripts/python_check.py`, which checks no

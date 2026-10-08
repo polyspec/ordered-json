@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 1e0905e5b614ac85bd3cbe63c47b5df136240f7aa6cdc0d3afa6ba519b49b7d4 -->
+<!-- source-sha256: cc3dd0edabff13517acabed2cff3fedac1e04e7a7937595d71831b68ff1c48bf -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- README와 설치 문서가 Python 패키지를 명시합니다 (T1.27-5). README(.ko)는 소개, 패키지 표, 시작 절에 Python 패키지를 적고, 시작 절은 `python/src`에서 실행하는 예제를 보여 줍니다. pip 설치 줄과 설치 문서는 `python/`을 포함한 첫 tag의 자리표시자 `vX.Y.Z`를 쓰며, tag `v0.0.3`에는 `python/`이 없습니다.
 - CI가 지원하는 두 minor에서 Python 패키지를 실행합니다 (T1.27-4). `ci.yml`의 job `python`은 3.11과
   `.python-version`의 minor release를 matrix로 가지고, job의 interpreter로 패키지 test, 사례 목록, symbol
   보고를 실행하는 `make ci CI_JOB=python`을 실행합니다(`scripts/python_check.py`. 바닥 minor가 핀보다
