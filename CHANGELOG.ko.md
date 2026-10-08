@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 8be7b34ef29dff90e182bf4a3ff5aa5522af546a1233abd1c1beba3d249760cc -->
+<!-- source-sha256: 3709607a01aed607cab08c52f552fb1adf3f7820f102ee5c85015781c3108478 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+## 0.0.5
 
 - T1.27-18: release version test가 고정된 tag v0.0.3 대신 `js/package.json`이 선언한 version의 tag를 검사합니다. 0.0.4 bump로 고정 tag가 오래되었기 때문입니다.
 - T1.27-19: CI workflow가 main에 push될 때마다 실행되어, main의 모든 commit에 release workflow가 요구하는 check ci-passed가 붙습니다.
