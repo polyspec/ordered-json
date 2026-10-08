@@ -1,6 +1,7 @@
 node_modules/
 target/
 vendor/
+!/tests/kit/fixture/vendor/
 __pycache__/
 .DS_Store
 .cache/

@@ -1,15 +1,14 @@
-# The push gate in CI. The pre-push hook .githooks/pre-push refuses a push while a feature of
-# docs/features.md is partial, but a push from a checkout without the hook does not run it. This job
-# runs the same gate, make push-gate (scripts/push_gate.py), on the pushed commit of every branch, on the head commit
-# of every pull request, the commit that main receives: it fails while a feature is partial or a task of
-# docs/plans/execution-checklist.md is [~], naming each one, and when .githooks/pre-push or
-# .githooks/pre-commit is not tracked with mode 100755. The release workflow requires this job on the tagged commit, so
-# it also runs the documentation check, make docs-check (scripts/docs_check.py), which reads only Python and Git: a
-# commit whose documents, feature tracker or checklist fail their own checks does not reach main. That check runs
-# also after a failed gate. A step runs its make target, never a script
-# directly, so the environment and the prechecks of the Makefile apply. The full verification is not run here. The
-# runner image and each action are exact releases, and Python comes from the minor release of .python-version, so
-# the job does not change with a new release of any of them.
+# The push gate in CI. The pre-push hook .githooks/pre-push refuses a push while a task of
+# docs/plans/execution-checklist.md is [~], but a push from a checkout without the hook does not run it. This job runs
+# the same gate, make push-gate-commit (scripts/kit/push-gate.mjs), on the pushed commit of every branch and on the head
+# commit of every pull request: it fails while a task of the checklist is [~], naming each one, and when the commit does
+# not track .githooks/pre-push and .githooks/pre-commit with mode 100755. The release workflow requires this job on the
+# tagged commit, so it also runs the documentation check, make docs-check, which reads only Python and Git: a commit
+# whose documents or checklist fail their own checks does not reach a release. Both targets run through
+# make ci-targets, which runs the second after a failed first and writes the report. A step runs a make target, never a
+# script directly, so the environment and the prechecks of the Makefile apply. The full verification is not run here. The
+# runner image and each action are exact releases, and Python and Node.js come from .python-version and .node-version,
+# so the job does not change with a new release of any of them.
 name: push-gate
 
 on:
@@ -29,10 +28,22 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
       # actions/setup-python v6.3.0: the latest patch release of the minor release of .python-version.
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        if: ${{ !cancelled() }}
         with:
           python-version-file: .python-version
-      - name: push gate
-        run: make push-gate COMMIT="${{ github.event.pull_request.head.sha || github.sha }}"
-      - name: documentation check
+      # actions/setup-node v6.5.0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         if: ${{ !cancelled() }}
-        run: make docs-check
+        with:
+          node-version-file: .node-version
+          package-manager-cache: false
+      - name: make ci-targets
+        if: ${{ !cancelled() }}
+        run: make ci-targets TARGETS="push-gate-commit docs-check"
+      - name: report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: report-push-gate
+          path: var/report/ci-targets/
+          if-no-files-found: error

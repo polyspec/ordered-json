@@ -1,19 +1,15 @@
 # CI: the full suite of every pull request, of every push to main and of every manual run (workflow_dispatch). The
 # release workflow requires the job ci-passed, the last job, on the tagged commit; it passes only when every other job of
-# this workflow passed, so the run of a push to main is the evidence of the commit that main receives (AGENTS): the suite job runs make pie-check and make check, which write the PIE record and the aggregate
-# record into var/records and check both with the documentation check of make check, and uploads both in its
-# report. A failure never stops the run: every setup step and the step make ci run whatever the earlier steps did
-# (if: !cancelled()), make ci runs every target of the job to its end (scripts/ci_run.py), and the summary and the
-# report are written and uploaded also after a failure, with the status, the exit status and the time of each
-# target, the first failure lines of each failed target and the whole log of every target. fail-fast is false, so
-# one job does not cancel the other. No step or job has timeout-minutes: a build, an install, a PIE build or a
-# whole suite is a long operation that the log shows line by line; only a test case and an adapter reply have
-# their own deadline.
-# Every step runs a make target, never a script or a tool directly, so the environment and the prechecks of the
-# Makefile apply: checks run offline and make tools is the only step that downloads. A tool that only the suite
-# job needs is installed only there. The runner image is ubuntu-24.04, which push-gate.yml also uses. Each
-# action is pinned to the commit of a release; Python and PHP come from the minor releases of .python-version
-# and .php-version, and the records name the patch releases that ran.
+# this workflow passed, so the run of a push to main is the evidence of the commit that main receives (AGENTS). Every job
+# runs its targets with `make ci-targets TARGETS="..."` (scripts/kit/ci-targets.mjs), which runs every target to its end
+# past failures and writes a report: the log of each target, a summary with the first failure lines of each failed
+# target, which is also the job summary, and the versions of the toolchains of the job. Every job uploads its report
+# under `!cancelled()`. Every target of CHECK_TARGETS, the full suite of `make check`, runs in exactly one job of
+# ci.yml and push-gate.yml (scripts/tests/test_workflow_rules.py). No step or job has timeout-minutes: a build, an
+# install or a whole suite is a long operation that the log shows line by line; only a test case and an adapter reply
+# have their own deadline. The runner image is ubuntu-24.04. Each action is pinned to the commit of a release; Python
+# and PHP come from the minor releases of .python-version and .php-version, and the records name the patch releases
+# that ran.
 name: ci
 
 on:
@@ -32,17 +28,31 @@ permissions:
   contents: read
 
 jobs:
-  ci:
-    name: ${{ matrix.job }}
+  docs:
     runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - job: suite
-            toolchains: true
-          - job: docs
-            toolchains: false
+    steps:
+      # actions/checkout v6.1.0
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      # actions/setup-node v6.5.0: the Node.js of .node-version runs the tools of scripts/kit. The repository has no
+      # npm lock file, so the cache of the packageManager of package.json, which setup-node enables by default, is off.
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        if: ${{ !cancelled() }}
+        with:
+          node-version-file: .node-version
+          package-manager-cache: false
+      - name: make ci-targets
+        if: ${{ !cancelled() }}
+        run: make ci-targets TARGETS="kit-check kit-test hooks-check owner-validate"
+      # actions/upload-artifact v7.0.1: the report of this job, var/report/ci-targets.
+      - name: report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: report-docs
+          path: var/report/ci-targets/
+          if-no-files-found: error
+  suite:
+    runs-on: ubuntu-24.04
     steps:
       # actions/checkout v6.1.0
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
@@ -51,49 +61,46 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           python-version-file: .python-version
-      # actions/setup-node v6.5.0. The repository installs no npm package and has no lock file, so the cache of the
-      # packageManager of package.json, which setup-node enables by default, is off.
+      # actions/setup-node v6.5.0
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
-        if: ${{ !cancelled() && matrix.toolchains }}
+        if: ${{ !cancelled() }}
         with:
           node-version-file: .node-version
           package-manager-cache: false
       # actions/setup-go v6.5.0: the toolchain line of go/go.mod.
       - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
-        if: ${{ !cancelled() && matrix.toolchains }}
+        if: ${{ !cancelled() }}
         with:
           go-version-file: go/go.mod
           cache: false
       # shivammathur/setup-php 2.37.2: the latest patch release of the minor release of .php-version, with phpize
-      # for the extension builds of make check and PIE.
+      # for the extension builds of the verification and PIE.
       - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
-        if: ${{ !cancelled() && matrix.toolchains }}
+        if: ${{ !cancelled() }}
         with:
           php-version-file: .php-version
           coverage: none
       # The Rust toolchain of rust-toolchain.toml, npm, the crates of rust/Cargo.lock, the PIE PHAR and the
       # supplementary suite of external-inputs.json; the only step that downloads.
       - name: make tools
-        if: ${{ !cancelled() && matrix.toolchains }}
+        if: ${{ !cancelled() }}
         run: make tools
-      - name: make ci
+      - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci CI_JOB=${{ matrix.job }} JSON_TEST_SUITE=.cache/JSONTestSuite
-      - name: make ci-summary
-        if: ${{ !cancelled() }}
-        run: make ci-summary CI_JOB=${{ matrix.job }}
-      # actions/upload-artifact v7.0.1: the report of this job, var/ci/<job>.
+        env:
+          JSON_TEST_SUITE: .cache/JSONTestSuite
+        run: make ci-targets TARGETS="verify-all clippy go-vet pie-check"
       - name: report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: ci-${{ matrix.job }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: var/ci/${{ matrix.job }}/
+          name: report-suite
+          path: var/report/ci-targets/
           if-no-files-found: error
-  # The Python package supports the floor minor 3.11 as well as the minor release of .python-version. The
-  # job runs its package tests, its case listing and its symbol report with the interpreter of the matrix
-  # (make ci CI_JOB=python, scripts/python_check.py), which the suite job cannot do for a minor below the
-  # pin of the repository tools; the second entry of the matrix stays equal to .python-version.
+  # The Python package supports the floor minor 3.11 as well as the minor release of .python-version. The job runs
+  # its package tests, its case listing and its symbol report with the interpreter of the matrix
+  # (make python-package-check, scripts/python_check.py), which the job suite cannot do for a minor below the pin of
+  # the repository tools; the second entry of the matrix stays equal to .python-version.
   python:
     runs-on: ubuntu-24.04
     strategy:
@@ -109,33 +116,36 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           python-version: ${{ matrix.python }}
-      - name: make ci
+      # actions/setup-node v6.5.0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         if: ${{ !cancelled() }}
-        run: make ci CI_JOB=python
-      - name: make ci-summary
+        with:
+          node-version-file: .node-version
+          package-manager-cache: false
+      - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci-summary CI_JOB=python
-      # actions/upload-artifact v7.0.1: the report of this job, var/ci/python, which make ci CI_JOB=python writes.
+        run: make ci-targets TARGETS="python-package-check"
       - name: report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: ci-python-${{ matrix.python }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: var/ci/python/
+          name: report-python-${{ matrix.python }}
+          path: var/report/ci-targets/
           if-no-files-found: error
-  # The check of this workflow that the release workflow requires on the tagged commit. It runs after every other job, also after a failed,
-  # skipped or cancelled one (if: always()), and make ci-passed fails unless every job of needs has the result success,
-  # so a new job of this workflow is required once it is listed in needs. It installs Python as the job push-gate does.
+  # The check of this workflow that the release workflow requires on the tagged commit. It runs after every other job,
+  # also after a failed, skipped or cancelled one (if: always()), and make ci-passed fails unless every job of needs has
+  # the result success, so a new job of this workflow is required once it is listed in needs.
   ci-passed:
     if: ${{ always() }}
-    needs: [ci, python]
+    needs: [docs, suite, python]
     runs-on: ubuntu-24.04
     steps:
       # actions/checkout v6.1.0
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-      # actions/setup-python v6.3.0: the latest patch release of the minor release of .python-version.
-      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+      # actions/setup-node v6.5.0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         with:
-          python-version-file: .python-version
+          node-version-file: .node-version
+          package-manager-cache: false
       - name: make ci-passed
         run: make ci-passed RESULTS='${{ toJSON(needs) }}'

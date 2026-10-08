@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 8c2c81de4d1b5a19172c2b4eee32f44906dd8f4a4a7d0d861f3a7ec0c95caa21 -->
+<!-- source-sha256: a26a4941eaed50bc52aa9692498954115707f148107e3f2a94285e3ef5332972 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- T1.29-1: push gate, full-run guard, owner 검사, CI 보고서는 kit v0.0.4의 vendored 도구(`scripts/kit/`, `tests/kit/`, `.kit/kit.lock.json`)이며 `config/checklist.json`과 `config/owner-checks.json`으로 설정합니다. `push_gate.py`, `full_run.py`, `owner_check.py`, `ci_run.py`와 그 test를 제거했습니다. `ci.yml`과 `push-gate.yml`의 job은 `make ci-targets`를 실행하고, `test_workflow_rules`는 `CHECK_TARGETS`의 모든 target이 job 하나에서만 실행되도록 요구합니다. `partial` 기능은 더 이상 push나 전체 실행을 막지 않습니다.
 
 ## 0.0.6
 
