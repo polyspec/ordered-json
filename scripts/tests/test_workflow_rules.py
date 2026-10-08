@@ -211,7 +211,7 @@ class WorkflowRules(unittest.TestCase):
     def test_the_ci_jobs_are_parsed_with_their_report_steps(self):
         body = jobs((WORKFLOWS / 'ci.yml').read_text())['suite']
         runs = [step['run'] for step in body['steps'] if 'run' in step]
-        self.assertEqual(runs, ['make install', 'make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check"'])
+        self.assertEqual(runs, ['make install', 'make ci-targets TARGETS="kit-test toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check"'])
         self.assertEqual(body['steps'][-1]['with.path'], REPORT)
 
     def test_each_report_is_the_directory_that_make_ci_targets_writes(self):

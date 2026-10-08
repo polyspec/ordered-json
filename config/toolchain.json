@@ -2,6 +2,7 @@
   "schema": 1,
   "comment": "Node.js is declared in .node-version, npm in the packageManager of package.json, Rust in rust-toolchain.toml, PHP in .php-version and Python in .python-version. cargo-audit and govulncheck review the advisories of packages/ordered-json-rust/Cargo.lock and of the Go module.",
   "go": { "mod": "packages/ordered-json-go/go.mod" },
+  "composer": { "version": "2.10.3" },
   "cargoAudit": "0.22.2",
   "govulncheck": "1.8.0"
 }
