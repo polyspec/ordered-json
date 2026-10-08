@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 5668594ca0b562ea98b806a0ae72fdd46dc6d3aef7d62b05ffd8f4582e539d17 -->
+<!-- source-sha256: 095905aa513b5b223bcb986f45ad91a2a7bc85855cb690c14144324fd55ca4f7 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- AGENTS, 실행 체크리스트, 변경 기록의 번역이 영문 원본의 revision을 다시 적습니다. T1.27-9 commit이 영문을 바꾸면서 revision을 갱신하지 않아서 docs job의 문서 검사가 실패했고, 이제 검사가 통과합니다 (T1.27-10).
 - 도구 다운로드 test는 실패한 fetch, 성공한 fetch, 미설치 `cargo`를 `PATH`의 가짜 `cargo`로 실행하므로, 결과가 머신에 설치된 `cargo`에 의존하지 않습니다 (T1.27-8).
 - Python 패키지의 `package-data` key를 `polyspec.ordered_json`으로 맞춰 wheel에 `py.typed` 표식이 들어가게 했고, `python/tests/package_data.py`를 Python 검사에 더했습니다 (T1.27-9).
 - Python 문서는 현재 사실만 적습니다 (T1.27-7). 설치 문서와 README는 `python/`을 포함한 첫 tag의 자리표시자 `vX.Y.Z`를 보여 주며, 체크리스트 행 T1.27-3은 `docs/distribution.json`이 기록하는 Python registry 상태 `not-verified`를 적습니다.
