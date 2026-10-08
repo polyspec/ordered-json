@@ -8,6 +8,7 @@
 ## Unreleased
 
 - 도구 다운로드 test는 실패한 fetch, 성공한 fetch, 미설치 `cargo`를 `PATH`의 가짜 `cargo`로 실행하므로, 결과가 머신에 설치된 `cargo`에 의존하지 않습니다 (T1.27-8).
+- Python 패키지의 `package-data` key를 `polyspec.ordered_json`으로 맞춰 wheel에 `py.typed` 표식이 들어가게 했고, `python/tests/package_data.py`를 Python 검사에 더했습니다 (T1.27-9).
 - Python 문서는 현재 사실만 적습니다 (T1.27-7). 설치 문서와 README는 `python/`을 포함한 첫 tag의 자리표시자 `vX.Y.Z`를 보여 주며, 체크리스트 행 T1.27-3은 `docs/distribution.json`이 기록하는 Python registry 상태 `not-verified`를 적습니다.
 - `python` job의 CI는 `actions/upload-artifact`를 GitHub에 있는 commit으로 고정하며, `scripts/tests/test_workflow_rules.py`는 모든 워크플로의 모든 action이 전체 commit id 하나를 유지하도록 요구합니다 (T1.27-6).
 - README와 설치 문서가 Python 패키지를 명시합니다 (T1.27-5). README(.ko)는 소개, 패키지 표, 시작 절에 Python 패키지를 적고, 시작 절은 `python/src`에서 실행하는 예제를 보여 줍니다. pip 설치 줄과 설치 문서는 `python/`을 포함한 첫 tag의 자리표시자 `vX.Y.Z`를 쓰며, 아직 출시된 tag에는 `python/`이 없습니다.
