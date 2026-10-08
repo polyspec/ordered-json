@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The translations of AGENTS, the execution checklist and the changelog state the revision of their English documents again, so the documentation check of the docs job passes: the commit of T1.27-9 changed the English documents without updating the revision (T1.27-10).
 - The toolchain download tests run a fake `cargo` on `PATH` for a failed fetch, a successful fetch and a missing `cargo`, so their results do not depend on the `cargo` installed on the machine (T1.27-8).
 - Set the `package-data` key of the Python package to `polyspec.ordered_json`, so the `py.typed` marker ships in the wheel, and added `python/tests/package_data.py` to the Python checks (T1.27-9).
 - The Python documents state the current facts only (T1.27-7): the installation document and the README show the placeholder `vX.Y.Z` for the first tag that contains `python/`, and the checklist row T1.27-3 names the Python registry state `not-verified` that `docs/distribution.json` records.
