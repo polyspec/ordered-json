@@ -16,6 +16,9 @@
     },
     "php-extension": {
       "path": "php-extension"
+    },
+    "python": {
+      "path": "python"
     }
   },
   "implementations": {
@@ -333,6 +336,43 @@
       "artifacts": [
         "{php-extension}/src/modules/ordered_json.so"
       ]
+    },
+    "python": {
+      "repository": "python",
+      "command": [
+        "python3",
+        "{python}/tests/probe.py"
+      ],
+      "tests": {
+        "cwd": "{python}",
+        "command": [
+          "python3",
+          "tests/api.py"
+        ]
+      },
+      "test_cases": {
+        "cwd": "{python}",
+        "command": [
+          "python3",
+          "tests/api.py",
+          "--cases"
+        ],
+        "format": "lines"
+      },
+      "api_symbols": {
+        "cwd": "{python}",
+        "command": [
+          "python3",
+          "tests/api_symbols.py"
+        ]
+      },
+      "runtime": {
+        "python": [
+          "python3",
+          "-c",
+          "import platform; print(platform.python_version())"
+        ]
+      }
     }
   }
 }

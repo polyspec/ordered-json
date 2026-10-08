@@ -51,7 +51,7 @@ class CaseListings(unittest.TestCase):
         formats = {name: implementation['test_cases'].get('format')
                    for name, implementation in REGISTRY['implementations'].items()}
         self.assertEqual(formats, {'js': 'lines', 'rust': 'cargo-terse', 'go': 'go-test-json', 'php': 'lines',
-                                   'php-extension': 'lines'})
+                                   'php-extension': 'lines', 'python': 'lines'})
         self.assertIn('-json', REGISTRY['implementations']['go']['test_cases']['command'])
         self.assertEqual(REGISTRY['implementations']['rust']['test_cases']['command'][-2:], ['--format', 'terse'])
 
