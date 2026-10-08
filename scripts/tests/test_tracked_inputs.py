@@ -4,11 +4,13 @@ A file that is not committed is not part of the tree that a record names, so it 
 source manifest, a documentation result or the shared cases.
 """
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from docs_check import authored_markdown, report_paths
@@ -63,6 +65,27 @@ class TrackedInputs(unittest.TestCase):
         subprocess.run(['rm', '-rf', str(self.root / '.git')], check=True)
         self.assertEqual([path.name for path in fixture_paths(plain, 'valid')], ['a.json'])
         self.assertEqual(authored_markdown(plain), {'readme.md'})
+
+    def test_a_localized_git_message_still_reads_as_no_work_tree(self):
+        # Git reports a missing repository in the locale of the user; the check reads
+        # that message, so it runs git under LC_ALL=C and a translated message, which
+        # the C locale turns back to English, still reads as no work tree.
+        scripts = self.root / 'bin'
+        scripts.mkdir()
+        (scripts / 'git').write_text(
+            '#!/bin/sh\n'
+            'if [ "$LC_ALL" = "C" ]; then\n'
+            '  echo "fatal: not a git repository (or any of the parent directories): .git" >&2\n'
+            'else\n'
+            '  echo "fatal: 깃 저장소가 아닙니다" >&2\n'
+            'fi\n'
+            'exit 128\n')
+        (scripts / 'git').chmod(0o755)
+        plain = self.root / 'archive'
+        (plain / 'fixtures/valid').mkdir(parents=True)
+        (plain / 'fixtures/valid/a.json').write_text('1')
+        with mock.patch.dict(os.environ, {'PATH': f'{scripts}:{os.environ["PATH"]}'}):
+            self.assertEqual([path.name for path in fixture_paths(plain, 'valid')], ['a.json'])
 
 
 if __name__ == '__main__':
