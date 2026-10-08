@@ -119,7 +119,7 @@ jobs:
       # actions/upload-artifact v7.0.1: the report of this job, var/ci/python-<minor>.
       - name: report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6c0a
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: ci-python-${{ matrix.python }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: var/ci/python-${{ matrix.python }}/
