@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 095905aa513b5b223bcb986f45ad91a2a7bc85855cb690c14144324fd55ca4f7 -->
+<!-- source-sha256: 0917f3280159d1ecc3ab69bfe42e194f9b7d7a2901315006d416918430ea3b7b -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- test_the_job_fails_on_a_commit_whose_documentation_check_fails가 커밋된 tree에서 통과합니다. 이 test의 실패는 오래된 번역 revision에서 왔고 T1.27-10이 이를 고쳤으므로, test와 검사 대상 코드는 바뀌지 않았습니다 (T1.27-11).
 - AGENTS, 실행 체크리스트, 변경 기록의 번역이 영문 원본의 revision을 다시 적습니다. T1.27-9 commit이 영문을 바꾸면서 revision을 갱신하지 않아서 docs job의 문서 검사가 실패했고, 이제 검사가 통과합니다 (T1.27-10).
 - 도구 다운로드 test는 실패한 fetch, 성공한 fetch, 미설치 `cargo`를 `PATH`의 가짜 `cargo`로 실행하므로, 결과가 머신에 설치된 `cargo`에 의존하지 않습니다 (T1.27-8).
 - Python 패키지의 `package-data` key를 `polyspec.ordered_json`으로 맞춰 wheel에 `py.typed` 표식이 들어가게 했고, `python/tests/package_data.py`를 Python 검사에 더했습니다 (T1.27-9).
