@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: 2f748f13e280f04715162a16ab13f592374b3e4ed944f699fc993a1abc66e9ea -->
+<!-- source-sha256: dcfb382589513bb04573eb019ef63910d339da71d847913e8ae6bad167971cb2 -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
