@@ -7,6 +7,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+## 0.0.4
+
 - PR #1에서 T1.27-10부터 T1.27-13까지의 수정 뒤 `ci-passed`가 통과합니다. docs, python, push-gate, suite job이 같은 commit에서 통과합니다 (T1.27-14).
 - CI의 `python` job은 `make ci CI_JOB=python`이 쓰는 `var/ci/python/`을 업로드합니다. 이전의 `var/ci/python-<minor>/`는 어떤 target도 쓰지 않았습니다. `scripts/tests/test_workflow_rules.py`는 각 report 경로가 그 make target의 디렉터리이도록 요구합니다 (T1.27-13).
 - push-gate job이 커밋된 tree에서 통과합니다. job의 종료 상태 2는 `make docs-check`에서 왔고, 이는 T1.27-10이 맞춘 오래된 번역 revision을 읽은 결과입니다. 따라서 `scripts/push_gate.py`와 `.github/workflows/push-gate.yml`은 바뀌지 않았습니다 (T1.27-12).
