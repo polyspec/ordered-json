@@ -488,7 +488,9 @@ class Repository(unittest.TestCase):
         self.assertEqual(release.manifest_issues(release.published_manifests(ROOT)), [])
 
     def test_the_released_versions_pass_the_version_check(self):
-        self.assertEqual(release.versions(ROOT, 'v0.0.3'), '0.0.3')
+        # The version of the repository is the one of js/package.json, which every release sets; the check of its tag passes.
+        version = json.loads((ROOT / 'js/package.json').read_text(encoding='utf-8'))['version']
+        self.assertEqual(release.versions(ROOT, f'v{version}'), version)
         self.assertEqual(release.versions(ROOT, 'go/v0.0.3'), '0.0.3')
 
     def test_make_runs_each_step_with_the_tag_of_the_environment(self):
