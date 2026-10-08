@@ -17,6 +17,6 @@
     ]
   },
   "scripts": {
-    "test": "python3 ../scripts/verify.py --only php"
+    "test": "make -C .. verify-php"
   }
 }

@@ -95,15 +95,16 @@ class FailureMessages(unittest.TestCase):
         self.assertIn("phpversion('ordered_json') false", process.stderr)
         self.assertIn('ORDERED_JSON_VERSION 9.9.9', process.stderr)
 
-    def test_each_package_script_runs_a_file_that_exists(self):
+    def test_each_package_script_runs_a_make_target_that_exists(self):
+        targets = set(re.findall(r'(?m)^([a-z][a-z-]*):', (ROOT / 'Makefile').read_text()))
         for manifest in ('package.json', 'js/package.json', 'php/composer.json'):
             scripts = json.loads((ROOT / manifest).read_text()).get('scripts', {})
+            self.assertTrue(scripts, manifest)
             for name, command in scripts.items():
-                for argument in shlex.split(command):
-                    if argument.endswith('.py'):
-                        with self.subTest(manifest=manifest, script=name):
-                            self.assertTrue(((ROOT / manifest).parent / argument).is_file(),
-                                            f'{manifest} script {name} runs {argument}, which does not exist')
+                with self.subTest(manifest=manifest, script=name):
+                    words = shlex.split(command)
+                    self.assertEqual(words[0], 'make', f'{manifest} script {name} runs {command}, not a make target')
+                    self.assertIn(words[-1], targets, f'{manifest} script {name} runs {words[-1]}, which the Makefile lacks')
 
 
 if __name__ == '__main__':

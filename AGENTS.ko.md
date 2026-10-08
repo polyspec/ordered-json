@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 66faf6ecc3229e695e8e5f3007d652f7c0044439593acc7368727768af06622d -->
+<!-- source-sha256: ae601219588fc3d25fdccc3f04e077e3264729caaabb5f57c0a8616f8f56e55d -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -78,11 +78,16 @@ Rust 코드는 `rust/`에서 `cargo clippy --all-targets -- -D warnings`를, Go 
 
 릴리스는 CI 실행이 `ci-passed` 성공으로 끝난 `main`의 commit에 붙인 tag입니다. tag를 만들고 옮기고 push하는 것은 메인테이너뿐입니다.
 
-1. 버전 올림 commit `Release X.Y.Z`는 `ci-passed`가 성공한 push 뒤에 오며 체크리스트 작업을 적고, 저장소의 모든 manifest(`package.json`, `js/package.json`, `composer.json`, `php/composer.json`, `php-extension/composer.json`, `rust/Cargo.toml`, `python/pyproject.toml`, `rust/Cargo.lock`의 package 항목)의 버전을 X.Y.Z로 정하고, `make release-consumer-lock TAG=vX.Y.Z`로 그 버전의 consumer lock을 쓰며, 모든 changelog의 `## Unreleased`를 `## X.Y.Z`로 바꾸고 그 위에 비어 있는 새 `## Unreleased`를 둡니다.
+1. 버전 올림 commit `Release X.Y.Z`는 `ci-passed`가 성공한 push 뒤에 오며 체크리스트 작업을 적고, 저장소의 모든 manifest(`package.json`, `js/package.json`, `composer.json`, `php/composer.json`, `php-extension/composer.json`, `rust/Cargo.toml`, `python/pyproject.toml`, `package-lock.json`의 루트 항목, `rust/Cargo.lock`의 package 항목)의 버전을 X.Y.Z로 정하고, 검토 기록이 각 lock의 hash를 담으므로 `make dependency-review RECORD=1`로 의존성 검토를 다시 기록하고, `make release-consumer-lock TAG=vX.Y.Z`로 그 버전의 consumer lock을 쓰며, 모든 changelog의 `## Unreleased`를 `## X.Y.Z`로 바꾸고 그 위에 비어 있는 새 `## Unreleased`를 둡니다.
 2. 메인테이너는 merge된 `main`의 commit에 `vX.Y.Z` tag를, `go/`의 Go 모듈에는 `go/vX.Y.Z` tag를 붙이고 tag를 push합니다.
 3. tag push는 `.github/workflows/release.yml`을 실행합니다. 이 workflow는 tag된 commit이 `main`에 있고 check `push-gate`와 `ci-passed`를 통과했는지, 모든 manifest에 tag의 버전이 있고 `CHANGELOG.md`에 section `## X.Y.Z`가 있는지 확인하고, 패키지 archive를 만들어 GitHub Release를 생성합니다([tag 릴리스](docs/operations/distribution.ko.md#tag-release)).
 
 이 저장소의 package가 다른 저장소의 package를 고정할 때(`git+https://github.com/polyspec/<repository>@vX.Y.Z`)는 GitHub에 실제로 존재하는 tag만 씁니다. 그 tag를 push한 뒤에 고정하며, 아직 release되지 않은 tag를 가리키는 고정은 쓰지 않습니다.
+
+<a id="dependencies"></a>
+## 의존성
+
+의존성은 선언된 runtime 범위를 지원하는 최신 stable release를 씁니다. 의존성을 고르거나 갱신할 때 알려진 최신 release입니다. 시험판은 stable이 아닙니다. 의존성은 `make dependency-review UPDATE=1`로 고르고 갱신하며, 바뀐 manifest나 lock은 `make dependency-review RECORD=1`이 쓰는 검토 기록 `config/dependency-review.json`과 함께 commit합니다. `make dependency-policy-check`(`scripts/kit/check-dependency-policy.mjs`)는 manifest와 lock을 그 기록 및 `config/dependency-policy.json`과 비교하며 registry를 질의하지 않으므로, 한 tree는 언제나 한 결과를 냅니다. 더 오래된 release는 재현 가능한 사유, pin을 없애는 조건, 검증 명령을 적은 `config/dependency-policy.json`의 예외로만 고정합니다. 검토 시점에 advisory가 있는 lock은 gate에 실패합니다.
 
 <a id="idempotency"></a>
 ## 멱등성

@@ -76,11 +76,16 @@ Rust code passes `cargo clippy --all-targets -- -D warnings` in `rust/` and Go c
 
 A release is a tag of a commit of `main` whose CI run concluded with `ci-passed` success. Only the maintainer creates, moves or pushes a tag.
 
-1. The version-bump commit `Release X.Y.Z`, which follows the push whose `ci-passed` succeeded and names its checklist task, sets the version X.Y.Z in every manifest of the repository (`package.json`, `js/package.json`, `composer.json`, `php/composer.json`, `php-extension/composer.json`, `rust/Cargo.toml`, `python/pyproject.toml` and the package entry of `rust/Cargo.lock`), writes the consumer locks of the version with `make release-consumer-lock TAG=vX.Y.Z` and renames `## Unreleased` of every changelog to `## X.Y.Z`, with a new empty `## Unreleased` above it.
+1. The version-bump commit `Release X.Y.Z`, which follows the push whose `ci-passed` succeeded and names its checklist task, sets the version X.Y.Z in every manifest of the repository (`package.json`, `js/package.json`, `composer.json`, `php/composer.json`, `php-extension/composer.json`, `rust/Cargo.toml`, `python/pyproject.toml`, the root entry of `package-lock.json` and the package entry of `rust/Cargo.lock`), records the dependency review again with `make dependency-review RECORD=1`, because the review record holds the hash of each lock, writes the consumer locks of the version with `make release-consumer-lock TAG=vX.Y.Z` and renames `## Unreleased` of every changelog to `## X.Y.Z`, with a new empty `## Unreleased` above it.
 2. The maintainer tags the commit of `main` whose CI run concluded `ci-passed` success as `vX.Y.Z`, and `go/vX.Y.Z` for the Go module of `go/`, and pushes the tag.
 3. The tag push runs `.github/workflows/release.yml`: it requires the tagged commit on `main` with the checks `push-gate` and `ci-passed` passed, the version of the tag in every manifest and the section `## X.Y.Z` in `CHANGELOG.md`, builds the package archives and creates the GitHub Release ([tag releases](docs/operations/distribution.md#tag-release)).
 
 A package of this repository that pins a package of another repository (`git+https://github.com/polyspec/<repository>@vX.Y.Z`) names only a tag that exists on GitHub: the pin is written after that tag is pushed, and no pin names a tag that is not released.
+
+<a id="dependencies"></a>
+## Dependencies
+
+Use the latest stable release of a dependency that supports the declared runtime range: the latest known when the dependency is chosen or updated. A prerelease is not stable. Choose and update dependencies with `make dependency-review UPDATE=1`, and commit a changed manifest or lock with the review record `config/dependency-review.json` that `make dependency-review RECORD=1` writes. `make dependency-policy-check` (`scripts/kit/check-dependency-policy.mjs`) compares the manifests and locks with that record and with `config/dependency-policy.json` and queries no registry, so one tree gives one result at any time. An older release is pinned only by an exception of `config/dependency-policy.json` that names a reproducible reason, the condition that removes the pin and its verification commands. A lock with an advisory at its review fails the gate.
 
 <a id="idempotency"></a>
 ## Idempotency

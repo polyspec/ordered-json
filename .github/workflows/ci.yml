@@ -33,8 +33,8 @@ jobs:
     steps:
       # actions/checkout v6.1.0
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-      # actions/setup-node v6.5.0: the Node.js of .node-version runs the tools of scripts/kit. The repository has no
-      # npm lock file, so the cache of the packageManager of package.json, which setup-node enables by default, is off.
+      # actions/setup-node v6.5.0: the Node.js of .node-version runs the tools of scripts/kit. The repository installs no
+      # npm package, so the cache of the packageManager of package.json, which setup-node enables by default, is off.
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         if: ${{ !cancelled() }}
         with:
@@ -42,7 +42,7 @@ jobs:
           package-manager-cache: false
       - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci-targets TARGETS="kit-check kit-test hooks-check owner-validate release-coverage release-config-check"
+        run: make ci-targets TARGETS="kit-check kit-test hooks-check owner-validate release-coverage release-config-check dependency-policy-check"
       # actions/upload-artifact v7.0.1: the report of this job, var/report/ci-targets.
       - name: report
         if: ${{ !cancelled() }}

@@ -19,7 +19,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "python3 ../scripts/verify.py --only js"
+    "test": "make -C .. verify-js"
   },
   "repository": {
     "type": "git",
