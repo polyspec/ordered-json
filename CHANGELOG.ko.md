@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 618ef2fa10569b9cf1bcf6a801d94d0308b998e1684dbfec828ceaa0aa9be5e5 -->
+<!-- source-sha256: fbdf10c79c9ab1fb5cf1c3518f7afd9ddd9e8c09c0f466af9870b12c0dbcffdc -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -15,6 +15,7 @@
 - T1.29-6: 패키지는 `packages/ordered-json-npm`, `packages/ordered-json-php`, `packages/ordered-json-php-ext`, `packages/ordered-json-python`, `packages/ordered-json-rust`, `packages/ordered-json-go`에 있습니다. Go 모듈 경로는 `github.com/polyspec/ordered-json/packages/ordered-json-go`이고 tag는 `packages/ordered-json-go/vX.Y.Z`입니다.
 - T1.29-7: AGENTS는 `scripts/kit/`과 `tests/kit/`의 도구가 polyspec/kit에서만 바뀌고, 이 저장소가 다른 polyspec 저장소와 `config/*.json` 및 자기 제품 코드에서만 다르며, pull request, merge queue, ruleset이 없는 0.x 규칙과 archive 이름 `<package>-<language>-<version>.<ext>`를 적습니다. 릴리스 0.0.7을 준비했습니다. manifest는 올리지 않았고 tag는 없으며, `make release-config-check`, `make release-coverage`, `make dependency-policy-check`는 `packages/` 배치에서 통과합니다.
 - T1.29-8: `config/toolchain.json`은 Composer 2.10.3을 선언합니다. `ci.yml`의 job `docs`는 `make dependency-policy-check`를 위해 PHP와 그 Composer release를 설정하고, `make kit-test`는 job `suite`에서 실행합니다.
+- T1.29-9: kit의 vendored 도구는 v0.0.8입니다.
 
 ## 0.0.6
 
