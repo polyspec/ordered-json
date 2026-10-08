@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.27-17: the consumer fixtures of the release asset install test name the 0.0.4 archives, written by `make install-fixtures`.
 ## 0.0.4
 
 - On PR #1, `ci-passed` passes after the fixes of T1.27-10 to T1.27-13: the docs, python, push-gate and suite jobs pass on the same commit (T1.27-14).
