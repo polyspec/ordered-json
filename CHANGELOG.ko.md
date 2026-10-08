@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.27-17: release asset 설치 test의 consumer fixture가 `make install-fixtures`로 쓴 0.0.4 아카이브를 가리킵니다.
 ## 0.0.4
 
 - PR #1에서 T1.27-10부터 T1.27-13까지의 수정 뒤 `ci-passed`가 통과합니다. docs, python, push-gate, suite job이 같은 commit에서 통과합니다 (T1.27-14).
