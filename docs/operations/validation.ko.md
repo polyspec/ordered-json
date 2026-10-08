@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 0a3b7f20c2a6f0ff82e4387cb57249dbec2ab40b9251315588275731ba0c3e4e -->
+<!-- source-sha256: c9e04ec31b3cbb43d106e2df9e15a8f164fb86e1167b53fafcb14be6c8c347ca -->
 # 검증
 
 [English](validation.md)
@@ -88,7 +88,7 @@ make ci CI_JOB=docs
 make ci-summary CI_JOB=suite
 ~~~
 
-job `suite`는 고정 파일에서 Python, Node.js, Go, PHP를 설치하고, 내려받는 유일한 단계인 `make tools`를 실행한 뒤 target `hooks`, `pie-check`, `check`를 실행합니다. `make pie-check`는 PIE 기록을, `make check`는 통합 기록을 쓰고 그 문서 검사가 두 기록을 검사합니다. job `docs`는 Python만 설치하고 `docs-check`와 `owner-validate`를 실행합니다. 모든 step은 make target을 실행하고 실패한 step 뒤에도 실행됩니다(`if: !cancelled()`). `make ci`(`scripts/ci_run.py`)는 job의 모든 target을 끝까지 실행하고, 출력을 도착하는 대로 출력하며 `var/ci/<job>/logs/<target>.log`에 쓰고, 각 target의 상태, 종료 상태, 시간을 `var/ci/<job>/summary.json`에 기록합니다. `make ci-summary`는 각 target과 그 상태와 시간, 실패한 target마다 첫 실패 줄을 담은 `var/ci/<job>/summary.md`를 쓰고, `var/records`의 기록을 `var/ci/<job>/records`로 복사하고, 요약을 GitHub의 job summary에 덧붙이며 실패하지 않습니다. step `report`는 실패 뒤에도 `var/ci/<job>/`를 artifact `ci-<job>-<run id>-<attempt>`로 upload합니다. 어떤 step에도 시간 한도가 없습니다. `actions/python-versions`가 `ubuntu-26.04`용 Python 3.9를 build하지 않으므로 job은 push gate처럼 `ubuntu-24.04`에서 실행하며, 기록은 실행한 Python과 PHP의 patch release를 적습니다.
+job `suite`는 고정 파일에서 Python, Node.js, Go, PHP를 설치하고, 내려받는 유일한 단계인 `make tools`를 실행한 뒤 target `hooks`, `pie-check`, `check`를 실행합니다. `make pie-check`는 PIE 기록을, `make check`는 통합 기록을 쓰고 그 문서 검사가 두 기록을 검사합니다. job `docs`는 Python만 설치하고 `docs-check`와 `owner-validate`를 실행합니다. 모든 step은 make target을 실행하고 실패한 step 뒤에도 실행됩니다(`if: !cancelled()`). `make ci`(`scripts/ci_run.py`)는 job의 모든 target을 끝까지 실행하고, 출력을 도착하는 대로 출력하며 `var/ci/<job>/logs/<target>.log`에 쓰고, 각 target의 상태, 종료 상태, 시간을 `var/ci/<job>/summary.json`에 기록합니다. `make ci-summary`는 각 target과 그 상태와 시간, 실패한 target마다 첫 실패 줄을 담은 `var/ci/<job>/summary.md`를 쓰고, `var/records`의 기록을 `var/ci/<job>/records`로 복사하고, 요약을 GitHub의 job summary에 덧붙이며 실패하지 않습니다. step `report`는 실패 뒤에도 `var/ci/<job>/`를 artifact `ci-<job>-<run id>-<attempt>`로 upload합니다. 어떤 step에도 시간 한도가 없습니다. job은 push gate처럼 `ubuntu-24.04`에서 실행하며, 기록은 실행한 Python과 PHP의 patch release를 적습니다.
 
 `ci.yml`의 마지막 job `ci-passed`는 [ruleset](#publish)이 요구하는 이 workflow의 check입니다. workflow의 다른 모든 job을 need로 가지고, 그중 하나가 실패하거나 skip되거나 취소되어도 그 모든 job 뒤에 실행되며(`if: ${{ always() }}`), `make ci-passed RESULTS='${{ toJSON(needs) }}'`를 실행합니다. `scripts/ci_run.py passed`는 need로 가진 모든 job의 결과를 출력하고, 하나라도 `success`가 아니면 실패합니다. `ci.yml`에 추가한 job은 `needs`에 넣으므로 필수 check가 그 job을 포함합니다. `scripts/tests/test_workflow_rules.py`는 `ci-passed`가 없거나, 마지막 job이 아니거나, `if: ${{ always() }}`가 없거나, 다른 모든 job을 need로 가지지 않거나, 다른 runner에서 실행되거나, 다른 step을 실행하면 실패합니다.
 

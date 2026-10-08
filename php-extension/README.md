@@ -36,7 +36,7 @@ The [JSON contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec
 <a id="verification"></a>
 ## Verification
 
-Install Python >= 3.9, Git, make, and this implementation's runtime/build tools. Run from this checkout:
+Install the Python minor release that `.python-version` names, Git, make, and this implementation's runtime/build tools. Run from this checkout:
 
 ~~~sh
 make check
