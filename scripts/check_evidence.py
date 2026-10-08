@@ -1,114 +1,30 @@
 #!/usr/bin/env python3
-"""Check bilingual documents, local links, and feature state; with --records, current evidence."""
+"""Check the evidence that the feature record names: the feature rows, the distribution observations, the benchmark result and
+the JSON reports; with --records, the verification records of the checkout against the current sources.
+
+The documents themselves (translation pairs, links, anchors, code blocks, checklists, status values) are checked by
+scripts/kit/check-documents.mjs (make documents-check)."""
 import argparse
 from datetime import datetime
 import json
-import os
 from pathlib import Path
 import re
 import sys
-from urllib.parse import unquote, urlsplit
+from urllib.parse import urlsplit
 
 from verification_record import (AGGREGATE_RECORD, IMPLEMENTATIONS, PIE_RECORD, external_inputs, manifest_differences, package_revisions, sha256,
                                  source_manifest)
-from registry import REGISTRY, artifact_paths, files_under, fixture_paths, repository_paths, tracked_files
+from registry import REGISTRY, artifact_paths, files_under, fixture_paths, repository_paths
 
 ROOT = Path(__file__).resolve().parents[1]
-KINDS = {'overview', 'specification', 'state', 'operations', 'history', 'procedure', 'usage', 'report'}
-IGNORED = {'.git', '.cache', 'node_modules', 'target', 'vendor', '__pycache__',
-           'autom4te.cache', 'build', 'modules', '.libs', 'include'}
 PRIVATE_PATH = re.compile(r'/(?:Users|home)/[^/\s"<>]+/')
 ANCHOR = re.compile(r'<a\s+id="([a-z0-9][a-z0-9-]*)"\s*></a>')
-INLINE_LINK = re.compile(r'!?\[[^\]\n]*\]\((<[^>\n]+>|[^\s()]+(?:\([^\s()]*\)[^\s()]*)*)(?:\s+"[^"]*")?\)')
+CELL_LINK = re.compile(r'\[[^\]\n]*\]\(([^\s()]+)\)')
 
 
-def markdown_parts(text):
-    """Return prose and fenced blocks so code examples are not treated as links."""
-    prose, blocks, block = [], [], []
-    fence = None
-    language = ''
-    for line in text.splitlines():
-        marker = re.match(r'^ {0,3}(`{3,}|~{3,})(.*)$', line)
-        if fence:
-            if marker and marker[1][0] == fence[0] and len(marker[1]) >= len(fence) and not marker[2].strip():
-                blocks.append((language, '\n'.join(block)))
-                fence, block = None, []
-            else:
-                block.append(line)
-        elif marker:
-            fence, language = marker[1], marker[2].strip()
-        else:
-            prose.append(line)
-    if fence:
-        raise ValueError('Unclosed fenced code block')
-    return '\n'.join(prose), blocks
-
-
-def link_targets(prose):
-    prose = re.sub(r'(`+)[^`]*?\1', '', prose)
-    links = [match[1].strip('<>') for match in INLINE_LINK.finditer(prose)]
-    definitions = {match[1].lower(): match[2].strip('<>') for match in re.finditer(
-        r'^ {0,3}\[([^\]]+)\]:\s*(<[^>]+>|\S+)', prose, re.MULTILINE)}
-    links.extend(definitions.values())
-    for match in re.finditer(r'\[([^\]\n]+)\]\[([^\]\n]*)\]', prose):
-        identifier = (match[2] or match[1]).lower()
-        if identifier not in definitions:
-            raise ValueError('Undefined reference link: ' + identifier)
-    links.extend(re.findall(r'<((?:https?://|mailto:)[^>]+)>', prose))
-    links.extend(re.findall(r'\bhref="([^"]+)"', prose))
-    if re.search(r'\]\(', INLINE_LINK.sub('', prose)):
-        raise ValueError('Malformed or unsupported inline link')
-    return links
-
-
-def local_target(root, source, target):
-    parts = urlsplit(target)
-    if parts.scheme:
-        if parts.scheme in ('http', 'https') and parts.netloc and not re.search(r'\s', target):
-            return None
-        if parts.scheme == 'mailto' and '@' in parts.path:
-            return None
-        raise ValueError('Invalid external link: ' + target)
-    if parts.netloc or parts.query:
-        raise ValueError('Local links cannot contain a host or query: ' + target)
-    path = (source.parent / unquote(parts.path)).resolve() if parts.path else source.resolve()
-    try:
-        path.relative_to(root)
-    except ValueError as error:
-        raise ValueError('Link escapes repository: ' + target) from error
-    if not path.exists():
-        raise ValueError('Missing link target: ' + target)
-    if parts.fragment:
-        if path.suffix != '.md':
-            raise ValueError('Local anchors must target Markdown: ' + target)
-        prose, _ = markdown_parts(path.read_text(encoding='utf-8'))
-        if unquote(parts.fragment) not in ANCHOR.findall(prose):
-            raise ValueError('Missing explicit anchor: ' + target)
-    return path
-
-
-def authored_markdown(root):
-    """The Markdown files of root: the tracked ones in a Git work tree, every one outside ignored
-    directories otherwise. The common root leaves the package directories to their own checks."""
-    root = Path(root)
-    package_roots = {Path(entry['path']).parts[0] for entry in REGISTRY['repositories'].values()}
-    common = root.resolve() == ROOT.resolve()
-    tracked = tracked_files(root)
-    if tracked is not None:
-        return {name for name in tracked if name.endswith('.md') and (root / name).is_file()
-                and not (common and '/' in name and name.split('/')[0] in package_roots)}
-    paths = set()
-    for folder, directories, files in os.walk(root):
-        relative = Path(folder).resolve().relative_to(root.resolve())
-        if common and relative.parts and relative.parts[0] in package_roots:
-            directories[:] = []
-            continue
-        directories[:] = [name for name in directories if name not in IGNORED
-                          and not (Path(folder) / name / '.git').exists()]
-        for name in files:
-            if name.endswith('.md'):
-                paths.add((Path(folder) / name).relative_to(root).as_posix())
-    return paths
+def cell_links(cell):
+    """The targets of the inline links of one table cell."""
+    return CELL_LINK.findall(cell)
 
 
 def report_paths(root):
@@ -160,7 +76,7 @@ def feature_rows(text):
             raise ValueError('Invalid distribution state: ' + identifier)
         if implementation != 'implemented' and verification != 'not-verified':
             raise ValueError('Incomplete features cannot claim completed verification: ' + identifier)
-        evidence_links, specification_links = link_targets(evidence), link_targets(specification)
+        evidence_links, specification_links = cell_links(evidence), cell_links(specification)
         if len(specification_links) != 1:
             raise ValueError('A feature requires one specification link: ' + identifier)
         # The shared suite, the package tests and the checker tests are recorded by the run that verifies a commit,
@@ -172,46 +88,6 @@ def feature_rows(text):
             raise ValueError('A verified feature names the record that backs it: ' + identifier)
         rows[identifier] = (implementation, verification, distribution,
                             tuple(link.replace('.ko.md', '.md') for link in evidence_links), tuple(link.replace('.ko.md', '.md') for link in specification_links))
-    return rows
-
-
-CHECKLIST = 'docs/plans/execution-checklist.md'
-TASK_ID = re.compile(r'T\d+(?:\.\d+)*(?:-\d+)?')
-# The four task states (AGENTS): waiting, in progress, done, and bypassed with its cause and its retry condition.
-TASK_STATE = re.compile(r'\[ \]|\[~\]|\[o\]|\[!\] cause: \S.*; retry: \S.*')
-
-
-def checklist_rows(text):
-    """The cells of each task row of the execution checklist, the rows of every table whose header starts with
-    `| ID |`. The last cell is the state of the task.
-
-    The checklist check reads the tasks here, so a checklist
-    that reads no row cannot pass: ValueError names a checklist without task rows, a row whose ID is not a task
-    ID, a row whose last cell is not a task state and an ID with more than one row."""
-    lines = text.splitlines()
-    rows, seen, index = [], set(), 0
-    while index < len(lines):
-        if not lines[index].startswith(FEATURE_HEADER):
-            index += 1
-            continue
-        if index + 1 >= len(lines) or not re.fullmatch(r'\|(?: *-{3,} *\|)+', lines[index + 1].strip()):
-            raise ValueError(f'line {index + 1} of the checklist: the table header has no separator line')
-        index += 2
-        while index < len(lines) and lines[index].startswith('|'):
-            cells = [cell.strip() for cell in re.split(r'(?<!\\)\|', lines[index].strip().strip('|'))]
-            if not TASK_ID.fullmatch(cells[0]):
-                raise ValueError(f'line {index + 1} of the checklist: {cells[0]!r} is not a task ID T<wave>.<task>')
-            if not TASK_STATE.fullmatch(cells[-1]):
-                raise ValueError(f'line {index + 1} of the checklist: {cells[-1]!r} is not a task state; the states '
-                                 'are [ ], [~], [o] and [!] cause: <cause>; retry: <condition>')
-            if cells[0] in seen:
-                raise ValueError(f'line {index + 1} of the checklist: {cells[0]} has more than one row')
-            seen.add(cells[0])
-            rows.append(cells)
-            index += 1
-    if not rows:
-        raise ValueError('the checklist has no task rows: no table whose header starts with '
-                         f'{FEATURE_HEADER!r} holds a row')
     return rows
 
 
@@ -404,10 +280,12 @@ def check_pie_verification(root, record):
     check_supplementary(record, counts, pin)
 
 
-def check_repository(root, include_children=True, records=True):
-    """Check documents; with records, also check verification records against the sources."""
-    root = root.resolve()
-    errors, registered, identifiers, documents = [], set(), set(), {}
+def check_evidence(root, records=True):
+    """The errors of the evidence of the checkout at `root`: the feature record against the evidence it names, the
+    distribution observations, the JSON reports; with records, the verification records against the current sources.
+    Returns (errors, number of feature rows)."""
+    root = Path(root).resolve()
+    errors = []
 
     def error(path, message):
         errors.append(f'{path}: {message}')
@@ -415,107 +293,31 @@ def check_repository(root, include_children=True, records=True):
     def read_json(path):
         return json.loads((root / path).read_text(encoding='utf-8'))
 
-    role = 'common'
-    try:
-        manifest = read_json('docs/documentation-manifest.json')
-        if manifest.get('schema_version') != 1 or not isinstance(manifest.get('documents'), list):
-            raise ValueError('Expected documentation manifest schema version 1')
-        role = manifest.get('role', 'common')
-        if role not in ('common', 'package'):
-            raise ValueError('Unknown documentation repository role')
-        for entry in manifest['documents']:
-            identifier, en, ko, kind = (entry[key] for key in ('id', 'en', 'ko', 'kind'))
-            if not re.fullmatch(r'[a-z][a-z0-9-]*', identifier) or identifier in identifiers:
-                raise ValueError('Invalid or duplicate document ID: ' + identifier)
-            identifiers.add(identifier)
-            if kind not in KINDS or not en.endswith('.md') or en.endswith('.ko.md') or ko != en[:-3] + '.ko.md':
-                raise ValueError('Invalid kind or translation path: ' + identifier)
-            bodies, sections, blocks = [], [], []
-            for name in (en, ko):
-                if name in registered:
-                    raise ValueError('Document is registered more than once: ' + name)
-                registered.add(name)
-                path = local_target(root, root / 'README.md', name)
-                if path is None or not path.is_file():
-                    raise ValueError('Document must be a repository file: ' + name)
-                body = path.read_text(encoding='utf-8')
-                if body.count(f'<!-- doc-id: {identifier} -->') != 1:
-                    error(name, 'Missing or duplicate doc-id marker')
-                if PRIVATE_PATH.search(body):
-                    error(name, 'Public document contains a local home-directory path')
-                prose, fenced = markdown_parts(body)
-                anchors = ANCHOR.findall(prose)
-                if len(anchors) != len(set(anchors)):
-                    error(name, 'Duplicate section anchor')
-                sections.append(anchors)
-                blocks.append(fenced)
-                bodies.append(body)
-                documents[name] = prose
-                for target in link_targets(prose):
-                    try:
-                        local_target(root, path, target)
-                    except ValueError as issue:
-                        error(name, str(issue))
-            if sections[0] != sections[1]:
-                error(ko, 'Section identifiers differ from English')
-            if blocks[0] != blocks[1]:
-                error(ko, 'Fenced code blocks differ from English')
-            revisions = re.findall(r'<!-- source-sha256: ([a-f0-9]{64}) -->', bodies[1])
-            if revisions != [sha256(bodies[0].encode('utf-8'))]:
-                error(ko, 'Translation revision differs from English; review both documents')
-    except (ValueError, KeyError, TypeError, OSError) as issue:
-        error('docs/documentation-manifest.json', str(issue))
-
-    for name in sorted(authored_markdown(root) - registered):
-        error(name, 'Markdown document is not registered')
-
     features = {}
-    if role == 'common':
-        for name in ('docs/features.md', 'docs/features.ko.md'):
-            if (root / name).is_file():
-                errors.extend(tracker_errors(name, (root / name).read_text(encoding='utf-8')))
+    for name in ('docs/features.md', 'docs/features.ko.md'):
+        if (root / name).is_file():
+            errors.extend(tracker_errors(name, (root / name).read_text(encoding='utf-8')))
+    try:
+        features = feature_rows((root / 'docs/features.md').read_text(encoding='utf-8'))
+        if features != feature_rows((root / 'docs/features.ko.md').read_text(encoding='utf-8')):
+            raise ValueError('English and Korean feature states or references differ')
+        if records and any(row[1] != 'not-verified' for row in features.values()):
+            if not (root / AGGREGATE_RECORD).is_file():
+                raise ValueError(f'{AGGREGATE_RECORD} does not exist; make verify-all writes it before this check')
+            check_verification(root, read_json(AGGREGATE_RECORD))
+        if any(row[1] == 'benchmark' for row in features.values()):
+            check_benchmark(root, read_json('benchmarks/results.json'))
+    except (ValueError, KeyError, TypeError, OSError) as issue:
+        error('docs/features.md', str(issue))
+    try:
+        check_distribution(read_json('docs/distribution.json'), features)
+    except (ValueError, KeyError, TypeError, OSError) as issue:
+        error('docs/distribution.json', str(issue))
+    if records and (root / PIE_RECORD).exists():
         try:
-            features = feature_rows(documents['docs/features.md'])
-            if features != feature_rows(documents['docs/features.ko.md']):
-                raise ValueError('English and Korean feature states or references differ')
-            if records and any(row[1] != 'not-verified' for row in features.values()):
-                if not (root / AGGREGATE_RECORD).is_file():
-                    raise ValueError(f'{AGGREGATE_RECORD} does not exist; make check writes it before this check')
-                check_verification(root, read_json(AGGREGATE_RECORD))
-            if any(row[1] == 'benchmark' for row in features.values()):
-                check_benchmark(root, read_json('benchmarks/results.json'))
+            check_pie_verification(root, read_json(PIE_RECORD))
         except (ValueError, KeyError, TypeError, OSError) as issue:
-            error('docs/features.md', str(issue))
-        if (root / CHECKLIST).is_file():
-            korean = CHECKLIST.replace('.md', '.ko.md')
-            try:
-                english_tasks = [(cells[0], cells[-1]) for cells in checklist_rows((root / CHECKLIST).read_text(encoding='utf-8'))]
-            except ValueError as issue:
-                error(CHECKLIST, str(issue))
-            else:
-                try:
-                    korean_tasks = [(cells[0], cells[-1]) for cells in
-                                    checklist_rows((root / korean).read_text(encoding='utf-8'))]
-                    if korean_tasks != english_tasks:
-                        raise ValueError('English and Korean task IDs or states differ')
-                except (ValueError, OSError) as issue:
-                    error(korean, str(issue))
-        try:
-            check_distribution(read_json('docs/distribution.json'), features)
-        except (ValueError, KeyError, TypeError, OSError) as issue:
-            error('docs/distribution.json', str(issue))
-        if records and (root / PIE_RECORD).exists():
-            try:
-                check_pie_verification(root, read_json(PIE_RECORD))
-            except (ValueError, KeyError, TypeError, OSError) as issue:
-                error(PIE_RECORD, str(issue))
-        if include_children:
-            for name, path in repository_paths(root).items():
-                manifest = path / 'docs/documentation-manifest.json'
-                if manifest.is_file():
-                    child_errors, count, _ = check_repository(path, include_children=False, records=records)
-                    errors.extend(name + '/' + issue for issue in child_errors)
-
+            error(PIE_RECORD, str(issue))
     for path in report_paths(root):
         try:
             body = path.read_text(encoding='utf-8')
@@ -524,7 +326,7 @@ def check_repository(root, include_children=True, records=True):
                 error(path.relative_to(root), 'Public report contains a local home-directory path')
         except (ValueError, OSError) as issue:
             error(path.relative_to(root), str(issue))
-    return errors, len(identifiers), len(features)
+    return errors, len(features)
 
 
 def main(argv=None):
@@ -532,14 +334,14 @@ def main(argv=None):
     parser.add_argument('--root', type=Path, default=ROOT)
     parser.add_argument('--records', action='store_true',
                         help='Also require verification records that match the current sources; '
-                             'make check passes this after it writes a record')
+                             'make verify-all passes this after it writes a record')
     args = parser.parse_args(argv)
-    errors, documents, features = check_repository(args.root, records=args.records)
+    errors, features = check_evidence(args.root, records=args.records)
     if errors:
         for issue in errors:
             print(issue, file=sys.stderr)
         return 1
-    print(f'Documentation check passed: {documents} bilingual topics, {features} feature records.')
+    print(f'Evidence check passed: {features} feature records.')
     return 0
 
 

@@ -1,5 +1,5 @@
-<!-- doc-id: development -->
-<!-- source-sha256: c3b05a6fad56c7a1c5ab848091ecfb576744ff3323d4c2af8c252ec972c98bd0 -->
+<!-- doc-id: rust-development -->
+<!-- source-sha256: f8ee04d12b3a4ee8497d9f5724022ffc68270819c93b5c4890fd5e438725764b -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -9,7 +9,7 @@
 
 수정 전에 [사용 방법](README.ko.md)과 저장소의 공통 JSON 계약을 읽습니다. 동작을 바꾸기 전에 공통 명세를 갱신합니다. 공식 사례와 기대 결과는 저장소 루트에서 관리하며 이 패키지에 독립 기대값을 추가하지 않습니다.
 
-영어가 정본입니다. 한국어 문서에 같은 정보를 반영하고 전체 번역을 검토한 뒤 `source-sha256`을 갱신합니다. 문서는 [목록](docs/documentation-manifest.json)에 등록합니다. 개인 선호, 대화 맥락, 인증 정보, 백업 위치는 Git 외부에서 관리합니다. 주석과 커밋 메시지는 사실을 직접 작성합니다.
+영어가 정본입니다. 한국어 문서에 같은 정보를 반영하고 전체 번역을 검토한 뒤 `source-sha256`을 갱신합니다. 저장소 루트의 `make documents-check`가 모든 Markdown 문서를 읽습니다(`config/documents.json`). 개인 선호, 대화 맥락, 인증 정보, 백업 위치는 Git 외부에서 관리합니다. 주석과 커밋 메시지는 사실을 직접 작성합니다.
 
 <a id="checks"></a>
 ## 필수 검사
@@ -22,7 +22,7 @@ make docs-check
 git diff --check
 ~~~
 
-`make check`는 이 패키지만 공통 검증기로 검사하며(`scripts/verify.py --only`) 기록을 쓰지 않습니다. `make docs-check`는 저장소의 문서 검사를 실행합니다. 저장소 루트의 구현 등록 정보 `implementations.json`이 이 패키지의 빌드, 패키지 테스트, 어댑터 명령을 선언합니다. 저장소 루트의 전체 suite는 `rust/`에서 `cargo clippy --all-targets -- -D warnings`, `go/`에서 `go vet ./...`을 실행합니다. 네이티브 소스를 변경하면 새로 빌드해야 하며 공통 네이티브 검사는 자동으로 다시 빌드합니다.
+`make check`는 이 패키지만 공통 검증기로 검사하며(`scripts/verify.py --only`) 기록을 쓰지 않습니다. `make docs-check`는 저장소 루트의 `make documents-check`를 실행합니다. 저장소 루트의 구현 등록 정보 `implementations.json`이 이 패키지의 빌드, 패키지 테스트, 어댑터 명령을 선언합니다. 저장소 루트의 전체 suite는 `rust/`에서 `cargo clippy --all-targets -- -D warnings`, `go/`에서 `go vet ./...`을 실행합니다. 네이티브 소스를 변경하면 새로 빌드해야 하며 공통 네이티브 검사는 자동으로 다시 빌드합니다.
 
 <a id="completion"></a>
 ## 완료

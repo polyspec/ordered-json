@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: ce209cdd85107e8f084f24b7154366d75da02d77d2baa4e7a93b84f263ae14aa -->
+<!-- source-sha256: 9470d6d264044727e4f737a2092f0d41ffba0c73c9e42aa5b95721dfe19dce43 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -24,25 +24,25 @@
 <a id="feature-state"></a>
 ## 기능 상태
 
-[기능 상태](docs/features.ko.md)는 이 저장소의 기능 기록입니다. `scripts/docs_check.py`는 각 기능 행의 구현 칸을 읽습니다. 상태는 그 칸에만 둡니다. 기능 표의 절은 표만 담고, `scripts/docs_check.py`는 `docs/features.md`와 그 번역의 다른 곳에 code span이나 표 칸으로 적힌 상태와 그 절의 다른 줄에서 file, 줄, 열을 적으며 실패합니다. 이 도구는 하나의 parser로 행을 읽고, 기능 표가 없는 기록, 기능 행이 없는 표, ID가 기능 ID `F-...`가 아닌 행을 거부하므로, 행을 내지 않는 기록은 어떤 검사도 통과하지 못합니다. 이 절이 상태를 정의합니다.
+[기능 상태](docs/features.ko.md)는 이 저장소의 기능 기록입니다. `scripts/check_evidence.py`는 각 기능 행의 구현 칸을 읽고, `make documents-check`는 그 값이 세 상태 중 하나이도록 요구합니다. 상태는 그 칸에만 둡니다. 기능 표의 절은 표만 담고, `scripts/check_evidence.py`는 `docs/features.md`와 그 번역의 다른 곳에 code span이나 표 칸으로 적힌 상태와 그 절의 다른 줄에서 file, 줄, 열을 적으며 실패합니다. `scripts/check_evidence.py`는 하나의 parser로 행을 읽고, 기능 표가 없는 기록, 기능 행이 없는 표, ID가 기능 ID `F-...`가 아닌 행을 거부하므로, 행을 내지 않는 기록은 어떤 검사도 통과하지 못합니다. 이 절이 상태를 정의합니다.
 
 `implemented`는 해당 동작이 구현됐다는 뜻입니다. `partial`은 구현이 진행 중인 기능을 표시합니다. `planned`는 구현을 시작하지 않은 기능을 표시합니다. `shared-suite`는 공통 JSON 테스트, `package-tests`는 구현 자체의 테스트, `docs-tests`는 문서 검사기 테스트, `benchmark`는 저장소 벤치마크 프로토콜과 커밋된 결과를 뜻합니다. 각 상태는 자신을 뒷받침하는 기록을 가리킵니다. 공통 스위트, 패키지 테스트, 검사기 테스트는 commit을 검증하는 실행의 [기록](docs/operations/validation.ko.md#records)을, 벤치마크는 [벤치마크 결과](benchmarks/results.json)를 가리킵니다. 검증 기록에는 실제 버전, 사례 수, 실행 시각, 소스 해시가 있습니다. 벤치마크 결과는 깨끗한 체크아웃에서 workload가 선언한 프로토콜과 입력으로 측정했을 때에만 근거가 됩니다. `source-only`는 확인된 배포 방식이며 레지스트리 게시는 검증되지 않았습니다. 게시 확인 결과는 [distribution.json](docs/distribution.json)에서 별도로 관리합니다.
 
 <a id="checklist"></a>
 ## 실행 체크리스트
 
-[실행 체크리스트](docs/plans/execution-checklist.ko.md)는 검사, 도구, CI처럼 제품 기능이 아닌 이 저장소의 작업을 추적합니다. 각 작업은 ID `T<wave>.<task>`, 작업, 산출물, 그것을 검증하는 소유 명령, 마지막 칸의 상태를 가진 행입니다. 상태는 `[ ]` 대기, `[~]` 진행 중, `[o]` 완료, `[!] cause: <cause>; retry: <condition>` 우회입니다. `scripts/docs_check.py`는 다른 상태를 받지 않고, 작업 ID가 없는 행, 반복된 ID, 행이 없는 체크리스트, ID나 상태가 다른 번역을 거부합니다. 작업은 진행하는 동안 `[~]`이고 그것을 끝내는 commit에서 `[o]`가 됩니다. `make check`의 guard, pre-push hook, push gate(`scripts/kit/full-run.mjs`, `scripts/kit/push-gate.mjs`)는 작업이 `[~]`이면 거부하고, 체크리스트를 읽을 수 없으면 거부합니다. `config/checklist.json`이 체크리스트와 Git hook을 선언합니다. 새 문제는 새 작업이 됩니다. `[o]`인 작업과 관련된 문제는 다음 파생 ID(`T1.1-1`)를 가진 하위 항목이 됩니다.
+[실행 체크리스트](docs/plans/execution-checklist.ko.md)는 검사, 도구, CI처럼 제품 기능이 아닌 이 저장소의 작업을 추적합니다. 각 작업은 ID `T<wave>.<task>`, 작업, 산출물, 그것을 검증하는 소유 명령, 마지막 칸의 상태를 가진 행입니다. 상태는 `[ ]` 대기, `[~]` 진행 중, `[o]` 완료, `[!] cause: <cause>; retry: <condition>` 우회입니다. `make documents-check`(`scripts/kit/check-documents.mjs`)는 다른 상태를 받지 않고, 작업 ID가 없는 행, 반복된 ID, 행이 없는 체크리스트, 제목이나 작업 행이 아닌 줄, 작업 행의 마지막 칸 밖의 상태 표지, ID나 상태가 다른 번역을 거부합니다. 작업은 진행하는 동안 `[~]`이고 그것을 끝내는 commit에서 `[o]`가 됩니다. `make check`의 guard, pre-push hook, push gate(`scripts/kit/full-run.mjs`, `scripts/kit/push-gate.mjs`)는 작업이 `[~]`이면 거부하고, 체크리스트를 읽을 수 없으면 거부합니다. `config/checklist.json`이 체크리스트와 Git hook을 선언합니다. 새 문제는 새 작업이 됩니다. `[o]`인 작업과 관련된 문제는 다음 파생 ID(`T1.1-1`)를 가진 하위 항목이 됩니다.
 
 <a id="verification"></a>
 ## 필수 검사
 
-각 구현 패키지는 자체 소스와 문서 목록을 관리합니다. 명령은 저장소 루트에서 실행합니다.
+각 구현 패키지는 자체 소스와 문서를 관리합니다. 명령은 저장소 루트에서 실행합니다.
 
 개발 중에는 unit test만 실행합니다. 변경을 진행하는 동안 RED 사례와 같은 사례의 GREEN을 검증기 unit test(`python3 scripts/test.py --unit`)로 실행합니다. `make pie-check`, `make check`, `make owner-check`, 어댑터 suite, 추가 사례 실행은 end-to-end 검사이며 hosted CI가 push 뒤에 실행합니다([hosted CI](docs/operations/validation.ko.md#ci)). 어떤 규칙도 commit이나 push 전에 로컬 실행을 요구하지 않습니다. pre-push hook은 체크리스트만 읽는 빠른 gate로 남습니다. 수정할 때마다 더 넓은 검사를 다시 실행하지 않습니다. [config/owner-checks.json](config/owner-checks.json)은 모든 추적 경로를 그것을 소유한 make target에 대응시킵니다(`test-scripts`는 검증기 unit test를, `verify-<language>`는 구현 하나를 검증합니다). `make owner-check`(`scripts/kit/owner-check.mjs`)는 커밋되지 않은 변경, `PATHS`, 또는 `BASE` 이후 바뀐 경로의 소유자를 각각 끝까지 실행하고, pre-commit hook `.githooks/pre-commit`은 `make owner-validate` 논리(`node scripts/kit/owner-check.mjs --validate`)를 실행하여 추적 경로가 어떤 규칙에도 맞지 않거나, glob이 어떤 경로에도 맞지 않거나, 소유자가 존재하지 않으면 commit을 거부합니다. 새 파일은 같은 commit에서 대응시킵니다.
 
 ~~~sh
 python3 scripts/verify.py --only js
-python3 scripts/test.py --unit test_docs_check.DocumentationChecks.test_missing_anchor_fails
+python3 scripts/test.py --unit test_check_evidence.EvidenceChecks.test_missing_feature_field_fails
 git diff --check
 ~~~
 
@@ -56,7 +56,7 @@ make check JSON_TEST_SUITE=.cache/JSONTestSuite
 
 `make check`는 어떤 target보다 먼저 guard `scripts/kit/full-run.mjs`를 Makefile의 `CHECK_TARGETS` target과 함께 시작합니다. 이 저장소의 활성 작업은 [실행 체크리스트](docs/plans/execution-checklist.ko.md)에서 상태가 `[~]`인 작업입니다. guard는 판단을 이유와 함께 출력하고, 그런 작업이 있으면 각 ID를 작업과 함께 나열하며 거부하고, `make hooks-check`가 보고하듯 pre-push hook이 설치되지 않았으면 거부하고, 추적 파일의 변경이 커밋되지 않았거나 `.gitignore`가 무시하지 않는 파일이 추적되지 않으면 각각을 밝히며 거부합니다. 전체 실행은 커밋된 tree를 검증하고, build는 추적되지 않은 파일도 읽기 때문입니다. `var/full-run.json`이 현재 tree(`git rev-parse HEAD^{tree}`)의 전체 실행을 기록하고 있으면 그 실행을 commit, 시작 시각, 결과와 함께 밝히며 거부하고, `incomplete` record의 process가 아직 실행 중이면 거부합니다. guard는 첫 검사부터 끝까지 `var/full-run.lock`을 배타적으로 잡고, 다른 guard가 이를 잡고 있으면 그 holder를 밝히며 거부하므로, 동시에 시작한 두 guard가 모두 실행하지 않습니다. 각 target을 `make -k <target>`로 시간 제한 없이 끝까지 실행하고, 각 target의 log를 `var/report/full-run/targets/`에 쓰며, 각 target의 앞뒤에 record를 쓰므로, 멈춘 실행은 `incomplete`로 기록되어 남습니다. `make rerun-failed`는 현재 tree에서 통과하지 못한 target만 다시 실행하고, 그 밖에는 거부됩니다. `var/`는 Git이 무시하므로 checkout과 worktree마다 자기 record를 가집니다. hosted CI는 전체 suite를 실행합니다. `.github/workflows/ci.yml`은 모든 pull request, `main`의 모든 push, 모든 수동 실행(`workflow_dispatch`)에서 모든 실패를 지나 job마다 `make ci-targets TARGETS="..."`(`scripts/kit/ci-targets.mjs`)로 `CHECK_TARGETS`의 target을 실행하고, 각 job의 보고서(`var/report/ci-targets/`)를 실행의 기록과 함께 upload합니다([hosted CI](docs/operations/validation.ko.md#ci)). `CHECK_TARGETS`의 모든 target은 `ci.yml`과 `push-gate.yml`의 job 하나에서만 실행됩니다(`scripts/tests/test_workflow_rules.py`). commit의 근거는 그 실행입니다. workflow의 step은 script나 도구를 직접 실행하지 않고 make target을 실행합니다. 새 checkout에는 record가 없으므로, 그곳에서 `make check`는 `[~]` 작업이 없고 tree가 깨끗하면 실행됩니다.
 
-push는 `[~]` 작업이 없을 때만 합니다. pre-push hook `.githooks/pre-push`는 `scripts/kit/push-gate.mjs hook`을 실행합니다. 이 명령은 push되는 commit이나 working tree의 `docs/plans/execution-checklist.md`에 `[~]` 작업이 있으면 각 ref, commit, ID, 작업을 밝히며 push를 거부하고, 체크리스트를 읽을 수 없으면 거부합니다. Makefile을 읽는 것은 모든 make 호출이 `.githooks`로 설정하는 `core.hooksPath` 외에는 설정을 쓰지 않습니다. `make hooks`는 hook을 설치하고 검사하며, `make hooks-check`는 `core.hooksPath`가 `.githooks`가 아니거나 `config/checklist.json`의 hook이 없거나 실행 가능하지 않거나 바뀌었으면 실패합니다. hook이 없는 checkout에서 한 push는 hook을 실행하지 않으므로, `.github/workflows/push-gate.yml`의 job `push-gate`가 모든 branch에 push된 commit과 모든 pull request의 head commit에 `make ci-targets TARGETS="push-gate-commit docs-check"`를 실행합니다. `make push-gate-commit`은 `scripts/kit/push-gate.mjs commit`을 실행하여 작업이 `[~]`이면 실패하고, `.githooks/pre-push`나 `.githooks/pre-commit`이 mode 100755로 추적되지 않으면 실패합니다. `make docs-check`는 gate가 실패해도 실행됩니다. 그래서 문서나 체크리스트가 자체 검사에 실패하는 commit은 release가 요구하는 check에 실패합니다. 이 job은 local checkout의 설정을 검사할 수 없습니다.
+push는 `[~]` 작업이 없을 때만 합니다. pre-push hook `.githooks/pre-push`는 `scripts/kit/push-gate.mjs hook`을 실행합니다. 이 명령은 push되는 commit이나 working tree의 `docs/plans/execution-checklist.md`에 `[~]` 작업이 있으면 각 ref, commit, ID, 작업을 밝히며 push를 거부하고, 체크리스트를 읽을 수 없으면 거부합니다. Makefile을 읽는 것은 모든 make 호출이 `.githooks`로 설정하는 `core.hooksPath` 외에는 설정을 쓰지 않습니다. `make hooks`는 hook을 설치하고 검사하며, `make hooks-check`는 `core.hooksPath`가 `.githooks`가 아니거나 `config/checklist.json`의 hook이 없거나 실행 가능하지 않거나 바뀌었으면 실패합니다. hook이 없는 checkout에서 한 push는 hook을 실행하지 않으므로, `.github/workflows/push-gate.yml`의 job `push-gate`가 모든 branch에 push된 commit과 모든 pull request의 head commit에 `make ci-targets TARGETS="push-gate-commit documents-check evidence-check commits-check"`를 실행합니다. `make push-gate-commit`은 `scripts/kit/push-gate.mjs commit`을 실행하여 작업이 `[~]`이면 실패하고, `.githooks/pre-push`나 `.githooks/pre-commit`이 mode 100755로 추적되지 않으면 실패합니다. 다른 target은 gate가 실패해도 실행됩니다. 그래서 문서, 체크리스트, 기능 기록, 메시지가 자체 검사에 실패하는 commit은 release가 요구하는 check에 실패합니다. 이 job은 local checkout의 설정을 검사할 수 없습니다.
 
 0.x 동안 변경은 소유 unit test가 로컬에서 통과한 뒤 `main`에 바로 commit합니다. pull request와 merge queue는 쓰지 않습니다.
 CI workflow는 `main`에 push될 때마다 전체 suite를 실행하며, 그 job `ci-passed`가 release workflow가 tag된 commit에 요구하는 check입니다. pre-push hook은 push 전에 push gate를 실행합니다.
@@ -65,7 +65,7 @@ CI workflow는 `main`에 push될 때마다 전체 suite를 실행하며, 그 job
 
 
 
-문서만 검토할 때는 `make docs-check`를 실행합니다. 이 검사는 검증 기록을 소스와 비교하지 않습니다. commit의 근거는 커밋된 파일이 아니라 그것을 검증하는 실행입니다. `make pie-check`는 PIE 기록 `var/records/pie-verification.json`을, `make check`는 통합 기록 `var/records/verification.json`을 쓰며 Git은 이를 무시하고, `make check` 마지막의 문서 검사는 두 기록을 현재 소스와 대조합니다([기록](docs/operations/validation.ko.md#records)). 기록은 모든 추적 파일을 해시하므로 커밋된 기록은 commit마다 오래된 기록이 됩니다. 어떤 기록도 커밋하지 않으며, 어떤 guard도 기록이 없다는 이유로 거부하지 않습니다. 검사를 통과시키기 위해 검증 결과나 소스 해시를 직접 수정하지 않습니다.
+문서만 검토할 때는 `make documents-check`와 `make evidence-check`를 실행합니다. 이 검사들은 검증 기록을 소스와 비교하지 않습니다. commit의 근거는 커밋된 파일이 아니라 그것을 검증하는 실행입니다. `make pie-check`는 PIE 기록 `var/records/pie-verification.json`을, `make verify-all`은 통합 기록 `var/records/verification.json`을 쓰며 Git은 이를 무시하고, `make verify-all` 마지막의 근거 검사는 두 기록을 현재 소스와 대조합니다([기록](docs/operations/validation.ko.md#records)). 기록은 모든 추적 파일을 해시하므로 커밋된 기록은 commit마다 오래된 기록이 됩니다. 어떤 기록도 커밋하지 않으며, 어떤 guard도 기록이 없다는 이유로 거부하지 않습니다. 검사를 통과시키기 위해 검증 결과나 소스 해시를 직접 수정하지 않습니다.
 
 [구현 등록 정보](implementations.json)는 패키지 경로·빌드·어댑터·패키지 테스트·런타임 명령을 정의합니다. `make check`는 선언된 패키지 테스트 명령을 모두 실행합니다. 공통 사례는 JSON 계약만 검사하므로 한 패키지에만 있는 API에는 닿지 않으며, 그런 API는 해당 패키지의 테스트가 필요합니다. [package-tests.json](package-tests.json)은 모든 구현이 실행하는 케이스, 사유를 적은 면제, 패키지 고유 케이스, 그리고 공개 심볼마다 그것을 검증하는 케이스를 정의합니다. `make check`는 이 표준과 각 패키지가 보고한 케이스·심볼을 대조해 누락된 케이스, 선언되지 않은 케이스, 검증되지 않는 심볼, 더 이상 내보내지 않는 심볼 선언이 있으면 실패합니다. 각 케이스 목록은 출력의 기계 형식을 선언합니다(`test_cases`의 `format`). 패키지 자신의 케이스 ID 목록은 `lines`, `cargo test -- --list --format terse`는 `cargo-terse`, `go test -list .* -json`의 event는 `go-test-json`입니다. 형식이 정의하지 않은 줄은 목록을 실패시키고, 0이 아닌 status로 끝난 목록은 standard error와 함께 실패하며, 성공한 목록의 standard error는 도구 알림으로 출력합니다. 공통 JSON 비교 알고리즘을 변경하지 않고 해당 등록 정보와 패키지 디렉터리로 새 언어를 추가합니다. 계약 변경은 같은 저장소 리비전에서 검증기와 관련 패키지를 갱신합니다. [저장소 계약](docs/spec/repositories.ko.md)을 참조합니다.
 

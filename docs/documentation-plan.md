@@ -8,7 +8,7 @@ This document defines the repository's documentation structure and update proced
 <a id="ownership"></a>
 ## Canonical documents
 
-Each topic has one English canonical document and one `.ko.md` translation. The [manifest](documentation-manifest.json) registers every common Markdown document and its topic. Each implementation package registers its own documents. The common checker checks both levels. Other documents link to the canonical topic instead of repeating its rules.
+Each topic has one English canonical document and one `.ko.md` translation. [config/documents.json](../config/documents.json) selects the Markdown documents of the repository, common documents and package documents alike, and every document carries a `doc-id` marker that names its topic once in the repository. Other documents link to the canonical topic instead of repeating its rules.
 
 | Location | Content |
 | --- | --- |
@@ -39,11 +39,11 @@ After a proposal is approved, update the specification and remove the proposal d
 <a id="checks"></a>
 ## Documentation checks
 
-`make docs-check` checks registered document pairs, local link targets and anchors, matching section identifiers and executable code blocks, Korean translation revision hashes, required feature fields, and evidence references. It also rejects local home-directory paths in public documents and reports. It does not compare verification records with the current sources, so a documentation review does not require a full verification run.
+`make documents-check` (`scripts/kit/check-documents.mjs`) checks document pairs, local link targets and anchors, matching section identifiers and code blocks, Korean translation revision hashes, the checklist, the values of the feature table, and the changelog sections. It also rejects local home-directory paths in documents. `make evidence-check` (`scripts/check_evidence.py`) checks the feature rows against the evidence they name and rejects local home-directory paths in reports. Neither compares verification records with the current sources, so a documentation review does not require a full verification run.
 
 The Korean file's `source-sha256` comment records the English revision reviewed for that translation. Update it only after reviewing the translation. Matching hashes do not prove translation accuracy. The checker does not verify external website availability or prose meaning; those require review against code and test results.
 
-`make check` runs the verifier and documentation checker tests, every registered JSON implementation, and the documentation checker with `--records`, which also rejects an aggregate or PIE record of the checkout (`var/records`) whose source hashes differ from the current sources. [PIE verification](operations/validation.md#pie) records a separate build and shared case result. Hosted CI runs these checks: `.github/workflows/ci.yml` runs the full suite on every pushed commit of `main` and every pull request ([hosted CI](operations/validation.md#ci)), and `.github/workflows/push-gate.yml` refuses a pushed commit while a feature is `partial` or a task is `[~]`.
+`make check` runs the verifier tests, every registered JSON implementation, and the evidence check with `--records` (`make verify-all`), which also rejects an aggregate or PIE record of the checkout (`var/records`) whose source hashes differ from the current sources. [PIE verification](operations/validation.md#pie) records a separate build and shared case result. Hosted CI runs these checks: `.github/workflows/ci.yml` runs the full suite on every pushed commit of `main` and every pull request ([hosted CI](operations/validation.md#ci)), and `.github/workflows/push-gate.yml` refuses a pushed commit while a task is `[~]`.
 
 <a id="records"></a>
 ## Technical records

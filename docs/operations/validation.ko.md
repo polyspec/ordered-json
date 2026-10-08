@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 818cbfd0aa59fd95b0106f9d5ffeda0d49902924633c49c02b282c39736f72ec -->
+<!-- source-sha256: 216aea8b6267e3ee486b2d31251c99c16aa8407d231a84a9f3496e2bb84a3c84 -->
 # 검증
 
 [English](validation.md)
@@ -87,7 +87,7 @@ make ci-targets TARGETS="verify-all clippy go-vet pie-check" JSON_TEST_SUITE=.ca
 make ci-targets TARGETS="kit-check kit-test hooks-check owner-validate release-coverage release-config-check"
 ~~~
 
-job `suite`는 고정 파일에서 Python, Node.js, Go, PHP를 설치하고, 내려받는 유일한 단계인 `make tools`를 실행한 뒤 target `verify-all`, `clippy`, `go-vet`, `pie-check`를 실행합니다. `make pie-check`는 PIE 기록을, `make verify-all`은 통합 기록을 쓰고 그 문서 검사가 두 기록을 검사합니다. job `docs`는 Node.js만 설치하고 `kit-check`, `kit-test`, `hooks-check`, `owner-validate`, `release-coverage`, `release-config-check`를 실행합니다. `push-gate.yml`의 job `push-gate`는 `push-gate-commit`과 `docs-check`를 실행합니다. job `python`은 자기 matrix의 interpreter, 바닥 minor 3.11과 `.python-version`의 minor release를 설치하고, 그 interpreter로 Python 구현의 패키지 test, 사례 목록, symbol 보고를 실행하는 `python-package-check`를 실행합니다(`scripts/python_check.py`). suite job이 저장소 도구 핀보다 낮은 minor에 대해 할 수 없는 일입니다. Makefile의 `CHECK_TARGETS`, 곧 `make check`의 전체 suite의 모든 target은 `ci.yml`과 `push-gate.yml`의 job 하나에서만 실행됩니다. 모든 step은 make target을 실행하고 실패한 step 뒤에도 실행됩니다(`if: !cancelled()`). `make ci-targets`(`scripts/kit/ci-targets.mjs`)는 job의 모든 target을 끝까지 실행하고, 출력을 도착하는 대로 출력하며 `var/report/ci-targets/targets/<target>.log`에 쓰고, 각 target의 상태, 종료 상태, 시간을 `var/report/ci-targets/record.json`에 기록하며, 실패한 target마다 첫 실패 줄을 담은 `summary.md`를 쓰고 GitHub의 job summary에 덧붙입니다. step `report`는 실패 뒤에도 `var/report/ci-targets/`를 job의 artifact로 upload합니다. 어떤 step에도 시간 한도가 없습니다. job은 push gate처럼 `ubuntu-24.04`에서 실행하며, 기록은 실행한 Python과 PHP의 patch release를 적습니다.
+job `suite`는 고정 파일에서 Python, Node.js, Go, PHP를 설치하고, 내려받는 유일한 단계인 `make tools`를 실행한 뒤 target `verify-all`, `clippy`, `go-vet`, `pie-check`를 실행합니다. `make pie-check`는 PIE 기록을, `make verify-all`은 통합 기록을 쓰고 그 문서 검사가 두 기록을 검사합니다. job `docs`는 Node.js만 설치하고 `kit-check`, `kit-test`, `hooks-check`, `owner-validate`, `release-coverage`, `release-config-check`를 실행합니다. `push-gate.yml`의 job `push-gate`는 `push-gate-commit`, `documents-check`, `evidence-check`, `commits-check`를 실행합니다. job `python`은 자기 matrix의 interpreter, 바닥 minor 3.11과 `.python-version`의 minor release를 설치하고, 그 interpreter로 Python 구현의 패키지 test, 사례 목록, symbol 보고를 실행하는 `python-package-check`를 실행합니다(`scripts/python_check.py`). suite job이 저장소 도구 핀보다 낮은 minor에 대해 할 수 없는 일입니다. Makefile의 `CHECK_TARGETS`, 곧 `make check`의 전체 suite의 모든 target은 `ci.yml`과 `push-gate.yml`의 job 하나에서만 실행됩니다. 모든 step은 make target을 실행하고 실패한 step 뒤에도 실행됩니다(`if: !cancelled()`). `make ci-targets`(`scripts/kit/ci-targets.mjs`)는 job의 모든 target을 끝까지 실행하고, 출력을 도착하는 대로 출력하며 `var/report/ci-targets/targets/<target>.log`에 쓰고, 각 target의 상태, 종료 상태, 시간을 `var/report/ci-targets/record.json`에 기록하며, 실패한 target마다 첫 실패 줄을 담은 `summary.md`를 쓰고 GitHub의 job summary에 덧붙입니다. step `report`는 실패 뒤에도 `var/report/ci-targets/`를 job의 artifact로 upload합니다. 어떤 step에도 시간 한도가 없습니다. job은 push gate처럼 `ubuntu-24.04`에서 실행하며, 기록은 실행한 Python과 PHP의 patch release를 적습니다.
 
 `ci.yml`의 마지막 job `ci-passed`는 release workflow가 tag된 commit에 요구하는 이 workflow의 check입니다. workflow의 다른 모든 job을 need로 가지고, 그중 하나가 실패하거나 skip되거나 취소되어도 그 모든 job 뒤에 실행되며(`if: ${{ always() }}`), `make ci-passed RESULTS='${{ toJSON(needs) }}'`를 실행합니다. `scripts/kit/ci-passed.mjs`는 need로 가진 모든 job의 결과를 출력하고, 하나라도 `success`가 아니면 실패합니다. `ci.yml`에 추가한 job은 `needs`에 넣으므로 필수 check가 그 job을 포함합니다. `scripts/tests/test_workflow_rules.py`는 `ci-passed`가 없거나, 마지막 job이 아니거나, `if: ${{ always() }}`가 없거나, 다른 모든 job을 need로 가지지 않거나, 다른 runner에서 실행되거나, 다른 step을 실행하면 실패합니다.
 
@@ -106,10 +106,11 @@ git push origin HEAD:main
 ## 문서 검사
 
 ~~~sh
-make docs-check
+make documents-check
+make evidence-check
 ~~~
 
-[검사기](../../scripts/docs_check.py)는 각 문서 목록, 링크, 번역 쌍과 개정 해시, 절과 코드 블록 일치, 기능 상태를 검사합니다. `make check`가 통합 기록을 쓴 뒤 붙이는 `--records`가 있으면 체크아웃의 [기록](#records)이 현재 소스와 일치하는지도 검사합니다. `make docs-check`는 그 비교를 생략합니다. 공통 목록에는 공통 문서만 등록합니다. 각 패키지 디렉터리는 자체 목록으로 검사합니다.
+`make documents-check`는 [config/documents.json](../../config/documents.json)이 선택한 문서(공통 문서와 패키지 문서 모두)에 [scripts/kit/check-documents.mjs](../../scripts/kit/check-documents.mjs)를 실행합니다. 번역 쌍과 개정 해시, 저장소에서 자기 주제를 한 번만 가리키는 문서별 `doc-id` 표지, 절과 코드 블록 일치, 링크와 앵커, 로컬 홈 디렉터리 경로, 체크리스트 `docs/plans/execution-checklist.md`와 그 번역, `docs/features.md`의 기능 표 값, `CHANGELOG.md`의 section을 검사합니다. `make evidence-check`는 [scripts/check_evidence.py](../../scripts/check_evidence.py)를 실행합니다. 기능 행을 그것이 가리키는 근거와 대조하고, 배포 관측, 벤치마크 결과, `docs/`의 JSON 보고서를 검사합니다. `make verify-all`이 통합 기록을 쓴 뒤 붙이는 `--records`가 있으면 체크아웃의 [기록](#records)이 현재 소스와 일치하는지도 검사합니다. `make evidence-check`는 그 비교를 생략합니다. `make commits-check`는 commit의 메시지를 [config/commits.json](../../config/commits.json)에 대해 검사합니다.
 
 한국어 `source-sha256`을 갱신하기 전에 코드·테스트와 영어·한국어 내용을 비교합니다. 해시 일치는 번역 정확성을 증명하지 않습니다. 외부 링크는 문법만 검사하며 접속하지 않습니다. [hosted CI](#ci)가 모든 pull request와 모든 merge group에서 이 검사들을 실행합니다.
 

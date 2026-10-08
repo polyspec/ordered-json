@@ -3,9 +3,10 @@
 # the same gate, make push-gate-commit (scripts/kit/push-gate.mjs), on the pushed commit of every branch and on the head
 # commit of every pull request: it fails while a task of the checklist is [~], naming each one, and when the commit does
 # not track .githooks/pre-push and .githooks/pre-commit with mode 100755. The release workflow requires this job on the
-# tagged commit, so it also runs the documentation check, make docs-check, which reads only Python and Git: a commit
-# whose documents or checklist fail their own checks does not reach a release. Both targets run through
-# make ci-targets, which runs the second after a failed first and writes the report. A step runs a make target, never a
+# tagged commit, so it also runs the document check, make documents-check (scripts/kit/check-documents.mjs), the evidence
+# check, make evidence-check (scripts/check_evidence.py), and the check of the commit message, make commits-check: a
+# commit whose documents, checklist, feature record or message fail their own checks does not reach a release. The
+# targets run through make ci-targets, which runs each after a failed one and writes the report. A step runs a make target, never a
 # script directly, so the environment and the prechecks of the Makefile apply. The full verification is not run here. The
 # runner image and each action are exact releases, and Python and Node.js come from .python-version and .node-version,
 # so the job does not change with a new release of any of them.
@@ -39,7 +40,7 @@ jobs:
           package-manager-cache: false
       - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci-targets TARGETS="push-gate-commit docs-check"
+        run: make ci-targets TARGETS="push-gate-commit documents-check evidence-check commits-check"
       - name: report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

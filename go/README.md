@@ -1,4 +1,4 @@
-<!-- doc-id: overview -->
+<!-- doc-id: go-overview -->
 # ordered-json for Go
 
 [한국어](README.ko.md)

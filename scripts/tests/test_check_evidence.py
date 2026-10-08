@@ -1,4 +1,4 @@
-"""Exercise documentation failures with isolated, explicitly synthetic records."""
+"""Exercise the failures of the evidence check with isolated, explicitly synthetic records."""
 import copy
 from contextlib import redirect_stdout
 import io
@@ -12,7 +12,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from docs_check import check_repository, feature_rows
+from check_evidence import check_evidence, feature_rows
 from registry import REGISTRY
 from verification_record import (AGGREGATE_RECORD, IMPLEMENTATIONS, PIE_RECORD, create_record, sha256, source_manifest,
                                  write_record)
@@ -30,7 +30,7 @@ class FeatureStateChecks(unittest.TestCase):
             feature_rows(row.replace('operations/validation.md#records', 'other.json'))
 
 
-class DocumentationChecks(unittest.TestCase):
+class EvidenceChecks(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory(prefix='ordered-json-docs-test-')
         self.addCleanup(self.directory.cleanup)
@@ -38,17 +38,6 @@ class DocumentationChecks(unittest.TestCase):
         self.write('js/index.js', 'export const fixture = true;\n')
         self.json('examples/official.json', {'cases': [{'id': 'fixture'}]})
         self.write('fixtures/valid/object.json', '{}')
-        self.manifest = {'schema_version': 1, 'documents': [
-            {'id': 'overview', 'kind': 'overview', 'en': 'README.md', 'ko': 'README.ko.md'},
-            {'id': 'features', 'kind': 'state', 'en': 'docs/features.md', 'ko': 'docs/features.ko.md'},
-            {'id': 'validation', 'kind': 'operations', 'en': 'docs/operations/validation.md',
-             'ko': 'docs/operations/validation.ko.md'},
-        ]}
-        self.json('docs/documentation-manifest.json', self.manifest)
-        self.pair('docs/operations/validation.md', 'validation', '# Verification\n\n<a id="records"></a>\n## Records\n')
-        self.pair('README.md', 'overview',
-            '# Fixture\n\n<a id="contract"></a>\n## Contract\n\n[Features](docs/features.md)\n'
-            '\n~~~js\nconst text = "[code only](missing.json)";\n~~~\n')
         self.pair('docs/features.md', 'features',
             '# Features\n\n<a id="state"></a>\n## State\n\n'
             '| ID | Feature | Implementation | Verification | Evidence | Distribution | Specification |\n'
@@ -98,56 +87,11 @@ class DocumentationChecks(unittest.TestCase):
         self.write(path, original.replace(old, new))
 
     def assert_failure(self, text):
-        errors, _, _ = check_repository(self.root)
+        errors, _ = check_evidence(self.root)
         self.assertTrue(any(text in error for error in errors), errors)
 
-    def test_valid_documents_ignore_links_inside_code(self):
-        self.assertEqual(check_repository(self.root), ([], 3, 1))
-
-    def test_missing_translation_fails(self):
-        (self.root / 'README.ko.md').unlink()
-        self.assert_failure('Missing link target: README.ko.md')
-
-    def test_english_change_requires_translation_review(self):
-        self.change('README.md', '# Fixture', '# Changed fixture')
-        self.assert_failure('Translation revision differs')
-
-    def test_missing_file_link_fails(self):
-        self.change('README.md', 'docs/features.md', 'docs/missing.md')
-        self.assert_failure('Missing link target: docs/missing.md')
-
-    def test_missing_anchor_fails(self):
-        self.change('docs/features.md', '#contract', '#missing')
-        self.assert_failure('Missing explicit anchor')
-
-    def test_reference_link_missing_target_fails(self):
-        self.write('README.md', (self.root / 'README.md').read_text() + '\n[details][target]\n\n[target]: missing.md\n')
-        self.assert_failure('Missing link target: missing.md')
-
-    def test_undefined_reference_fails(self):
-        self.write('README.md', (self.root / 'README.md').read_text() + '\n[details][undefined]\n')
-        self.assert_failure('Undefined reference link')
-
-    def test_unregistered_markdown_fails(self):
-        self.write('docs/extra.md', '# Extra\n')
-        self.assert_failure('Markdown document is not registered')
-
-    def test_duplicate_topic_fails(self):
-        self.manifest['documents'].append(self.manifest['documents'][0])
-        self.json('docs/documentation-manifest.json', self.manifest)
-        self.assert_failure('duplicate document ID')
-
-    def test_mismatched_code_fails(self):
-        self.change('README.ko.md', 'const text', 'let text')
-        self.assert_failure('Fenced code blocks differ')
-
-    def test_mismatched_sections_fail(self):
-        self.change('README.ko.md', 'id="contract"', 'id="changed"')
-        self.assert_failure('Section identifiers differ')
-
-    def test_unclosed_fence_fails(self):
-        self.write('README.md', (self.root / 'README.md').read_text() + '\n```sh\n')
-        self.assert_failure('Unclosed fenced code block')
+    def test_a_valid_record_passes(self):
+        self.assertEqual(check_evidence(self.root), ([], 1))
 
     def test_missing_feature_field_fails(self):
         self.change('docs/features.md', ' | source-only |', ' |')
@@ -168,7 +112,7 @@ class DocumentationChecks(unittest.TestCase):
     def test_state_word_outside_implementation_cell_fails(self):
         self.features_with(after='\n<a id="limits"></a>\n## Limits\n\n`partial` marks work in progress.\n'
                                  '\n| Kind | State |\n| --- | --- |\n| work | planned |\n')
-        errors, _, _ = check_repository(self.root)
+        errors, _ = check_evidence(self.root)
         # The Korean file starts with its source-sha256 line, so its lines are one further.
         for name, offset in (('docs/features.md', 0), ('docs/features.ko.md', 1)):
             self.assertIn(f'{name}:{14 + offset}:1: state `partial` stands outside the Implementation cell of a feature row', errors)
@@ -177,47 +121,11 @@ class DocumentationChecks(unittest.TestCase):
 
     def test_paragraph_in_tracker_section_fails(self):
         self.features_with(before_table='`implemented` means the behavior exists.\n\n')
-        errors, _, _ = check_repository(self.root)
+        errors, _ = check_evidence(self.root)
         for name, offset in (('docs/features.md', 0), ('docs/features.ko.md', 1)):
             self.assertIn(f'{name}:{7 + offset}:1: the line is not a row of the feature table; the section of the feature table holds only the table', errors)
             self.assertIn(f'{name}:{7 + offset}:1: state `implemented` stands outside the Implementation cell of a feature row', errors)
         self.assertEqual(len(errors), 4, errors)
-
-    def checklist(self, rows, korean_rows=None):
-        """Register an execution checklist with the task rows `rows`; `korean_rows` replaces them in the translation."""
-        self.manifest['documents'].append({'id': 'execution-checklist', 'kind': 'procedure',
-                                           'en': 'docs/plans/execution-checklist.md',
-                                           'ko': 'docs/plans/execution-checklist.ko.md'})
-        self.json('docs/documentation-manifest.json', self.manifest)
-        table = '| ID | Task | Deliverables | Verification | Done |\n| --- | --- | --- | --- | --- |\n'
-        self.pair('docs/plans/execution-checklist.md', 'execution-checklist',
-                  '# Execution checklist\n\n## Wave 1\n\n' + table + rows)
-        if korean_rows is not None:
-            self.change('docs/plans/execution-checklist.ko.md', rows, korean_rows)
-
-    def test_checklist_task_states_are_the_four_states(self):
-        self.checklist('| T1.1 | Task | File | `make docs-check` | [o] |\n'
-                       '| T1.2 | Task | File | `make docs-check` | [~] |\n'
-                       '| T1.3 | Task | File | `make docs-check` | [ ] |\n'
-                       '| T1.4 | Task | File | `make docs-check` | [!] cause: no runner; retry: a runner exists |\n')
-        self.assertEqual(check_repository(self.root), ([], 4, 1))
-        self.checklist('| T1.1 | Task | File | `make docs-check` | [x] |\n')
-        self.assert_failure("docs/plans/execution-checklist.md: line 8 of the checklist: '[x]' is not a task state")
-
-    def test_checklist_rows_need_task_ids_and_one_row_each(self):
-        self.checklist('| W1 | Task | File | `make docs-check` | [o] |\n')
-        self.assert_failure("'W1' is not a task ID")
-        self.checklist('| T1.1 | Task | File | `make docs-check` | [o] |\n| T1.1 | Task | File | `make docs-check` | [o] |\n')
-        self.assert_failure('T1.1 has more than one row')
-
-    def test_checklist_without_task_rows_fails(self):
-        self.checklist('')
-        self.assert_failure('the checklist has no task rows')
-
-    def test_translated_checklist_states_must_match(self):
-        self.checklist('| T1.1 | Task | File | `make docs-check` | [o] |\n',
-                       '| T1.1 | 작업 | 파일 | `make docs-check` | [~] |\n')
-        self.assert_failure('English and Korean task IDs or states differ')
 
     def test_planned_feature_cannot_claim_passed_tests(self):
         self.change('docs/features.md', '| implemented |', '| planned |')
@@ -239,7 +147,7 @@ class DocumentationChecks(unittest.TestCase):
         # A source edit must not force the full suite before a documentation review;
         # make check runs the checker with --records and still rejects a stale record.
         self.write('js/index.js', 'export const fixture = false;\n')
-        script = str(Path(__file__).resolve().parents[1] / 'docs_check.py')
+        script = str(Path(__file__).resolve().parents[1] / 'check_evidence.py')
         alone = subprocess.run([sys.executable, script, '--root', str(self.root)],
                                capture_output=True, text=True)
         self.assertEqual(alone.returncode, 0, alone.stderr)
@@ -258,7 +166,7 @@ class DocumentationChecks(unittest.TestCase):
         stale['sources'] = {'sha256': '0' * 64, 'files': {}}
         self.json('docs/verification.json', stale)
         self.json('docs/pie-verification.json', {'schema_version': 1, 'scope': 'pie-build', 'status': 'passed'})
-        errors, _, _ = check_repository(self.root)
+        errors, _ = check_evidence(self.root)
         self.assertEqual(errors, [])
         (self.root / AGGREGATE_RECORD).unlink()
         self.assert_failure('var/records/verification.json')
@@ -286,23 +194,9 @@ class DocumentationChecks(unittest.TestCase):
         self.json(AGGREGATE_RECORD, self.record)
         self.assert_failure('PHP runtime and extension versions')
 
-    def test_private_paths_in_markdown_fail(self):
-        self.write('README.md', (self.root / 'README.md').read_text() + '\n' + '/' + 'Users/example/project/\n')
-        self.assert_failure('Public document contains a local home-directory path')
-
     def test_private_paths_in_reports_fail(self):
         self.json('docs/report.json', {'path': '/' + 'home/example/project/'})
         self.assert_failure('Public report contains a local home-directory path')
-
-    def test_link_cannot_escape_repository(self):
-        self.change('README.md', 'docs/features.md', '../../outside.md')
-        self.assert_failure('Link escapes repository')
-
-    def test_symlink_cannot_escape_repository(self):
-        with tempfile.TemporaryDirectory() as outside:
-            (self.root / 'outside').symlink_to(outside, target_is_directory=True)
-            self.change('README.md', 'docs/features.md', 'outside')
-            self.assert_failure('Link escapes repository')
 
     def test_source_observation_must_name_the_declared_repository(self):
         self.distribution['source'] = {'state': 'available', 'url': 'https://github.com/example/other',
@@ -387,7 +281,7 @@ class DocumentationChecks(unittest.TestCase):
         self.json(name, record)
         self.json(other[0], other[1])
         # Without this the mutations below could pass on an unrelated error.
-        self.assertEqual(check_repository(self.root)[0], [], 'The unchanged records must pass')
+        self.assertEqual(check_evidence(self.root)[0], [], 'The unchanged records must pass')
         for path in located:
             with self.subTest(field='.'.join(str(step) for step in path)):
                 mutated = copy.deepcopy(record)
@@ -398,7 +292,7 @@ class DocumentationChecks(unittest.TestCase):
                 target[path[-1]] = ('1' if value[0] == '0' else '0') + value[1:]
                 self.json(name, mutated)
                 self.json(other[0], other[1])
-                errors, _, _ = check_repository(self.root)
+                errors, _ = check_evidence(self.root)
                 self.assertTrue(errors, 'A changed hash must fail the check: ' + '.'.join(
                     str(step) for step in path))
 
@@ -445,7 +339,7 @@ class DocumentationChecks(unittest.TestCase):
             {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions,
             package_tests=self.package_tests))
         # Without this the failures below could pass on an unrelated error.
-        self.assertEqual(check_repository(self.root)[0], [], 'The benchmark fixture must pass')
+        self.assertEqual(check_evidence(self.root)[0], [], 'The benchmark fixture must pass')
         return record
 
     def test_benchmark_evidence_must_name_the_benchmark_record(self):

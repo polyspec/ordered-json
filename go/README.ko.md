@@ -1,5 +1,5 @@
-<!-- doc-id: overview -->
-<!-- source-sha256: 5e5850b499b458f7f4862813387b4d14489fd36f590d9cb283cefc9305916254 -->
+<!-- doc-id: go-overview -->
+<!-- source-sha256: 68eca7bd73148232855998701b393b365b0a65084d3860ee3505809e7258301c -->
 # ordered-json for Go
 
 [English](README.md)

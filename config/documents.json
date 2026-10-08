@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "comment": "The Markdown documents of the repository, common and package documents alike. The feature record docs/features.md is a status table whose values are closed sets; the evidence it names is checked by scripts/check_evidence.py.",
+  "include": ["**/*.md"],
+  "exclude": ["tests/kit/**"],
+  "statusTables": [
+    {
+      "path": "docs/features.md",
+      "idPattern": "F-[A-Z0-9-]+",
+      "cells": 7,
+      "columns": [
+        { "index": 2, "enum": ["implemented", "partial", "planned"] },
+        { "index": 3, "enum": ["shared-suite", "package-tests", "docs-tests", "benchmark", "not-verified"] },
+        { "index": 5, "enum": ["source-only", "not-distributed", "published"] }
+      ]
+    }
+  ],
+  "changelogs": ["CHANGELOG.md"]
+}

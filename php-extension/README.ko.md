@@ -1,5 +1,5 @@
-<!-- doc-id: overview -->
-<!-- source-sha256: d8f709911f2a41f72e90ff7dea79dc779df30026d50d32d3651579acdda20cea -->
+<!-- doc-id: php-ext-overview -->
+<!-- source-sha256: 846ede1c8e67c84d45cfb9ce5d947e1010e03f78a321cc61e216b6224d0bcd06 -->
 # ordered-json for PHP extension
 
 [English](README.md)
