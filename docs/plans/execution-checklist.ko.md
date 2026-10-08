@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: 031efe30f7d89fa9369d106372f5b639a071998b602f1ad521ff64f6e7ba519c -->
+<!-- source-sha256: 031b47cec2c7cd2b832878dc8e8caf2c009555beddf8085782c0e469da2b9d6d -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
@@ -59,3 +59,4 @@
 | T1.27-21 | 0.x 규칙으로 AGENTS의 pull request 규칙을 바꿉니다. 변경은 소유 unit test가 로컬에서 통과한 뒤 main에 commit하고, CI push trigger(T1.27-19)가 release에 필요한 check ci-passed를 만듭니다. ruleset은 선언만 되어 있고 적용하지 않음을 명시합니다. | `AGENTS.md`(.ko) | `make docs-check` | [o] |
 | T1.27-22 | AGENTS에 pin 규칙을 씁니다. 다른 저장소 package의 pin은 GitHub에 존재하는 tag만 가리키며, 그 tag를 push한 뒤에 씁니다. | `AGENTS.md`(.ko) | `make docs-check` | [o] |
 | T1.27-23 | GitHub ruleset과 merge queue를 제거합니다: ruleset 선언, 그 make target과 test, merge_group trigger, 그것을 요구하던 workflow 규칙을 지웁니다. workflow는 push와 pull_request에서 실행되고, release는 tag된 commit에 check ci-passed를 요구합니다. | `.github/workflows/*.yml`, `Makefile`, `scripts/tests/test_workflow_rules.py`, `scripts/tests/test_push_gate.py`, `AGENTS.md`(.ko), `docs/operations/validation.md`(.ko), `docs/operations/distribution.md`(.ko) | `python3 scripts/test.py --unit test_workflow_rules` | [o] |
+| T1.27-25 | release 자산 이름에 언어를 넣습니다: `<package>-<language>-<version>.<ext>`이므로 npm 자산은 `polyspec-ordered-json-npm-X.Y.Z.tgz`, PHP 자산은 `polyspec-ordered-json-php-X.Y.Z.zip`과 `polyspec-ordered-json-extension-php-X.Y.Z.zip`입니다. Red: `test_an_asset_is_named_after_its_package_and_version`가 언어 형식을 기대합니다. Green: 자산 이름과 install fixture가 그 형식을 씁니다. | `scripts/release.py`, `scripts/install_fixtures.py`, `scripts/tests/test_release.py` | `python3 scripts/tests/test_release.py` | [o] |

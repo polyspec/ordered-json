@@ -1,11 +1,15 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 3709607a01aed607cab08c52f552fb1adf3f7820f102ee5c85015781c3108478 -->
+<!-- source-sha256: 8c2c81de4d1b5a19172c2b4eee32f44906dd8f4a4a7d0d861f3a7ec0c95caa21 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+## 0.0.6
+
+- T1.27-25: release 자산은 `<package>-<language>-<version>.<ext>` 이름을 가집니다. npm 자산은 `polyspec-ordered-json-npm-X.Y.Z.tgz`, PHP 자산은 `polyspec-ordered-json-php-X.Y.Z.zip`과 `polyspec-ordered-json-extension-php-X.Y.Z.zip`입니다.
 
 ## 0.0.5
 

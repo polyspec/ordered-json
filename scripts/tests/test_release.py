@@ -241,12 +241,13 @@ class Verify(unittest.TestCase):
 
 class Assets(unittest.TestCase):
     def test_an_asset_is_named_after_its_package_and_version(self):
-        self.assertEqual(release.asset_name('@polyspec/ordered-json', '0.0.1', 'tgz'), 'polyspec-ordered-json-0.0.1.tgz')
-        self.assertEqual(release.asset_name('polyspec/ordered-json-extension', '1.2.3', 'zip'),
-                         'polyspec-ordered-json-extension-1.2.3.zip')
+        self.assertEqual(release.asset_name('@polyspec/ordered-json', 'npm', '0.0.1', 'tgz'),
+                         'polyspec-ordered-json-npm-0.0.1.tgz')
+        self.assertEqual(release.asset_name('polyspec/ordered-json-extension', 'php', '1.2.3', 'zip'),
+                         'polyspec-ordered-json-extension-php-1.2.3.zip')
         self.assertEqual(release.asset_names('v0.0.1'), [
-            'polyspec-ordered-json-0.0.1.tgz', 'polyspec-ordered-json-0.0.1.zip',
-            'polyspec-ordered-json-extension-0.0.1.zip'])
+            'polyspec-ordered-json-npm-0.0.1.tgz', 'polyspec-ordered-json-php-0.0.1.zip',
+            'polyspec-ordered-json-extension-php-0.0.1.zip'])
         self.assertEqual(release.asset_names('go/v0.0.1'), [])
 
     def test_assets_builds_one_archive_per_package(self):
@@ -255,7 +256,7 @@ class Assets(unittest.TestCase):
         built = sorted(path.name for path in (sandbox.root / release.ASSETS).iterdir())
         self.assertEqual(built, sorted(names))
         self.assertEqual(sorted(names), sorted(release.asset_names('v0.0.1')))
-        with zipfile.ZipFile(sandbox.root / release.ASSETS / 'polyspec-ordered-json-0.0.1.zip') as archive:
+        with zipfile.ZipFile(sandbox.root / release.ASSETS / 'polyspec-ordered-json-php-0.0.1.zip') as archive:
             self.assertEqual(sorted(archive.namelist()), ['composer.json', 'src/', 'src/OrderedJson.php'])
 
     def test_each_archive_carries_the_manifest_of_its_package_unchanged(self):
@@ -264,8 +265,8 @@ class Assets(unittest.TestCase):
         for kind, path, _ in release.PACKAGES:
             manifest = f"{path}/{'package.json' if kind == 'npm' else 'composer.json'}"
             archive = sandbox.root / release.ASSETS / release.asset_name(
-                dict((name, package) for _, name, package in release.PACKAGES)[path], '0.0.1',
-                'tgz' if kind == 'npm' else 'zip')
+                dict((name, package) for _, name, package in release.PACKAGES)[path],
+                'npm' if kind == 'npm' else 'php', '0.0.1', 'tgz' if kind == 'npm' else 'zip')
             with self.subTest(manifest=manifest):
                 self.assertEqual(release.packed_manifest(archive), (sandbox.root / manifest).read_text())
 
@@ -274,7 +275,7 @@ class Assets(unittest.TestCase):
         tag = sandbox.tag('v0.0.1')
         package = sandbox.root / 'js/package.json'
         package.write_text(json.dumps({'name': '@polyspec/ordered-json', 'version': '0.0.1', 'private': False}))
-        with self.assertRaisesRegex(release.Stop, r'^polyspec-ordered-json-0.0.1.tgz: its manifest differs from '
+        with self.assertRaisesRegex(release.Stop, r'^polyspec-ordered-json-npm-0.0.1.tgz: its manifest differs from '
                                                   r'js/package.json of the commit [0-9a-f]{40}; the archive carries '
                                                   r'the manifest unchanged$'):
             release.assets(sandbox.root, tag)
@@ -358,7 +359,7 @@ class InstallFromAssets(unittest.TestCase):
         npm = json.loads((install_fixtures.FIXTURES / 'npm/package-lock.json').read_text())
         entry = npm['packages']['node_modules/@polyspec/ordered-json']
         self.assertEqual((entry['version'], entry['resolved']),
-                         (self.version, 'file:' + release.asset_name('@polyspec/ordered-json', self.version, 'tgz')))
+                         (self.version, 'file:' + release.asset_name('@polyspec/ordered-json', 'npm', self.version, 'tgz')))
         self.assertNotIn('integrity', entry)
         composer = json.loads((install_fixtures.FIXTURES / 'composer/composer.lock').read_text())
         self.assertEqual([(entry['name'], entry['version'], entry['dist']['shasum']) for entry in composer['packages']],

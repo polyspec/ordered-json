@@ -17,7 +17,7 @@ repos/<repository>/commits/<sha>/check-runs`, the repository of GITHUB_REPOSITOR
 push-gate and ci-passed must be completed with the conclusion success. `versions` compares X.Y.Z with the version of
 every manifest of MANIFESTS (a composer.json declares `version`, because a Composer artifact repository reads the
 version of the manifest) and requires the section `## X.Y.Z` in CHANGELOG.md; for a Go tag it requires the module path of the go.mod of
-the directory. `assets` builds one archive per package, named `<package name>-<version>.<ext>` with `@scope/` written
+the directory. `assets` builds one archive per package, named `<package name>-<language>-<version>.<ext>` with `@scope/` written
 as `scope-` and `vendor/` as `vendor-`: `npm pack` (.tgz) and a zip of the directory of a Composer package from `git
 archive` of the tagged commit (.zip), with stored entries, the time ARCHIVE_MTIME and TZ=UTC, so the zip of a tree has
 the same bytes on every machine and at every time. Before it packs, the published manifests of the tagged commit must be in the
@@ -278,17 +278,17 @@ def versions(root, tag):
     return version
 
 
-def asset_name(name, version, extension):
-    """<package name>-<version>.<ext>: `@scope/name` is written `scope-name` and `vendor/name` `vendor-name`."""
-    return f"{name.lstrip('@').replace('/', '-')}-{version}.{extension}"
+def asset_name(name, language, version, extension):
+    """<package name>-<language>-<version>.<ext>: `@scope/name` is written `scope-name` and `vendor/name` `vendor-name`."""
+    return f"{name.lstrip('@').replace('/', '-')}-{language}-{version}.{extension}"
 
 
 def asset_names(tag):
     directory, version = parse_tag(tag)
     if directory is not None:
         return []
-    extensions = {'npm': 'tgz', 'composer': 'zip'}
-    return [asset_name(name, version, extensions[kind]) for kind, _, name in PACKAGES]
+    formats = {'npm': ('npm', 'tgz'), 'composer': ('php', 'zip')}
+    return [asset_name(name, formats[kind][0], version, formats[kind][1]) for kind, _, name in PACKAGES]
 
 
 def assets(root, tag):
@@ -316,7 +316,12 @@ def build_assets(root, commit, version, target):
     tag = f'v{version}'
     for (kind, path, name), expected in zip(PACKAGES, asset_names(tag)):
         if kind == 'npm':
+            before = set(target.iterdir())
             run(['npm', 'pack', '--pack-destination', str(target)], root / path, env)
+            created = [item for item in target.iterdir() if item not in before]
+            if len(created) != 1:
+                raise Stop(f'npm pack of {path} wrote {sorted(item.name for item in created)}, not one archive')
+            created[0].rename(target / expected)
         else:
             run(['git', 'archive', '--format=zip', '-0', f'--mtime={ARCHIVE_MTIME}', f'--output={target / expected}',
                  f'{commit}:{path}'], root, {**os.environ, 'TZ': 'UTC'})
