@@ -19,6 +19,7 @@ CHECKS = (
     ('package tests', 'tests'),
     ('case listing', 'test_cases'),
     ('symbol report', 'api_symbols'),
+    ('package data', 'package_data'),
 )
 
 

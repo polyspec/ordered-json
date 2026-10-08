@@ -366,6 +366,13 @@
           "tests/api_symbols.py"
         ]
       },
+      "package_data": {
+        "cwd": "{python}",
+        "command": [
+          "python3",
+          "tests/package_data.py"
+        ]
+      },
       "runtime": {
         "python": [
           "python3",
