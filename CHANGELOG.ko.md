@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: d38cf89e730deaf0650a2a41baf147aa21bf663f93298d0cb9a3a35ff98af3db -->
+<!-- source-sha256: 69e0a5797f46257b58f9afa16e47ceb52b7cf0708fac843b4cc803fa1114ee92 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -11,6 +11,7 @@
 - T1.29-2: release step은 kit 도구 `scripts/kit/release.mjs`이며 `config/release.json`으로 설정합니다. `release.py`, `install_fixtures.py`, `test_release.py`를 제거했습니다. `js/`의 npm 패키지와 `php/`, `php-extension/`의 Composer 패키지 archive 이름은 `polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip`, `polyspec-ordered-json-extension-php-X.Y.Z.zip`입니다. `make release-coverage`는 모든 package 파일이 분류되도록 요구하고, `make release-config-check`는 `js/package.json` 버전에 대한 step `versions`를 실행합니다. archive의 consumer project는 `tests/release-consumer`에 있으며, `make release-consumer-lock`이 release commit에서 그 lock을 씁니다. Go 모듈 tag는 `go/vX.Y.Z`이고, `make release-verify`는 이 tag가 `vX.Y.Z`와 같은 commit에 있도록 요구합니다.
 - T1.29-3: 문서는 `scripts/kit/check-documents.mjs`(`make documents-check`, `config/documents.json`)가, commit message는 `scripts/kit/check-commits.mjs`(`make commits-check`, `config/commits.json`)가 검사합니다. 문서 목록(manifest)을 제거했습니다. 표지 하나가 저장소의 문서 하나를 가리키므로 패키지 문서의 `doc-id` 표지는 `npm-`, `php-`, `php-ext-`, `python-`, `rust-`, `go-`로 시작합니다. `docs_check.py`는 `scripts/check_evidence.py`(`make evidence-check`)가 되며 기능 행과 그 근거, 배포 관측, 벤치마크 결과, 검증 기록, JSON 보고서의 검사를 유지하고, `test_docs_check.py`는 `test_check_evidence.py`가 됩니다. 체크리스트 행은 상태를 말로 씁니다.
 - T1.29-4: toolchain은 `config/toolchain.json`, `.node-version`, `package.json`의 `packageManager`, `rust-toolchain.toml`, `.php-version`, `.python-version`에 선언하고 `make toolchain-check`와 `make cargo-downloads-check`(kit 도구)로 검사합니다. `make install`은 npm과 Go(`var/tools`), Rust toolchain, crate, `external-inputs.json`의 PIE PHAR와 추가 사례를 설치하며 내려받는 유일한 target입니다. `toolchains.py`와 `test.py`를 제거했습니다. 외부 입력의 설치는 `scripts/external_inputs.py`, 검증기 unit test 실행기는 `scripts/unit_tests.py`(`make test-scripts`), 통합 검증은 `scripts/verification.py`(`make verify-all`)입니다. flag `--build-extension`을 제거했습니다. workflow는 `make install`을 실행하고, release workflow는 Node.js만으로 `make install-tools`를 실행합니다.
+- T1.29-5: 의존성은 `make dependency-policy-check`(`scripts/kit/check-dependency-policy.mjs`)가 `config/dependency-policy.json`과 `make dependency-review RECORD=1`이 쓰는 검토 기록 `config/dependency-review.json`에 대해 gate합니다. 루트 `package.json`에는 lock `package-lock.json`이 있습니다. `package.json`, `js/package.json`, `php/composer.json`의 script `test`는 `make verify-js`, `make verify-php`를 실행합니다. AGENTS가 의존성 규칙을 적습니다. `make dependency-policy-mutation-check`는 이 저장소에 변형이 바꿀 npm registry 의존성과 Composer platform이 없어 TypeError로 실패합니다.
 
 ## 0.0.6
 

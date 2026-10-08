@@ -10,6 +10,7 @@ after every other job (`if: ${{ always() }}`), needs every other job of the work
 text with their two-space indentation; Python 3.9 has no YAML parser.
 """
 from pathlib import Path
+import json
 import re
 import unittest
 
@@ -166,10 +167,10 @@ def violations(name, text):
                              'never a script or a tool directly')
         for index, step in enumerate(steps, 1):
             # setup-node caches the dependencies of the packageManager of package.json by default and fails without
-            # a lock file; this repository has none, since no npm package is installed.
+            # a lock file with packages; the lock file of this repository lists none, since no npm package is installed.
             if step.get('uses', '').startswith('actions/setup-node@') and step.get('with.package-manager-cache') != 'false':
                 found.append(f'{name}: job {job} step {index} (setup-node) lacks package-manager-cache: false; the '
-                             'repository has no npm lock file to cache')
+                             'repository installs no npm package to cache')
         if any('strategy:' in line for line in body['lines']) and not any(
                 re.fullmatch(r'\s+fail-fast: false', line) for line in body['lines']):
             found.append(f'{name}: job {job} has a matrix without fail-fast: false; one failed job would cancel the others')
@@ -266,8 +267,9 @@ class WorkflowRules(unittest.TestCase):
 
     def test_setup_node_without_a_lock_file_disables_its_cache(self):
         # In CI: setup-node failed with `Dependencies lock file is not found`.
-        tracked = [name for name in ('package-lock.json', 'npm-shrinkwrap.json', 'yarn.lock') if (ROOT / name).exists()]
-        self.assertEqual(tracked, [])
+        lock = json.loads((ROOT / 'package-lock.json').read_text())
+        self.assertEqual(list(lock['packages']), [''], 'the lock lists the root package only')
+        self.assertEqual([name for name in ('npm-shrinkwrap.json', 'yarn.lock') if (ROOT / name).exists()], [])
         text = (WORKFLOWS / 'ci.yml').read_text()
         broken = text.replace('          package-manager-cache: false\n', '', 1)
         self.assertTrue(any('(setup-node) lacks package-manager-cache: false' in issue for issue in violations('ci.yml', broken)))

@@ -254,6 +254,25 @@
       "targets": [
         "cargo-downloads-check"
       ]
+    },
+    {
+      "paths": [
+        "config/dependency-policy.json",
+        "config/dependency-review.json",
+        "package-lock.json",
+        "rust/Cargo.lock",
+        "rust/Cargo.toml",
+        "python/pyproject.toml",
+        "go/go.mod",
+        "package.json",
+        "composer.json",
+        "php/composer.json",
+        "php-extension/composer.json",
+        "js/package.json"
+      ],
+      "targets": [
+        "dependency-policy-check"
+      ]
     }
   ]
 }
