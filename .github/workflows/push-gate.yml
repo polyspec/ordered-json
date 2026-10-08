@@ -9,11 +9,14 @@
 # targets run through make ci-targets, which runs each after a failed one and writes the report. A step runs a make target, never a
 # script directly, so the environment and the prechecks of the Makefile apply. The full verification is not run here. The
 # runner image and each action are exact releases, and Python and Node.js come from .python-version and .node-version,
-# so the job does not change with a new release of any of them.
+# so the job does not change with a new release of any of them. The push trigger names the branches, so the push of a tag does not
+# start this job again: the release workflow requires the check push-gate of the commit that the tag names, and a second run
+# on that commit would be queued while the release verifies it.
 name: push-gate
 
 on:
   push:
+    branches: ['**']
   pull_request:
 
 permissions:

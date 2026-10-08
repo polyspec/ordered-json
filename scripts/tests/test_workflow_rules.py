@@ -21,11 +21,11 @@ REPORT = 'var/report/ci-targets/'
 GATE_TARGETS = {'push-gate-commit'}
 ALWAYS = '${{ !cancelled() }}'
 # The `on:` block of each workflow: ci.yml runs the checks on every pull request, every push to main and every manual
-# run; push-gate.yml runs the gate on every push and every pull request; release.yml runs on the push of a tag vX.Y.Z or <directory>/vX.Y.Z at any depth (in a tag
+# run; push-gate.yml runs the gate on every push to a branch and every pull request; release.yml runs on the push of a tag vX.Y.Z or <directory>/vX.Y.Z at any depth (in a tag
 # filter * does not match /, so **/v* covers the tags of the Go modules). No other workflow exists.
 TRIGGERS = {
     'ci.yml': "on:\n  pull_request:\n  push:\n    branches: [main]\n  workflow_dispatch:\n",
-    'push-gate.yml': "on:\n  push:\n  pull_request:\n",
+    'push-gate.yml': "on:\n  push:\n    branches: ['**']\n  pull_request:\n",
     'release.yml': "on:\n  push:\n    tags: ['v*', '**/v*']\n",
 }
 # The workflows whose checks the release workflow requires on the tagged commit; they run on every push.
@@ -373,6 +373,29 @@ class WorkflowRules(unittest.TestCase):
             with self.subTest(tag=tag):
                 self.assertTrue(any(matches(pattern, tag) for pattern in patterns), f'{tag} matches none of {patterns}')
         self.assertFalse(any(matches('v*', tag) for tag in tags[1:]), 'the pattern v* alone misses the tag of a Go module')
+
+    def test_a_tag_push_starts_none_of_the_workflows_whose_checks_the_release_requires(self):
+        # make release-verify requires the checks of config/release.json on the tagged commit. A workflow that a tag push
+        # starts again runs those checks anew on the same commit, queued, so the release races against them.
+        checks = json.loads((ROOT / 'config/release.json').read_text())['checks']
+        owners = {}
+        for path in sorted(WORKFLOWS.glob('*.yml')):
+            for job in jobs(path.read_text()):
+                owners.setdefault(job, []).append(path.name)
+        for check in checks:
+            with self.subTest(check=check):
+                self.assertEqual(len(owners.get(check, [])), 1, f'the check {check} is the job of {owners.get(check)}')
+                name = owners[check][0]
+                text = (WORKFLOWS / name).read_text()
+                push = re.search(r'(?m)^  push:\n((?:    .*\n)*)', text)
+                self.assertIsNotNone(push, f'{name} does not run on push')
+                self.assertRegex(push.group(1), r"(?m)^    branches: \['\*\*'\]$|^    branches: \[main\]$",
+                                 f'{name} runs on the push of every ref, a tag included')
+                self.assertNotIn('tags', push.group(1))
+        tagged = [path.name for path in sorted(WORKFLOWS.glob('*.yml'))
+                  if re.search(r'(?m)^  push:\n(?:    .*\n)*?    tags:', path.read_text())]
+        self.assertEqual(tagged, ['release.yml'])
+        self.assertEqual([name for name in tagged if name in {owners[check][0] for check in checks}], [])
 
     def test_a_step_that_does_not_run_after_a_failure_fails(self):
         text = (WORKFLOWS / 'ci.yml').read_text()
