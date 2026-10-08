@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 1d9a549c9ba9ab328524979d8a8601dd2a0456b2b8799daf2897b548635da09a -->
+<!-- source-sha256: d7b6e7a941aa440d31cbaa09a33891e7c624fb9d485d8648fcccfa7dba790b10 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.27-20: 버전이 0.x인 동안 메인테이너가 `main`에 직접 push하며, push마다 실행되는 workflow `ci`가 commit의 게이트입니다. agent는 pull request와 merge queue를 유지합니다.
 - T1.27-19: CI workflow가 main에 push될 때마다 실행되어, main의 모든 commit에 release workflow가 요구하는 check ci-passed가 붙습니다.
 - T1.27-18: release version test가 고정된 tag v0.0.3 대신 `js/package.json`이 선언한 version의 tag를 검사합니다. 0.0.4 bump로 고정 tag가 오래되었기 때문입니다.
 - T1.27-17: release asset 설치 test의 consumer fixture가 `make install-fixtures`로 쓴 0.0.4 아카이브를 가리킵니다.

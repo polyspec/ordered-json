@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: 3deded916f7bf94c091ed62c4463cfe22dc523004c0954b062fc1cacbbf92bd2 -->
+<!-- source-sha256: 62553578501f3a900c6d2b8e531b5189cd40989562aba3fafc9d650654e13613 -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
@@ -56,3 +56,4 @@
 | T1.27-17 | 0.0.4 consumer fixture를 씁니다. 0.0.4 bump가 scripts/tests/install을 0.0.3에 둬서, suite job이 0.0.3 아카이브를 읽는 "npm ci"와 "composer install"에서 실패합니다. Red: `python3 scripts/tests/test_release.py`가 0.0.3 아카이브 설치에서 실패합니다. Green: `make install-fixtures`(tag 없이 작업 트리의 아카이브를 만듦)가 0.0.4 manifest와 lock을 씁니다. | `scripts/tests/install/composer/composer.json`, `scripts/tests/install/composer/composer.lock`, `scripts/tests/install/npm/package.json`, `scripts/tests/install/npm/package-lock.json` | `make install-fixtures`, 그다음 CI (`suite`) | [ ] |
 | T1.27-18 | 릴리스 version 검사 test가 현재 저장소 version을 js/package.json에서 읽어 그 tag를 검사합니다. `test_the_released_versions_pass_the_version_check`는 v0.0.3과 0.0.3을 고정해서, 0.0.4 bump 뒤 suite가 "version 0.0.4, the tag v0.0.3 is 0.0.3"으로 실패했습니다. Go module tag go/v0.0.3의 검사는 그대로 둡니다. Red: 변경 전에는 0.0.4 manifest에서 test가 실패합니다. Green: test 통과. | `scripts/tests/test_release.py` | `python3 scripts/tests/test_release.py Repository.test_the_released_versions_pass_the_version_check` | [ ] |
 | T1.27-19 | main에 push할 때마다 전체 CI를 실행해서, release workflow가 요구하는 check ci-passed가 main의 모든 commit에 붙게 합니다. v0.0.4 release는 tag 커밋 471ab69에 ci-passed가 없어서 거부되었습니다. workflow는 pull request와 같은 job을 push to main에서도 실행합니다. Red: ci-passed가 없는 tag를 release workflow가 거부합니다(run 37790670438). Green: main에 push하면 CI workflow가 시작되고, push된 commit에서 ci-passed가 성공합니다. | `.github/workflows/ci.yml` | main에 push하면 workflow ci가 시작되고, push된 commit에서 job ci-passed가 성공합니다 | [ ] |
+| T1.27-20 | 버전이 0.x인 동안 메인테이너가 main에 직접 push하도록 허용합니다. 각 commit의 게이트는 main push마다 실행되는 workflow ci입니다. owner가 0.x 동안 pull request가 얻는 것보다 비용이 크다고 결정했습니다. AGENTS.md(EN, KO)가 규칙을 적고, agent는 pull request와 merge queue를 유지합니다. Red: AGENTS.md에 직접 push 규칙이 없습니다. Green: 두 언어의 규칙. | `AGENTS.md`, `AGENTS.ko.md` | `python3 scripts/docs_check.py` | [ ] |
