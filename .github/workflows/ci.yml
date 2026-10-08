@@ -67,11 +67,11 @@ jobs:
         with:
           node-version-file: .node-version
           package-manager-cache: false
-      # actions/setup-go v6.5.0: the toolchain line of go/go.mod.
+      # actions/setup-go v6.5.0: the toolchain line of packages/ordered-json-go/go.mod.
       - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
         if: ${{ !cancelled() }}
         with:
-          go-version-file: go/go.mod
+          go-version-file: packages/ordered-json-go/go.mod
           cache: false
       # shivammathur/setup-php 2.37.2: the latest patch release of the minor release of .php-version, with phpize
       # for the extension builds of the verification and PIE.
@@ -80,7 +80,7 @@ jobs:
         with:
           php-version-file: .php-version
           coverage: none
-      # npm and Go of the checkout, the Rust toolchain of rust-toolchain.toml, the crates of rust/Cargo.lock, the PIE
+      # npm and Go of the checkout, the Rust toolchain of rust-toolchain.toml, the crates of packages/ordered-json-rust/Cargo.lock, the PIE
       # PHAR and the supplementary suite of external-inputs.json; the only step that downloads.
       - name: make install
         if: ${{ !cancelled() }}

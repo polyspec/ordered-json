@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import { performance } from 'node:perf_hooks';
 import { createHash } from 'node:crypto';
-import { parse, stringify } from '../js/index.js';
+import { parse, stringify } from '../packages/ordered-json-npm/index.js';
 
 const iterations = Number(process.env.OJ_BENCH_ITERATIONS ?? 1000);
 const warmup = Number(process.env.OJ_BENCH_WARMUP ?? 1000);

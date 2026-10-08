@@ -3,22 +3,22 @@
   "url": "https://github.com/polyspec/ordered-json.git",
   "repositories": {
     "javascript": {
-      "path": "js"
+      "path": "packages/ordered-json-npm"
     },
     "rust": {
-      "path": "rust"
+      "path": "packages/ordered-json-rust"
     },
     "go": {
-      "path": "go"
+      "path": "packages/ordered-json-go"
     },
     "php": {
-      "path": "php"
+      "path": "packages/ordered-json-php"
     },
     "php-extension": {
-      "path": "php-extension"
+      "path": "packages/ordered-json-php-ext"
     },
     "python": {
-      "path": "python"
+      "path": "packages/ordered-json-python"
     }
   },
   "implementations": {

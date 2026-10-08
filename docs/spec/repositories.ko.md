@@ -1,5 +1,5 @@
 <!-- doc-id: repositories -->
-<!-- source-sha256: c976a5ceedc073c00ebc5120b94754f8d0a801f8e3b56907786de9b79833d116 -->
+<!-- source-sha256: 7ef3ff13dba2887b176c50849c2035731e83d626772c39074a785c7c3e2c07b9 -->
 # 저장소 계약
 
 [English](repositories.md)
@@ -7,17 +7,17 @@
 <a id="ownership"></a>
 ## 관리 주체
 
-저장소는 JSON 명세, 공식 입력과 기대 결과, 공통 검증기, 구현 등록 정보, 통합 검증 기록과 모든 구현 소스를 관리합니다. 각 언어 디렉터리는 같은 Git 리비전 안에서 소스, 어댑터, 패키지 메타데이터, 문서와 패키지 빌드 설정을 관리합니다.
+저장소는 JSON 명세, 공식 입력과 기대 결과, 공통 검증기, 구현 등록 정보, 통합 검증 기록과 모든 구현 소스를 관리합니다. 각 패키지 디렉터리는 같은 Git 리비전 안에서 소스, 어댑터, 패키지 메타데이터, 문서와 패키지 빌드 설정을 관리합니다. 패키지 디렉터리는 `packages/ordered-json-<language>`이며 language는 `npm`, `php`, `php-ext`, `python`, `rust`, `go`입니다. 다른 polyspec 저장소와 같은 배치입니다.
 
 | 패키지 | 경로 | 구현 |
 | --- | --- | --- |
 | common | . | 계약, fixture, 검증과 registry |
-| javascript | js | JavaScript |
-| rust | rust | Rust |
-| go | go | Go |
-| php | php | 순수 PHP와 PHP Value API |
-| php-extension | php-extension | 네이티브 PHP 확장 |
-| python | python | Python |
+| javascript | packages/ordered-json-npm | JavaScript |
+| rust | packages/ordered-json-rust | Rust |
+| go | packages/ordered-json-go | Go |
+| php | packages/ordered-json-php | 순수 PHP와 PHP Value API |
+| php-extension | packages/ordered-json-php-ext | 네이티브 PHP 확장 |
+| python | packages/ordered-json-python | Python |
 
 저장소는 공통 계약과 모든 구현체에 하나의 리비전을 사용합니다. 구현 디렉터리에는 중첩 Git 저장소를 두지 않습니다. 순수 PHP와 확장은 패키지 메타데이터와 빌드 절차를 별도로 유지하지만, 소스 변경은 같은 저장소 리비전에서 검토하고 검사합니다. 네이티브 구현은 같은 리비전의 PHP Value API와 함께 검사합니다.
 
@@ -35,7 +35,7 @@
 <a id="documents"></a>
 ## 문서와 변경
 
-각 패키지는 자체 영어 문서와 한국어 번역을 등록합니다. 구현 문서는 공통 계약과 통합 기능 상태를 참조합니다. 공통 문서 검사는 이 저장소의 모든 패키지 문서를 검사합니다.
+각 패키지는 자체 영어 문서와 한국어 번역을 가집니다. 구현 문서는 공통 계약과 통합 기능 상태를 참조합니다. `config/documents.json`이 공통 루트와 모든 패키지의 문서를 선택하며 `make documents-check`가 함께 검사합니다.
 
 공통 계약을 변경할 때 검증기, 관련 구현과 적합성 fixture를 하나의 변경으로 갱신하고 패키지 및 통합 검사를 실행한 다음 결과 저장소 리비전을 게시합니다. 테스트 성공과 소스 또는 패키지 게시는 별도로 확인합니다.
 

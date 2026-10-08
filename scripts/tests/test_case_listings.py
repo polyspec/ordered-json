@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from registry import REGISTRY
 from verify import STANDARD, compare_package_cases
 
-PACKAGE = 'github.com/polyspec/ordered-json/go'
+PACKAGE = 'github.com/polyspec/ordered-json/packages/ordered-json-go'
 
 
 def required(language):

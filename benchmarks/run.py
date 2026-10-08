@@ -159,7 +159,7 @@ def main():
     if missing: raise SystemExit("Missing benchmark tools: " + ", ".join(missing))
     commands.extend([
         ("js", ROOT, ["node", "benchmarks/js.mjs", *files]),
-        ("go", ROOT / "go", ["go", "run", "./internal/benchmark", *files]),
+        ("go", ROOT / "packages/ordered-json-go", ["go", "run", "./internal/benchmark", *files]),
         ("php", ROOT, ["php", "-n", "benchmarks/php.php", "custom", *files]),
         ("php-native", ROOT, ["php", "-n", "benchmarks/php.php", "native-json", *files]),
     ])
@@ -174,7 +174,7 @@ def main():
         rust_env = dict(env, CARGO_TARGET_DIR=str(build.cache / "rust-target"))
         commands.extend([
             ("php-extension", ROOT, ["php", "-n", "-d", f"extension={extension}", "benchmarks/php.php", "extension", *files]),
-            ("rust", ROOT, ["cargo", "run", "--locked", "--release", "--quiet", "--manifest-path", "rust/Cargo.toml", "--example", "benchmark", "--", *files]),
+            ("rust", ROOT, ["cargo", "run", "--locked", "--release", "--quiet", "--manifest-path", "packages/ordered-json-rust/Cargo.toml", "--example", "benchmark", "--", *files]),
         ])
         for label, cwd, argv in commands:
             rows.extend(run(argv, rust_env if label == "rust" else env, cwd, label))

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Run one lint that AGENTS requires on the tracked sources.
 
-    python3 scripts/lint.py clippy   cargo clippy --locked --all-targets -- -D warnings in rust/
-    python3 scripts/lint.py go-vet   go vet ./... in go/
+    python3 scripts/lint.py clippy   cargo clippy --locked --all-targets -- -D warnings in packages/ordered-json-rust/
+    python3 scripts/lint.py go-vet   go vet ./... in packages/ordered-json-go/
 
 make check runs each lint as a target of its own after the verification, so hosted CI runs them on every pull
 request and every push to main, and make clippy and make go-vet run one. The tools are the pinned ones (make toolchain-check) and run
@@ -18,8 +18,8 @@ import tempfile
 from registry import ROOT, run_streamed
 
 LINTS = {
-    'clippy': ('rust', ['cargo', 'clippy', '--locked', '--all-targets', '--', '-D', 'warnings']),
-    'go-vet': ('go', ['go', 'vet', './...']),
+    'clippy': ('packages/ordered-json-rust', ['cargo', 'clippy', '--locked', '--all-targets', '--', '-D', 'warnings']),
+    'go-vet': ('packages/ordered-json-go', ['go', 'vet', './...']),
 }
 
 

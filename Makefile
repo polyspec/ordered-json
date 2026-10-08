@@ -3,7 +3,7 @@ JSON_TEST_SUITE ?=
 PIE ?= .cache/pie/pie.phar
 
 # The tools of every run are the releases that the tracked declaration files name: Node.js in .node-version, npm in the
-# packageManager of package.json, Rust in rust-toolchain.toml, Go in the toolchain line of go/go.mod (config/toolchain.json),
+# packageManager of package.json, Rust in rust-toolchain.toml, Go in the toolchain line of packages/ordered-json-go/go.mod (config/toolchain.json),
 # Python in .python-version and PHP in .php-version. No command installs or selects a toolchain on demand: make install
 # installs npm and Go into var/tools (scripts/kit/install-tools.mjs), which comes first on PATH, so no npm or Go of the
 # machine is used or changed, and make toolchain-check compares every tool with its declaration.
@@ -39,7 +39,7 @@ check:
 	node scripts/kit/full-run.mjs run $(CHECK_TARGETS)
 
 # install makes every download that the checks read: npm and Go (config/toolchain.json), the Rust toolchain of
-# rust-toolchain.toml, the crates of rust/Cargo.lock, and the PIE PHAR and the supplementary suite of external-inputs.json.
+# rust-toolchain.toml, the crates of packages/ordered-json-rust/Cargo.lock, and the PIE PHAR and the supplementary suite of external-inputs.json.
 # It is the only target that downloads, besides dependency-review and release-consumer-lock.
 install: install-tools install-rust cargo-downloads-fetch install-external
 
@@ -90,10 +90,10 @@ python-package-check:
 	$(PYTHON) scripts/python_check.py
 
 # release-config-check runs the step versions of the release (scripts/kit/release.mjs, config/release.json) for the tag of the
-# version that js/package.json declares: every manifest of config/release.json declares that version, the module path of
+# version that packages/ordered-json-npm/package.json declares: every manifest of config/release.json declares that version, the module path of
 # every Go module is the declared one, and CHANGELOG.md and CHANGELOG.ko.md hold the section of that version.
 release-config-check:
-	node scripts/kit/release.mjs versions "v$$(node -p "require('./js/package.json').version")"
+	node scripts/kit/release.mjs versions "v$$(node -p "require('./packages/ordered-json-npm/package.json').version")"
 
 pie-check: toolchain-check cargo-downloads-check
 	$(PYTHON) scripts/check_pie.py --pie "$(PIE)" $(if $(JSON_TEST_SUITE),--suite "$(JSON_TEST_SUITE)")

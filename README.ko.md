@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: 4240d580af133e4bda95fe3caa9d68d910dacd439b20547553fe0c6ee82c50ce -->
+<!-- source-sha256: 79630b9226bd95f516af32f5e0edb40e821b16257848f40a151a7ea1f72f2b37 -->
 # ordered-json
 
 [English](README.md)
@@ -23,17 +23,17 @@ cd ordered-json
 ~~~sh
 node --input-type=module <<'JS'
 import {readFileSync} from 'node:fs';
-import {parse, stringify} from './js/index.js';
+import {parse, stringify} from './packages/ordered-json-npm/index.js';
 const {cases} = JSON.parse(readFileSync('examples/official.json', 'utf8'));
 const example = cases.find(example => example.id === 'document-order');
 console.log(stringify(parse(example.input)));
 JS
 ~~~
 
-설치 없이 `python/src`에서 같은 예제를 Python으로 실행합니다.
+설치 없이 `packages/ordered-json-python/src`에서 같은 예제를 Python으로 실행합니다.
 
 ~~~sh
-PYTHONPATH=python/src python3 - <<'PY'
+PYTHONPATH=packages/ordered-json-python/src python3 - <<'PY'
 import json
 from polyspec.ordered_json import parse, stringify
 with open('examples/official.json', encoding='utf8') as f:
@@ -43,7 +43,7 @@ print(stringify(parse(example['input'])))
 PY
 ~~~
 
-tag의 Python 패키지는 `pip`로 설치합니다([설치](docs/operations/installation.ko.md)). `python/`을 포함한 첫 tag는 아직 릴리스되지 않았으므로 `X.Y.Z`는 그 버전을 뜻합니다.
+tag의 Python 패키지는 `pip`로 설치합니다([설치](docs/operations/installation.ko.md)). `packages/ordered-json-python/`을 포함한 첫 tag는 아직 릴리스되지 않았으므로 `X.Y.Z`는 그 버전을 뜻합니다.
 
 ~~~sh
 pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@vX.Y.Z#subdirectory=python"
@@ -51,12 +51,12 @@ pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-jso
 
 | 패키지 | 내용 | 경로 |
 | --- | --- | --- |
-| JavaScript | JavaScript 및 TypeScript 선언 | `js/` |
-| Rust | Rust crate | `rust/` |
-| Go | Go 패키지 | `go/` |
-| PHP | 순수 PHP 및 Value API | `php/` |
-| PHP 확장 | PIE 메타데이터를 제공하는 네이티브 PHP 확장 | `php-extension/` |
-| Python | Python 패키지 `polyspec-ordered-json`, import `polyspec.ordered_json` | `python/` |
+| JavaScript | JavaScript 및 TypeScript 선언 | `packages/ordered-json-npm/` |
+| Rust | Rust crate | `packages/ordered-json-rust/` |
+| Go | Go 패키지 | `packages/ordered-json-go/` |
+| PHP | 순수 PHP 및 Value API | `packages/ordered-json-php/` |
+| PHP 확장 | PIE 메타데이터를 제공하는 네이티브 PHP 확장 | `packages/ordered-json-php-ext/` |
+| Python | Python 패키지 `polyspec-ordered-json`, import `polyspec.ordered_json` | `packages/ordered-json-python/` |
 
 <a id="verification"></a>
 ## 검증

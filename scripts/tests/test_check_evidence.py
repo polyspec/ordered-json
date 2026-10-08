@@ -35,7 +35,7 @@ class EvidenceChecks(unittest.TestCase):
         self.directory = tempfile.TemporaryDirectory(prefix='ordered-json-docs-test-')
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
-        self.write('js/index.js', 'export const fixture = true;\n')
+        self.write('packages/ordered-json-npm/index.js', 'export const fixture = true;\n')
         self.json('examples/official.json', {'cases': [{'id': 'fixture'}]})
         self.write('fixtures/valid/object.json', '{}')
         self.pair('docs/features.md', 'features',
@@ -140,13 +140,13 @@ class EvidenceChecks(unittest.TestCase):
         self.assert_failure('names the record that backs it')
 
     def test_source_change_invalidates_old_result(self):
-        self.write('js/index.js', 'export const fixture = false;\n')
+        self.write('packages/ordered-json-npm/index.js', 'export const fixture = false;\n')
         self.assert_failure('Verification is stale')
 
     def test_documentation_check_leaves_record_freshness_to_make_check(self):
         # A source edit must not force the full suite before a documentation review;
         # make check runs the checker with --records and still rejects a stale record.
-        self.write('js/index.js', 'export const fixture = false;\n')
+        self.write('packages/ordered-json-npm/index.js', 'export const fixture = false;\n')
         script = str(Path(__file__).resolve().parents[1] / 'check_evidence.py')
         alone = subprocess.run([sys.executable, script, '--root', str(self.root)],
                                capture_output=True, text=True)
@@ -177,11 +177,11 @@ class EvidenceChecks(unittest.TestCase):
         self.assert_failure('names the record that backs it')
 
     def test_source_addition_invalidates_old_result(self):
-        self.write('js/new.js', 'export const added = true;\n')
+        self.write('packages/ordered-json-npm/new.js', 'export const added = true;\n')
         self.assert_failure('Verification is stale')
 
     def test_source_deletion_invalidates_old_result(self):
-        (self.root / 'js/index.js').unlink()
+        (self.root / 'packages/ordered-json-npm/index.js').unlink()
         self.assert_failure('Verification is stale')
 
     def test_missing_implementation_result_fails(self):
@@ -219,7 +219,7 @@ class EvidenceChecks(unittest.TestCase):
 
     def test_changed_sources_cannot_create_record(self):
         before = source_manifest(self.root)
-        self.write('js/index.js', '// changed during run\n')
+        self.write('packages/ordered-json-npm/index.js', '// changed during run\n')
         with self.assertRaisesRegex(ValueError, 'Sources changed during verification'):
             create_record(self.root, before, self.results,
                           {'official': 1, 'fixtures': 1, 'supplementary': 0}, 1, self.versions,
@@ -257,7 +257,7 @@ class EvidenceChecks(unittest.TestCase):
                'pie': {'version': 'synthetic fixture', 'phar_sha256': sha256(b'pie tool')},
                'package': 'polyspec/ordered-json-extension:*@dev',
                'commands': [{'arguments': ['build'], 'exit_code': 0}], 'build_warnings': [],
-               'artifact': {'path': 'php-extension/src/modules/ordered_json.so'},
+               'artifact': {'path': 'packages/ordered-json-php-ext/src/modules/ordered_json.so'},
                'cases': aggregate['cases'],
                'implementations': {'php-extension': {'status': 'passed', 'cases': 3,
                                                      'runtime': self.versions['php-extension']}},
@@ -386,7 +386,7 @@ class EvidenceChecks(unittest.TestCase):
 
     def test_recorded_artifact_must_be_the_declared_one(self):
         aggregate, pie = self.supplementary_records()
-        pie['artifact'] = {'path': 'php-extension/src/modules/other.so'}
+        pie['artifact'] = {'path': 'packages/ordered-json-php-ext/src/modules/other.so'}
         self.json(AGGREGATE_RECORD, aggregate)
         self.json(PIE_RECORD, pie)
         self.assert_failure('artifact the registry declares')
