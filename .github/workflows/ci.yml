@@ -42,7 +42,7 @@ jobs:
           package-manager-cache: false
       - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci-targets TARGETS="kit-check kit-test hooks-check owner-validate"
+        run: make ci-targets TARGETS="kit-check kit-test hooks-check owner-validate release-coverage release-config-check"
       # actions/upload-artifact v7.0.1: the report of this job, var/report/ci-targets.
       - name: report
         if: ${{ !cancelled() }}

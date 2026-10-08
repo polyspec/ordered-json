@@ -27,11 +27,10 @@ include scripts/kit/kit.mk
 
 # The targets of the full suite that make check runs through the guard of scripts/kit/full-run.mjs and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
-CHECK_TARGETS := kit-check kit-test hooks-check owner-validate docs-check verify-all clippy go-vet pie-check python-package-check
+CHECK_TARGETS := kit-check kit-test hooks-check owner-validate release-coverage release-config-check docs-check verify-all clippy go-vet pie-check python-package-check
 
 .PHONY: check test-scripts verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python docs-check pie-check \
-	benchmark benchmark-check clippy go-vet python-package-check tools toolchains-check \
-	release-verify release-versions release-assets release-publish install-fixtures
+	benchmark benchmark-check clippy go-vet python-package-check tools toolchains-check release-config-check
 
 # check runs the full suite once per committed tree, when no task of docs/plans/execution-checklist.md is [~]
 # (scripts/kit/full-run.mjs); it records its result in var/full-run.json. rerun-failed (kit.mk) reruns the targets that failed.
@@ -76,6 +75,12 @@ docs-check:
 python-package-check:
 	$(PYTHON) scripts/python_check.py
 
+# release-config-check runs the step versions of the release (scripts/kit/release.mjs, config/release.json) for the tag of the
+# version that js/package.json declares: every manifest of config/release.json declares that version, the module path of
+# every Go module is the declared one, and CHANGELOG.md and CHANGELOG.ko.md hold the section of that version.
+release-config-check:
+	node scripts/kit/release.mjs versions "v$$(node -p "require('./js/package.json').version")"
+
 pie-check:
 	$(PYTHON) scripts/check_pie.py --pie "$(PIE)" $(if $(JSON_TEST_SUITE),--suite "$(JSON_TEST_SUITE)")
 
@@ -96,19 +101,3 @@ tools:
 
 toolchains-check:
 	$(PYTHON) scripts/toolchains.py
-
-# The steps of .github/workflows/release.yml for the tag TAG (scripts/release.py), in this order: release-verify requires
-# the tagged commit on origin/main with the checks push-gate and ci-passed passed, release-versions the version of the
-# tag in every manifest and its section in CHANGELOG.md, release-assets builds the package archives into
-# var/release/assets, and release-publish creates the GitHub Release. The workflow sets TAG in the environment, and the
-# recipe passes it as "$$TAG", so the name of a tag never becomes shell text.
-release-verify release-versions release-assets release-publish:
-	$(if $(TAG),,$(error make $@ needs TAG=<tag>, a tag vX.Y.Z or go/vX.Y.Z))
-	$(PYTHON) scripts/release.py $(@:release-%=%) "$$TAG"
-
-# install-fixtures writes the consumer fixtures of the release asset install test of scripts/tests/test_release.py:
-# the manifests and the locks of scripts/tests/install for the version of js/package.json, from the archives of the
-# working tree (scripts/install_fixtures.py). A lock records each archive of this repository by name and version only,
-# without a hash, so a change of a release version or of a dependency runs this target; the release commit runs it. It runs offline, as every target other than make tools.
-install-fixtures:
-	$(PYTHON) scripts/install_fixtures.py

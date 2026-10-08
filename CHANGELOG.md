@@ -7,6 +7,7 @@
 ## Unreleased
 
 - T1.29-1: the push gate, the full-run guard, the owner check and the CI report are the vendored tools of kit v0.0.4 (`scripts/kit/`, `tests/kit/`, `.kit/kit.lock.json`), configured in `config/checklist.json` and `config/owner-checks.json`. `push_gate.py`, `full_run.py`, `owner_check.py`, `ci_run.py` and their tests are removed. The jobs of `ci.yml` and `push-gate.yml` run `make ci-targets`, and `test_workflow_rules` requires every target of `CHECK_TARGETS` to run in exactly one job. A `partial` feature no longer stops a push or a full run.
+- T1.29-2: the release steps are the kit tool `scripts/kit/release.mjs`, configured in `config/release.json`; `release.py`, `install_fixtures.py` and `test_release.py` are removed. The archives of the npm package of `js/` and of the Composer packages of `php/` and `php-extension/` are named `polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip` and `polyspec-ordered-json-extension-php-X.Y.Z.zip`. `make release-coverage` requires every package file to be classified, and `make release-config-check` runs the step `versions` for the version of `js/package.json`. The consumer projects of the archives are in `tests/release-consumer`; `make release-consumer-lock` writes their locks on the release commit. The Go module tag is `go/vX.Y.Z`, and `make release-verify` requires it at the commit of `vX.Y.Z`.
 
 ## 0.0.6
 
