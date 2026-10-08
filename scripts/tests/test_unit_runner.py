@@ -7,7 +7,7 @@ import time
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from test import run_unit_tests, timeout
+from unit_tests import run_unit_tests, timeout
 
 
 class UnitRunnerChecks(unittest.TestCase):
@@ -33,11 +33,11 @@ class UnitRunnerChecks(unittest.TestCase):
 
     def test_a_selection_of_no_test_fails_by_name(self):
         # A name that loads a module without tests ran nothing and must not pass as a test run.
-        script = str(Path(__file__).resolve().parents[1] / 'test.py')
-        empty = subprocess.run([sys.executable, script, '--unit', 'registry'], capture_output=True, text=True)
+        script = str(Path(__file__).resolve().parents[1] / 'unit_tests.py')
+        empty = subprocess.run([sys.executable, script, 'registry'], capture_output=True, text=True)
         self.assertEqual(empty.returncode, 1, empty.stdout + empty.stderr)
         self.assertIn('selected 0 tests: registry', empty.stderr)
-        mixed = subprocess.run([sys.executable, script, '--unit', 'test_benchmark.WorkloadChecks.test_wrong_depth_is_rejected',
+        mixed = subprocess.run([sys.executable, script, 'test_benchmark.WorkloadChecks.test_wrong_depth_is_rejected',
                                 'registry'], capture_output=True, text=True)
         self.assertEqual(mixed.returncode, 1, mixed.stdout + mixed.stderr)
         self.assertIn('selected 0 tests: registry', mixed.stderr)

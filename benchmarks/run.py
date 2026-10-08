@@ -14,7 +14,6 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 from registry import artifact_paths, prepare, repository_paths, run_directory
 from verification_record import write_record
-from toolchains import require
 
 WORKLOAD = json.loads((ROOT / "benchmarks/workload.json").read_text())
 if WORKLOAD.get("schema_version") != 2:
@@ -150,7 +149,6 @@ def main():
     warmup = args.warmup or PROTOCOL["warmup"]
     samples = args.samples or PROTOCOL["samples"]
     if min(iterations, warmup, samples) < 1: parser.error("measurement counts must be positive")
-    if not require(): raise SystemExit(1)
     validate_workload()
     files = [str(path) for path in FIXTURES]
     env = os.environ.copy(); env.update({"OJ_BENCH_ITERATIONS": str(iterations), "OJ_BENCH_WARMUP": str(warmup),

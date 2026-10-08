@@ -11,7 +11,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from test import timeout
+from unit_tests import timeout
 from verify import ROOT, run_package_tests, verify_adapters
 
 # Replies to the first request like a correct adapter, then reads the next request

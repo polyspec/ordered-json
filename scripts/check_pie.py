@@ -17,7 +17,7 @@ from registry import (ROOT, adapter_commands, artifact_paths, repository_paths, 
 from verification_record import (PIE_RECORD, external_inputs, input_issues, manifest_differences, package_revisions,
                                  report_input_issues, sha256,
                                  source_manifest, supplementary_manifest, write_record)
-from toolchains import PIE_FIX, SUITE_FIX, require
+from external_inputs import PIE_FIX, SUITE_FIX
 from verify import verify_adapters
 
 
@@ -89,9 +89,7 @@ def main():
     parser.add_argument('--pie', type=Path, required=True, help='Verified PIE PHAR')
     parser.add_argument('--suite', type=Path)
     args = parser.parse_args()
-    if not require():
-        return 1
-    # A check runs offline, so a missing download names make tools, which makes it.
+    # A check runs offline, so a missing download names make install, which makes it.
     if not args.pie.is_file():
         print(f'the PIE PHAR {args.pie} does not exist; {PIE_FIX}', file=sys.stderr)
         return 1

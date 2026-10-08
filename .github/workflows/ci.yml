@@ -80,16 +80,16 @@ jobs:
         with:
           php-version-file: .php-version
           coverage: none
-      # The Rust toolchain of rust-toolchain.toml, npm, the crates of rust/Cargo.lock, the PIE PHAR and the
-      # supplementary suite of external-inputs.json; the only step that downloads.
-      - name: make tools
+      # npm and Go of the checkout, the Rust toolchain of rust-toolchain.toml, the crates of rust/Cargo.lock, the PIE
+      # PHAR and the supplementary suite of external-inputs.json; the only step that downloads.
+      - name: make install
         if: ${{ !cancelled() }}
-        run: make tools
+        run: make install
       - name: make ci-targets
         if: ${{ !cancelled() }}
         env:
           JSON_TEST_SUITE: .cache/JSONTestSuite
-        run: make ci-targets TARGETS="verify-all clippy go-vet pie-check"
+        run: make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check"
       - name: report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

@@ -33,7 +33,7 @@ class FailureMessages(unittest.TestCase):
         phar = self.folder / 'pie.phar'
         phar.write_text('<?php\n')
         output = 'PIE 1.4.10\nsrc/ordered_json.c:12: error: unknown type name\nbuild tools are missing: re2c\n'
-        with patch('toolchains.problems', return_value=[]), patch.dict(os.environ), \
+        with \
                 patch('check_pie.input_issues', return_value=[]), \
                 patch('check_pie.run_streamed', return_value=subprocess.CompletedProcess([], 0, stdout=output)), \
                 patch.object(sys, 'argv', ['check_pie.py', '--pie', str(phar)]), redirect_stdout(io.StringIO()):

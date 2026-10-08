@@ -19,7 +19,7 @@ import check_pie
 import compare_ojson
 import registry
 import run as benchmark
-import test as test_runner
+import verification as test_runner
 import verify
 from registry import ROOT, repository_paths
 
@@ -133,7 +133,6 @@ class RunIsolation(unittest.TestCase):
             pie = Path(folder) / 'pie.phar'
             pie.write_text('<?php\n')
             with patch('check_pie.run_streamed', side_effect=capture), redirect_stdout(io.StringIO()), \
-                    patch('toolchains.problems', return_value=[]), patch.dict(os.environ), \
                     patch('check_pie.input_issues', return_value=[]), \
                     patch.object(sys, 'argv', ['check_pie.py', '--pie', str(pie)]):
                 with self.assertRaises(Stop):
@@ -150,7 +149,6 @@ class RunIsolation(unittest.TestCase):
             raise Stop
 
         with patch('run.prepare', side_effect=capture), patch('run.shutil.which', return_value='/usr/bin/true'), \
-                patch('toolchains.problems', return_value=[]), patch.dict(os.environ), \
                 patch.object(sys, 'argv', ['run.py', '--check']), redirect_stdout(io.StringIO()):
             with self.assertRaises(Stop):
                 benchmark.main()
@@ -174,7 +172,6 @@ class RunIsolation(unittest.TestCase):
             with patch.dict(os.environ, {'CARGO_TARGET_DIR': '/shared/target'}), \
                     patch('run.prepare', return_value=[]), patch('run.artifact_paths', return_value=[module]), \
                     patch('run.run', side_effect=capture), patch('run.shutil.which', return_value='/usr/bin/true'), \
-                    patch('toolchains.problems', return_value=[]), \
                     patch.object(sys, 'argv', ['run.py', '--check']), redirect_stdout(io.StringIO()):
                 with self.assertRaises(Stop):
                     benchmark.main()

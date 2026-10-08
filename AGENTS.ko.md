@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 9470d6d264044727e4f737a2092f0d41ffba0c73c9e42aa5b95721dfe19dce43 -->
+<!-- source-sha256: 66faf6ecc3229e695e8e5f3007d652f7c0044439593acc7368727768af06622d -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -38,15 +38,15 @@
 
 각 구현 패키지는 자체 소스와 문서를 관리합니다. 명령은 저장소 루트에서 실행합니다.
 
-개발 중에는 unit test만 실행합니다. 변경을 진행하는 동안 RED 사례와 같은 사례의 GREEN을 검증기 unit test(`python3 scripts/test.py --unit`)로 실행합니다. `make pie-check`, `make check`, `make owner-check`, 어댑터 suite, 추가 사례 실행은 end-to-end 검사이며 hosted CI가 push 뒤에 실행합니다([hosted CI](docs/operations/validation.ko.md#ci)). 어떤 규칙도 commit이나 push 전에 로컬 실행을 요구하지 않습니다. pre-push hook은 체크리스트만 읽는 빠른 gate로 남습니다. 수정할 때마다 더 넓은 검사를 다시 실행하지 않습니다. [config/owner-checks.json](config/owner-checks.json)은 모든 추적 경로를 그것을 소유한 make target에 대응시킵니다(`test-scripts`는 검증기 unit test를, `verify-<language>`는 구현 하나를 검증합니다). `make owner-check`(`scripts/kit/owner-check.mjs`)는 커밋되지 않은 변경, `PATHS`, 또는 `BASE` 이후 바뀐 경로의 소유자를 각각 끝까지 실행하고, pre-commit hook `.githooks/pre-commit`은 `make owner-validate` 논리(`node scripts/kit/owner-check.mjs --validate`)를 실행하여 추적 경로가 어떤 규칙에도 맞지 않거나, glob이 어떤 경로에도 맞지 않거나, 소유자가 존재하지 않으면 commit을 거부합니다. 새 파일은 같은 commit에서 대응시킵니다.
+개발 중에는 unit test만 실행합니다. 변경을 진행하는 동안 RED 사례와 같은 사례의 GREEN을 검증기 unit test(`make test-scripts`)로 실행합니다. `make pie-check`, `make check`, `make owner-check`, 어댑터 suite, 추가 사례 실행은 end-to-end 검사이며 hosted CI가 push 뒤에 실행합니다([hosted CI](docs/operations/validation.ko.md#ci)). 어떤 규칙도 commit이나 push 전에 로컬 실행을 요구하지 않습니다. pre-push hook은 체크리스트만 읽는 빠른 gate로 남습니다. 수정할 때마다 더 넓은 검사를 다시 실행하지 않습니다. [config/owner-checks.json](config/owner-checks.json)은 모든 추적 경로를 그것을 소유한 make target에 대응시킵니다(`test-scripts`는 검증기 unit test를, `verify-<language>`는 구현 하나를 검증합니다). `make owner-check`(`scripts/kit/owner-check.mjs`)는 커밋되지 않은 변경, `PATHS`, 또는 `BASE` 이후 바뀐 경로의 소유자를 각각 끝까지 실행하고, pre-commit hook `.githooks/pre-commit`은 `make owner-validate` 논리(`node scripts/kit/owner-check.mjs --validate`)를 실행하여 추적 경로가 어떤 규칙에도 맞지 않거나, glob이 어떤 경로에도 맞지 않거나, 소유자가 존재하지 않으면 commit을 거부합니다. 새 파일은 같은 commit에서 대응시킵니다.
 
 ~~~sh
-python3 scripts/verify.py --only js
-python3 scripts/test.py --unit test_check_evidence.EvidenceChecks.test_missing_feature_field_fails
+make verify-js
+make test-scripts TESTS=scripts/tests/test_check_evidence.py
 git diff --check
 ~~~
 
-`scripts/verify.py --only`는 선택한 구현을 빌드하고 그 구현의 케이스·심볼 목록, 선언된 패키지 테스트, 공통 사례를 실행하며 기록을 쓰지 않습니다. `scripts/test.py --unit`은 지정한 검증기 unit test를 실행하며 기록을 쓰지 않습니다. test가 없는 module처럼 test를 하나도 고르지 않는 이름은 어떤 test도 실행하기 전에 `selected 0 tests`와 그 이름을 출력하며 실패합니다.
+`make verify-<language>`(`scripts/verify.py --only`)는 선택한 구현을 빌드하고 그 구현의 케이스·심볼 목록, 선언된 패키지 테스트, 공통 사례를 실행하며 기록을 쓰지 않습니다. `make test-scripts`(`scripts/unit_tests.py`)는 `scripts/tests`의 검증기 unit test 또는 `TESTS`의 test 파일을 test마다 자기 시간 한도로 실행하며 기록을 쓰지 않습니다. test가 없는 module처럼 test를 하나도 고르지 않는 이름은 어떤 test도 실행하기 전에 `selected 0 tests`와 그 이름을 출력하며 실패합니다.
 
 `make check`는 hosted CI가 모든 pull request와 모든 push to `main`에서 실행하는 전체 suite입니다. 로컬 실행은 선택이며, 활성 항목이 모두 끝난 뒤 tree마다 많아야 한 번 합니다. 추가 사례를 포함하면 그 실행은 다음과 같습니다.
 
@@ -90,7 +90,7 @@ Rust 코드는 `rust/`에서 `cargo clippy --all-targets -- -D warnings`를, Go 
 같은 tree는 언제 어느 기계에서든 같은 결과를 냅니다. 한 polyspec 저장소에서 찾은 결함은 하나의 부류입니다. 모든 저장소에서 고치고 그 규칙을 여기에 적습니다. 각 규칙은 이 저장소가 그것을 지키는 방법을 밝힙니다.
 
 - 검사는 결과가 시간에 따라 달라지는 registry 질의를 하지 않습니다. 최신 조회나 `@latest`, 버전 범위의 해석, 오래된 package나 새 release에 대한 질의가 없습니다. lock 파일이 정확한 버전과 integrity hash로 고정한 package를 내려받는 것은 그런 질의가 아니라 설치이며, `npm ci`와 `composer install`처럼 허용됩니다. 릴리스 archive의 consumer 설치(`make release-consumer`, `scripts/kit/release-consumer.mjs`)는 `tests/release-consumer`의 커밋된 lock으로 offline 설정 없이 `npm ci`와 `composer install`을 실행합니다. 그 lock을 해석하는 `make release-consumer-lock`은 검사가 아닙니다.
-- 어떤 명령도 도구를 필요할 때 설치하지 않으며, 모든 도구는 추적되는 버전으로 실행합니다. 추적 파일이 Node.js, Rust, Go, Python, PHP, npm을 고정합니다. 로컬과 CI에서 같은 patch release를 쓸 수 없는 interpreter는 minor release로 고정하므로, Python은 `.python-version`이 3.14를, PHP는 `.php-version`이 8.5를 적고, 검사는 major.minor를 비교하며, 각 기록은 실행 중인 patch release를 적습니다. setup-python과 setup-php는 minor의 최신 patch release를 설치하기 때문입니다. 그리고 `scripts/toolchains.py`는 어떤 작업보다 먼저 각 도구를 고정값과 비교하며, `GOTOOLCHAIN=local`과 `RUSTUP_AUTO_INSTALL=0`은 go와 rustup이 다른 toolchain을 가져오지 못하게 하고, cargo는 `--locked`로 실행하며, `make tools`가 내려받는 유일한 단계로서 Rust toolchain, tarball hash와 대조한 npm, `rust/Cargo.lock`의 crate, `external-inputs.json`과 대조한 PIE PHAR와 추가 사례를 설치하고, 그 설치 테스트를 뺀 다른 모든 명령은 cargo, go, npm, Composer를 offline으로 실행하며(Makefile이 export하고 `scripts/toolchains.py`가 설정하는 `CARGO_NET_OFFLINE`, `GOPROXY=off`, `npm_config_offline`, `COMPOSER_DISABLE_NETWORK`), 내려받지 않은 입력은 `run make tools`로 실패하고(모든 진입점은 첫 단계 전에 `cargo fetch --locked --offline`을 실행해 lock file을 밝히고, `make pie-check`와 `make check`는 없는 PIE PHAR나 추가 사례를 밝힙니다), CI는 image, action, Python을 고정하고, `make pie-check`와 `make check`는 PIE PHAR와 추가 사례를 먼저 `external-inputs.json`과 비교합니다.
+- 어떤 명령도 도구를 필요할 때 설치하지 않으며, 모든 도구는 추적되는 버전으로 실행합니다. 추적 파일이 Node.js, Rust, Go, Python, PHP, npm을 고정합니다. 로컬과 CI에서 같은 patch release를 쓸 수 없는 interpreter는 minor release로 고정하므로, Python은 `.python-version`이 3.14를, PHP는 `.php-version`이 8.5를 적고, 검사는 major.minor를 비교하며, 각 기록은 실행 중인 patch release를 적습니다. setup-python과 setup-php는 minor의 최신 patch release를 설치하기 때문입니다. 그리고 `make toolchain-check`(`scripts/kit/check-toolchain.mjs`)는 각 도구를 선언과 비교하고 도구를 실행하는 모든 target이 이에 의존하며, `GOTOOLCHAIN=local`과 `RUSTUP_AUTO_INSTALL=0`은 go와 rustup이 다른 toolchain을 가져오지 못하게 하고, cargo는 `--locked`로 실행하며, `make install`이 내려받는 유일한 단계로서 tarball hash와 대조한 npm과 Go(`var/tools`), Rust toolchain, `rust/Cargo.lock`의 crate, `external-inputs.json`과 대조한 PIE PHAR와 추가 사례(`scripts/external_inputs.py`)를 설치하고, 릴리스 archive의 consumer 설치를 뺀 다른 모든 명령은 cargo, go, npm, Composer를 offline으로 실행하며(Makefile이 export하는 `CARGO_NET_OFFLINE`, `GOPROXY=off`, `npm_config_offline`, `COMPOSER_DISABLE_NETWORK`), 내려받지 않은 입력은 `run make install`로 실패하고(`make cargo-downloads-check`는 `cargo fetch --locked --offline`을 실행해 lock file을 밝히고, `make pie-check`와 `make verify-all`은 없는 PIE PHAR나 추가 사례를 밝힙니다), CI는 image, action, Python을 고정하고, `make pie-check`와 `make verify-all`은 PIE PHAR와 추가 사례를 먼저 `external-inputs.json`과 비교합니다.
 - test는 자기가 만든 출력만 읽고 추적되지 않은 상태에 의존하지 않습니다. 기록, 문서 검사, 공통 사례, build 사본은 Git이 추적하는 파일을 읽고, guard는 추적되지 않은 파일을 거부하며, 각 실행은 자기 `CARGO_TARGET_DIR`를 가진 자기 실행 디렉터리에서 빌드하고, test는 자기 파일을 자기 임시 디렉터리에만 씁니다.
 - 공유 출력은 원자적으로 게시합니다. `var/`의 파일에 끝까지 쓴 뒤 그 경로 위로 이름을 바꿉니다(`write_record`).
 - 검사는 실패를 모으고 첫 실패에서 멈추지 않습니다. 모든 언어, 단계, 사례가 끝까지 실행되고, 실행은 status 1로 끝나기 전에 모든 실패를 나열합니다.

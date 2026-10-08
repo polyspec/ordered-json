@@ -6,21 +6,21 @@
 <a id="repository-check"></a>
 ## Aggregate check
 
-Development runs unit tests only (`python3 scripts/test.py --unit`). The aggregate check, the PIE artifact check and the owner checks are end-to-end checks that [hosted CI](#ci) runs after every push; no rule requires a local run before a commit or a push, and the pre-push hook only reads the checklist. To run the aggregate check locally anyway, install the [required tools](installation.md#requirements) and run from the repository root:
+Development runs unit tests only (`make test-scripts`). The aggregate check, the PIE artifact check and the owner checks are end-to-end checks that [hosted CI](#ci) runs after every push; no rule requires a local run before a commit or a push, and the pre-push hook only reads the checklist. To run the aggregate check locally anyway, install the [required tools](installation.md#requirements) and run from the repository root:
 
 ~~~sh
-make tools
+make install
 make check
 ~~~
 
-The command runs the verification and documentation checker tests, builds the selected packages, tests every registered implementation against the common JSON cases, writes the aggregate record `var/records/verification.json`, and checks common and package documentation with the [records](#records) of the checkout. An aggregate record includes the source hash of every tracked file.
+`make check` runs the targets of `CHECK_TARGETS` through `scripts/kit/full-run.mjs`. Its target `verify-all` runs the verifier unit tests, builds the selected packages, tests every registered implementation against the common JSON cases, writes the aggregate record `var/records/verification.json`, and runs the evidence check with the [records](#records) of the checkout. An aggregate record includes the source hash of every tracked file.
 
 Each build step prints a start line, its output as it arrives, and its exit status with the elapsed time. A build step or PIE command has no time limit: its exit status and its output decide the result. Package tests print each case as it ends, with its elapsed time. A case has 60 s after the previous result; when that passes, the verifier kills the test process group and fails with the name of the running case. Each adapter receives one shared case at a time and the verifier prints the case with the elapsed time of its reply; a reply has 60 s, and an adapter that misses it is killed and the case is named. No limit applies to the whole run. When a build step, a package test command or an adapter ends, the verifier kills its process group, so a process that it started in the background neither outlives it nor holds its output open. A failure ends neither the run nor the other languages: the unit tests, the build of each language, the case and symbol listings, the package tests and every shared case of every adapter run to their end, a failed build skips only the later steps of its own language, and the run then lists every failure and exits with status 1 without writing a record.
 
 <a id="records"></a>
 ## Records
 
-The evidence of a commit is the run that verifies it. `make pie-check` writes the PIE record `var/records/pie-verification.json` and `make check` writes the aggregate record `var/records/verification.json`. Git ignores `var/`, so no record is committed: a record hashes every tracked file except `benchmarks/results.json`, so a committed record would go stale with the next commit and would force a full run on a local machine after every change. With `--records`, the documentation check at the end of `make check` checks the aggregate record and, when it exists, the PIE record of the same checkout against the current sources, so a run that writes both checks both.
+The evidence of a commit is the run that verifies it. `make pie-check` writes the PIE record `var/records/pie-verification.json` and `make verify-all` writes the aggregate record `var/records/verification.json`. Git ignores `var/`, so no record is committed: a record hashes every tracked file except `benchmarks/results.json`, so a committed record would go stale with the next commit and would force a full run on a local machine after every change. With `--records`, the evidence check at the end of `make verify-all` checks the aggregate record and, when it exists, the PIE record of the same checkout against the current sources, so a run that writes both checks both.
 
 The aggregate record includes source hashes, package file records, actual runtime versions, the running Python patch release, case counts, results, checker test count, build warnings, and supplementary input revision. PHP and extension versions are separate fields. A changed input invalidates the record as current evidence. The verifier rejects changes during execution and incomplete implementation results. The record does not establish publication. Every record and report (`var/records/verification.json`, `var/records/pie-verification.json`, `benchmarks/results.json`, the review copy of a failed benchmark and `docs/reports/ojson-comparison.json`) is written completely to a file in `var/`, which Git ignores and no manifest reads, and renamed over its path, so a reader finds the previous file or the new one and never part of one.
 
@@ -28,11 +28,11 @@ The aggregate record includes source hashes, package file records, actual runtim
 ## Supplementary inputs
 
 ~~~sh
-make tools
+make install
 make check JSON_TEST_SUITE=.cache/JSONTestSuite
 ~~~
 
-`make tools` fetches the revision of nst/JSONTestSuite that [external inputs](../../external-inputs.json) pins into `.cache/JSONTestSuite` and refuses a checkout whose revision, case count or inputs hash differs from the pin, naming the expected and the actual value of each field.
+`make install` fetches the revision of nst/JSONTestSuite that [external inputs](../../external-inputs.json) pins into `.cache/JSONTestSuite` and refuses a checkout whose revision, case count or inputs hash differs from the pin, naming the expected and the actual value of each field.
 
 The record states whether supplementary inputs were used. `i_` cases use the shared UTF-8 and depth policy. Official inputs and expectations exist only at the repository root; adapters contain no separate goldens.
 
@@ -65,7 +65,7 @@ Run `make check JSON_TEST_SUITE=/path/to/JSONTestSuite` for supplementary inputs
 <a id="pie"></a>
 ## PIE artifact check
 
-`make tools` downloads the PIE release that [external inputs](../../external-inputs.json) pins from the [official releases](https://github.com/php/pie/releases) into `.cache/pie/pie.phar`, the default `PIE` of `make pie-check`, and refuses a file whose SHA-256 differs from the pin, naming both hashes. Its provenance can be verified with `gh attestation verify --owner php .cache/pie/pie.phar`. From the common root:
+`make install` downloads the PIE release that [external inputs](../../external-inputs.json) pins from the [official releases](https://github.com/php/pie/releases) into `.cache/pie/pie.phar`, the default `PIE` of `make pie-check`, and refuses a file whose SHA-256 differs from the pin, naming both hashes. Its provenance can be verified with `gh attestation verify --owner php .cache/pie/pie.phar`. From the common root:
 
 ~~~sh
 make pie-check JSON_TEST_SUITE=.cache/JSONTestSuite
@@ -81,12 +81,12 @@ The PIE record `var/records/pie-verification.json` records the PIE version and P
 `.github/workflows/ci.yml` runs the full suite on every pull request, every push to `main` and every manual run (`workflow_dispatch`), in the jobs `docs`, `suite` and `python`. `.github/workflows/push-gate.yml` runs on every push and every pull request, `.github/workflows/release.yml` runs only on the push of a tag `v*` or `**/v*` ([tag releases](distribution.md#tag-release)), and no other workflow exists:
 
 ~~~sh
-make tools
-make ci-targets TARGETS="verify-all clippy go-vet pie-check" JSON_TEST_SUITE=.cache/JSONTestSuite
+make install
+make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check" JSON_TEST_SUITE=.cache/JSONTestSuite
 make ci-targets TARGETS="kit-check kit-test hooks-check owner-validate release-coverage release-config-check"
 ~~~
 
-The job `suite` installs Python, Node.js, Go and PHP from the pin files, runs `make tools`, the only step that downloads, and runs the targets `verify-all`, `clippy`, `go-vet` and `pie-check`: `make pie-check` writes the PIE record, `make verify-all` writes the aggregate record and its documentation check checks both. The job `docs` installs only Node.js and runs `kit-check`, `kit-test`, `hooks-check`, `owner-validate`, `release-coverage` and `release-config-check`; the job `push-gate` of `push-gate.yml` runs `push-gate-commit`, `documents-check`, `evidence-check` and `commits-check`. The job `python` installs the interpreter of its matrix, the floor minor 3.11 and the minor release of `.python-version`, and runs `python-package-check`, the package tests, the case listing and the symbol report of the Python implementation with that interpreter (`scripts/python_check.py`), which the suite job cannot do for a minor below the pin of the repository tools. Every target of `CHECK_TARGETS` in the Makefile, the full suite of `make check`, runs in exactly one job of `ci.yml` and `push-gate.yml`. Every step runs a make target and runs after a failed step (`if: !cancelled()`); `make ci-targets` (`scripts/kit/ci-targets.mjs`) runs every target of the job to its end, prints its output as it arrives, writes it to `var/report/ci-targets/targets/<target>.log` and records the status, the exit status and the time of each target in `var/report/ci-targets/record.json`, and writes `summary.md` with the first failure lines of each failed target, which it appends to the job summary of GitHub. The step `report` uploads `var/report/ci-targets/` as the artifact of the job, also after a failure. No step has a time limit. The jobs run on `ubuntu-24.04`, as the push gate does; the records name the Python and PHP patch releases that ran.
+The job `suite` installs Python, Node.js, Go and PHP from the pin files, runs `make install`, the only step that downloads, and runs the targets `toolchain-check`, `cargo-downloads-check`, `verify-all`, `clippy`, `go-vet` and `pie-check`: `make pie-check` writes the PIE record, `make verify-all` writes the aggregate record and its evidence check checks both. The job `docs` installs only Node.js and runs `kit-check`, `kit-test`, `hooks-check`, `owner-validate`, `release-coverage` and `release-config-check`; the job `push-gate` of `push-gate.yml` runs `push-gate-commit`, `documents-check`, `evidence-check` and `commits-check`. The job `python` installs the interpreter of its matrix, the floor minor 3.11 and the minor release of `.python-version`, and runs `python-package-check`, the package tests, the case listing and the symbol report of the Python implementation with that interpreter (`scripts/python_check.py`), which the suite job cannot do for a minor below the pin of the repository tools. Every target of `CHECK_TARGETS` in the Makefile, the full suite of `make check`, runs in exactly one job of `ci.yml` and `push-gate.yml`. Every step runs a make target and runs after a failed step (`if: !cancelled()`); `make ci-targets` (`scripts/kit/ci-targets.mjs`) runs every target of the job to its end, prints its output as it arrives, writes it to `var/report/ci-targets/targets/<target>.log` and records the status, the exit status and the time of each target in `var/report/ci-targets/record.json`, and writes `summary.md` with the first failure lines of each failed target, which it appends to the job summary of GitHub. The step `report` uploads `var/report/ci-targets/` as the artifact of the job, also after a failure. No step has a time limit. The jobs run on `ubuntu-24.04`, as the push gate does; the records name the Python and PHP patch releases that ran.
 
 The last job of `ci.yml`, `ci-passed`, is the check of the workflow that the release workflow requires on the tagged commit ([publishing main](#publish)). It needs every other job of the workflow, runs after each of them also when one failed, was skipped or was cancelled (`if: ${{ always() }}`), and runs `make ci-passed RESULTS='${{ toJSON(needs) }}'`: `scripts/kit/ci-passed.mjs` prints the result of every needed job and fails unless each one is `success`. A job added to `ci.yml` is listed in `needs`, so the required check covers it; `scripts/tests/test_workflow_rules.py` fails when `ci-passed` is missing, is not the last job, lacks `if: ${{ always() }}`, does not need every other job, runs on another runner or runs another step.
 
