@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 4c7e0ffc34fb2198970b82c3eef4c6766081b47de732b59d8debd14da1f9aaac -->
+<!-- source-sha256: 5dc2e2ce2c999dc769d14855d192281719d2a0afc1a209f5342d670ca2986dc0 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -10,6 +10,7 @@
 - T1.27-18: release version test가 고정된 tag v0.0.3 대신 `js/package.json`이 선언한 version의 tag를 검사합니다. 0.0.4 bump로 고정 tag가 오래되었기 때문입니다.
 - T1.27-19: CI workflow가 main에 push될 때마다 실행되어, main의 모든 commit에 release workflow가 요구하는 check ci-passed가 붙습니다.
 - T1.27-21: AGENTS.md에 0.x 규칙을 적었습니다. 변경은 소유 unit test가 로컬에서 통과한 뒤 main에 commit하며, CI push trigger가 main의 각 commit에 ci-passed check를 만듭니다.
+- T1.27-22: AGENTS.md에 pin 규칙을 적었습니다. 다른 저장소 package의 pin은 GitHub에 존재하는 tag만 가리킵니다.
 - T1.27-17: release asset 설치 test의 consumer fixture가 `make install-fixtures`로 쓴 0.0.4 아카이브를 가리킵니다.
 ## 0.0.4
 

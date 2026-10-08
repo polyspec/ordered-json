@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 6f880de2a94fd9cb51103eac339cba9c6fe053c14504fb66e8f9dd2bc7293b66 -->
+<!-- source-sha256: 5780ebbbe5fcdb48f92a7595da85d8da17fcc9d44d165972bc0d099c88701d9c -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -80,6 +80,8 @@ Rust 코드는 `rust/`에서 `cargo clippy --all-targets -- -D warnings`를, Go 
 1. 버전 올림 pull request `Release X.Y.Z`는 commit에 체크리스트 작업을 적고, 저장소의 모든 manifest(`package.json`, `js/package.json`, `composer.json`, `php/composer.json`, `php-extension/composer.json`, `rust/Cargo.toml`, `python/pyproject.toml`, `rust/Cargo.lock`의 package 항목)의 버전을 X.Y.Z로 정하고, `make install-fixtures`로 그 버전의 설치 fixture를 쓰며, 모든 changelog의 `## Unreleased`를 `## X.Y.Z`로 바꾸고 그 위에 비어 있는 새 `## Unreleased`를 둡니다.
 2. 메인테이너는 merge된 `main`의 commit에 `vX.Y.Z` tag를, `go/`의 Go 모듈에는 `go/vX.Y.Z` tag를 붙이고 tag를 push합니다.
 3. tag push는 `.github/workflows/release.yml`을 실행합니다. 이 workflow는 tag된 commit이 `main`에 있고 check `push-gate`와 `ci-passed`를 통과했는지, 모든 manifest에 tag의 버전이 있고 `CHANGELOG.md`에 section `## X.Y.Z`가 있는지 확인하고, 패키지 archive를 만들어 GitHub Release를 생성합니다([tag 릴리스](docs/operations/distribution.ko.md#tag-release)).
+
+이 저장소의 package가 다른 저장소의 package를 고정할 때(`git+https://github.com/polyspec/<repository>@vX.Y.Z`)는 GitHub에 실제로 존재하는 tag만 씁니다. 그 tag를 push한 뒤에 고정하며, 아직 release되지 않은 tag를 가리키는 고정은 쓰지 않습니다.
 
 <a id="idempotency"></a>
 ## 멱등성
