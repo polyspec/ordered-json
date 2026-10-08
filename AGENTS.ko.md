@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: a1d32c7e51d96a48a60d87d9e7ca1c9cdc4f0d8c037df1386e1eddda4ef8caa4 -->
+<!-- source-sha256: fd4c23e85600e85cfb6f4ba27b4b3c2db3b275b2274d578359a633053e224c50 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -95,6 +95,7 @@ Rust 코드는 `rust/`에서 `cargo clippy --all-targets -- -D warnings`를, Go 
 - test는 자기가 만든 출력만 읽고 추적되지 않은 상태에 의존하지 않습니다. 기록, 문서 검사, 공통 사례, build 사본은 Git이 추적하는 파일을 읽고, guard는 추적되지 않은 파일을 거부하며, 각 실행은 자기 `CARGO_TARGET_DIR`를 가진 자기 실행 디렉터리에서 빌드하고, test는 자기 파일을 자기 임시 디렉터리에만 씁니다.
 - 공유 출력은 원자적으로 게시합니다. `var/`의 파일에 끝까지 쓴 뒤 그 경로 위로 이름을 바꿉니다(`write_record`).
 - 검사는 실패를 모으고 첫 실패에서 멈추지 않습니다. 모든 언어, 단계, 사례가 끝까지 실행되고, 실행은 status 1로 끝나기 전에 모든 실패를 나열합니다.
+- 검사는 사용자 로캘의 메시지를 판정하지 않습니다. 출력 텍스트를 비교하는 명령은 `LC_ALL=C`로 실행하고, `scripts/registry.py`가 `git rev-parse --is-inside-work-tree`를 그렇게 실행하므로 다른 언어로 보고하는 git도 work tree가 아님으로 읽힙니다.
 - 실패는 기대값, 실제값, 도구 자신의 오류를 출력합니다. 일치한 줄, 다른 파일, 두 버전이나 hash, 종료 상태와 standard error입니다.
 - 빈 선택은 실패합니다. test를 고르지 않는 unit test 이름, 기능 행이 없는 tracker, test를 찾지 못한 실행은 이름을 밝히며 실패합니다.
 - 자식 process는 명령이 끝나거나 호출자가 멈출 때 손자를 포함한 process group 단위로 회수하고(`end_group`), 임시 디렉터리는 `finally`나 context manager에서 제거합니다.

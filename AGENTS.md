@@ -94,6 +94,7 @@ The same tree gives the same result at any time and on any machine. A defect fou
 - A test reads only the outputs it creates and does not depend on untracked state. Records, documentation checks, shared cases and build copies read the files Git tracks, the guard refuses untracked files, each run builds in its own run directory with its own `CARGO_TARGET_DIR`, and a test writes its files only into its own temporary directory.
 - A shared output is published atomically: it is written completely to a file in `var/` and renamed over its path (`write_record`).
 - A check accumulates failures and does not stop at the first: every language, step and case runs to its end, and the run lists every failure before it exits with status 1.
+- A check never judges a message in the locale of the user: a command whose output text is compared runs with `LC_ALL=C`, as `scripts/registry.py` runs `git rev-parse --is-inside-work-tree`, so a git that reports in another language still reads as no work tree.
 - A failure prints the expected value, the actual value and the tool's own error: matched lines, differing files, both versions or hashes, the exit status and standard error.
 - An empty selection fails: a unit test name that selects no test, a tracker without feature rows and a run that discovers no test fail by name.
 - Children are reaped by process group, grandchildren included, when a command ends or its caller stops (`end_group`), and a temporary directory is removed in `finally` or by its context manager.

@@ -96,7 +96,8 @@ def tracked_files(root):
     An untracked file is not part of the tree that a record names, so no record, documentation check
     or shared case reads one."""
     process = subprocess.run(['git', 'rev-parse', '--is-inside-work-tree'], cwd=root,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                             env={**os.environ, 'LC_ALL': 'C'})
     if process.returncode:
         if 'not a git repository' in process.stderr:
             return None
