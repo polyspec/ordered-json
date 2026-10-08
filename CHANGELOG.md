@@ -6,6 +6,9 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The repository tools run on Python 3.14 (T1.27-1): `.python-version` names 3.14, the unit tests of the verifier
+  pass on it, every workflow that installs Python reads the pin file instead of a release of its own, and the setup
+  section of every package README names the pin file.
 - A git that reports in the language of the user reads as no work tree (T1.28): `tracked_files` judged the absence
   of a work tree by the English text of git's error, so a localized git turned the records, documentation checks and
   shared cases of a source tree into errors. The `git rev-parse --is-inside-work-tree` call runs with `LC_ALL=C`,

@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: ec36cadab7469bbb7602475f5fca5d5cc2015810c358aa3d847863114039e0a6 -->
+<!-- source-sha256: d2e4abff31df39273f5a58565b153a3ed02bdde09fc1ab5ee4b783ddcfad8c54 -->
 # ordered-json for JavaScript
 
 [English](README.md)
@@ -27,7 +27,7 @@ const output = stringify(value);
 <a id="verification"></a>
 ## 검증
 
-Python >= 3.9, Git, make, 해당 구현의 런타임·빌드 도구를 설치하고 이 체크아웃에서 실행합니다.
+`.python-version`이 지정한 minor release의 Python, Git, make, 해당 구현의 런타임·빌드 도구를 설치하고 이 체크아웃에서 실행합니다.
 
 ~~~sh
 make check

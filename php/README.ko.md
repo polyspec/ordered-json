@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: cfa47887ed98be26f8121361b36795cf7ad0bb3a887005fc9e4ea58073bef569 -->
+<!-- source-sha256: 8e1054d0b9502951da048de1ea43f3f2824c06069878bea61c902dd5d81459e7 -->
 # ordered-json for PHP
 
 [English](README.md)
@@ -29,7 +29,7 @@ $output = Polyspec\OrderedJson\stringify($value);
 <a id="verification"></a>
 ## 검증
 
-Python >= 3.9, Git, make, 해당 구현의 런타임·빌드 도구를 설치하고 이 체크아웃에서 실행합니다.
+`.python-version`이 지정한 minor release의 Python, Git, make, 해당 구현의 런타임·빌드 도구를 설치하고 이 체크아웃에서 실행합니다.
 
 ~~~sh
 make check

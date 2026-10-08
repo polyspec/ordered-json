@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: f224280118c4d744439fccc72b22587890e1abdf53f6bf5981d836b075cae029 -->
+<!-- source-sha256: d8f709911f2a41f72e90ff7dea79dc779df30026d50d32d3651579acdda20cea -->
 # ordered-json for PHP extension
 
 [English](README.md)
@@ -37,7 +37,7 @@ PIE 설정은 `PIE_WORKING_DIRECTORY` 환경 변수로 격리할 수 있습니�
 <a id="verification"></a>
 ## 검증
 
-Python >= 3.9, Git, make, 해당 구현의 런타임·빌드 도구를 설치하고 이 체크아웃에서 실행합니다.
+`.python-version`이 지정한 minor release의 Python, Git, make, 해당 구현의 런타임·빌드 도구를 설치하고 이 체크아웃에서 실행합니다.
 
 ~~~sh
 make check
