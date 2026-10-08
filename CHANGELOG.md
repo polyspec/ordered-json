@@ -14,6 +14,7 @@
 - T1.29-6: the packages are in `packages/ordered-json-npm`, `packages/ordered-json-php`, `packages/ordered-json-php-ext`, `packages/ordered-json-python`, `packages/ordered-json-rust` and `packages/ordered-json-go`. The Go module path is `github.com/polyspec/ordered-json/packages/ordered-json-go` and its tag is `packages/ordered-json-go/vX.Y.Z`.
 - T1.29-7: AGENTS states that the tools of `scripts/kit/` and `tests/kit/` change only in polyspec/kit, that this repository differs from another polyspec repository only in `config/*.json` and its own product code, the 0.x rule without pull request, merge queue or ruleset, and the archive names `<package>-<language>-<version>.<ext>`. The release 0.0.7 is prepared: the manifests are not bumped, no tag exists, and `make release-config-check`, `make release-coverage` and `make dependency-policy-check` pass for the layout of `packages/`.
 - T1.29-8: `config/toolchain.json` declares Composer 2.10.3. The job `docs` of `ci.yml` sets up PHP and that Composer release for `make dependency-policy-check`, and `make kit-test` runs in the job `suite`.
+- T1.29-9: the vendored tools of kit are v0.0.8.
 
 ## 0.0.6
 
