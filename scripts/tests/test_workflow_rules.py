@@ -336,6 +336,24 @@ class WorkflowRules(unittest.TestCase):
         broken = text.replace('      - name: make ci\n        if: ${{ !cancelled() }}\n', '      - name: make ci\n')
         self.assertTrue(any('does not run after a failed step' in issue for issue in violations('ci.yml', broken)))
 
+    def test_each_action_keeps_one_pinned_commit(self):
+        """Every `uses:` line names a full commit id, and an action keeps one commit id in every workflow."""
+        pins, unpinned = {}, []
+        for path in sorted(WORKFLOWS.glob('*.yml')):
+            for line in path.read_text().splitlines():
+                if 'uses:' not in line:
+                    continue
+                match = re.search(r'uses: ([\w.-]+/[\w.-]+)@([0-9a-f]{40})\b', line)
+                if match is None:
+                    unpinned.append(f'{path.name}: {line.strip()}')
+                    continue
+                pins.setdefault(match.group(1), {}).setdefault(match.group(2), []).append(path.name)
+        self.assertEqual(unpinned, [])
+        self.assertTrue(pins)
+        for action, commits in sorted(pins.items()):
+            with self.subTest(action=action):
+                self.assertEqual(len(commits), 1, commits)
+
 
 if __name__ == '__main__':
     unittest.main()
