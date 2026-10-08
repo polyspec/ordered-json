@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 76883d98d1182ec0be589e3fb623c0d3fd6429fe156e0380f5def6d0f99dcefc -->
+<!-- source-sha256: dec0e2858094199ff28189ffba33111ab05c8f5cb0f858570fbb8ba24df6b6a3 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- v0.0.4의 `release-verify`가 실패했습니다. `main`의 commit 471ab69에 check `ci-passed`가 없습니다. 이 commit은 `push-gate` job을 실행했고 `ci` workflow 실행은 없었습니다. 원인은 열린 행으로 기록했으며 아직 고치지 않았습니다 (T1.27-16).
 
 ## 0.0.4
 

@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The `release-verify` of v0.0.4 failed because the check `ci-passed` is missing for commit 471ab69 on `main`: that commit ran the `push-gate` job and no `ci` workflow run. The cause is recorded as an open row and is not yet fixed (T1.27-16).
+
 ## 0.0.4
 
 - On PR #1, `ci-passed` passes after the fixes of T1.27-10 to T1.27-13: the docs, python, push-gate and suite jobs pass on the same commit (T1.27-14).
