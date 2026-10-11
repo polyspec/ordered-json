@@ -1,5 +1,5 @@
 <!-- doc-id: distribution -->
-<!-- source-sha256: a1984ccaf387bd8721837126c917287127eeca0bcc45ee4d900b59e4a56fd8b7 -->
+<!-- source-sha256: 26b6a4a9a47f3cca97d4596a55e4db0b2f593239b162229fdf6a991b802bcef6 -->
 # 배포
 
 [English](distribution.md)
@@ -29,7 +29,7 @@ git push origin HEAD:main
 <a id="tag-release"></a>
 ## Tag 릴리스
 
-릴리스는 `main`의 commit에 붙인 tag입니다([릴리스 절차](../../AGENTS.ko.md#release)). `vX.Y.Z`는 `packages/ordered-json-npm/`의 npm 패키지와 `packages/ordered-json-php/`, `packages/ordered-json-php-ext/`의 Composer 패키지를 버전 X.Y.Z로 릴리스하고, `packages/ordered-json-go/vX.Y.Z`는 Go 모듈 `github.com/polyspec/ordered-json/packages/ordered-json-go`를 릴리스합니다. `packages/ordered-json-rust/`의 Cargo 패키지와 `packages/ordered-json-python/`의 Python 패키지는 archive로 릴리스하지 않고 git tag로 사용합니다(`config/release.json`, mode `git-tag`). `cargo package`는 git 의존성을 해석되지 않는 crates.io 요구로 바꾸기 때문입니다. 패키지, tag가 각 manifest를 릴리스하는 방식, 어떤 tag도 릴리스하지 않는 manifest, Go 모듈은 [config/release.json](../../config/release.json)에 선언합니다. `make release-coverage`는 checkout의 모든 package 파일이 그곳에 분류되도록 요구하고, `make release-config-check`는 `packages/ordered-json-npm/package.json`이 선언한 버전의 step `versions`를 실행합니다. tag의 push는 `.github/workflows/release.yml`(`on: push: tags: ['v*', '**/v*']`, 권한 `contents: write`. tag filter에서 `*`는 `/`와 맞지 않으므로 `**/v*`가 어느 깊이의 Go 모듈 tag든 포함합니다)을 실행하며, 그 step은 다음 순서로 `scripts/kit/release.mjs`를 실행하고 첫 실패에서 멈춥니다.
+릴리스는 `main`의 commit에 붙인 tag입니다([릴리스 절차](../../AGENTS.ko.md#release)). `vX.Y.Z`는 `packages/ordered-json-npm/`의 npm 패키지와 `packages/ordered-json-php/`, `packages/ordered-json-php-ext/`의 Composer 패키지를 버전 X.Y.Z로 릴리스하고, `packages/ordered-json-python/`의 Python wheel을 버전 X.Y.Z로 릴리스하고, `packages/ordered-json-go/vX.Y.Z`는 Go 모듈 `github.com/polyspec/ordered-json/packages/ordered-json-go`를 릴리스합니다. Python 패키지는 wheel asset `polyspec_ordered_json-X.Y.Z-py3-none-any.whl`로 릴리스하며(`config/release.json`, kind `wheel`), git tag로 사용하지 않습니다. `packages/ordered-json-rust/`의 Cargo 패키지는 archive로 릴리스하지 않고 git tag로 사용합니다(`config/release.json`, mode `git-tag`). `cargo package`는 git 의존성을 해석되지 않는 crates.io 요구로 바꾸기 때문입니다. tag `vX.Y.Z`와 `packages/ordered-json-go/vX.Y.Z`는 같은 commit을 가리키며, `vX.Y.Z`보다 Go tag를 먼저 push합니다. `vX.Y.Z`의 실행이 검증할 때 그 commit의 Go tag를 확인하기 때문입니다([릴리스 절차](../../AGENTS.ko.md#release), 2단계). 패키지, tag가 각 manifest를 릴리스하는 방식, 어떤 tag도 릴리스하지 않는 manifest, Go 모듈은 [config/release.json](../../config/release.json)에 선언합니다. `make release-coverage`는 checkout의 모든 package 파일이 그곳에 분류되도록 요구하고, `make release-config-check`는 `packages/ordered-json-npm/package.json`이 선언한 버전의 step `versions`를 실행합니다. tag의 push는 `.github/workflows/release.yml`(`on: push: tags: ['v*', '**/v*']`, 권한 `contents: write`. tag filter에서 `*`는 `/`와 맞지 않으므로 `**/v*`가 어느 깊이의 Go 모듈 tag든 포함합니다)을 실행하며, 그 step은 다음 순서로 `scripts/kit/release.mjs`를 실행하고 첫 실패에서 멈춥니다.
 
 ~~~sh
 make release-verify

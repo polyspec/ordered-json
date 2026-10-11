@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 7f10fde8e6e60c91e57a8354a5a37d14857964d803421a93908eb35e991e530b -->
+<!-- source-sha256: 3cb3cfa0b0dd7b5a7fed0cdca3db0c5a1bd92a35c443ca19e82d31ef497f7bb4 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- T1.32-4: 배포 문서, 설치 문서와 `AGENTS.md`는 Python 패키지를 git tag가 아니라 wheel asset `polyspec_ordered_json-X.Y.Z-py3-none-any.whl`로 적습니다. Python 패키지 README는 그 wheel asset으로 설치합니다. 릴리스 절차는 Go tag `packages/ordered-json-go/vX.Y.Z`를 같은 commit의 `vX.Y.Z`보다 먼저 push한다고 밝힙니다.
 
 - T1.32-3: kit의 vendored 도구는 v0.0.20입니다(`make kit-sync KIT_TAG=v0.0.20`). `make kit-test`가 vendored test를 모두 통과합니다.
 

@@ -1,5 +1,5 @@
 <!-- doc-id: python-overview -->
-<!-- source-sha256: d50ab43fbd13258e8a9b0e5d726b5f5992a1a57e0be3db8ebe01ddc716c2fcff -->
+<!-- source-sha256: 9404923524d8d0af15e0d6f960da7d150a019c372b1d2849f25bf338cbc3ac7e -->
 # Python용 ordered-json
 
 [English](README.md)
@@ -9,10 +9,10 @@
 <a id="usage"></a>
 ## 사용
 
-Python >= 3.14. 패키지는 `polyspec-ordered-json`이고 import 이름은 `polyspec.ordered_json`이며, 이 저장소의 tag에서 설치합니다:
+Python >= 3.14. 패키지는 `polyspec-ordered-json`이고 import 이름은 `polyspec.ordered_json`이며, release의 wheel asset으로 설치합니다. `X.Y.Z`는 그 release의 버전입니다:
 
 ~~~sh
-pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@v0.0.3#subdirectory=python"
+pip install "https://github.com/polyspec/ordered-json/releases/download/vX.Y.Z/polyspec_ordered_json-X.Y.Z-py3-none-any.whl"
 ~~~
 
 사용 예의 `source`는 [공통 공식 예시](https://github.com/polyspec/ordered-json/blob/main/examples/official.json)의 object 사례에서 가져옵니다. parse 오류는 UTF-8 byte offset을 보고합니다. `Value.string_value()`는 surrogate pair를 한 문자로, 짝 없는 surrogate를 자기 문자 그대로 돌려주며, 이는 JavaScript binding과 같습니다.
