@@ -1,5 +1,5 @@
 <!-- doc-id: distribution -->
-<!-- source-sha256: 26b6a4a9a47f3cca97d4596a55e4db0b2f593239b162229fdf6a991b802bcef6 -->
+<!-- source-sha256: f9ab04f177f5ed80fc143a0d2f226336d62992cad4d121ddb6c2e6574ea9f574 -->
 # 배포
 
 [English](distribution.md)
@@ -7,7 +7,7 @@
 <a id="state"></a>
 ## 확인된 상태
 
-[distribution.json](../distribution.json)에 소스와 게시 관측을 기록합니다. 저장소는 다섯 [구현 패키지](../spec/repositories.ko.md#ownership)를 하나의 리비전에 담습니다. 기록된 관측에서 GitHub 릴리스와 버전 태그는 발견되지 않았습니다.
+[distribution.json](../distribution.json)에 소스와 게시 관측을 기록합니다. 저장소는 다섯 [구현 패키지](../spec/repositories.ko.md#ownership)를 하나의 리비전에 담습니다. 저장소의 GitHub 릴리스와 버전 태그는 `gh release list -R polyspec/ordered-json`과 저장소의 Releases 페이지에 나열됩니다. `vX.Y.Z` 릴리스는 [릴리스 asset](installation.ko.md#release-assets)에 나열된 asset을 첨부하고, Go 모듈 릴리스 `packages/ordered-json-go/vX.Y.Z`는 asset을 첨부하지 않습니다.
 
 npm, crates.io, Packagist, Go, PHP 확장의 레지스트리 게시는 검증되지 않았습니다. 확인된 로컬 배포는 소스 체크아웃입니다. PIE 메타데이터와 성공한 PIE 빌드는 로컬 빌드 호환성을 확인하며 Packagist 게시 근거는 아닙니다. 확장 패키지는 `polyspec/ordered-json-extension`, PHP 라이브러리는 `polyspec/ordered-json`입니다.
 

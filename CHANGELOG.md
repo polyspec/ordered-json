@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.32-5: the distribution document and the root `README.md` no longer state that no release exists or that the first release is unpublished. They name where the releases are listed (`gh release list -R polyspec/ordered-json` and the Releases page) and what a `vX.Y.Z` release attaches.
+
 - T1.32-4: the distribution documents, the installation document and `AGENTS.md` name the Python package as its wheel asset `polyspec_ordered_json-X.Y.Z-py3-none-any.whl` instead of a git tag. The Python package README installs that wheel asset. The release procedure states that the Go tag `packages/ordered-json-go/vX.Y.Z` is pushed before `vX.Y.Z` on the same commit.
 
 - T1.32-3: the vendored tools of kit are v0.0.20 (`make kit-sync KIT_TAG=v0.0.20`); `make kit-test` passes on the vendored tests.

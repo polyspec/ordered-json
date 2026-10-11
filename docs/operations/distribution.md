@@ -6,7 +6,7 @@
 <a id="state"></a>
 ## Observed state
 
-[distribution.json](../distribution.json) records source and publication observations. The repository holds the five [implementation packages](../spec/repositories.md#ownership) in one revision. No GitHub releases or version tags were found in the recorded observations.
+[distribution.json](../distribution.json) records source and publication observations. The repository holds the five [implementation packages](../spec/repositories.md#ownership) in one revision. The GitHub releases and version tags of the repository are listed by `gh release list -R polyspec/ordered-json` and on its Releases page. A `vX.Y.Z` release attaches the assets listed in [release assets](installation.md#release-assets); a Go module release, `packages/ordered-json-go/vX.Y.Z`, attaches none.
 
 Registry publication for npm, crates.io, Packagist, Go, and the PHP extension is not verified. Source checkout is the confirmed local distribution. PIE metadata and a passing PIE build establish local build compatibility, not Packagist publication. The extension package is `polyspec/ordered-json-extension`; the PHP library is `polyspec/ordered-json`.
 
