@@ -1,5 +1,5 @@
 <!-- doc-id: distribution -->
-<!-- source-sha256: 9a7070966b03f59b94969786cef5ff6540355e97a18cc1a7538c736518cb575d -->
+<!-- source-sha256: 6c4e02e94fc751b048d935ab8d3732f9b409321d402499038681db3293244b4a -->
 # 배포
 
 [English](distribution.md)
@@ -9,9 +9,9 @@
 
 저장소는 다섯 [구현 패키지](../spec/repositories.ko.md#ownership)를 하나의 리비전에 담습니다. GitHub 릴리스와 버전 태그는 `gh release list -R polyspec/ordered-json`과 저장소의 Releases 페이지에 나열되며, 추적 파일은 이를 다시 적지 않습니다. `make release-proof TAG=<tag>`는 릴리스를 [config/release.json](../../config/release.json)이 선언한 archive와 비교하며, 네트워크가 필요하고 릴리스가 만들어진 뒤에 실행합니다. `vX.Y.Z` 릴리스는 [릴리스 asset](installation.ko.md#release-assets)에 나열된 asset을 첨부하고, Go 모듈 릴리스 `packages/ordered-json-go/vX.Y.Z`는 asset을 첨부하지 않습니다. `published`로 표시한 기능 행은 릴리스 tag와 asset 이름을 적으며([기능](../features.ko.md)), 그 형식은 `make evidence-check`가 오프라인으로 검사합니다.
 
-npm, crates.io, Packagist, Go, PHP 확장의 레지스트리 게시는 검증되지 않았습니다. 확인된 로컬 배포는 소스 체크아웃입니다. PIE 메타데이터와 성공한 PIE 빌드는 로컬 빌드 호환성을 확인하며 Packagist 게시 근거는 아닙니다. 확장 패키지는 `polyspec/ordered-json-extension`, PHP 라이브러리는 `polyspec/ordered-json`입니다.
+이 저장소는 세 채널로 배포합니다. `vX.Y.Z` release의 GitHub release asset(npm tarball, PHP 라이브러리와 PHP 확장의 Composer zip, Python wheel), `packages/ordered-json-rust/`의 Rust 크레이트 `polyspec-ordered-json`을 git tag로, Go 모듈 `github.com/polyspec/ordered-json/packages/ordered-json-go`를 tag `packages/ordered-json-go/vX.Y.Z`로 배포합니다. 어떤 release도 레지스트리에 게시하지 않습니다. npm, crates.io, Packagist, PyPI는 release를 받지 않으며, 어떤 workflow도 레지스트리에 게시하지 않습니다. 확인된 로컬 배포는 소스 체크아웃입니다. PIE 메타데이터와 성공한 PIE 빌드는 로컬 빌드 호환성을 확인하며 Packagist 게시 근거는 아닙니다. 확장 패키지는 `polyspec/ordered-json-extension`, PHP 라이브러리는 `polyspec/ordered-json`입니다.
 
-소스 버전 문자열은 릴리스된 산출물의 근거가 아닙니다. 레지스트리 게시 워크플로는 설정되지 않았고, 호스팅 CI는 전체 suite와 push gate를 실행하며([호스팅 CI](validation.ko.md#ci)), tag의 push는 그 tag의 GitHub Release를 만듭니다([tag 릴리스](#tag-release)). LICENSE 파일은 없습니다.
+소스 버전 문자열은 릴리스된 산출물의 근거가 아닙니다. 어떤 workflow도 레지스트리에 게시하지 않고, 호스팅 CI는 전체 suite와 push gate를 실행하며([호스팅 CI](validation.ko.md#ci)), tag의 push는 그 tag의 GitHub Release를 만듭니다([tag 릴리스](#tag-release)). LICENSE 파일은 없습니다.
 
 <a id="source-publication"></a>
 ## 소스 게시
@@ -50,6 +50,6 @@ tag는 환경 변수 `TAG`로 step에 전달됩니다. `scripts/tests/test_workf
 <a id="releases"></a>
 ## 레지스트리와 릴리스 기록
 
-확립되거나 검증된 레지스트리 게시는 없습니다. 릴리스를 기록하기 전에 패키지 이름, 버전, 포함 파일, 레지스트리, 산출물, 검사한 소스 개정본을 확인합니다. 기능 행에 릴리스 asset을 적습니다. 확장 릴리스를 게시할 때는 `php-ext` Composer 메타데이터를 사용해 Packagist를 통해 PIE에 등록합니다.
+어떤 release도 레지스트리에 게시되지 않습니다. 릴리스를 기록하기 전에 패키지 이름, 버전, 포함 파일, 배포 채널, 산출물, 검사한 소스 개정본을 확인합니다. 기능 행에 릴리스 asset을 적습니다.
 
 게시 상태가 변경되면 영어·한국어 배포 문서, 기능 배포 상태, 변경 기록을 갱신합니다. 테스트, 버전 선언, 계획된 태그, 소스 푸시만으로 게시를 추정하지 않습니다.
