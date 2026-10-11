@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 3cb3cfa0b0dd7b5a7fed0cdca3db0c5a1bd92a35c443ca19e82d31ef497f7bb4 -->
+<!-- source-sha256: b2f50792df162d727a3e85cf318578a91ceb8fb6c1a08d45289b801dda4ca3e9 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- T1.32-5: 배포 문서와 루트 `README.md`는 릴리스가 없다거나 첫 release가 게시되지 않았다고 적지 않습니다. 릴리스가 나열되는 곳(`gh release list -R polyspec/ordered-json`과 Releases 페이지)과 `vX.Y.Z` 릴리스가 첨부하는 asset을 적습니다.
 
 - T1.32-4: 배포 문서, 설치 문서와 `AGENTS.md`는 Python 패키지를 git tag가 아니라 wheel asset `polyspec_ordered_json-X.Y.Z-py3-none-any.whl`로 적습니다. Python 패키지 README는 그 wheel asset으로 설치합니다. 릴리스 절차는 Go tag `packages/ordered-json-go/vX.Y.Z`를 같은 commit의 `vX.Y.Z`보다 먼저 push한다고 밝힙니다.
 
