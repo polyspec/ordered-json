@@ -133,6 +133,9 @@ jobs:
           package-manager-cache: false
       - name: make ci-targets
         if: ${{ !cancelled() }}
+        # The job checks the floor minor and the pinned minor with the interpreter of its matrix, not var/tools.
+        env:
+          PYTHON: python3
         run: make ci-targets TARGETS="python-package-check"
       - name: report
         if: ${{ !cancelled() }}
