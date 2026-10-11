@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: 79630b9226bd95f516af32f5e0edb40e821b16257848f40a151a7ea1f72f2b37 -->
+<!-- source-sha256: afc053afbda25b0480a6883204c15eef6cfe7819950502b6ddf8cb2442e07450 -->
 # ordered-json
 
 [English](README.md)
@@ -43,10 +43,10 @@ print(stringify(parse(example['input'])))
 PY
 ~~~
 
-tag의 Python 패키지는 `pip`로 설치합니다([설치](docs/operations/installation.ko.md)). `packages/ordered-json-python/`을 포함한 첫 tag는 아직 릴리스되지 않았으므로 `X.Y.Z`는 그 버전을 뜻합니다.
+release의 wheel asset으로 Python 패키지를 `pip`로 설치합니다([설치](docs/operations/installation.ko.md)). 그 첫 release는 아직 게시되지 않았으므로 `X.Y.Z`는 그 버전을 뜻합니다.
 
 ~~~sh
-pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@vX.Y.Z#subdirectory=python"
+pip install "https://github.com/polyspec/ordered-json/releases/download/vX.Y.Z/polyspec_ordered_json-X.Y.Z-py3-none-any.whl"
 ~~~
 
 | 패키지 | 내용 | 경로 |

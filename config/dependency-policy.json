@@ -2,5 +2,6 @@
   "schema": 1,
   "composerPlatforms": [],
   "pythonManifests": ["packages/ordered-json-python/pyproject.toml"],
+  "npmLocks": ["package-lock.json"],
   "exceptions": []
 }

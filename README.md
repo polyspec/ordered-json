@@ -42,10 +42,10 @@ print(stringify(parse(example['input'])))
 PY
 ~~~
 
-Install the Python package from a tag that contains `packages/ordered-json-python/`, with pip ([installation](docs/operations/installation.md)). The first such tag is not released yet, so `X.Y.Z` stands for its version:
+Install the Python package from the wheel asset of a release, with pip ([installation](docs/operations/installation.md)). The first such release is not published yet, so `X.Y.Z` stands for its version:
 
 ~~~sh
-pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@vX.Y.Z#subdirectory=python"
+pip install "https://github.com/polyspec/ordered-json/releases/download/vX.Y.Z/polyspec_ordered_json-X.Y.Z-py3-none-any.whl"
 ~~~
 
 | Package | Contents | Path |

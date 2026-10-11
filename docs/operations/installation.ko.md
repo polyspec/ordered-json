@@ -1,5 +1,5 @@
 <!-- doc-id: installation -->
-<!-- source-sha256: 0973e446a15b1dae9666459275e0f51740dfacda5b07aa929fd3278abc83184e -->
+<!-- source-sha256: f378ea832316e1f9699ecef03c48c7d7e4e9497a39553abfd097a502399bd7aa -->
 # 설치와 실행
 
 [English](installation.md)
@@ -35,16 +35,16 @@ cd ordered-json
 - Rust: `path`가 `packages/ordered-json-rust/`를 지정하는 로컬 Cargo 의존성을 설정합니다.
 - Go: `github.com/polyspec/ordered-json/packages/ordered-json-go` 모듈의 로컬 `replace`가 `packages/ordered-json-go/`를 지정하도록 설정합니다.
 - PHP: `packages/ordered-json-php/src/OrderedJson.php`를 require하거나 `packages/ordered-json-php/`를 Composer path 저장소로 사용합니다.
-- Python: tag의 패키지를 pip로 설치하거나 `packages/ordered-json-python/src`를 import 경로에 둡니다.
+- Python: release의 wheel asset을 pip로 설치하거나 `packages/ordered-json-python/src`를 import 경로에 둡니다.
 
 ~~~sh
-pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@vX.Y.Z#subdirectory=python"
+pip install "https://github.com/polyspec/ordered-json/releases/download/vX.Y.Z/polyspec_ordered_json-X.Y.Z-py3-none-any.whl"
 ~~~
 
 <a id="release-assets"></a>
 ## 릴리스 asset
 
-GitHub Release `vX.Y.Z`마다 `polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip`, `polyspec-ordered-json-extension-php-X.Y.Z.zip`이 있습니다. 각 archive는 자기 package의 manifest를 바꾸지 않고 담습니다. `packages/ordered-json-npm/`의 `package.json`, `packages/ordered-json-php/`와 `packages/ordered-json-php-ext/`의 `composer.json`이며, 모두 `version` X.Y.Z를 선언하고 `repositories`와 `@dev`가 없습니다. Python 패키지는 archive를 만들지 않습니다. pip가 저장소의 tag에서 `#subdirectory=python`으로 패키지 디렉터리를 지정해 설치합니다.
+GitHub Release `vX.Y.Z`마다 `polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip`, `polyspec-ordered-json-extension-php-X.Y.Z.zip`과 wheel `polyspec_ordered_json-X.Y.Z-py3-none-any.whl`이 있습니다. 각 archive는 자기 package의 manifest를 바꾸지 않고 담습니다. `packages/ordered-json-npm/`의 `package.json`, `packages/ordered-json-php/`와 `packages/ordered-json-php-ext/`의 `composer.json`이며, 모두 `version` X.Y.Z를 선언하고 `repositories`와 `@dev`가 없습니다. Python 패키지는 archive를 만들지 않습니다. pip가 저장소의 tag에서 `#subdirectory=python`으로 패키지 디렉터리를 지정해 설치합니다.
 
 npm은 tarball을 경로로 설치합니다.
 

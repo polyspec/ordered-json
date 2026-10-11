@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 96760b5c8f35195352b31211e454663740b05aaa638f4d07e3e149a1c761942f -->
+<!-- source-sha256: 0135d567e92f0e9f9a46bd9fefb67f3a48b0c9a9a7ec5acbd7e3806bacd21b4b -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- T1.32: Python 패키지는 wheel `polyspec_ordered_json-X.Y.Z-py3-none-any.whl`으로 release하며, `buildBackend`에 고정한 build backend `setuptools==84.0.0`으로 만들고 git tag가 아니라 release asset으로 설치합니다. README와 설치 문서는 wheel URL의 `pip install` 줄을 보여 줍니다.
 
 ## 0.0.7
 

@@ -7,7 +7,8 @@
   "packages": [
     { "kind": "npm", "directory": "packages/ordered-json-npm", "name": "@polyspec/ordered-json" },
     { "kind": "composer", "directory": "packages/ordered-json-php", "name": "polyspec/ordered-json" },
-    { "kind": "composer", "directory": "packages/ordered-json-php-ext", "name": "polyspec/ordered-json-extension" }
+    { "kind": "composer", "directory": "packages/ordered-json-php-ext", "name": "polyspec/ordered-json-extension" },
+    { "kind": "wheel", "directory": "packages/ordered-json-python", "name": "polyspec-ordered-json" }
   ],
   "manifests": {
     "package.json": "version",
@@ -16,11 +17,15 @@
     "packages/ordered-json-php/composer.json": "archive",
     "packages/ordered-json-php-ext/composer.json": "archive",
     "packages/ordered-json-rust/Cargo.toml": "git-tag",
-    "packages/ordered-json-python/pyproject.toml": "git-tag"
+    "packages/ordered-json-python/pyproject.toml": "archive"
   },
   "notReleased": {
     "tests/release-consumer/npm/package.json": "the npm consumer project of the release archives",
     "tests/release-consumer/composer/composer.json": "the Composer consumer project of the release archives"
+  },
+  "buildBackend": {
+    "requirement": "setuptools==84.0.0",
+    "sha256": "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670"
   },
   "goModules": {
     "packages/ordered-json-go": "github.com/polyspec/ordered-json/packages/ordered-json-go"
@@ -46,15 +51,15 @@
           "require 'vendor/autoload.php'; if (Polyspec\\OrderedJson\\stringify(Polyspec\\OrderedJson\\Value::parse('{\"b\":1,\"a\":2}')) !== '{\"b\":1,\"a\":2}') { exit(1); }"
         ]
       }
+    },
+    "wheel": {
+      "smoke": {
+        "polyspec-ordered-json": ["python", "-c", "import polyspec.ordered_json"]
+      }
     }
   },
   "proof": {
     "gitTag": {
-      "packages/ordered-json-python/pyproject.toml": {
-        "kind": "python",
-        "name": "polyspec-ordered-json",
-        "smoke": ["python", "-c", "import polyspec.ordered_json"]
-      },
       "packages/ordered-json-rust/Cargo.toml": {
         "kind": "rust",
         "name": "polyspec-ordered-json",

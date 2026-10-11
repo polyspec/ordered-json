@@ -34,16 +34,16 @@ The clone contains every implementation package. Use the package directory or a 
 - Rust: set a local Cargo dependency with `path` pointing to `packages/ordered-json-rust/`.
 - Go: use a local `replace` for module `github.com/polyspec/ordered-json/packages/ordered-json-go` pointing to `packages/ordered-json-go/`.
 - PHP: require `packages/ordered-json-php/src/OrderedJson.php` or use `packages/ordered-json-php/` as a Composer path repository.
-- Python: install the package of a tag with pip, or put `packages/ordered-json-python/src` on the import path.
+- Python: install the wheel asset of a release with pip, or put `packages/ordered-json-python/src` on the import path.
 
 ~~~sh
-pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@vX.Y.Z#subdirectory=python"
+pip install "https://github.com/polyspec/ordered-json/releases/download/vX.Y.Z/polyspec_ordered_json-X.Y.Z-py3-none-any.whl"
 ~~~
 
 <a id="release-assets"></a>
 ## Release assets
 
-Each GitHub Release `vX.Y.Z` carries `polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip` and `polyspec-ordered-json-extension-php-X.Y.Z.zip`. Each archive carries the manifest of its package unchanged: `package.json` of `packages/ordered-json-npm/` and `composer.json` of `packages/ordered-json-php/` and `packages/ordered-json-php-ext/`, each with `version` X.Y.Z, without `repositories` and without `@dev`. The Python package ships no archive: pip installs it from the tag of the repository itself, with `#subdirectory=python` naming the package directory.
+Each GitHub Release `vX.Y.Z` carries `polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip`, `polyspec-ordered-json-extension-php-X.Y.Z.zip` and the wheel `polyspec_ordered_json-X.Y.Z-py3-none-any.whl`. Each archive carries the manifest of its package unchanged: `package.json` of `packages/ordered-json-npm/` and `composer.json` of `packages/ordered-json-php/` and `packages/ordered-json-php-ext/`, each with `version` X.Y.Z, without `repositories` and without `@dev`. The Python package ships no archive: pip installs it from the tag of the repository itself, with `#subdirectory=python` naming the package directory.
 
 npm installs the tarball by its path:
 
