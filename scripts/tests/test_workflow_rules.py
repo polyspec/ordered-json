@@ -258,10 +258,8 @@ class WorkflowRules(unittest.TestCase):
                 self.assertTrue(any('a step runs one make target, never a script or a tool directly' in issue
                                     for issue in violations('push-gate.yml', broken)), command)
 
-    def test_a_matrix_without_fail_fast_false_and_a_timeout_fail(self):
+    def test_a_job_without_a_timeout_fails(self):
         text = (WORKFLOWS / 'ci.yml').read_text()
-        self.assertIn('ci.yml: job python has a matrix without fail-fast: false; one failed job would cancel the others',
-                      violations('ci.yml', text.replace('fail-fast: false', 'fail-fast: true')))
         timed = text.replace('    runs-on: ubuntu-24.04\n', '    runs-on: ubuntu-24.04\n    timeout-minutes: 60\n')
         self.assertTrue(any('timeout-minutes' in issue for issue in violations('ci.yml', timed)))
 

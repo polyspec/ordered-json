@@ -8,7 +8,7 @@ Strict JSON with associative objects that preserve document key order recursivel
 <a id="usage"></a>
 ## Usage
 
-Python >= 3.11. The package is `polyspec-ordered-json` under the import name `polyspec.ordered_json`, installed from a tag of this repository:
+Python >= 3.14. The package is `polyspec-ordered-json` under the import name `polyspec.ordered_json`, installed from a tag of this repository:
 
 ~~~sh
 pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@v0.0.3#subdirectory=python"

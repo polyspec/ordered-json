@@ -1,9 +1,7 @@
-"""The Python package check of a CI job that runs an interpreter below the pin.
+"""The Python package check that the job python of the hosted CI runs.
 
 scripts/python_check.py runs the declared commands of the Python implementation
-with the running interpreter and checks no tool pin, because the job python of
-the hosted CI proves the floor minor 3.11, which the pin of the repository tools
-does not name.
+with the interpreter that runs it and checks no tool pin itself.
 """
 import io
 import sys

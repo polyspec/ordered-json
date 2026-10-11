@@ -87,9 +87,8 @@ go-vet: toolchain-check cargo-downloads-check
 evidence-check:
 	$(PYTHON) scripts/check_evidence.py
 
-# python-package-check runs the declared package checks of the Python implementation with the running interpreter
-# (scripts/python_check.py). The job python of the hosted CI runs it on the floor minor 3.11 as well, which the pin of the
-# repository tools does not name; the job suite runs the package under the pinned interpreter through the registry.
+# python-package-check runs the declared package checks of the Python implementation with the pinned interpreter PYTHON
+# (scripts/python_check.py); the job python of the hosted CI runs it after make install-tools.
 python-package-check:
 	$(PYTHON) scripts/python_check.py
 

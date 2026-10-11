@@ -106,42 +106,31 @@ jobs:
           name: report-suite
           path: var/report/ci-targets/
           if-no-files-found: error
-  # The Python package supports the floor minor 3.11 as well as the minor release of .python-version. The job runs
-  # its package tests, its case listing and its symbol report with the interpreter of the matrix
-  # (make python-package-check, scripts/python_check.py), which the job suite cannot do for a minor below the pin of
-  # the repository tools; the second entry of the matrix stays equal to .python-version.
+  # The Python package runs under the pinned interpreter of make install-tools, the minor release of .python-version, which
+  # is also its requires-python (scripts/tests/test_python_requires.py). The job runs its package tests, its case listing and
+  # its symbol report (make python-package-check, scripts/python_check.py).
   python:
     runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      matrix:
-        # Keep 3.14 equal to the minor release of .python-version.
-        python: ['3.11', '3.14']
     steps:
       # actions/checkout v6.1.0
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-      # actions/setup-python v6.3.0: the interpreter of the matrix, the floor minor and the pinned minor.
-      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
-        if: ${{ !cancelled() }}
-        with:
-          python-version: ${{ matrix.python }}
       # actions/setup-node v6.5.0
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         if: ${{ !cancelled() }}
         with:
           node-version-file: .node-version
           package-manager-cache: false
+      - name: make install-tools
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS="python"
       - name: make ci-targets
         if: ${{ !cancelled() }}
-        # The job checks the floor minor and the pinned minor with the interpreter of its matrix, not var/tools.
-        env:
-          PYTHON: python3
         run: make ci-targets TARGETS="python-package-check"
       - name: report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: report-python-${{ matrix.python }}
+          name: report-python
           path: var/report/ci-targets/
           if-no-files-found: error
   # The check of this workflow that the release workflow requires on the tagged commit. It runs after every other job,
