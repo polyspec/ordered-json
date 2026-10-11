@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: eee252e6c6638973c8d058982cb7cdc8d204946f0eef44bcde6fc827fd64f1ae -->
+<!-- source-sha256: d7eb3764500f274ee2fbf098bdb26f95969e7a816cee6112f1eec93108814186 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -100,6 +100,8 @@ Rust 코드는 `packages/ordered-json-rust/`에서 `cargo clippy --all-targets -
 
 - 검사는 결과가 시간에 따라 달라지는 registry 질의를 하지 않습니다. 최신 조회나 `@latest`, 버전 범위의 해석, 오래된 package나 새 release에 대한 질의가 없습니다. lock 파일이 정확한 버전과 integrity hash로 고정한 package를 내려받는 것은 그런 질의가 아니라 설치이며, `npm ci`와 `composer install`처럼 허용됩니다. 릴리스 archive의 consumer 설치(`make release-consumer`, `scripts/kit/release-consumer.mjs`)는 `tests/release-consumer`의 커밋된 lock으로 offline 설정 없이 `npm ci`와 `composer install`을 실행합니다. 그 lock을 해석하는 `make release-consumer-lock`은 검사가 아닙니다.
 - 어떤 명령도 도구를 필요할 때 설치하지 않으며, 모든 도구는 추적되는 버전으로 실행합니다. 추적 파일이 Node.js, Rust, Go, Python, PHP, npm을 고정합니다. 로컬과 CI에서 같은 patch release를 쓸 수 없는 interpreter는 minor release로 고정하므로, Python은 `.python-version`이 3.14를, PHP는 `.php-version`이 8.5를 적고, 검사는 major.minor를 비교하며, 각 기록은 실행 중인 patch release를 적습니다. setup-python과 setup-php는 minor의 최신 patch release를 설치하기 때문입니다. 그리고 `make toolchain-check`(`scripts/kit/check-toolchain.mjs`)는 각 도구를 선언과 비교하고 도구를 실행하는 모든 target이 이에 의존하며, `GOTOOLCHAIN=local`과 `RUSTUP_AUTO_INSTALL=0`은 go와 rustup이 다른 toolchain을 가져오지 못하게 하고, cargo는 `--locked`로 실행하며, `make install`이 내려받는 유일한 단계로서 tarball hash와 대조한 npm과 Go(`var/tools`), Rust toolchain, `packages/ordered-json-rust/Cargo.lock`의 crate, `external-inputs.json`과 대조한 PIE PHAR와 추가 사례(`scripts/external_inputs.py`)를 설치하고, 릴리스 archive의 consumer 설치를 뺀 다른 모든 명령은 cargo, go, npm, Composer를 offline으로 실행하며(Makefile이 export하는 `CARGO_NET_OFFLINE`, `GOPROXY=off`, `npm_config_offline`, `COMPOSER_DISABLE_NETWORK`), 내려받지 않은 입력은 `run make install`로 실패하고(`make cargo-downloads-check`는 `cargo fetch --locked --offline`을 실행해 lock file을 밝히고, `make pie-check`와 `make verify-all`은 없는 PIE PHAR나 추가 사례를 밝힙니다), CI는 image, action, Python을 고정하고, `make pie-check`와 `make verify-all`은 PIE PHAR와 추가 사례를 먼저 `external-inputs.json`과 비교합니다.
+- 기존 외부 도구나 라이브러리가 이미 하는 일을 다시 만들지 않습니다. 그 생태계의 표준 도구를 있는 그대로 사용하고(예: Python interpreter, 환경, lock에는 uv, PHP 의존성에는 Composer), 그 도구 자신의 동작, 예를 들어 그 도구가 만드는 symbolic link를 받아들입니다. 우리 규칙은 우리가 만드는 것을 규율합니다.
+- 이 저장소의 규칙이 symbolic link를 거부하거나 경로를 디렉터리 기준 상대 경로로 정하는 곳에서는, 예를 들어 symbolic link를 거부하는 build 사본([저장소 계약](docs/spec/repositories.ko.md))처럼, 그 규칙은 이 저장소가 만드는 것을 규율하며 외부 도구가 만드는 것을 규율하지 않습니다. 경로는 추적되는 파일의 이름으로 선언적으로 정하거나, 명시된 발견 규칙에 따른 발견으로 정합니다.
 - test는 자기가 만든 출력만 읽고 추적되지 않은 상태에 의존하지 않습니다. 기록, 문서 검사, 공통 사례, build 사본은 Git이 추적하는 파일을 읽고, guard는 추적되지 않은 파일을 거부하며, 각 실행은 자기 `CARGO_TARGET_DIR`를 가진 자기 실행 디렉터리에서 빌드하고, test는 자기 파일을 자기 임시 디렉터리에만 씁니다.
 - 공유 출력은 원자적으로 게시합니다. `var/`의 파일에 끝까지 쓴 뒤 그 경로 위로 이름을 바꿉니다(`write_record`).
 - 검사는 실패를 모으고 첫 실패에서 멈추지 않습니다. 모든 언어, 단계, 사례가 끝까지 실행되고, 실행은 status 1로 끝나기 전에 모든 실패를 나열합니다.

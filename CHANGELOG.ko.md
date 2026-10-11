@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: c18acd8bdcd52f8fa0e57f007baeadee75df65eae4a111978b1ac85c3d764387 -->
+<!-- source-sha256: 11bf074d1904f2bfcb2a8faffd6ed6afb47975f52ee361e50d94d553a8389a4a -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- T1.33: AGENTS는 기존 외부 도구나 라이브러리를 다시 만들지 않고 있는 그대로 사용한다고 적습니다. 예로 Python interpreter, 환경, lock에는 uv를, PHP 의존성에는 Composer를 들며, 그런 도구가 만드는 symbolic link를 받아들입니다. 또한 이 저장소의 symbolic link와 상대 경로 규칙은 있는 곳에서 이 저장소가 만드는 것을 규율하며, 경로는 선언적으로 또는 명시된 발견 규칙으로 정한다고 적습니다.
 
 - T1.32-6-1: `docs/distribution.json`을 제거합니다. 이 파일은 GitHub release, version tag와 source 공개 여부를 다시 적었으나 어떤 검사도 저장소와 비교하지 않아 release마다 오래되었습니다. `published`로 표시한 기능 행은 release tag와 asset을 적으며, `make evidence-check`가 그 형식을 오프라인으로 검사합니다. `make release-proof TAG=<tag>`가 release의 네트워크 비교입니다.
 
