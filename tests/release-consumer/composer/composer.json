@@ -11,6 +11,6 @@
         }
     ],
     "require": {
-        "polyspec/ordered-json": "0.0.7"
+        "polyspec/ordered-json": "0.0.8"
     }
 }

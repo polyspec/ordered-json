@@ -4,14 +4,14 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0675d0f988e296a44dec7079f4c97f3e",
+    "content-hash": "2878b9dcfe02356d55a7f954de401606",
     "packages": [
         {
             "name": "polyspec/ordered-json",
-            "version": "0.0.7",
+            "version": "0.0.8",
             "dist": {
                 "type": "zip",
-                "url": "artifacts/polyspec-ordered-json-php-0.0.7.zip",
+                "url": "artifacts/polyspec-ordered-json-php-0.0.8.zip",
                 "shasum": ""
             },
             "require": {
