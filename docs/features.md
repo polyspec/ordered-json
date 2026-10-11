@@ -28,4 +28,4 @@
 
 The previous native macOS and PIE records are not current evidence. A new PIE record will be created only after a local PHAR is available and `make pie-check` passes.
 
-Passing shared cases establishes their recorded acceptance criteria. It does not establish exhaustive input coverage, all declared minimum runtimes, all platforms, or every host encoder integration. See [verification limits](operations/validation.md#limits). Source metadata contains development version strings; this table does not identify a registry release.
+Passing shared cases establishes their recorded acceptance criteria. It does not establish exhaustive input coverage, all declared minimum runtimes, all platforms, or every host encoder integration. See [verification limits](operations/validation.md#limits). Source metadata contains development version strings. A row marked `published` names the release tag and the asset of its GitHub release; `make evidence-check` checks that form.

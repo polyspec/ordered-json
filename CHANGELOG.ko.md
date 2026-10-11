@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 9e04c0ce5045697969c67199a718b6e01af4158e44561ad1094ba20b55f23b8e -->
+<!-- source-sha256: c18acd8bdcd52f8fa0e57f007baeadee75df65eae4a111978b1ac85c3d764387 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,7 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
-- T1.32-6: `docs/distribution.json`은 빈 목록 대신 관측한 source(`main`의 공개 저장소), GitHub release 11개와 각 asset 이름, version tag 13개를 기록합니다. 레지스트리는 확인되지 않음으로 둡니다. `make evidence-check`는 형식만 검사하므로 release와 tag 목록은 날짜가 붙은 관측(`checked_at`)이며 release마다 오래됩니다.
+- T1.32-6-1: `docs/distribution.json`을 제거합니다. 이 파일은 GitHub release, version tag와 source 공개 여부를 다시 적었으나 어떤 검사도 저장소와 비교하지 않아 release마다 오래되었습니다. `published`로 표시한 기능 행은 release tag와 asset을 적으며, `make evidence-check`가 그 형식을 오프라인으로 검사합니다. `make release-proof TAG=<tag>`가 release의 네트워크 비교입니다.
 
 - T1.32-5: 배포 문서와 루트 `README.md`는 릴리스가 없다거나 첫 release가 게시되지 않았다고 적지 않습니다. 릴리스가 나열되는 곳(`gh release list -R polyspec/ordered-json`과 Releases 페이지)과 `vX.Y.Z` 릴리스가 첨부하는 asset을 적습니다.
 
@@ -490,4 +490,4 @@
 - 공식 입력과 기대 결과를 [official.json](examples/official.json)으로 통합하고 공통 문법 사례와 선택적 추가 입력을 제공합니다.
 - 모든 구현을 공통 사례 433개로 검증했습니다. PIE 빌드 산출물도 같은 433개를 통과했으며 검사기 테스트 42개가 통과했습니다. 당시 PHP 빌드 도구의 링커 옵션 사용 중단 경고 두 건은 해당 검증 기록에 기록했습니다.
 
-현재 검증 기록은 검사한 소스와 다섯 구현 및 문서 검사기 테스트의 결과를 명시합니다. [배포 확인 결과](docs/distribution.json)는 별도입니다. 이 항목은 개발 변경을 기록하며 패키지 릴리스를 선언하지 않습니다.
+현재 검증 기록은 검사한 소스와 다섯 구현 및 문서 검사기 테스트의 결과를 명시합니다. 배포 확인 결과는 별도입니다. 이 항목은 개발 변경을 기록하며 패키지 릴리스를 선언하지 않습니다.

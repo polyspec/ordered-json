@@ -1,5 +1,5 @@
 <!-- doc-id: features -->
-<!-- source-sha256: 44fde45fd70f2ced2ad0c01adcd93e07f327f02f4b0f97891ae6aa7a5cf72a15 -->
+<!-- source-sha256: fed988d5c076a9276af210ffead5b171365557578c65b4018c645fb82f9ea3ef -->
 # 기능 상태
 
 [English](features.md)
@@ -29,4 +29,4 @@
 
 이전 네이티브 macOS 및 PIE 기록은 현재 근거가 아닙니다. 로컬 PHAR가 준비되고 `make pie-check`가 통과한 뒤에만 새 PIE 기록을 생성합니다.
 
-공통 사례 통과는 기록된 인수 기준에 대한 검증입니다. 모든 입력, 선언한 최소 런타임 전체, 모든 플랫폼, 모든 호스트 인코더 연동을 검증한 결과는 아닙니다. [검증 한계](operations/validation.ko.md#limits)를 확인합니다. 소스 메타데이터에는 개발 버전 문자열이 있으며 이 표는 레지스트리 릴리스를 나타내지 않습니다.
+공통 사례 통과는 기록된 인수 기준에 대한 검증입니다. 모든 입력, 선언한 최소 런타임 전체, 모든 플랫폼, 모든 호스트 인코더 연동을 검증한 결과는 아닙니다. [검증 한계](operations/validation.ko.md#limits)를 확인합니다. 소스 메타데이터에는 개발 버전 문자열이 있습니다. `published`로 표시한 행은 GitHub release의 tag와 asset 이름을 적으며, 그 형식은 `make evidence-check`가 검사합니다.

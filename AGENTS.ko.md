@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 298ad8bf5bcc69a555ec9d5a3a8fe8d116875baf7fbe28b2ac60cc67155cf537 -->
+<!-- source-sha256: eee252e6c6638973c8d058982cb7cdc8d204946f0eef44bcde6fc827fd64f1ae -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -26,7 +26,7 @@
 
 [기능 상태](docs/features.ko.md)는 이 저장소의 기능 기록입니다. `scripts/check_evidence.py`는 각 기능 행의 구현 칸을 읽고, `make documents-check`는 그 값이 세 상태 중 하나이도록 요구합니다. 상태는 그 칸에만 둡니다. 기능 표의 절은 표만 담고, `scripts/check_evidence.py`는 `docs/features.md`와 그 번역의 다른 곳에 code span이나 표 칸으로 적힌 상태와 그 절의 다른 줄에서 file, 줄, 열을 적으며 실패합니다. `scripts/check_evidence.py`는 하나의 parser로 행을 읽고, 기능 표가 없는 기록, 기능 행이 없는 표, ID가 기능 ID `F-...`가 아닌 행을 거부하므로, 행을 내지 않는 기록은 어떤 검사도 통과하지 못합니다. 이 절이 상태를 정의합니다.
 
-`implemented`는 해당 동작이 구현됐다는 뜻입니다. `partial`은 구현이 진행 중인 기능을 표시합니다. `planned`는 구현을 시작하지 않은 기능을 표시합니다. `shared-suite`는 공통 JSON 테스트, `package-tests`는 구현 자체의 테스트, `docs-tests`는 문서 검사기 테스트, `benchmark`는 저장소 벤치마크 프로토콜과 커밋된 결과를 뜻합니다. 각 상태는 자신을 뒷받침하는 기록을 가리킵니다. 공통 스위트, 패키지 테스트, 검사기 테스트는 commit을 검증하는 실행의 [기록](docs/operations/validation.ko.md#records)을, 벤치마크는 [벤치마크 결과](benchmarks/results.json)를 가리킵니다. 검증 기록에는 실제 버전, 사례 수, 실행 시각, 소스 해시가 있습니다. 벤치마크 결과는 깨끗한 체크아웃에서 workload가 선언한 프로토콜과 입력으로 측정했을 때에만 근거가 됩니다. `source-only`는 확인된 배포 방식이며 레지스트리 게시는 검증되지 않았습니다. 게시 확인 결과는 [distribution.json](docs/distribution.json)에서 별도로 관리합니다.
+`implemented`는 해당 동작이 구현됐다는 뜻입니다. `partial`은 구현이 진행 중인 기능을 표시합니다. `planned`는 구현을 시작하지 않은 기능을 표시합니다. `shared-suite`는 공통 JSON 테스트, `package-tests`는 구현 자체의 테스트, `docs-tests`는 문서 검사기 테스트, `benchmark`는 저장소 벤치마크 프로토콜과 커밋된 결과를 뜻합니다. 각 상태는 자신을 뒷받침하는 기록을 가리킵니다. 공통 스위트, 패키지 테스트, 검사기 테스트는 commit을 검증하는 실행의 [기록](docs/operations/validation.ko.md#records)을, 벤치마크는 [벤치마크 결과](benchmarks/results.json)를 가리킵니다. 검증 기록에는 실제 버전, 사례 수, 실행 시각, 소스 해시가 있습니다. 벤치마크 결과는 깨끗한 체크아웃에서 workload가 선언한 프로토콜과 입력으로 측정했을 때에만 근거가 됩니다. `source-only`는 확인된 배포 방식이며 레지스트리 게시는 검증되지 않았습니다. `published`로 표시한 기능 행은 릴리스 tag와 asset을 적으며, 그 형식은 `make evidence-check`가 검사합니다.
 
 <a id="checklist"></a>
 ## 실행 체크리스트

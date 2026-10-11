@@ -30,6 +30,31 @@ class FeatureStateChecks(unittest.TestCase):
             feature_rows(row.replace('operations/validation.md#records', 'other.json'))
 
 
+def published_row(distribution):
+    return ('| ID | Feature | Implementation | Verification | Evidence | Distribution | Specification |\n'
+            '| --- | --- | --- | --- | --- | --- | --- |\n'
+            '| F-ORDER | Order | implemented | shared-suite | [result](operations/validation.md#records) | '
+            + distribution + ' | [contract](../README.md#contract) |')
+
+
+class PublishedFeatureChecks(unittest.TestCase):
+    def test_release_assets_of_the_tag_version_are_named(self):
+        row = published_row('published v0.0.8 polyspec-ordered-json-npm-0.0.8.tgz, polyspec_ordered_json-0.0.8-py3-none-any.whl')
+        self.assertEqual(feature_rows(row)['F-ORDER'][2], 'published v0.0.8 polyspec-ordered-json-npm-0.0.8.tgz, polyspec_ordered_json-0.0.8-py3-none-any.whl')
+
+    def test_published_without_tag_and_asset_fails(self):
+        with self.assertRaisesRegex(ValueError, 'a published feature names its release tag and asset'):
+            feature_rows(published_row('published'))
+
+    def test_asset_of_another_version_fails(self):
+        with self.assertRaisesRegex(ValueError, 'a published feature names its release tag and asset'):
+            feature_rows(published_row('published v0.0.8 polyspec-ordered-json-npm-0.0.7.tgz'))
+
+    def test_tag_that_is_not_a_release_version_fails(self):
+        with self.assertRaisesRegex(ValueError, 'a published feature names its release tag and asset'):
+            feature_rows(published_row('published main polyspec-ordered-json-npm-0.0.8.tgz'))
+
+
 class EvidenceChecks(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory(prefix='ordered-json-docs-test-')
@@ -43,13 +68,6 @@ class EvidenceChecks(unittest.TestCase):
             '| ID | Feature | Implementation | Verification | Evidence | Distribution | Specification |\n'
             '| --- | --- | --- | --- | --- | --- | --- |\n'
             '| F-ORDER | Order | implemented | shared-suite | [result](operations/validation.md#records) | source-only | [contract](../README.md#contract) |\n')
-        self.distribution = {'schema_version': 1, 'checked_at': '2026-09-07T00:00:00+00:00',
-            'source': {'state': 'available', 'url': 'https://github.com/polyspec/ordered-json',
-                       'branch': 'main', 'visibility': 'public'},
-            'github_releases': [], 'version_tags': [],
-            'registries': {name: {'state': 'not-verified'} for name in
-                          ('npm', 'crates.io', 'packagist', 'go', 'php-extension', 'pypi')}}
-        self.json('docs/distribution.json', self.distribution)
         self.supplementary = {'project': 'nst/JSONTestSuite', 'revision': 'a' * 40,
                               'cases': 1, 'inputs_sha256': sha256(b'supplementary inputs')}
         self.json('external-inputs.json', {'schema_version': 1,
@@ -198,16 +216,15 @@ class EvidenceChecks(unittest.TestCase):
         self.json('docs/report.json', {'path': '/' + 'home/example/project/'})
         self.assert_failure('Public report contains a local home-directory path')
 
-    def test_source_observation_must_name_the_declared_repository(self):
-        self.distribution['source'] = {'state': 'available', 'url': 'https://github.com/example/other',
-                                       'branch': 'main', 'visibility': 'public'}
-        self.json('docs/distribution.json', self.distribution)
-        self.assert_failure('names the declared repository')
-
-    def test_unobserved_publication_fails(self):
+    def test_published_feature_without_release_asset_fails(self):
         for path in ('docs/features.md', 'docs/features.ko.md'):
             self.change(path, '| source-only |', '| published |')
-        self.assert_failure('Published feature has no observed artifact')
+        self.assert_failure('a published feature names its release tag and asset')
+
+    def test_published_feature_with_release_asset_passes(self):
+        for path in ('docs/features.md', 'docs/features.ko.md'):
+            self.change(path, '| source-only |', '| published v0.0.8 polyspec-ordered-json-npm-0.0.8.tgz |')
+        self.assertEqual(check_evidence(self.root), ([], 1))
 
     def test_partial_results_cannot_create_record(self):
         results = copy.deepcopy(self.results)

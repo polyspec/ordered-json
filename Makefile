@@ -82,8 +82,8 @@ clippy: toolchain-check cargo-downloads-check
 go-vet: toolchain-check cargo-downloads-check
 	$(PYTHON) scripts/lint.py go-vet
 
-# evidence-check checks the feature rows against the evidence they name, the distribution observations and the JSON reports
-# of docs/ (scripts/check_evidence.py); verify-all runs it again with the verification records of the run.
+# evidence-check checks the feature rows against the evidence they name, the release assets of the published features and the
+# JSON reports of docs/ (scripts/check_evidence.py); verify-all runs it again with the verification records of the run.
 evidence-check:
 	$(PYTHON) scripts/check_evidence.py
 
