@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.33: AGENTS states that an existing outside tool or library is used as it is and not rebuilt, with uv for Python interpreters, environments and locks and Composer for PHP dependencies as examples, and accepts the symbolic links that such a tool creates. It also states that the symbolic link and relative path rules of this repository, where they exist, govern what this repository creates, and that paths are resolved declaratively or by a stated discovery rule.
+
 - T1.32-6-1: `docs/distribution.json` is removed. It restated the GitHub releases, the version tags and the source visibility, which no check compared with the repository, so it went stale after each release. A feature row marked `published` names its release tag and asset, and `make evidence-check` checks that form offline. `make release-proof TAG=<tag>` is the networked comparison of a release.
 
 - T1.32-5: the distribution document and the root `README.md` no longer state that no release exists or that the first release is unpublished. They name where the releases are listed (`gh release list -R polyspec/ordered-json` and the Releases page) and what a `vX.Y.Z` release attaches.
