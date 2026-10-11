@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.32: the Python package is released as its wheel `polyspec_ordered_json-X.Y.Z-py3-none-any.whl`, built with the pinned build backend `setuptools==84.0.0` (`buildBackend`) and installed from the release asset instead of the git tag. The README and the installation document show the `pip install` line of the wheel URL.
+
 ## 0.0.7
 
 - T1.31: the push of a tag does not start `push-gate.yml` (`push: branches: ['**']`), so the release verifies the check `push-gate` of the commit without a second queued run; `test_a_tag_push_starts_none_of_the_workflows_whose_checks_the_release_requires` requires it.
