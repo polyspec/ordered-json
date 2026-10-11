@@ -12,7 +12,7 @@
 | Rust | Rust >= 1.71, edition 2021 | `polyspec-ordered-json`, 0.0.3 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-rust/Cargo.toml) |
 | Go | Go >= 1.22 | `github.com/polyspec/ordered-json/packages/ordered-json-go` module, `orderedjson` package | [go.mod](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-go/go.mod) |
 | PHP | PHP >= 8.2, JSON and PCRE extensions | `polyspec/ordered-json`, `Polyspec\OrderedJson` namespace | [composer.json](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-php/composer.json) |
-| Python | Python >= 3.11 | `polyspec-ordered-json`, `polyspec.ordered_json` import, 0.0.3 | [pyproject.toml](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-python/pyproject.toml) |
+| Python | Python >= 3.14 | `polyspec-ordered-json`, `polyspec.ordered_json` import, 0.0.3 | [pyproject.toml](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-python/pyproject.toml) |
 | Native PHP | Matching PHP development headers, C compiler, phpize, make | `ordered_json` extension, 0.0.3 | [extension source](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-php-ext/src/ordered_json.c) |
 | Repository checks | The pinned Python, Node.js, Rust, Go and npm releases, Git, make, PHP above | `make install`, `make check` | [verification](validation.md) |
 

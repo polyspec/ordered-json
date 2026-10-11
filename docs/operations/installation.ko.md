@@ -1,5 +1,5 @@
 <!-- doc-id: installation -->
-<!-- source-sha256: f378ea832316e1f9699ecef03c48c7d7e4e9497a39553abfd097a502399bd7aa -->
+<!-- source-sha256: 9332f67b04aa766a2b37f972fcd17f1e1a4cc659dde3ae50bff4346ca07ace90 -->
 # 설치와 실행
 
 [English](installation.md)
@@ -13,7 +13,7 @@
 | Rust | Rust >= 1.71, edition 2021 | `polyspec-ordered-json`, 0.0.3 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-rust/Cargo.toml) |
 | Go | Go >= 1.22 | `github.com/polyspec/ordered-json/packages/ordered-json-go` 모듈, `orderedjson` 패키지 | [go.mod](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-go/go.mod) |
 | PHP | PHP >= 8.2, JSON 및 PCRE 확장 | `polyspec/ordered-json`, `Polyspec\OrderedJson` 네임스페이스 | [composer.json](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-php/composer.json) |
-| Python | Python >= 3.11 | `polyspec-ordered-json`, `polyspec.ordered_json` import, 0.0.3 | [pyproject.toml](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-python/pyproject.toml) |
+| Python | Python >= 3.14 | `polyspec-ordered-json`, `polyspec.ordered_json` import, 0.0.3 | [pyproject.toml](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-python/pyproject.toml) |
 | 네이티브 PHP | 일치하는 PHP 개발 헤더, C 컴파일러, phpize, make | `ordered_json` 확장, 0.0.3 | [확장 소스](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-php-ext/src/ordered_json.c) |
 | 저장소 검사 | 고정된 Python, Node.js, Rust, Go, npm release, Git, make, 위 PHP | `make install`, `make check` | [검증](validation.ko.md) |
 

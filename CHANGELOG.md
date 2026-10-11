@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.32-2: the Python package states `requires-python = ">=3.14"`, the minor release of `.python-version` that CI runs under the pinned interpreter. The job python of `ci.yml` has no 3.11 matrix entry and no `PYTHON` override, and `scripts/tests/test_python_requires.py` checks the declared range against `.python-version`.
+
 ## 0.0.8
 
 - T1.32: the Python package is released as its wheel `polyspec_ordered_json-X.Y.Z-py3-none-any.whl`, built with the pinned build backend `setuptools==84.0.0` (`buildBackend`) and installed from the release asset instead of the git tag. The README and the installation document show the `pip install` line of the wheel URL.

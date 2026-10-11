@@ -1,5 +1,5 @@
 <!-- doc-id: python-overview -->
-<!-- source-sha256: 088588612f5069f438ea99efe5d6ec3ad08bf3426307e24a0312e0ac6b19f1c7 -->
+<!-- source-sha256: d50ab43fbd13258e8a9b0e5d726b5f5992a1a57e0be3db8ebe01ddc716c2fcff -->
 # Python용 ordered-json
 
 [English](README.md)
@@ -9,7 +9,7 @@
 <a id="usage"></a>
 ## 사용
 
-Python >= 3.11. 패키지는 `polyspec-ordered-json`이고 import 이름은 `polyspec.ordered_json`이며, 이 저장소의 tag에서 설치합니다:
+Python >= 3.14. 패키지는 `polyspec-ordered-json`이고 import 이름은 `polyspec.ordered_json`이며, 이 저장소의 tag에서 설치합니다:
 
 ~~~sh
 pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@v0.0.3#subdirectory=python"

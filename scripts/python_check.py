@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Runs the package checks of the Python implementation with the running interpreter.
+"""Runs the package checks of the Python implementation with the interpreter that runs it.
 
-The job python of the hosted CI proves the package on the floor minor 3.11, which the
-pin of the repository tools does not name, so this entry point checks no tool pin: the
-suite job runs the same package under the pinned interpreter through the registry.
+Make passes the pinned interpreter of var/tools (PYTHON); this entry point checks no tool
+pin itself, and the registry runs the same package under that interpreter in the job python.
 Each declared command of the implementation runs to its end; a failure names the
 command, the exit status and the output.
 """
