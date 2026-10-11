@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: b2f50792df162d727a3e85cf318578a91ceb8fb6c1a08d45289b801dda4ca3e9 -->
+<!-- source-sha256: 9e04c0ce5045697969c67199a718b6e01af4158e44561ad1094ba20b55f23b8e -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- T1.32-6: `docs/distribution.json`은 빈 목록 대신 관측한 source(`main`의 공개 저장소), GitHub release 11개와 각 asset 이름, version tag 13개를 기록합니다. 레지스트리는 확인되지 않음으로 둡니다. `make evidence-check`는 형식만 검사하므로 release와 tag 목록은 날짜가 붙은 관측(`checked_at`)이며 release마다 오래됩니다.
 
 - T1.32-5: 배포 문서와 루트 `README.md`는 릴리스가 없다거나 첫 release가 게시되지 않았다고 적지 않습니다. 릴리스가 나열되는 곳(`gh release list -R polyspec/ordered-json`과 Releases 페이지)과 `vX.Y.Z` 릴리스가 첨부하는 asset을 적습니다.
 

@@ -1,14 +1,135 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-09-07T13:59:34+00:00",
+  "checked_at": "2026-10-11T06:00:51+00:00",
   "source": {
-    "state": "not-verified",
+    "state": "available",
     "url": "https://github.com/polyspec/ordered-json",
     "branch": "main",
-    "visibility": "not-verified"
+    "visibility": "public"
   },
-  "github_releases": [],
-  "version_tags": [],
+  "github_releases": [
+    {
+      "tag": "packages/ordered-json-go/v0.0.8",
+      "published_at": "2026-10-11T05:50:54Z",
+      "draft": false,
+      "prerelease": false,
+      "assets": []
+    },
+    {
+      "tag": "v0.0.8",
+      "published_at": "2026-10-11T05:50:33Z",
+      "draft": false,
+      "prerelease": false,
+      "assets": [
+        "polyspec-ordered-json-extension-php-0.0.8.zip",
+        "polyspec-ordered-json-npm-0.0.8.tgz",
+        "polyspec-ordered-json-php-0.0.8.zip",
+        "polyspec_ordered_json-0.0.8-py3-none-any.whl"
+      ]
+    },
+    {
+      "tag": "v0.0.7",
+      "published_at": "2026-10-08T22:52:30Z",
+      "draft": false,
+      "prerelease": false,
+      "assets": [
+        "polyspec-ordered-json-extension-php-0.0.7.zip",
+        "polyspec-ordered-json-npm-0.0.7.tgz",
+        "polyspec-ordered-json-php-0.0.7.zip"
+      ]
+    },
+    {
+      "tag": "packages/ordered-json-go/v0.0.7",
+      "published_at": "2026-10-08T22:52:29Z",
+      "draft": false,
+      "prerelease": false,
+      "assets": []
+    },
+    {
+      "tag": "v0.0.6",
+      "published_at": "2026-10-08T18:43:52Z",
+      "draft": false,
+      "prerelease": false,
+      "assets": [
+        "polyspec-ordered-json-extension-php-0.0.6.zip",
+        "polyspec-ordered-json-npm-0.0.6.tgz",
+        "polyspec-ordered-json-php-0.0.6.zip"
+      ]
+    },
+    {
+      "tag": "v0.0.5",
+      "published_at": "2026-10-08T18:10:24Z",
+      "draft": false,
+      "prerelease": false,
+      "assets": [
+        "polyspec-ordered-json-0.0.5.tgz",
+        "polyspec-ordered-json-0.0.5.zip",
+        "polyspec-ordered-json-extension-0.0.5.zip"
+      ]
+    },
+    {
+      "tag": "v0.0.4",
+      "published_at": "2026-10-08T17:39:57Z",
+      "draft": false,
+      "prerelease": false,
+      "assets": [
+        "polyspec-ordered-json-0.0.4.tgz",
+        "polyspec-ordered-json-0.0.4.zip",
+        "polyspec-ordered-json-extension-0.0.4.zip"
+      ]
+    },
+    {
+      "tag": "go/v0.0.3",
+      "published_at": "2026-10-07T11:57:35Z",
+      "draft": false,
+      "prerelease": false,
+      "assets": []
+    },
+    {
+      "tag": "v0.0.3",
+      "published_at": "2026-10-07T11:56:36Z",
+      "draft": false,
+      "prerelease": false,
+      "assets": [
+        "polyspec-ordered-json-0.0.3.tgz",
+        "polyspec-ordered-json-0.0.3.zip",
+        "polyspec-ordered-json-extension-0.0.3.zip"
+      ]
+    },
+    {
+      "tag": "go/v0.0.2",
+      "published_at": "2026-10-07T09:39:07Z",
+      "draft": false,
+      "prerelease": false,
+      "assets": []
+    },
+    {
+      "tag": "v0.0.2",
+      "published_at": "2026-10-07T09:39:06Z",
+      "draft": false,
+      "prerelease": false,
+      "assets": [
+        "polyspec-ordered-json-0.0.2.tgz",
+        "polyspec-ordered-json-0.0.2.zip",
+        "polyspec-ordered-json-extension-0.0.2.zip"
+      ]
+    }
+  ],
+  "version_tags": [
+    "go/v0.0.1",
+    "go/v0.0.2",
+    "go/v0.0.3",
+    "packages/ordered-json-go/v0.0.7",
+    "packages/ordered-json-go/v0.0.8",
+    "v0.0.1",
+    "v0.0.2",
+    "v0.0.3",
+    "v0.0.4",
+    "v0.0.5",
+    "v0.0.6",
+    "v0.0.7",
+    "v0.0.8"
+  ],
   "registries": {
     "npm": {
       "state": "not-verified"
