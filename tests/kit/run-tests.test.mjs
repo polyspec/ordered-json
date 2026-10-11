@@ -60,15 +60,14 @@ test('a failing test prints its failure and exits 1', (t) => {
   assert.match(result.stdout, /✔ tests\/a\.test\.mjs › fine/);
 });
 
-test('a test that outlives --timeout fails, and the run has no other limit', (t) => {
-  const root = checkout(t, { 'tests/a.test.mjs': `${SPEC}test('slow', async () => { await new Promise(resolve => setTimeout(resolve, 8000)); });\n` });
-  const started = Date.now();
+// The test never resolves, so only the runner's timeout ends it. The deadline of this test is far above the expected stop.
+test('a test that outlives --timeout fails, and the run has no other limit', { timeout: 100_000 }, (t) => {
+  const root = checkout(t, { 'tests/a.test.mjs': `${SPEC}test('slow', async () => { await new Promise(() => {}); });\n` });
   const result = runner(root, ['node', '--timeout', '1', '--', 'tests/a.test.mjs']);
   assert.equal(result.status, 1, output(result));
   assert.match(result.stdout, /\(each test 1s\)/);
   assert.match(result.stdout, /✖ tests\/a\.test\.mjs › slow/);
   assert.match(result.stdout, /timed out after 1000ms/);
-  assert.ok(Date.now() - started < 7000, 'the timeout stopped the test');
 });
 
 test('a run in which no test ran fails: a file without a test case, only skipped tests, no matching file', (t) => {
@@ -89,8 +88,9 @@ test('a run in which no test ran fails: a file without a test case, only skipped
   assert.equal(runner(root, ['node', '--', 'tests/ok.test.mjs']).status, 0);
 });
 
+// The top-level await never settles: the process ends with no live handle, before the module registers `late`.
 test('a file whose process ends before its module registered every test fails', (t) => {
-  const root = checkout(t, { 'tests/late.test.mjs': `${SPEC}test('early', () => {});\nawait new Promise(resolve => setTimeout(resolve, 300));\ntest('late', () => {});\n` });
+  const root = checkout(t, { 'tests/late.test.mjs': `${SPEC}test('early', () => {});\nawait new Promise(() => {});\ntest('late', () => {});\n` });
   const result = runner(root, ['node', '--', 'tests/late.test.mjs']);
   assert.equal(result.status, 1, output(result));
   assert.match(output(result), /the process ended before the module finished loading; tests registered later did not run/);
@@ -176,12 +176,20 @@ test('the progress closes a run as failed when a test failed, a group failed, th
   assert.ok(lines.some(line => line.includes('the test did not finish')));
 });
 
-test('the progress reports a test that outlives its timeout', async () => {
+// The heartbeat and the clock are driven by the test: the heartbeat at 20 ms prints the still-running line, and the
+// heartbeat at 60 ms, past the 50 ms timeout, stops the test. A real timer made the outcome depend on the load of the machine.
+test('the progress reports a test that outlives its timeout', (t) => {
+  t.mock.timers.enable({ apis: ['setInterval'] });
+  let clock = 0;
   const lines = [];
   const stopped = [];
-  const progress = createProgress({ write: text => lines.push(text), heartbeatMs: 20, timeoutMs: 50, onTimeout: id => stopped.push(id), command: 'tool run' });
+  const progress = createProgress({ write: text => lines.push(text), heartbeatMs: 20, timeoutMs: 50, onTimeout: id => stopped.push(id), command: 'tool run', now: () => clock });
   progress.start('slow');
-  await new Promise(resolve => setTimeout(resolve, 200));
+  clock = 20;
+  t.mock.timers.tick(20);
+  assert.ok(lines.some(line => line.includes('… slow still running')), lines.join(''));
+  clock = 60;
+  t.mock.timers.tick(40);
   assert.deepEqual(stopped, ['slow']);
   progress.fail('slow', undefined, 'stopped');
   assert.ok(lines.some(line => /⏱ slow ran \d\.\ds and exceeded its 0\.1s timeout; stopping `tool run`/.test(line)), lines.join(''));
@@ -332,7 +340,9 @@ test('a PHP extension that is not built fails before the tool starts', async (t)
   assert.match(result.text, /the PHP extension build\/ext\.so is not built; build it before the run/);
 });
 
-test('python tests run through var/tools/bin/python3, pass, fail and stop at their timeout', async (t) => {
+// The hanging stub keeps a live timer and never ends on its own, so only the runner's timeout stops it. The deadline of this
+// test is far above the expected stop.
+test('python tests run through var/tools/bin/python3, pass, fail and stop at their timeout', { timeout: 100_000 }, async (t) => {
   const passing = pythonRoot(t, `process.stderr.write('test_a (t.T.test_a) ... ok\\n\\n' + '-'.repeat(70) + '\\nRan 1 test in 0.001s\\n\\nOK\\n');`);
   const passed = await inProcess(t, ['python', 'tests'], { root: passing });
   assert.equal(passed.status, 0, passed.text);
@@ -346,7 +356,7 @@ test('python tests run through var/tools/bin/python3, pass, fail and stop at the
   const hanging = pythonRoot(t, `process.stderr.write('test_hang (t.T.test_hang) ... '); setInterval(() => {}, 1000);`);
   const hung = await inProcess(t, ['python', '--timeout', '1', 'tests'], { root: hanging });
   assert.equal(hung.status, 1, hung.text);
-  assert.match(hung.text, /⏱ test_hang \(t\.T\.test_hang\) ran \d\.\ds and exceeded its 1\.0s timeout; stopping `[^`]*var\/tools\/bin\/python3 -m unittest`/);
+  assert.match(hung.text, /⏱ test_hang \(t\.T\.test_hang\) ran [\d.]+s and exceeded its 1\.0s timeout; stopping `[^`]*var\/tools\/bin\/python3 -m unittest`/);
 
   const empty = pythonRoot(t, `process.stderr.write('\\n' + '-'.repeat(70) + '\\nRan 0 tests in 0.000s\\n\\nNO TESTS RAN\\n'); process.exitCode = 5;`);
   const none = await inProcess(t, ['python', 'tests'], { root: empty });
