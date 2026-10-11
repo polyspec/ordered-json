@@ -43,7 +43,7 @@ pip install "https://github.com/polyspec/ordered-json/releases/download/vX.Y.Z/p
 <a id="release-assets"></a>
 ## Release assets
 
-Each GitHub Release `vX.Y.Z` carries `polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip`, `polyspec-ordered-json-extension-php-X.Y.Z.zip` and the wheel `polyspec_ordered_json-X.Y.Z-py3-none-any.whl`. Each archive carries the manifest of its package unchanged: `package.json` of `packages/ordered-json-npm/` and `composer.json` of `packages/ordered-json-php/` and `packages/ordered-json-php-ext/`, each with `version` X.Y.Z, without `repositories` and without `@dev`. The Python package ships no archive: pip installs it from the tag of the repository itself, with `#subdirectory=python` naming the package directory.
+Each GitHub Release `vX.Y.Z` carries `polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip`, `polyspec-ordered-json-extension-php-X.Y.Z.zip` and the wheel `polyspec_ordered_json-X.Y.Z-py3-none-any.whl`. Each archive carries the manifest of its package unchanged: `package.json` of `packages/ordered-json-npm/` and `composer.json` of `packages/ordered-json-php/` and `packages/ordered-json-php-ext/`, each with `version` X.Y.Z, without `repositories` and without `@dev`. The Python package ships only its wheel: pip installs the wheel asset URL shown in the install section above, and no git tag installs it.
 
 npm installs the tarball by its path:
 

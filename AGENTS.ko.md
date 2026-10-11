@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 878add5d6758ac45a4a40a06dfc30adcf55bdc61f8b3321154ff6f63fed15122 -->
+<!-- source-sha256: 298ad8bf5bcc69a555ec9d5a3a8fe8d116875baf7fbe28b2ac60cc67155cf537 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -60,7 +60,7 @@ push는 `[~]` 작업이 없을 때만 합니다. pre-push hook `.githooks/pre-pu
 
 0.x 동안 변경은 소유 unit test가 로컬에서 통과한 뒤 `main`에 바로 commit합니다. pull request, merge queue, GitHub ruleset은 쓰지 않습니다. CI workflow는 `main`에 push될 때마다 전체 suite를 실행하며, 그 job `ci-passed`가 release workflow가 tag된 commit에 요구하는 check입니다. pre-push hook은 push 전에 push gate를 실행합니다.
 
-0.x 버전의 작업 단위는 체크리스트 행 하나이고, 그 행의 `[o]`는 그 행을 끝내는 commit에 들어갑니다. 작업은 로컬에 commit하고, 체크리스트의 모든 행이 `[o]`일 때 `main`에 한 번 push합니다. 그러므로 진행 중인 행이 있는 push는 없습니다. 그 push의 CI 실행은 `ci-passed` 성공으로 끝나야 하며, 그 뒤에 버전 올림 commit을 `main`에 넣고 CI가 통과한 commit에만 tag `vX.Y.Z`를 붙입니다. 릴리스 archive의 이름은 `<package>-<language>-<version>.<ext>`입니다(`polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip`, `polyspec-ordered-json-extension-php-X.Y.Z.zip`).
+0.x 버전의 작업 단위는 체크리스트 행 하나이고, 그 행의 `[o]`는 그 행을 끝내는 commit에 들어갑니다. 작업은 로컬에 commit하고, 체크리스트의 모든 행이 `[o]`일 때 `main`에 한 번 push합니다. 그러므로 진행 중인 행이 있는 push는 없습니다. 그 push의 CI 실행은 `ci-passed` 성공으로 끝나야 하며, 그 뒤에 버전 올림 commit을 `main`에 넣고 CI가 통과한 commit에만 tag `vX.Y.Z`를 붙입니다. 릴리스 archive의 이름은 `<package>-<language>-<version>.<ext>`입니다(`polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip`, `polyspec-ordered-json-extension-php-X.Y.Z.zip`), Python 패키지는 wheel `polyspec_ordered_json-X.Y.Z-py3-none-any.whl`로 릴리스합니다.
 
 
 
@@ -78,8 +78,8 @@ Rust 코드는 `packages/ordered-json-rust/`에서 `cargo clippy --all-targets -
 릴리스는 CI 실행이 `ci-passed` 성공으로 끝난 `main`의 commit에 붙인 tag입니다. tag를 만들고 옮기고 push하는 것은 메인테이너뿐입니다.
 
 1. 버전 올림 commit `Release X.Y.Z`는 `ci-passed`가 성공한 push 뒤에 오며 체크리스트 작업을 적고, 저장소의 모든 manifest(`package.json`, `packages/ordered-json-npm/package.json`, `composer.json`, `packages/ordered-json-php/composer.json`, `packages/ordered-json-php-ext/composer.json`, `packages/ordered-json-rust/Cargo.toml`, `packages/ordered-json-python/pyproject.toml`, `package-lock.json`의 루트 항목, `packages/ordered-json-rust/Cargo.lock`의 package 항목)의 버전을 X.Y.Z로 정하고, 검토 기록이 각 lock의 hash를 담으므로 `make dependency-review RECORD=1`로 의존성 검토를 다시 기록하고, `make release-consumer-lock TAG=vX.Y.Z`로 그 버전의 consumer lock을 쓰며, 모든 changelog의 `## Unreleased`를 `## X.Y.Z`로 바꾸고 그 위에 비어 있는 새 `## Unreleased`를 둡니다.
-2. 메인테이너는 merge된 `main`의 commit에 `vX.Y.Z` tag를, `packages/ordered-json-go/`의 Go 모듈에는 `packages/ordered-json-go/vX.Y.Z` tag를 붙이고, tag를 한 번의 `git push`로 또는 Go tag를 먼저 push합니다. `vX.Y.Z`의 실행이 그 commit의 Go tag를 요구하기 때문입니다(`make release-go-tags`). Go tag의 실행은 archive를 만들지 않고 archive 없는 release를 만듭니다.
-3. tag push는 `.github/workflows/release.yml`을 실행합니다. 이 workflow는 tag된 commit이 `main`에 있고 check `push-gate`와 `ci-passed`를 통과했는지, 모든 manifest에 tag의 버전이 있고 `CHANGELOG.md`에 section `## X.Y.Z`가 있는지 확인하고, 패키지 archive를 만들어 GitHub Release를 생성합니다([tag 릴리스](docs/operations/distribution.ko.md#tag-release)).
+2. 메인테이너는 `ci-passed`가 성공으로 끝난 `main`의 commit 하나에 두 tag를 붙입니다. `packages/ordered-json-go/`의 Go 모듈에는 `packages/ordered-json-go/vX.Y.Z`, 그리고 `vX.Y.Z`입니다. `vX.Y.Z`의 실행이 검증하기 전에 두 tag가 GitHub에 있어야 하며, 그 실행이 그 commit의 Go tag를 요구하기 때문입니다(`make release-go-tags`). 메인테이너는 Go tag를 자체 `git push`로 먼저 push하고, 그 push가 성공한 뒤에만 `vX.Y.Z`를 push합니다. 첫 push 전에 `git rev-parse --verify 'vX.Y.Z^{commit}' 'packages/ordered-json-go/vX.Y.Z^{commit}'`가 같은 commit을 두 번 출력해야 합니다. Go tag의 실행은 archive를 만들지 않고 archive 없는 release를 만듭니다. GitHub에 Go tag가 없는 상태로 push된 `vX.Y.Z`는 검증에 실패합니다.
+3. tag push는 `.github/workflows/release.yml`을 실행합니다. 이 workflow는 tag된 commit이 `main`에 있고 check `push-gate`와 `ci-passed`를 통과했는지, 모든 manifest에 tag의 버전이 있고 `CHANGELOG.md`에 section `## X.Y.Z`가 있는지 확인하고, 패키지 archive와 Python wheel을 만들어 GitHub Release를 생성합니다([tag 릴리스](docs/operations/distribution.ko.md#tag-release)).
 
 이 저장소의 package가 다른 저장소의 package를 고정할 때(`git+https://github.com/polyspec/<repository>@vX.Y.Z`)는 GitHub에 실제로 존재하는 tag만 씁니다. 그 tag를 push한 뒤에 고정하며, 아직 release되지 않은 tag를 가리키는 고정은 쓰지 않습니다.
 

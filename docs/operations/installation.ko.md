@@ -1,5 +1,5 @@
 <!-- doc-id: installation -->
-<!-- source-sha256: 9332f67b04aa766a2b37f972fcd17f1e1a4cc659dde3ae50bff4346ca07ace90 -->
+<!-- source-sha256: 2314cd3539e006a9bccdb797be4fa11d21e3b51399a50e9695a71b7726a6b620 -->
 # 설치와 실행
 
 [English](installation.md)
@@ -44,7 +44,7 @@ pip install "https://github.com/polyspec/ordered-json/releases/download/vX.Y.Z/p
 <a id="release-assets"></a>
 ## 릴리스 asset
 
-GitHub Release `vX.Y.Z`마다 `polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip`, `polyspec-ordered-json-extension-php-X.Y.Z.zip`과 wheel `polyspec_ordered_json-X.Y.Z-py3-none-any.whl`이 있습니다. 각 archive는 자기 package의 manifest를 바꾸지 않고 담습니다. `packages/ordered-json-npm/`의 `package.json`, `packages/ordered-json-php/`와 `packages/ordered-json-php-ext/`의 `composer.json`이며, 모두 `version` X.Y.Z를 선언하고 `repositories`와 `@dev`가 없습니다. Python 패키지는 archive를 만들지 않습니다. pip가 저장소의 tag에서 `#subdirectory=python`으로 패키지 디렉터리를 지정해 설치합니다.
+GitHub Release `vX.Y.Z`마다 `polyspec-ordered-json-npm-X.Y.Z.tgz`, `polyspec-ordered-json-php-X.Y.Z.zip`, `polyspec-ordered-json-extension-php-X.Y.Z.zip`과 wheel `polyspec_ordered_json-X.Y.Z-py3-none-any.whl`이 있습니다. 각 archive는 자기 package의 manifest를 바꾸지 않고 담습니다. `packages/ordered-json-npm/`의 `package.json`, `packages/ordered-json-php/`와 `packages/ordered-json-php-ext/`의 `composer.json`이며, 모두 `version` X.Y.Z를 선언하고 `repositories`와 `@dev`가 없습니다. Python 패키지는 wheel만 릴리스합니다. pip는 위 설치 절의 wheel asset URL로 설치하며, git tag로는 설치하지 않습니다.
 
 npm은 tarball을 경로로 설치합니다.
 

@@ -8,10 +8,10 @@ Strict JSON with associative objects that preserve document key order recursivel
 <a id="usage"></a>
 ## Usage
 
-Python >= 3.14. The package is `polyspec-ordered-json` under the import name `polyspec.ordered_json`, installed from a tag of this repository:
+Python >= 3.14. The package is `polyspec-ordered-json` under the import name `polyspec.ordered_json`, installed from the wheel asset of a release, where `X.Y.Z` is the version of the release:
 
 ~~~sh
-pip install "polyspec-ordered-json @ git+https://github.com/polyspec/ordered-json@v0.0.3#subdirectory=python"
+pip install "https://github.com/polyspec/ordered-json/releases/download/vX.Y.Z/polyspec_ordered_json-X.Y.Z-py3-none-any.whl"
 ~~~
 
 The usage fragment takes `source` from an object case in the [common official examples](https://github.com/polyspec/ordered-json/blob/main/examples/official.json). Parse errors report UTF-8 byte offsets; `Value.string_value()` returns a surrogate pair as one character and an unpaired surrogate as its own character, like the JavaScript binding.
