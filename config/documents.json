@@ -11,7 +11,7 @@
       "columns": [
         { "index": 2, "enum": ["implemented", "partial", "planned"] },
         { "index": 3, "enum": ["shared-suite", "package-tests", "docs-tests", "benchmark", "not-verified"] },
-        { "index": 5, "enum": ["source-only", "not-distributed", "published"] }
+        { "index": 5, "pattern": "source-only|not-distributed|published v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*) [A-Za-z0-9_.-]+(, [A-Za-z0-9_.-]+)*" }
       ]
     }
   ],

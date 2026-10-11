@@ -6,7 +6,7 @@
 <a id="state"></a>
 ## Observed state
 
-[distribution.json](../distribution.json) records source and publication observations. The repository holds the five [implementation packages](../spec/repositories.md#ownership) in one revision. The GitHub releases and version tags of the repository are listed by `gh release list -R polyspec/ordered-json` and on its Releases page. A `vX.Y.Z` release attaches the assets listed in [release assets](installation.md#release-assets); a Go module release, `packages/ordered-json-go/vX.Y.Z`, attaches none.
+The repository holds the five [implementation packages](../spec/repositories.md#ownership) in one revision. The GitHub releases and version tags are listed by `gh release list -R polyspec/ordered-json` and on the Releases page of the repository; no tracked file restates them. `make release-proof TAG=<tag>` compares a release with the archives that [config/release.json](../../config/release.json) declares; it needs the network and runs after the release exists. A `vX.Y.Z` release attaches the assets listed in [release assets](installation.md#release-assets); a Go module release, `packages/ordered-json-go/vX.Y.Z`, attaches none. A feature row marked `published` names its release tag and asset ([features](../features.md)), and `make evidence-check` checks that form offline.
 
 Registry publication for npm, crates.io, Packagist, Go, and the PHP extension is not verified. Source checkout is the confirmed local distribution. PIE metadata and a passing PIE build establish local build compatibility, not Packagist publication. The extension package is `polyspec/ordered-json-extension`; the PHP library is `polyspec/ordered-json`.
 
@@ -49,6 +49,6 @@ The tag reaches the steps through the environment variable `TAG`. `scripts/tests
 <a id="releases"></a>
 ## Registry and release records
 
-No registry publication is established or verified. Before recording a release, verify its package name, version, included files, registry, artifact, and tested source revision. Record the artifact URL and publication observation separately. Register the extension for PIE through Packagist using its `php-ext` Composer metadata when publishing a release.
+No registry publication is established or verified. Before recording a release, verify its package name, version, included files, registry, artifact, and tested source revision. Name the release asset in the feature row. Register the extension for PIE through Packagist using its `php-ext` Composer metadata when publishing a release.
 
 Update English and Korean distribution documents, feature distribution state, and the changelog when publication state changes. Do not infer publication from a test, version declaration, planned tag, or source push.

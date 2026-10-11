@@ -1,5 +1,5 @@
 <!-- doc-id: distribution -->
-<!-- source-sha256: f9ab04f177f5ed80fc143a0d2f226336d62992cad4d121ddb6c2e6574ea9f574 -->
+<!-- source-sha256: 9a7070966b03f59b94969786cef5ff6540355e97a18cc1a7538c736518cb575d -->
 # 배포
 
 [English](distribution.md)
@@ -7,7 +7,7 @@
 <a id="state"></a>
 ## 확인된 상태
 
-[distribution.json](../distribution.json)에 소스와 게시 관측을 기록합니다. 저장소는 다섯 [구현 패키지](../spec/repositories.ko.md#ownership)를 하나의 리비전에 담습니다. 저장소의 GitHub 릴리스와 버전 태그는 `gh release list -R polyspec/ordered-json`과 저장소의 Releases 페이지에 나열됩니다. `vX.Y.Z` 릴리스는 [릴리스 asset](installation.ko.md#release-assets)에 나열된 asset을 첨부하고, Go 모듈 릴리스 `packages/ordered-json-go/vX.Y.Z`는 asset을 첨부하지 않습니다.
+저장소는 다섯 [구현 패키지](../spec/repositories.ko.md#ownership)를 하나의 리비전에 담습니다. GitHub 릴리스와 버전 태그는 `gh release list -R polyspec/ordered-json`과 저장소의 Releases 페이지에 나열되며, 추적 파일은 이를 다시 적지 않습니다. `make release-proof TAG=<tag>`는 릴리스를 [config/release.json](../../config/release.json)이 선언한 archive와 비교하며, 네트워크가 필요하고 릴리스가 만들어진 뒤에 실행합니다. `vX.Y.Z` 릴리스는 [릴리스 asset](installation.ko.md#release-assets)에 나열된 asset을 첨부하고, Go 모듈 릴리스 `packages/ordered-json-go/vX.Y.Z`는 asset을 첨부하지 않습니다. `published`로 표시한 기능 행은 릴리스 tag와 asset 이름을 적으며([기능](../features.ko.md)), 그 형식은 `make evidence-check`가 오프라인으로 검사합니다.
 
 npm, crates.io, Packagist, Go, PHP 확장의 레지스트리 게시는 검증되지 않았습니다. 확인된 로컬 배포는 소스 체크아웃입니다. PIE 메타데이터와 성공한 PIE 빌드는 로컬 빌드 호환성을 확인하며 Packagist 게시 근거는 아닙니다. 확장 패키지는 `polyspec/ordered-json-extension`, PHP 라이브러리는 `polyspec/ordered-json`입니다.
 
@@ -50,6 +50,6 @@ tag는 환경 변수 `TAG`로 step에 전달됩니다. `scripts/tests/test_workf
 <a id="releases"></a>
 ## 레지스트리와 릴리스 기록
 
-확립되거나 검증된 레지스트리 게시는 없습니다. 릴리스를 기록하기 전에 패키지 이름, 버전, 포함 파일, 레지스트리, 산출물, 검사한 소스 개정본을 확인합니다. 산출물 URL과 게시 관측을 별도로 기록합니다. 확장 릴리스를 게시할 때는 `php-ext` Composer 메타데이터를 사용해 Packagist를 통해 PIE에 등록합니다.
+확립되거나 검증된 레지스트리 게시는 없습니다. 릴리스를 기록하기 전에 패키지 이름, 버전, 포함 파일, 레지스트리, 산출물, 검사한 소스 개정본을 확인합니다. 기능 행에 릴리스 asset을 적습니다. 확장 릴리스를 게시할 때는 `php-ext` Composer 메타데이터를 사용해 Packagist를 통해 PIE에 등록합니다.
 
 게시 상태가 변경되면 영어·한국어 배포 문서, 기능 배포 상태, 변경 기록을 갱신합니다. 테스트, 버전 선언, 계획된 태그, 소스 푸시만으로 게시를 추정하지 않습니다.

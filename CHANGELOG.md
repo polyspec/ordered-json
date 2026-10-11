@@ -6,7 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
-- T1.32-6: `docs/distribution.json` records the observed source (public, on `main`), the 11 GitHub releases with their asset names and the 13 version tags, in place of the empty lists. The registries stay not verified. `make evidence-check` checks its shape only, so the release and tag lists are a dated observation (`checked_at`) and go stale after each release.
+- T1.32-6-1: `docs/distribution.json` is removed. It restated the GitHub releases, the version tags and the source visibility, which no check compared with the repository, so it went stale after each release. A feature row marked `published` names its release tag and asset, and `make evidence-check` checks that form offline. `make release-proof TAG=<tag>` is the networked comparison of a release.
 
 - T1.32-5: the distribution document and the root `README.md` no longer state that no release exists or that the first release is unpublished. They name where the releases are listed (`gh release list -R polyspec/ordered-json` and the Releases page) and what a `vX.Y.Z` release attaches.
 
@@ -571,4 +571,4 @@
 - Centralized official inputs and expected results in [official.json](examples/official.json), with shared grammar fixtures and optional supplementary inputs.
 - Verified every implementation with 433 shared cases. The PIE-built artifact also passed all 433 cases; 42 checker tests passed. That earlier run recorded two PHP build-tool linker deprecation warnings in its verification record.
 
-The current verification record identifies the tested source and results for all five implementations and the documentation checker tests. [Distribution observations](docs/distribution.json) are separate. This entry records development changes and does not declare a package release.
+The current verification record identifies the tested source and results for all five implementations and the documentation checker tests. Distribution observations are separate. This entry records development changes and does not declare a package release.

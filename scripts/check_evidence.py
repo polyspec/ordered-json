@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check the evidence that the feature record names: the feature rows, the distribution observations, the benchmark result and
+"""Check the evidence that the feature record names: the feature rows and their release assets, the benchmark result and
 the JSON reports; with --records, the verification records of the checkout against the current sources.
 
 The documents themselves (translation pairs, links, anchors, code blocks, checklists, status values) are checked by
@@ -10,7 +10,6 @@ import json
 from pathlib import Path
 import re
 import sys
-from urllib.parse import urlsplit
 
 from verification_record import (AGGREGATE_RECORD, IMPLEMENTATIONS, PIE_RECORD, external_inputs, manifest_differences, package_revisions, sha256,
                                  source_manifest)
@@ -60,6 +59,23 @@ def feature_table(text):
     return rows
 
 
+PUBLISHED = re.compile(r'published (v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)) ([A-Za-z0-9_.-]+(?:, [A-Za-z0-9_.-]+)*)')
+
+
+def published_asset(distribution):
+    """The release tag and the asset names of a published distribution cell, or None. Each asset is a release asset of
+    the tag's version: an npm tarball, a Composer zip or a wheel."""
+    found = PUBLISHED.fullmatch(distribution)
+    if found is None:
+        return None
+    version = found.group(1)[1:]
+    assets = found.group(5).split(', ')
+    pattern = '|'.join(re.escape(suffix) for suffix in (f'-{version}.tgz', f'-{version}.zip', f'-{version}-py3-none-any.whl'))
+    if not all(re.fullmatch(r'[A-Za-z0-9_.-]+(?:' + pattern + r')', asset) for asset in assets):
+        return None
+    return found
+
+
 def feature_rows(text):
     rows = {}
     for cells in feature_table(text):
@@ -72,7 +88,10 @@ def feature_rows(text):
             raise ValueError('Invalid implementation state: ' + identifier)
         if verification not in ('shared-suite', 'package-tests', 'docs-tests', 'benchmark', 'not-verified'):
             raise ValueError('Invalid verification state: ' + identifier)
-        if distribution not in ('source-only', 'not-distributed', 'published'):
+        if distribution.startswith('published'):
+            if published_asset(distribution) is None:
+                raise ValueError('a published feature names its release tag and asset: ' + identifier)
+        elif distribution not in ('source-only', 'not-distributed'):
             raise ValueError('Invalid distribution state: ' + identifier)
         if implementation != 'implemented' and verification != 'not-verified':
             raise ValueError('Incomplete features cannot claim completed verification: ' + identifier)
@@ -203,38 +222,6 @@ def check_verification(root, record):
     check_supplementary(record, counts, external_inputs(root))
 
 
-def check_distribution(record, features):
-    if record.get('schema_version') != 1:
-        raise ValueError('Invalid distribution schema')
-    datetime.fromisoformat(record['checked_at'])
-    declared = REGISTRY['url'].removesuffix('.git')
-    source = record['source']
-    if source.get('state') not in ('available', 'not-verified'):
-        raise ValueError('Invalid source distribution state')
-    if source.get('state') == 'available':
-        if source.get('url') != declared or source.get('branch') != 'main':
-            raise ValueError('A confirmed source observation names the declared repository on main')
-        if source.get('visibility') != 'public':
-            raise ValueError('Source visibility observation is missing')
-    if not isinstance(record.get('github_releases'), list) or not isinstance(record.get('version_tags'), list):
-        raise ValueError('Release and tag observations are required')
-    registries = record['registries']
-    if set(registries) != {'npm', 'crates.io', 'packagist', 'go', 'php-extension', 'pypi'}:
-        raise ValueError('Registry observations are incomplete')
-    published = set()
-    for registry, observation in registries.items():
-        if observation.get('state') == 'published':
-            url = urlsplit(observation.get('artifact_url', ''))
-            if url.scheme != 'https' or not url.netloc or not observation.get('version'):
-                raise ValueError('A published artifact requires its version and URL: ' + registry)
-            published.update(observation.get('features', []))
-        elif observation.get('state') != 'not-verified':
-            raise ValueError('Invalid registry observation: ' + registry)
-    for identifier, (_, _, distribution, _, _) in features.items():
-        if distribution == 'published' and identifier not in published:
-            raise ValueError('Published feature has no observed artifact: ' + identifier)
-
-
 def check_pie_verification(root, record):
     if record.get('schema_version') != 1 or record.get('scope') != 'pie-build' or record.get('status') != 'passed':
         raise ValueError('Invalid PIE verification record')
@@ -309,10 +296,6 @@ def check_evidence(root, records=True):
             check_benchmark(root, read_json('benchmarks/results.json'))
     except (ValueError, KeyError, TypeError, OSError) as issue:
         error('docs/features.md', str(issue))
-    try:
-        check_distribution(read_json('docs/distribution.json'), features)
-    except (ValueError, KeyError, TypeError, OSError) as issue:
-        error('docs/distribution.json', str(issue))
     if records and (root / PIE_RECORD).exists():
         try:
             check_pie_verification(root, read_json(PIE_RECORD))
