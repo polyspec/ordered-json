@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: c6ac2e76327871eb79f1f10a1cd705ea4a88f075fd9ac885ba2d19282b7c6b32 -->
+<!-- source-sha256: 7f10fde8e6e60c91e57a8354a5a37d14857964d803421a93908eb35e991e530b -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- T1.32-3: kit의 vendored 도구는 v0.0.20입니다(`make kit-sync KIT_TAG=v0.0.20`). `make kit-test`가 vendored test를 모두 통과합니다.
 
 - T1.32-2: Python 패키지는 `requires-python = ">=3.14"`를 선언합니다. 이는 CI가 고정 interpreter로 실행하는 `.python-version`의 minor release입니다. `ci.yml`의 job `python`에는 3.11 matrix 항목과 `PYTHON` 재정의가 없으며, `scripts/tests/test_python_requires.py`가 선언된 범위를 `.python-version`과 비교합니다.
 

@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.32-3: the vendored tools of kit are v0.0.20 (`make kit-sync KIT_TAG=v0.0.20`); `make kit-test` passes on the vendored tests.
+
 - T1.32-2: the Python package states `requires-python = ">=3.14"`, the minor release of `.python-version` that CI runs under the pinned interpreter. The job python of `ci.yml` has no 3.11 matrix entry and no `PYTHON` override, and `scripts/tests/test_python_requires.py` checks the declared range against `.python-version`.
 
 ## 0.0.8
