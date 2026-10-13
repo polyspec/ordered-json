@@ -34,7 +34,7 @@ include scripts/kit/kit.mk
 CHECK_TARGETS := kit-check kit-test hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check documents-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check python-package-check
 
 .PHONY: check test-scripts verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
-	benchmark benchmark-check clippy go-vet python-package-check release-config-check install install-rust install-external
+	benchmark benchmark-check python-parse-budget clippy go-vet python-package-check release-config-check install install-rust install-external
 
 # check runs the full suite once per committed tree, when no task of docs/plans/execution-checklist.md is [~]
 # (scripts/kit/full-run.mjs); it records its result in var/full-run.json. rerun-failed (kit.mk) reruns the targets that failed.
@@ -107,3 +107,10 @@ benchmark: toolchain-check cargo-downloads-check
 # benchmark-check measures the benchmark without replacing the committed result.
 benchmark-check: toolchain-check cargo-downloads-check
 	$(PYTHON) benchmarks/run.py --check
+
+# python-parse-budget compares the CPU time of the Python parse with the pure PHP parse on one generated document and fails
+# when the Python median exceeds three times the PHP median (benchmarks/python-parse/run.py). A person runs it after a
+# change of the Python parser; it is no target of make check.
+python-parse-budget:
+	$(MAKE) --no-print-directory toolchain-check TOOLS="python php"
+	$(PYTHON) benchmarks/python-parse/run.py

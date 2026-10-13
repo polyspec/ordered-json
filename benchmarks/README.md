@@ -65,3 +65,12 @@ The Go ordered-json benchmark uses the explicit `ParseBytesBorrowed` path. It
 avoids copying the fixture bytes, and the benchmark keeps each input buffer
 alive and unchanged for the entire measurement. General callers should use
 `ParseBytes` when the input buffer may be modified.
+
+<a id="python-parse"></a>
+## Python parse ratio
+
+`make python-parse-budget` (`python-parse/run.py`) parses one generated document of 50,000 flat objects of eight members
+each (6.15 MB) with the Python package and with the pure PHP package, each in its own process, interleaved, three runs each.
+Each process reports the CPU time of its own parse, so the load of the machine slows both sides alike; no wall-clock budget
+exists. The check prints every run, both medians and their ratio, and fails when the Python median exceeds three times the
+PHP median. It is no target of `make check`: a person runs it after a change of the Python parser.
