@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 95707900233bc383c3b5523b46a2b8abcbbf3e36e461807750255dc74265c338 -->
+<!-- source-sha256: bbb65f4ab8a578a67367f87450afc4a76016cd3306896b5f35a7623350a4a707 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- T1.35: Python 패키지의 `parse_bytes`는 Python으로 byte마다 검사하지 않고 `bytes.decode('utf-8')`로 UTF-8을 검증하며, 이전과 같은 offset인 `UnicodeDecodeError`의 `start`에서 `invalid_utf8`을 보고합니다. `ParseError`는 그 error에서 발생합니다.
 
 - T1.34-1: job `python`과 `push-gate`는 Python과 함께 uv를 설치하며(`make install-tools TOOLS="uv python"`), workflow 규칙은 uv 없이 python을 설치하는 step을 거부합니다.
 

@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.35: `parse_bytes` of the Python package validates UTF-8 with `bytes.decode('utf-8')` instead of a byte-by-byte check in Python, and reports `invalid_utf8` at the `start` of the `UnicodeDecodeError`, the same offset as before; the `ParseError` is raised from that error.
+
 - T1.34-1: the jobs `python` and `push-gate` install uv with the Python (`make install-tools TOOLS="uv python"`), and the workflow rule refuses a step that installs python without uv.
 
 - T1.34: the vendored tools of kit are v0.0.28 (`make kit-sync KIT_TAG=v0.0.28`). `config/toolchain.json` declares `uv` 0.12.24, and `make install-tools` installs the Python of `pythonBuild` (3.14.8) with `uv python install` into `var/tools/uv-python`, keeping the symbolic links that uv creates; `pythonBuild` declares only the exact version. The Python package has the lock `packages/ordered-json-python/pylock.toml` (no dependency), and the release workflow proves a draft release before it makes it public (`make release-proof`, `make release-undraft`).

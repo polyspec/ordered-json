@@ -167,40 +167,6 @@ def _token_units(content: bytes) -> list[int]:
     return units
 
 
-def _invalid_utf8_offset(data: bytes) -> int | None:
-    """The offset of the first byte of the first invalid UTF-8 sequence,
-    or None when every byte is valid."""
-    length = len(data)
-    index = 0
-    while index < length:
-        start = index
-        first = data[index]
-        index += 1
-        if first < 0x80:
-            continue
-        if 0xc2 <= first <= 0xdf:
-            need, point = 1, first & 0x1f
-        elif 0xe0 <= first <= 0xef:
-            need, point = 2, first & 0x0f
-        elif 0xf0 <= first <= 0xf4:
-            need, point = 3, first & 0x07
-        else:
-            return start
-        if index + need > length:
-            return start
-        for _ in range(need):
-            following = data[index]
-            index += 1
-            if following & 0xc0 != 0x80:
-                return start
-            point = point << 6 | (following & 0x3f)
-        if ((need == 1 and point < 0x80) or (need == 2 and point < 0x800)
-                or (need == 3 and point < 0x10000) or point > 0x10ffff
-                or 0xd800 <= point <= 0xdfff):
-            return start
-    return None
-
-
 class Value:
     """An immutable JSON value. Objects keep the first position of each
     key with its last value; factories validate through the parser."""
@@ -378,9 +344,12 @@ class _Parser:
         self.duplicates = 0
 
     def parse(self) -> Value:
-        offset = _invalid_utf8_offset(self.source)
-        if offset is not None:
-            raise ParseError('invalid_utf8', offset)
+        # The strict UTF-8 codec of the standard library validates the document; the start of its
+        # error is the offset of the first byte of the first invalid sequence.
+        try:
+            self.source.decode('utf-8')
+        except UnicodeDecodeError as error:
+            raise ParseError('invalid_utf8', error.start) from error
         end, value = self._value(0, 0)
         end = self._skip(end)
         if end != self.length:

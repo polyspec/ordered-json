@@ -12,6 +12,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 
+from polyspec import ordered_json
 from polyspec.ordered_json import (MAX_DEPTH, ParseError, ParseOptions, Value, parse, parse_bytes,
                                     stringify)
 
@@ -133,13 +134,19 @@ class StandardCases(unittest.TestCase):
         self.assertEqual((caught.exception.kind, caught.exception.offset), ('invalid_utf8', 2))
 
     def test_invalid_utf8_reports_the_first_bad_byte(self):
+        # bytes.decode validates the document: the rejection is caused by its UnicodeDecodeError,
+        # whose start is the offset, and the package holds no UTF-8 checker of its own.
+        self.assertFalse(hasattr(ordered_json, '_invalid_utf8_offset'))
         for document, offset in ((b'\xff', 0), (b'["\x80"]', 2), (b'["\xed\xa0\x80"]', 2),
-                                 (b'["\xf0\x9f\x98"]', 2), (b'["\xc0\x80"]', 2)):
+                                 (b'["\xf0\x9f\x98"]', 2), (b'["\xc0\x80"]', 2), (b'["\xc3"]', 2),
+                                 (b'{"b":1,"b":\xff}', 11)):
             with self.subTest(document=document):
                 with self.assertRaises(ParseError) as caught:
                     parse_bytes(document)
                 self.assertEqual(caught.exception.kind, 'invalid_utf8')
                 self.assertEqual(caught.exception.offset, offset)
+                self.assertIsInstance(caught.exception.__cause__, UnicodeDecodeError)
+                self.assertEqual(caught.exception.__cause__.start, offset)
 
     def test_ordered_map_rejects_non_string_key(self):
         with self.assertRaises(TypeError):
