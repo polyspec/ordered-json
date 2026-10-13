@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.34: the vendored tools of kit are v0.0.28 (`make kit-sync KIT_TAG=v0.0.28`). `config/toolchain.json` declares `uv` 0.12.24, and `make install-tools` installs the Python of `pythonBuild` (3.14.8) with `uv python install` into `var/tools/uv-python`, keeping the symbolic links that uv creates; `pythonBuild` declares only the exact version. The Python package has the lock `packages/ordered-json-python/pylock.toml` (no dependency), and the release workflow proves a draft release before it makes it public (`make release-proof`, `make release-undraft`).
+
 - T1.33: AGENTS states that an existing outside tool or library is used as it is and not rebuilt, with uv for Python interpreters, environments and locks and Composer for PHP dependencies as examples, and accepts the symbolic links that such a tool creates. It also states that the symbolic link and relative path rules of this repository, where they exist, govern what this repository creates, and that paths are resolved declaratively or by a stated discovery rule.
 
 - T1.32-6-1: `docs/distribution.json` is removed. It restated the GitHub releases, the version tags and the source visibility, which no check compared with the repository, so it went stale after each release. A feature row marked `published` names its release tag and asset, and `make evidence-check` checks that form offline. `make release-proof TAG=<tag>` is the networked comparison of a release.

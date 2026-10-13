@@ -1,4 +1,4 @@
-# PYTHON is the pinned Python of var/tools (make install-tools, config/toolchain.json pythonBuild). A recipe names it by its
+# PYTHON is the pinned Python of var/tools (make install-tools installs it with uv, config/toolchain.json pythonBuild). A recipe names it by its
 # absolute path: GNU make execs a recipe line without shell metacharacters directly, so a bare python3 would resolve through
 # the PATH that make read at start (the system Python). The job python of ci.yml overrides it with the interpreter of its matrix.
 PYTHON ?= $(CURDIR)/var/tools/bin/python3

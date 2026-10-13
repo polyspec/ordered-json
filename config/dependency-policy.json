@@ -2,6 +2,12 @@
   "schema": 1,
   "composerPlatforms": [],
   "pythonManifests": ["packages/ordered-json-python/pyproject.toml"],
+  "pythonLocks": [
+    {
+      "lock": "packages/ordered-json-python/pylock.toml",
+      "source": { "requirements": "packages/ordered-json-python/pyproject.toml", "constraints": "packages/ordered-json-python/constraints.txt" }
+    }
+  ],
   "npmLocks": ["package-lock.json"],
   "exceptions": []
 }
