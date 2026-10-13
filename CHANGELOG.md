@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.34-1: the jobs `python` and `push-gate` install uv with the Python (`make install-tools TOOLS="uv python"`), and the workflow rule refuses a step that installs python without uv.
+
 - T1.34: the vendored tools of kit are v0.0.28 (`make kit-sync KIT_TAG=v0.0.28`). `config/toolchain.json` declares `uv` 0.12.24, and `make install-tools` installs the Python of `pythonBuild` (3.14.8) with `uv python install` into `var/tools/uv-python`, keeping the symbolic links that uv creates; `pythonBuild` declares only the exact version. The Python package has the lock `packages/ordered-json-python/pylock.toml` (no dependency), and the release workflow proves a draft release before it makes it public (`make release-proof`, `make release-undraft`).
 
 - T1.33: AGENTS states that an existing outside tool or library is used as it is and not rebuilt, with uv for Python interpreters, environments and locks and Composer for PHP dependencies as examples, and accepts the symbolic links that such a tool creates. It also states that the symbolic link and relative path rules of this repository, where they exist, govern what this repository creates, and that paths are resolved declaratively or by a stated discovery rule.

@@ -43,7 +43,7 @@ jobs:
           package-manager-cache: false
       - name: make install-tools
         if: ${{ !cancelled() }}
-        run: make install-tools TOOLS="python"
+        run: make install-tools TOOLS="uv python"
       - name: make ci-targets
         if: ${{ !cancelled() }}
         run: make ci-targets TARGETS="push-gate-commit documents-check evidence-check commits-check"
