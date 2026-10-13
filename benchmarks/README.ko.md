@@ -1,5 +1,5 @@
 <!-- doc-id: performance-benchmarks -->
-<!-- source-sha256: fda4b53183cfc8101c9c4f490aeffd0525506a27ad61d10c90cee56ec7e05f3a -->
+<!-- source-sha256: f604a1f5eb992a4e9eb318d4dfb6fc53754e196da68531f166f844fea280f4df -->
 # 성능 벤치마크
 
 `run.py`는 모든 런타임에서 같은 입력 문서, 워밍업 횟수, 반복 횟수,
@@ -61,3 +61,12 @@ python3 benchmarks/run.py --check
 python3 benchmarks/run.py --update-baseline
 python3 benchmarks/run.py --iterations 10000 --warmup 1000 --samples 9
 ~~~
+
+<a id="python-parse"></a>
+## Python parse 비율
+
+`make python-parse-budget`(`python-parse/run.py`)는 member 여덟 개짜리 평평한 객체 50,000개를 생성한 문서 하나(6.15 MB)를
+Python 패키지와 순수 PHP 패키지로 각자의 process에서 번갈아 세 번씩 parse합니다. 각 process는 자기 parse의 CPU 시간을
+보고하므로 기계의 부하는 양쪽을 똑같이 느리게 하며, wall-clock 예산은 없습니다. 검사는 모든 실행, 두 중앙값과 그 비율을
+출력하고, Python 중앙값이 PHP 중앙값의 세 배를 넘으면 실패합니다. `make check`의 target이 아니며, Python parser를 바꾼 뒤
+사람이 실행합니다.
