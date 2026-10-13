@@ -55,7 +55,9 @@
     "wheel": {
       "smoke": {
         "polyspec-ordered-json": ["python", "-c", "import polyspec.ordered_json"]
-      }
+      },
+      "lock": { "polyspec-ordered-json": "packages/ordered-json-python/pylock.toml" },
+      "polyspec": {}
     }
   },
   "proof": {

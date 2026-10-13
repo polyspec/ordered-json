@@ -6,6 +6,7 @@ import { spawnSync } from 'node:child_process';
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
+import { pathToFileURL } from 'node:url';
 import { FIXTURE_REGISTRY, stubRegistries } from './registry.mjs';
 
 import { fixtureCheckout as fixture, gate, installCargoAuditStub, installGovulncheckStub, review } from './checkout.mjs';
@@ -17,7 +18,7 @@ test('the gate passes on the fixture and queries no registry', (t) => {
   const stub = stubRegistries(t);
   const result = gate(root, stub.env);
   assert.equal(result.status, 0, result.stdout + result.stderr);
-  assert.match(result.stdout, /^\[dependency-policy\] 5 registry dependencies and 4 locks match the review of /m);
+  assert.match(result.stdout, /^\[dependency-policy\] 6 registry dependencies and 5 locks match the review of /m);
   assert.equal(stub.calls().filter(call => !call.startsWith('composer validate ')).length, 0, stub.calls().join('\n'));
 });
 
@@ -56,7 +57,7 @@ test('the review records the fixture, and a second run writes the same record', 
   const twice = JSON.parse(readFileSync(path.join(root, 'config/dependency-review.json'), 'utf8'));
   assert.deepEqual({ ...twice, reviewed: null }, { ...once, reviewed: null });
   assert.deepEqual(twice.dependencies.map(item => [item.ecosystem, item.package, item.version]), [
-    ['npm', 'is-number', '7.0.0'], ['npm', 'semver', '7.6.0'], ['composer', 'psr/log', '3.0.2'], ['pypi', 'setuptools', '84.0.0'], ['go', 'github.com/google/uuid', 'v1.6.0'],
+    ['npm', 'is-number', '7.0.0'], ['npm', 'semver', '7.6.0'], ['composer', 'psr/log', '3.0.2'], ['pypi', 'click', '8.1.7'], ['pypi', 'setuptools', '84.0.0'], ['go', 'github.com/google/uuid', 'v1.6.0'],
   ]);
 });
 
@@ -140,4 +141,14 @@ test('the review records and audits every npm lock that the policy names', (t) =
   const record = JSON.parse(readFileSync(path.join(root, 'config/dependency-review.json'), 'utf8'));
   assert.deepEqual(record.locks.map(entry => entry.lock).filter(lock => lock.endsWith('package-lock.json')), ['package-lock.json', SUB_LOCK]);
   assert.equal(stub.calls().filter(call => call.startsWith('npm audit ')).length, 2, stub.calls().join('\n'));
+});
+
+// K58: a command module does not act when it is imported; the mutation check runs only as the command.
+test('importing the mutation check runs nothing and prints nothing', (t) => {
+  const root = fixture(t);
+  const url = pathToFileURL(path.join(root, 'scripts/kit/check-dependency-policy-mutation.mjs')).href;
+  const result = spawnSync(process.execPath, ['--input-type=module', '-e', `await import(${JSON.stringify(url)}); console.log('imported');`], { cwd: root, encoding: 'utf8', env: process.env });
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stdout, 'imported\n', 'the import ran the mutation check');
+  assert.equal(result.stderr, '');
 });

@@ -22,7 +22,7 @@ cargo-downloads-check: ## Check that the crates of every Cargo.lock are in the r
 
 cargo-downloads-fetch: ## Download the crates of every Cargo.lock
 	$(ONLINE) node scripts/kit/check-cargo-downloads.mjs --fetch
-# Toolchains (K8.2): install-tools installs the declared npm, Go, ruff (with the sha256 of its wheels), Composer (with a sha256), cargo-audit and
+# Toolchains (K8.2): install-tools installs the declared npm, Go, ruff and uv (with the sha256 of their wheels), Composer (with a sha256), cargo-audit and
 # govulncheck into var/tools; ONLINE, because it downloads. Nothing on the machine changes. Put var/tools/bin first on PATH.
 # toolchain-check compares the running tools with the declarations and fails with the expected and the running version.
 .PHONY: install-tools toolchain-check
@@ -96,7 +96,11 @@ commits-check: ## Check the commit messages of RANGE (<base>..<head>, default HE
 	node scripts/kit/check-commits.mjs $(if $(RANGE),--range $(RANGE))
 # The steps of a release (scripts/kit/release.mjs, config/release.json). TAG is the pushed tag, vX.Y.Z or <Go module
 # directory>/vX.Y.Z; release-verify reads the check runs of GITHUB_REPOSITORY. The release workflow runs the steps in this order.
-.PHONY: release-verify release-versions release-assets release-publish release-coverage release-go-tags release-backend
+.PHONY: release-tools release-verify release-versions release-assets release-publish release-undraft release-coverage release-go-tags release-backend
+
+release-tools: ## Install the tools that config/release.json needs for the release (npm, Composer, Python and its backend, Go) and check cargo when a git-tag proof needs it; ONLINE
+	$(ONLINE) node scripts/kit/release-tools.mjs
+
 
 release-verify: ## Require the commit of TAG on origin/main with its check runs succeeded; reads GITHUB_REPOSITORY
 	@test -n "$$TAG" || { echo "release-verify: TAG is required, for example make release-verify TAG=v0.0.1"; exit 1; }
@@ -110,9 +114,13 @@ release-assets: ## Build the archive of every package of TAG into var/release/as
 	@test -n "$$TAG" || { echo "release-assets: TAG is required, for example make release-assets TAG=v0.0.1"; exit 1; }
 	node scripts/kit/release.mjs assets "$$TAG"
 
-release-publish: ## Create the GitHub Release of TAG with the notes and the archives of release-assets
+release-publish: ## Create the GitHub Release of TAG as a draft with the notes and the archives of release-assets; a draft of an earlier run is replaced
 	@test -n "$$TAG" || { echo "release-publish: TAG is required, for example make release-publish TAG=v0.0.1"; exit 1; }
 	node scripts/kit/release.mjs publish "$$TAG"
+
+release-undraft: ## Make the draft release of TAG public; run only after release-proof of TAG passed
+	@test -n "$$TAG" || { echo "release-undraft: TAG is required, for example make release-undraft TAG=v0.0.1"; exit 1; }
+	node scripts/kit/release.mjs undraft "$$TAG"
 
 release-coverage: ## Require every package file of the checkout to be classified in config/release.json; offline
 	node scripts/kit/release.mjs coverage
@@ -123,6 +131,13 @@ release-go-tags: ## Require the tag <directory>/vX.Y.Z of every Go module at the
 
 release-backend: ## Download the build backend of the wheel packages into var/tools/wheels with its sha256 checked; ONLINE
 	$(ONLINE) node scripts/kit/release-backend.mjs
+
+# --- python-venv: a virtual environment of the checkout Python, made by the uv of the checkout as uv makes it
+# (scripts/kit/python-venv.mjs); an existing venv of the checkout Python is kept.
+.PHONY: python-venv
+python-venv: ## Make the virtual environment DIR from var/tools/bin/python3 with var/tools/bin/uv venv; offline
+	@test -n "$(DIR)" || { echo "python-venv: DIR is required, for example make python-venv DIR=pkg/.venv"; exit 1; }
+	node scripts/kit/python-venv.mjs $(DIR)
 
 # --- lint-python: ruff check and ruff format --check of the Python of the checkout, with the ruff that config/toolchain.json declares.
 .PHONY: lint-python
@@ -135,7 +150,7 @@ lint-python: ## Lint and format-check the Python of the checkout with the ruff o
 # smoke command for each package. A lock pins registry packages by version and integrity, so the install downloads them: that is
 # installation, and the target is no offline check. release-consumer-lock resolves versions and runs ONLINE.
 # scripts/kit/release-proof.mjs proves a released TAG from outside the repository (GitHub Release, consumer installs, git-tag
-# installs, Go modules); it runs after the release exists and belongs to no check.
+# installs, Go modules); the release workflow of workflows/release.yml runs it on the draft after release-publish, and a developer may run it.
 .PHONY: release-consumer release-consumer-lock release-proof
 
 release-consumer: ## Install the archives of TAG in var/release/assets in clean npm and Composer projects and run the smoke commands
@@ -160,3 +175,20 @@ dependency-policy-mutation-check: ## Check that the dependency gate rejects each
 
 dependency-review: ## Ask the registries for newer stable releases and advisories; RECORD=1 records the review, UPDATE=1 updates first; ONLINE
 	$(ONLINE) node scripts/kit/dependency-review.mjs $(if $(RECORD),--record) $(if $(UPDATE),--update)
+
+# --- language parity: config/parity.json declares the implementations and the units that each of them holds.
+.PHONY: parity-check parity-declarations-check
+parity-check: ## Run the binding of every suite in every implementation and check every parity rule of config/parity.json; offline
+	node scripts/kit/parity.mjs
+
+parity-declarations-check: ## Check the parity rules of config/parity.json that need no run: symbols, bindings, tests, error codes, lists, documents; offline
+	node scripts/kit/parity.mjs --declarations
+
+# --- python-lock: the PEP 751 locks of config/dependency-policy.json (pythonLocks), each with its requirements and a constraints file
+# that pins every package. The writer resolves with var/tools/bin/uv (install-tools TOOLS=uv); the check never resolves.
+.PHONY: python-lock python-lock-check
+python-lock: ## Write every Python lock of pythonLocks with var/tools/bin/uv from its requirements and constraints; ONLINE
+	$(ONLINE) node scripts/kit/python-lock.mjs write
+
+python-lock-check: ## Check every Python lock of pythonLocks against its requirements and constraints, with no network; offline
+	node scripts/kit/python-lock.mjs check

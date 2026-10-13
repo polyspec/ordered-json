@@ -32,7 +32,11 @@ TRIGGERS = {
 CHECK_WORKFLOWS = ('ci.yml', 'push-gate.yml')
 # The steps of release.yml in their order (scripts/kit/release.mjs): verify the tagged commit, check the versions, build the
 # archives, create the release.
-RELEASE_STEPS = ['make release-verify', 'make release-versions', 'make release-assets', 'make release-publish']
+# A step runs one make target: its arguments hold no shell syntax except a ${{ }} expression and, at the end, make variables
+# that take an environment variable of the job by name (TAG="$TAG").
+MAKE_STEP = r'make [^|;&`$()]*(\$\{\{[^}]*\}\}[^|;&`$()]*)*( [A-Z][A-Z_]*="\$[A-Z][A-Z_]*")*'
+RELEASE_STEPS = ['make release-tools', 'make release-verify', 'make release-versions', 'make release-assets', 'make release-publish',
+                 'make release-proof TAG="$TAG"', 'make release-undraft TAG="$TAG"']
 
 
 def jobs(text):
@@ -162,7 +166,7 @@ def violations(name, text):
             found.append(f'{name}: job {job} has no steps')
         for index, step in enumerate(steps, 1):
             label = step.get('name') or step.get('uses') or step.get('run')
-            if 'run' in step and not re.fullmatch(r'make [^|;&`$()]*(\$\{\{[^}]*\}\}[^|;&`$()]*)*', step['run']):
+            if 'run' in step and not re.fullmatch(MAKE_STEP, step['run']):
                 found.append(f"{name}: job {job} step {index} ({label}) runs `{step['run']}`; a step runs one make target, "
                              'never a script or a tool directly')
         for index, step in enumerate(steps, 1):
@@ -252,7 +256,7 @@ class WorkflowRules(unittest.TestCase):
     def test_a_step_that_runs_a_script_or_a_tool_directly_fails(self):
         text = (WORKFLOWS / 'push-gate.yml').read_text()
         for command in ('node scripts/kit/push-gate.mjs commit "${{ github.sha }}"', 'cargo test', 'make check && cargo test',
-                        '|'):
+                        '|', 'make release-proof TAG="$(cat tag)"', 'make release-proof TAG="$TAG" && cargo test'):
             with self.subTest(command=command):
                 broken = re.sub(r'run: make ci-targets .*', f'run: {command}', text)
                 self.assertTrue(any('a step runs one make target, never a script or a tool directly' in issue
@@ -338,7 +342,7 @@ class WorkflowRules(unittest.TestCase):
         text = (WORKFLOWS / 'release.yml').read_text()
         self.assertEqual(release_violations('release.yml', text, jobs(text)), [])
         runs = [step['run'] for step in jobs(text)['release']['steps'] if 'run' in step]
-        self.assertEqual(runs, ['make install-tools TOOLS="npm python pythonBackend"'] + RELEASE_STEPS)
+        self.assertEqual(runs, RELEASE_STEPS)
         broken = {
             'order': (text.replace('run: make release-versions', 'run: make release-swap')
                       .replace('run: make release-verify', 'run: make release-versions')

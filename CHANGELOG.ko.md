@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 11bf074d1904f2bfcb2a8faffd6ed6afb47975f52ee361e50d94d553a8389a4a -->
+<!-- source-sha256: 0f9ea17290c239d3ea3ce454982384c636f830c03cff1cd89477ee0d2c8e31ec -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- T1.34: vendor된 kit 도구는 v0.0.28입니다(`make kit-sync KIT_TAG=v0.0.28`). `config/toolchain.json`은 `uv` 0.12.24를 선언하고, `make install-tools`는 `pythonBuild`의 Python(3.14.8)을 `uv python install`로 `var/tools/uv-python`에 설치하며 uv가 만드는 symbolic link를 그대로 둡니다. `pythonBuild`는 정확한 version만 선언합니다. Python 패키지는 lock `packages/ordered-json-python/pylock.toml`(의존성 없음)을 가지며, 릴리스 workflow는 draft 릴리스를 증명한 뒤 공개합니다(`make release-proof`, `make release-undraft`).
 
 - T1.33: AGENTS는 기존 외부 도구나 라이브러리를 다시 만들지 않고 있는 그대로 사용한다고 적습니다. 예로 Python interpreter, 환경, lock에는 uv를, PHP 의존성에는 Composer를 들며, 그런 도구가 만드는 symbolic link를 받아들입니다. 또한 이 저장소의 symbolic link와 상대 경로 규칙은 있는 곳에서 이 저장소가 만드는 것을 규율하며, 경로는 선언적으로 또는 명시된 발견 규칙으로 정한다고 적습니다.
 

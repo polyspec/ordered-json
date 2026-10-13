@@ -22,6 +22,7 @@ import path from 'node:path';
 import { checkedFiles } from './tracked-files.mjs';
 import { readJson } from './files.mjs';
 import { toolchainConfig } from './toolchain-declared.mjs';
+import { readPylock } from './pylock.mjs';
 
 export const POLICY = 'config/dependency-policy.json';
 export const RECORD = 'config/dependency-review.json';
@@ -71,6 +72,28 @@ export const dependencyKey = ({ ecosystem, manifest, package: name }) => `${ecos
 export const goModules = root => checkedFiles(root).filter(file => path.posix.basename(file) === 'go.mod');
 
 /**
+ * The package patterns of the module of `lock` (a go.sum, beside its go.mod), relative to the module directory, in order:
+ * `.` for the root package and `./<directory>` for each other directory of a tracked or new Go file. The advisory query
+ * names these instead of `./...`, because `./...` walks every directory below the module, including a Go toolchain
+ * under var/tools, which is not part of the module. As `./...` does, a directory whose name begins with `.` or `_`, or
+ * is `testdata` or `vendor`, is skipped, and so is a directory below a nested module (a go.mod of its own).
+ */
+export function goPackagePatterns(root, lock) {
+  const module = path.posix.dirname(lock);
+  const within = (directory, base) => base === '.' || directory === base || directory.startsWith(`${base}/`);
+  const nested = goModules(root).map(file => path.posix.dirname(file)).filter(directory => directory !== module && within(directory, module));
+  const patterns = new Set();
+  for (const file of checkedFiles(root).filter(item => item.endsWith('.go'))) {
+    const directory = path.posix.dirname(file);
+    if (!within(directory, module) || nested.some(base => within(directory, base))) continue;
+    const relative = path.posix.relative(module, directory);
+    if (relative.split('/').some(part => /^[._]/.test(part) || part === 'testdata' || part === 'vendor')) continue;
+    patterns.add(relative === '' ? '.' : `./${relative}`);
+  }
+  return [...patterns].sort();
+}
+
+/**
  * The direct requirements of a go.mod as { module, version }: the `require` lines without `// indirect`, except a module
  * that a `replace` directive points to a directory of the checkout, which is a package of this repository.
  */
@@ -92,8 +115,25 @@ export function goRequirements(text) {
 /** The Cargo locks of the checkout: every Cargo.lock that is tracked or new and not ignored. */
 export const cargoLocks = root => checkedFiles(root).filter(file => path.posix.basename(file) === 'Cargo.lock');
 
-/** The ecosystem of a lock: npm, composer, cargo or go. */
-export const lockEcosystem = lock => ({ 'package-lock.json': 'npm', 'composer.lock': 'composer', 'Cargo.lock': 'cargo', 'go.sum': 'go' })[path.posix.basename(lock)];
+// A PEP 751 lock is pylock.toml or pylock.<name>.toml.
+const PYLOCK = /^pylock(\.[A-Za-z0-9_-]+)?\.toml$/;
+
+/** The ecosystem of a lock: npm, composer, cargo, go or pypi (a PEP 751 pylock.toml). */
+export const lockEcosystem = (lock) => {
+  const name = path.posix.basename(lock);
+  if (PYLOCK.test(name)) return 'pypi';
+  return ({ 'package-lock.json': 'npm', 'composer.lock': 'composer', 'Cargo.lock': 'cargo', 'go.sum': 'go' })[name];
+};
+
+/**
+ * The command that regenerates a PEP 751 lock, named by the `created-by` field of the lock, which the writer sets. A lock without
+ * a writer, or with one that kit does not name, has no fix of its own: the fix says so.
+ */
+export function lockFix(lock, createdBy, name) {
+  if (createdBy === 'uv') return `regenerate ${lock} with uv: uv lock --upgrade-package ${name}, then uv export --format pylock.toml --frozen --no-emit-project -o ${lock}, then make dependency-review RECORD=1`;
+  if (createdBy === 'pip') return `regenerate ${lock} with pip: pip lock, then make dependency-review RECORD=1`;
+  return `regenerate ${lock} with the tool that wrote it (created-by ${createdBy === null ? 'is absent' : JSON.stringify(createdBy)}), then make dependency-review RECORD=1`;
+}
 
 /**
  * The npm manifests of the npm project at `base` (a directory of the checkout, `.` for the root): its package.json and the
@@ -134,6 +174,8 @@ export function readState(root, policy) {
   const locks = [];
   const manifests = [];
   const npmLocks = new Map();
+  const pythonLocks = [];
+  const vcs = [];
 
   for (const lockPath of policy.npmLocks) {
     const base = path.posix.dirname(lockPath);
@@ -188,6 +230,21 @@ export function readState(root, policy) {
       }
     }
   }
+  // Each Python lock named by the policy is recorded with its sha256; its packages are read by the lock format (K36).
+  // Each PEP 751 lock of the policy: its registry packages are dependencies of the lock (kind `lock`), its git packages are pinned
+  // by their commit and recorded with it. A lock whose packages are not read fails in readPylock with the line of the construct.
+  for (const { lock: lockPath } of policy.pythonLocks ?? []) {
+    locks.push(lockPath);
+    const lock = readPylock(readFileSync(path.join(root, lockPath), 'utf8'), lockPath);
+    pythonLocks.push({ lock: lockPath, createdBy: lock.createdBy, packages: lock.packages });
+    for (const item of lock.packages) {
+      if (item.kind === 'registry') {
+        dependencies.push({ ecosystem: 'pypi', manifest: lockPath, package: item.name, kind: 'lock', spec: `==${item.version}`, version: item.version, lock: lockPath, createdBy: lock.createdBy });
+      } else if (item.kind === 'vcs' && item.vcs.commitId !== null) {
+        vcs.push({ lock: lockPath, package: item.name, url: item.vcs.url, requestedRevision: item.vcs.requestedRevision, commitId: item.vcs.commitId });
+      }
+    }
+  }
   for (const manifestPath of policy.pythonManifests ?? []) {
     const text = readFileSync(path.join(root, manifestPath), 'utf8');
     for (const requirement of pythonRequirements(text, manifestPath)) {
@@ -208,7 +265,7 @@ export function readState(root, policy) {
     }
   }
   locks.push(...cargoLocks(root));
-  return { dependencies, local, tagged, locks, manifests, npmLocks };
+  return { dependencies, local, tagged, locks, manifests, npmLocks, pythonLocks, vcs };
 }
 
 // npm version ranges (https://docs.npmjs.com/cli/v11/using-npm/semver): `||` joins comparator sets, a set holds

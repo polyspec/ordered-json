@@ -1,16 +1,17 @@
-# Release: a tag push creates the GitHub Release of the tag. Every commit of main passed the full suite on its push; the
-# maintainer releases by tagging a commit of main
-# vX.Y.Z after a version-bump pull request, or packages/ordered-json-go/vX.Y.Z for the Go module of packages/ordered-json-go/. In a tag filter * does not match /,
-# so '**/v*' covers the tag of a Go module at any depth. The steps run in order and stop at the first failure: make
-# release-verify requires the tagged commit on origin/main with the check runs push-gate and ci-passed concluded
-# success, without running the tests again; make release-versions requires the version of the tag in every manifest and
-# its section in CHANGELOG.md; make release-assets builds the package archives (npm pack and a zip of each Composer
-# package and the wheel of the Python package; the Cargo package is not released as an archive and is consumed by git tag); make release-publish creates
-# the GitHub Release with the section as notes and the archives attached, and a Go tag builds and attaches nothing
-# (scripts/kit/release.mjs, config/release.json). TAG reaches the make targets through the environment. Each step runs a
-# make target. The runner image and each action are exact releases, as in ci.yml. The release builds the archives with the npm
-# that package.json declares and the wheel with the Python of .python-version and the build backend of config/toolchain.json,
-# which make install-tools TOOLS="npm python pythonBackend" installs into var/tools.
+# Release workflow of a repository that adopts kit. kit-sync copies this file to .github/workflows/release.yml, records it in
+# .kit/kit.lock.json, and kit-check fails when the checkout differs from it; a repository never edits it.
+#
+# A tag push creates the GitHub Release of the tag as a draft, proves the draft from outside the checkout, and makes it public
+# only after the proof passes. The steps run in order and stop at the first failure; each step runs one make target of
+# scripts/kit/kit.mk with TAG from the environment:
+#   release-tools    installs the tools that config/release.json needs for the packages and proof of this repository
+#   release-verify   the tagged commit is on origin/main and its check runs concluded success, without running the tests again
+#   release-versions every manifest has the version of the tag and the changelog has its section
+#   release-assets  builds the archive of every package into var/release/assets
+#   release-publish creates the GitHub Release of the tag as a draft, with its notes and archives
+#   release-proof   proves the draft: its assets, its consumer installs, its git-tag installs and its Go module tags
+#   release-undraft makes the release public; it runs only after release-proof passed
+# A failed step leaves the release a draft and fails the run, so a release that cannot be installed is never public.
 name: release
 
 on:
@@ -37,13 +38,17 @@ jobs:
         with:
           node-version-file: .node-version
           package-manager-cache: false
-      - name: make install-tools
-        run: make install-tools TOOLS="npm python pythonBackend"
+      - name: make release-tools
+        run: make release-tools
       - name: verify the tagged commit
         run: make release-verify
       - name: check the versions
         run: make release-versions
       - name: build the assets
         run: make release-assets
-      - name: create the release
+      - name: create the draft release
         run: make release-publish
+      - name: prove the draft release
+        run: make release-proof TAG="$TAG"
+      - name: make the release public
+        run: make release-undraft TAG="$TAG"
