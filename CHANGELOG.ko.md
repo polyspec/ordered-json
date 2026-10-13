@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 0f9ea17290c239d3ea3ce454982384c636f830c03cff1cd89477ee0d2c8e31ec -->
+<!-- source-sha256: 95707900233bc383c3b5523b46a2b8abcbbf3e36e461807750255dc74265c338 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- T1.34-1: job `python`과 `push-gate`는 Python과 함께 uv를 설치하며(`make install-tools TOOLS="uv python"`), workflow 규칙은 uv 없이 python을 설치하는 step을 거부합니다.
 
 - T1.34: vendor된 kit 도구는 v0.0.28입니다(`make kit-sync KIT_TAG=v0.0.28`). `config/toolchain.json`은 `uv` 0.12.24를 선언하고, `make install-tools`는 `pythonBuild`의 Python(3.14.8)을 `uv python install`로 `var/tools/uv-python`에 설치하며 uv가 만드는 symbolic link를 그대로 둡니다. `pythonBuild`는 정확한 version만 선언합니다. Python 패키지는 lock `packages/ordered-json-python/pylock.toml`(의존성 없음)을 가지며, 릴리스 workflow는 draft 릴리스를 증명한 뒤 공개합니다(`make release-proof`, `make release-undraft`).
 

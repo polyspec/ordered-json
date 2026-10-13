@@ -169,6 +169,11 @@ def violations(name, text):
             if 'run' in step and not re.fullmatch(MAKE_STEP, step['run']):
                 found.append(f"{name}: job {job} step {index} ({label}) runs `{step['run']}`; a step runs one make target, "
                              'never a script or a tool directly')
+            # uv installs the Python of pythonBuild (config/toolchain.json), so a step that installs python installs uv with it.
+            tools = re.fullmatch(r'make install-tools TOOLS="([^"]*)"', step.get('run', ''))
+            if tools and 'python' in tools.group(1).split() and 'uv' not in tools.group(1).split():
+                found.append(f"{name}: job {job} step {index} ({label}) installs python without uv, which installs it; "
+                             'name uv in TOOLS')
         for index, step in enumerate(steps, 1):
             # setup-node caches the dependencies of the packageManager of package.json by default and fails without
             # a lock file with packages; the lock file of this repository lists none, since no npm package is installed.
@@ -252,6 +257,12 @@ class WorkflowRules(unittest.TestCase):
         self.assertIn(message, violations('ci.yml', unguarded))
         elsewhere = text.replace(f'          path: {REPORT}\n', '          path: var/other/\n', 1)
         self.assertIn(message, violations('ci.yml', elsewhere))
+
+    def test_a_step_that_installs_python_installs_uv(self):
+        text = (WORKFLOWS / 'push-gate.yml').read_text()
+        broken = re.sub(r'run: make install-tools TOOLS="[^"]*"', 'run: make install-tools TOOLS="python"', text)
+        self.assertTrue(any('installs python without uv' in issue for issue in violations('push-gate.yml', broken)),
+                        violations('push-gate.yml', broken))
 
     def test_a_step_that_runs_a_script_or_a_tool_directly_fails(self):
         text = (WORKFLOWS / 'push-gate.yml').read_text()
