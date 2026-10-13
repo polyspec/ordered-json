@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.41: the Python parser reads a document in one pass of compiled `re` patterns, one match per member, item or root value, with the grammar defined once for the scan and for every error offset; `make python-parse-budget` compares its CPU time with the pure PHP parser on 50,000 flat objects, where the ratio fell from 4.44 to 2.34-2.94. Results and error offsets are unchanged on every vector.
+
 - T1.35: `parse_bytes` of the Python package validates UTF-8 with `bytes.decode('utf-8')` instead of a byte-by-byte check in Python, and reports `invalid_utf8` at the `start` of the `UnicodeDecodeError`, the same offset as before; the `ParseError` is raised from that error.
 
 - T1.34-1: the jobs `python` and `push-gate` install uv with the Python (`make install-tools TOOLS="uv python"`), and the workflow rule refuses a step that installs python without uv.

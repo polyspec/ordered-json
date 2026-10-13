@@ -7,6 +7,8 @@ implementation shares.
 """
 
 from collections.abc import Iterable, Mapping
+from json.decoder import scanstring as _scanstring
+import re
 from types import MappingProxyType
 
 __all__ = ['MAX_DEPTH', 'ParseError', 'ParseOptions', 'Value', 'parse', 'parse_bytes', 'stringify']
@@ -33,10 +35,60 @@ _MESSAGES = {
 
 _ESCAPED_UNITS = {0x62: 8, 0x66: 12, 0x6e: 10, 0x72: 13, 0x74: 9,
                   0x22: 34, 0x5c: 92, 0x2f: 47}
-_WHITESPACE = b' \t\n\r'
-_DIGITS = b'0123456789'
-_HEX_DIGITS = b'0123456789abcdefABCDEF'
-_SIMPLE_ESCAPES = b'"/\\bfnrt'
+# The grammar of the scanner, defined once. Each piece is a regular expression over bytes. The
+# tokenizer (_MEMBER, _ITEM, _ROOT) composes the pieces into the patterns that the C code of re
+# matches, and the analysis of a match that fails (_Parser._member_error, _value_error,
+# _string_error, _number_check) matches the same pieces up to the byte that breaks them, so the
+# fast path and every failure offset read one definition.
+_WS = rb'[ \t\n\r]*+'
+_DIGIT = rb'[0-9]'
+_HEX = rb'[0-9a-fA-F]'
+_SIMPLE_ESCAPE = rb'["\\/bfnrt]'
+_PLAIN = rb'[^"\\\x00-\x1f]'
+_ESCAPE = rb'\\(?:' + _SIMPLE_ESCAPE + rb'|u' + _HEX + rb'{4})'
+# A run of plain bytes, then each escape with the plain run after it: the body that
+# (?:PLAIN|ESCAPE)* describes, in the form that re matches a run at a time instead of a byte at a
+# time. Each run is possessive (*+): no byte that follows a run can belong to it, so no
+# backtracking into a run can change a match.
+_BODY = _PLAIN + rb'*+(?:' + _ESCAPE + _PLAIN + rb'*+)*+'
+_STRING = rb'"' + _BODY + rb'"'
+# A number: an integer, then a point and an exponent, each followed by its digits. The tokenizer
+# reads a number token as far as it reaches, with each part optional and each digit run possibly
+# empty (_NUMBER), so a sign, a point or an exponent without its digits is part of the token; the
+# token is valid exactly when it matches the number of the grammar (_STRICT_NUMBER), and
+# _Parser._number_check names the first missing digit. Both read the same parts. Digit runs are
+# possessive, as in _BODY.
+_INTEGER = rb'0|[1-9]' + _DIGIT + rb'*+'
+_POINT = rb'\.'
+_EXPONENT = rb'[eE][+-]?'
+_NUMBER = (rb'(?=[-0-9])-?(?P<int>' + _INTEGER + rb')?(?P<frac>' + _POINT + _DIGIT + rb'*+)?'
+           rb'(?P<exp>' + _EXPONENT + _DIGIT + rb'*+)?')
+_SCALAR = (rb'(?:' + _STRING + rb'|' + _NUMBER + rb'|true|false|null)')
+# The tokenizer: one match reads a whole member of an object (its name, colon and value, and after a
+# scalar value the delimiter that follows it), an item of an array, or the root value. A container
+# value ends the match at its bracket.
+_MEMBER = re.compile(_WS + rb'(?P<k>' + _STRING + rb')' + _WS + rb':' + _WS
+                     + rb'(?:(?P<v>' + _SCALAR + rb')(?:' + _WS + rb'(?P<d>[,}]))?|(?P<c>[{\[]))')
+_ITEM = re.compile(_WS + rb'(?:(?P<v>' + _SCALAR + rb')(?:' + _WS + rb'(?P<d>[,\]]))?|(?P<c>[{\[]))')
+_ROOT = re.compile(_WS + rb'(?:(?P<v>' + _SCALAR + rb')|(?P<c>[{\[]))')
+_VALUE = re.compile(_WS + rb'(?P<v>' + _SCALAR + rb'|[{\[])')
+_DELIMITER = re.compile(_WS + rb'(?P<d>[,}\]])')
+# The last group that a member or item match closes tells its shape: the delimiter after a scalar
+# value, or the bracket of a container value; any other last group is a scalar value without a
+# delimiter.
+_MEMBER_DELIMITER, _MEMBER_CONTAINER = _MEMBER.groupindex['d'], _MEMBER.groupindex['c']
+_ITEM_DELIMITER, _ITEM_CONTAINER = _ITEM.groupindex['d'], _ITEM.groupindex['c']
+_WS_RUN = re.compile(_WS)
+_STRICT_NUMBER = re.compile(rb'-?(?:' + _INTEGER + rb')(?:' + _POINT + _DIGIT + rb'++)?(?:' + _EXPONENT
+                            + _DIGIT + rb'++)?')
+_STRING_TOKEN = re.compile(_STRING)
+_BODY_RUN = re.compile(_BODY)
+_SIMPLE_ESCAPE_BYTE = re.compile(_SIMPLE_ESCAPE)
+_HEX_RUN = re.compile(_HEX + rb'{0,4}')
+_DIGIT_BYTE = re.compile(_DIGIT)
+# The kind of a scalar token by its first byte; any other first byte of a scalar is a number.
+_FIRST_BYTE_KINDS = {0x22: 'string', 0x74: 'boolean', 0x66: 'boolean', 0x6e: 'null'}
+_SCALAR_KINDS = tuple(_FIRST_BYTE_KINDS.get(byte, 'number') for byte in range(256))
 _INTERNAL = object()
 
 
@@ -144,6 +196,15 @@ def _quote_units(units: Iterable[int]) -> bytes:
     return b''.join(out)
 
 
+def _token_text(token: bytes) -> str:
+    """The decoded text of a validated string token, quotes included: its UTF-8 content, or with
+    escapes the decoding of the standard library's json scanner, which combines a surrogate pair and
+    keeps an unpaired surrogate as its own character."""
+    if b'\\' not in token:
+        return token[1:-1].decode('utf-8')
+    return _scanstring(token.decode('utf-8'), 1)[0]
+
+
 def _token_units(content: bytes) -> list[int]:
     """The UTF-16 code units of a validated string token's contents; an
     escape contributes its unit without combining a pair."""
@@ -172,7 +233,7 @@ class Value:
     key with its last value; factories validate through the parser."""
 
     __slots__ = ('_source', '_start', '_end', '_kind', '_root', '_compact',
-                 '_members', '_key_spans', '_items')
+                 '_members', '_key_starts', '_items')
 
     def __init__(self, token=None):
         if token is not _INTERNAL:
@@ -205,7 +266,7 @@ class Value:
         """The decoded text; a surrogate pair is one character and an
         unpaired surrogate stays as its own character."""
         self._expect('string')
-        return _combine(_token_units(self._content()))
+        return _token_text(self._source[self._start:self._end])
 
     def string_units(self) -> list[int]:
         """The UTF-16 code units, including escaped unpaired surrogates."""
@@ -316,7 +377,8 @@ def _write(value: Value, out: list[bytes] | None = None) -> bytes:
         for name, member in value._members.items():
             parts.append(separator)
             separator = b','
-            start, end = value._key_spans[name]
+            start = value._key_starts[name]
+            end = _STRING_TOKEN.match(value._source, start).end()
             parts.append(value._source[start:end])
             parts.append(b':')
             parts.append(_write(member))
@@ -332,8 +394,31 @@ def _write(value: Value, out: list[bytes] | None = None) -> bytes:
     return b''.join(parts)
 
 
+class _Frame:
+    """An open container of the scanner: its kind, its first byte, the members or items read so far,
+    and the whitespace and repeated keys of the document before it, which decide whether its source
+    token is its compact form."""
+
+    __slots__ = ('is_object', 'start', 'members', 'key_starts', 'items', 'whitespace', 'duplicates',
+                 'name', 'key')
+
+    def __init__(self, is_object: bool, start: int, whitespace: int, duplicates: int):
+        self.is_object = is_object
+        self.start = start
+        self.members: dict[str, Value] = {}
+        self.key_starts: dict[str, int] = {}
+        self.items: list[Value] = []
+        self.whitespace = whitespace
+        self.duplicates = duplicates
+        self.name = ''
+        self.key = 0
+
+
 class _Parser:
-    """The byte scanner; its rejections match the shared contract."""
+    """The scanner: one pass of the tokenizer over the document, one match per member, item or root
+    value, with an explicit stack of open containers. A match that fails is analysed piece by piece
+    with the same grammar, which names the first byte that breaks it. Its rejections match the
+    shared contract."""
 
     def __init__(self, source: bytes, options: ParseOptions):
         self.source = source
@@ -350,181 +435,236 @@ class _Parser:
             self.source.decode('utf-8')
         except UnicodeDecodeError as error:
             raise ParseError('invalid_utf8', error.start) from error
-        end, value = self._value(0, 0)
-        end = self._skip(end)
-        if end != self.length:
-            raise ParseError('trailing_input', end)
-        value._root = True
-        return value
-
-    def _skip(self, pos: int) -> int:
-        source = self.source
-        start = pos
-        while pos < self.length and source[pos] in _WHITESPACE:
-            pos += 1
-        self.whitespace += pos - start
-        return pos
-
-    def _fail(self, kind: str, pos: int) -> None:
-        raise ParseError(kind, pos)
-
-    def _string_end(self, pos: int) -> tuple[int, bool]:
-        """Validates the string token at pos; returns its end and whether
-        it contains escapes."""
-        source = self.source
-        if source[pos:pos + 1] != b'"':
-            self._fail('expected_object_key', pos)
-        pos += 1
-        escaped = False
+        source, ws_run = self.source, _WS_RUN.match
+        member, item, reject = _MEMBER.match, _ITEM.match, self.reject_duplicates
+        new, scalar_kinds, strict_number = Value.__new__, _SCALAR_KINDS, _STRICT_NUMBER.fullmatch
+        stack: list[_Frame] = []
+        found = _ROOT.match(source, 0)
+        if found is None:
+            self._value_error(0)
+        delimiter = None
+        if found.start('c') >= 0:
+            self.whitespace += found.start('c')
+            value, pos = self._open(stack, found.start('c'))
+        else:
+            self.whitespace += found.start('v')
+            value, pos = self._scalar(found, found.start('v'))
         while True:
-            while pos < self.length:
-                byte = source[pos]
-                if byte == 0x22 or byte == 0x5c or byte < 0x20:
-                    break
-                pos += 1
-            if pos >= self.length:
-                self._fail('unterminated_string', pos)
-            byte = source[pos]
-            pos += 1
-            if byte == 0x22:
-                return pos, escaped
-            if byte != 0x5c:
-                self._fail('unescaped_control_character', pos - 1)
-            escaped = True
-            if pos >= self.length:
-                self._fail('unfinished_escape', pos)
-            escape = source[pos]
-            pos += 1
-            if escape == 0x75:
-                digits = 0
-                while digits < 4 and pos + digits < self.length and source[pos + digits] in _HEX_DIGITS:
-                    digits += 1
-                if digits != 4:
-                    self._fail('invalid_unicode_escape', pos + digits)
-                pos += 4
-            elif escape not in _SIMPLE_ESCAPES:
-                self._fail('invalid_escape', pos - 1)
-
-    def _value(self, depth: int, pos: int) -> tuple[int, Value]:
-        pos = self._skip(pos)
-        source = self.source
-        start = pos
-        value = Value(_INTERNAL)
-        first = source[pos] if pos < self.length else -1
-        if first == 0x7b or first == 0x5b:
-            if depth >= self.max_depth:
-                self._fail('maximum_depth_exceeded', pos)
-            return self._container(depth, start, first == 0x7b)
-        if first == 0x22:
-            end, escaped = self._string_end(pos)
-            value._kind = 'string'
-            value._compact = True
-            pos = end
-        elif first == 0x2d or 0x30 <= first <= 0x39:
-            pos = self._number(pos)
-            value._kind = 'number'
-            value._compact = True
-        elif source[start:start + 4] == b'true' or source[start:start + 5] == b'false':
-            pos += 4 if source[start:start + 4] == b'true' else 5
-            value._kind = 'boolean'
-            value._compact = True
-        elif source[start:start + 4] == b'null':
-            pos += 4
-            value._kind = 'null'
-            value._compact = True
-        else:
-            self._fail('expected_value', pos)
-        value._source = source
-        value._start = start
-        value._end = pos
-        value._root = False
-        return pos, value
-
-    def _number(self, pos: int) -> int:
-        source = self.source
-        if source[pos] == 0x2d:
-            pos += 1
-        if source[pos:pos + 1] == b'0':
-            pos += 1
-        else:
-            digits = self._digits(pos)
-            if digits == 0:
-                self._fail('expected_digit', pos)
-            pos += digits
-        if source[pos:pos + 1] == b'.':
-            pos += 1
-            digits = self._digits(pos)
-            if digits == 0:
-                self._fail('expected_digit', pos)
-            pos += digits
-        if source[pos:pos + 1] in (b'e', b'E'):
-            pos += 1
-            if source[pos:pos + 1] in (b'+', b'-'):
-                pos += 1
-            digits = self._digits(pos)
-            if digits == 0:
-                self._fail('expected_digit', pos)
-            pos += digits
-        return pos
-
-    def _digits(self, pos: int) -> int:
-        count = 0
-        while pos + count < self.length and self.source[pos + count] in _DIGITS:
-            count += 1
-        return count
-
-    def _container(self, depth: int, start: int, is_object: bool) -> tuple[int, Value]:
-        source = self.source
-        close = b'}' if is_object else b']'
-        whitespace_before = self.whitespace
-        duplicates_before = self.duplicates
-        members: dict[str, Value] = {} if is_object else {}
-        key_spans: dict[str, tuple[int, int]] = {}
-        items: list[Value] = []
-        pos = self._skip(start + 1)
-        if source[pos:pos + 1] != close:
-            while True:
-                if is_object:
-                    if source[pos:pos + 1] != b'"':
-                        self._fail('expected_object_key', pos)
-                    key_start = pos
-                    key_end, _ = self._string_end(pos)
-                    name = _combine(_token_units(source[key_start + 1:key_end - 1]))
-                    if self.reject_duplicates and name in members:
-                        self._fail('duplicate_object_key', key_start)
-                    pos = self._skip(key_end)
-                    if source[pos:pos + 1] != b':':
-                        self._fail('expected_colon', pos)
-                    pos, member = self._value(depth + 1, pos + 1)
+            if value is not None:
+                # A complete value: add it to its container, then close every container that the
+                # delimiters end.
+                while True:
+                    if not stack:
+                        end = ws_run(source, pos).end()
+                        if end != self.length:
+                            raise ParseError('trailing_input', end)
+                        value._root = True
+                        return value
+                    frame = stack[-1]
+                    if frame.is_object:
+                        name = frame.name
+                        if name in frame.members:
+                            self.duplicates += 1
+                        else:
+                            frame.key_starts[name] = frame.key
+                        frame.members[name] = value
+                    else:
+                        frame.items.append(value)
+                    if delimiter is None:
+                        following = _DELIMITER.match(source, pos)
+                        if following is None:
+                            raise ParseError('expected_delimiter', ws_run(source, pos).end())
+                        self.whitespace += following.start('d') - pos
+                        delimiter, pos = following.group('d'), following.end()
+                    if delimiter == b',':
+                        delimiter = None
+                        break
+                    if delimiter != (b'}' if frame.is_object else b']'):
+                        raise ParseError('expected_delimiter', pos - 1)
+                    value, delimiter = self._close(stack.pop(), pos, not stack), None
+                value = None
+            # The members or items of the open container from pos, until a container value opens or
+            # a closing bracket completes this container.
+            frame = stack[-1]
+            if frame.is_object:
+                members, key_starts = frame.members, frame.key_starts
+                while True:
+                    found = member(source, pos)
+                    if found is None:
+                        self._member_error(frame, pos)
+                    key_start, key_end = found.span('k')
+                    content = source[key_start + 1:key_end - 1]
+                    if 0x5c in content:
+                        name = _token_text(source[key_start:key_end])
+                    else:
+                        name = content.decode('utf-8')
+                    if reject and name in members:
+                        raise ParseError('duplicate_object_key', key_start)
+                    last = found.lastindex
+                    if last == _MEMBER_CONTAINER:
+                        frame.name = name
+                        frame.key = key_start
+                        following = found.end()
+                        self.whitespace += following - pos - (key_end - key_start) - 2
+                        value, pos = self._open(stack, following - 1)
+                        break
+                    start, end = found.span('v')
+                    kind = scalar_kinds[source[start]]
+                    if kind == 'number' and strict_number(source, start, end) is None:
+                        self._number_check(found, start)
+                    value = new(Value)
+                    value._source = source
+                    value._start = start
+                    value._end = end
+                    value._kind = kind
+                    value._compact = True
+                    value._root = False
+                    if last != _MEMBER_DELIMITER:
+                        raise ParseError('expected_delimiter', ws_run(source, end).end())
+                    following = found.end()
+                    spaces = following - pos - (key_end - key_start) - (end - start) - 2
+                    if spaces:
+                        self.whitespace += spaces
+                    pos = following
                     if name in members:
-                        members[name] = member
                         self.duplicates += 1
                     else:
-                        members[name] = member
-                        key_spans[name] = (key_start, key_end)
-                else:
-                    pos, item = self._value(depth + 1, pos)
-                    items.append(item)
-                pos = self._skip(pos)
-                following = source[pos:pos + 1]
-                if following == close:
+                        key_starts[name] = key_start
+                    members[name] = value
+                    if source[following - 1] == 0x2c:
+                        continue
+                    value, delimiter = self._close(stack.pop(), pos, not stack), None
                     break
-                if following != b',':
-                    self._fail('expected_delimiter', pos)
-                pos = self._skip(pos + 1)
-        pos += 1
+            else:
+                items = frame.items
+                while True:
+                    found = item(source, pos)
+                    if found is None:
+                        self._value_error(pos)
+                    last = found.lastindex
+                    if last == _ITEM_CONTAINER:
+                        following = found.end()
+                        self.whitespace += following - pos - 1
+                        value, pos = self._open(stack, following - 1)
+                        break
+                    start, end = found.span('v')
+                    kind = scalar_kinds[source[start]]
+                    if kind == 'number' and strict_number(source, start, end) is None:
+                        self._number_check(found, start)
+                    value = new(Value)
+                    value._source = source
+                    value._start = start
+                    value._end = end
+                    value._kind = kind
+                    value._compact = True
+                    value._root = False
+                    if last != _ITEM_DELIMITER:
+                        raise ParseError('expected_delimiter', ws_run(source, end).end())
+                    following = found.end()
+                    spaces = following - pos - (end - start) - 1
+                    if spaces:
+                        self.whitespace += spaces
+                    pos = following
+                    items.append(value)
+                    if source[following - 1] == 0x2c:
+                        continue
+                    value, delimiter = self._close(stack.pop(), pos, not stack), None
+                    break
+
+    def _open(self, stack: list[_Frame], start: int) -> tuple['Value | None', int]:
+        """Opens the container whose bracket is at start. Returns the empty container closed at once
+        with the position after it, or None with the position after the bracket."""
+        source = self.source
+        if len(stack) >= self.max_depth:
+            raise ParseError('maximum_depth_exceeded', start)
+        frame = _Frame(source[start] == 0x7b, start, self.whitespace, self.duplicates)
+        stack.append(frame)
+        after = _WS_RUN.match(source, start + 1).end()
+        if source[after:after + 1] != (b'}' if frame.is_object else b']'):
+            return None, start + 1
+        self.whitespace += after - start - 1
+        return self._close(stack.pop(), after + 1, not stack), after + 1
+
+    def _scalar(self, found: re.Match, start: int) -> tuple['Value', int]:
+        """The scalar value of the root token that found matched from start, and its end."""
+        end = found.end('v')
+        kind = _SCALAR_KINDS[self.source[start]]
+        if kind == 'number':
+            self._number_check(found, start)
         value = Value(_INTERNAL)
-        value._source = source
+        value._source = self.source
         value._start = start
-        value._end = pos
-        value._kind = 'object' if is_object else 'array'
-        value._root = depth == 0
-        value._compact = (self.whitespace == whitespace_before
-                          and self.duplicates == duplicates_before)
-        value._members = members
-        value._key_spans = key_spans
-        value._items = tuple(items)
-        return pos, value
+        value._end = end
+        value._kind = kind
+        value._compact = True
+        value._root = False
+        return value, end
+
+    def _close(self, frame: _Frame, end: int, root: bool) -> Value:
+        value = Value(_INTERNAL)
+        value._source = self.source
+        value._start = frame.start
+        value._end = end
+        value._kind = 'object' if frame.is_object else 'array'
+        value._root = root
+        value._compact = self.whitespace == frame.whitespace and self.duplicates == frame.duplicates
+        value._members = frame.members
+        value._key_starts = frame.key_starts
+        value._items = tuple(frame.items)
+        return value
+
+    def _member_error(self, frame: _Frame, pos: int) -> None:
+        """Rejects the member at pos that _MEMBER does not match: its name, colon and value in turn."""
+        source = self.source
+        start = _WS_RUN.match(source, pos).end()
+        if source[start:start + 1] != b'"':
+            raise ParseError('expected_object_key', start)
+        found = _STRING_TOKEN.match(source, start)
+        if found is None:
+            self._string_error(start)
+        if self.reject_duplicates and _token_text(source[start:found.end()]) in frame.members:
+            raise ParseError('duplicate_object_key', start)
+        colon = _WS_RUN.match(source, found.end()).end()
+        if source[colon:colon + 1] != b':':
+            raise ParseError('expected_colon', colon)
+        self._value_error(colon + 1)
+
+    def _value_error(self, pos: int) -> None:
+        """Rejects the value at pos that the tokenizer does not match."""
+        start = _WS_RUN.match(self.source, pos).end()
+        if _VALUE.match(self.source, start) is not None:
+            raise AssertionError(f'the tokenizer and its pieces disagree at byte {start}')
+        if self.source[start:start + 1] == b'"':
+            self._string_error(start)
+        raise ParseError('expected_value', start)
+
+    def _string_error(self, pos: int) -> None:
+        """Rejects the string token at pos that _STRING does not match: its body pieces run to the
+        byte that breaks them."""
+        source, length = self.source, self.length
+        stop = _BODY_RUN.match(source, pos + 1).end()
+        if stop >= length:
+            raise ParseError('unterminated_string', length)
+        if source[stop] != 0x5c:
+            raise ParseError('unescaped_control_character', stop)
+        if stop + 1 >= length:
+            raise ParseError('unfinished_escape', stop + 1)
+        if source[stop + 1:stop + 2] == b'u':
+            raise ParseError('invalid_unicode_escape', _HEX_RUN.match(source, stop + 2).end())
+        if _SIMPLE_ESCAPE_BYTE.match(source, stop + 1) is None:
+            raise ParseError('invalid_escape', stop + 1)
+        raise AssertionError(f'_STRING and its pieces disagree at byte {stop}')
+
+    def _number_check(self, found: re.Match, start: int) -> None:
+        """Rejects a number token of _NUMBER whose integer, fraction or exponent has no digit, at
+        the first missing digit."""
+        integer, fraction, exponent = found.group('int', 'frac', 'exp')
+        if integer is None:
+            raise ParseError('expected_digit', start + (self.source[start:start + 1] == b'-'))
+        if fraction is not None and _DIGIT_BYTE.match(fraction, len(fraction) - 1) is None:
+            raise ParseError('expected_digit', found.end('frac'))
+        if exponent is not None and _DIGIT_BYTE.match(exponent, len(exponent) - 1) is None:
+            raise ParseError('expected_digit', found.end('exp'))
 
 
 def _parse_bytes(data: bytes, options: ParseOptions) -> Value:

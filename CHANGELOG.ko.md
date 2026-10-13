@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: bbb65f4ab8a578a67367f87450afc4a76016cd3306896b5f35a7623350a4a707 -->
+<!-- source-sha256: a1151f903fdaac410c1a23044056070066e45dc6b688e05c8b9a5fb997c39679 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- T1.41: Python parser는 문서를 compiled `re` pattern의 한 pass로, member, item, root 값마다 match 하나로 읽으며, 문법은 scan과 모든 오류 offset에 대해 한 번 정의됩니다. `make python-parse-budget`는 평평한 객체 50,000개에서 그 CPU 시간을 순수 PHP parser와 비교하며, 비율은 4.44에서 2.34-2.94로 내려갔습니다. 모든 vector에서 결과와 오류 offset은 같습니다.
 
 - T1.35: Python 패키지의 `parse_bytes`는 Python으로 byte마다 검사하지 않고 `bytes.decode('utf-8')`로 UTF-8을 검증하며, 이전과 같은 offset인 `UnicodeDecodeError`의 `start`에서 `invalid_utf8`을 보고합니다. `ParseError`는 그 error에서 발생합니다.
 
