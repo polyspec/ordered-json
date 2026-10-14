@@ -2763,5 +2763,11 @@
       "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
       "item": "T1.38"
     }
+  ],
+  "tools": [
+    {
+      "root": "tests/scripts",
+      "reason": "the node tests of the repository tools of scripts/ (the verifier, the evidence, PIE and external-input checks, the workflow and environment rules), which implement no contract"
+    }
   ]
 }
