@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: a463410e7d9a2861db3fd2a1db07172d103bad15c6ff2461b521c15dd59e6b74 -->
+<!-- source-sha256: 6fe62fc50b5d165d829113191bc92b869e3277b6d7f545df126a4328c58384ef -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
@@ -95,4 +95,4 @@
 | T1.45 | kit 0.0.43으로 옮긴다(kit K136–K139, K141–K143, K146): 게시된 파일의 integrity로 pin하고, `make kit-sync`가 bootstrap, node:test 등록을 허용하는 `.oxlintrc.json`, layout의 entry를 담은 `knip.json`, `ae-missing-release-tag`가 없는 `config/api-extractor.kit.json`을 복사한다. | `package.json`, `package-lock.json`, kit의 복사본, `config/dependency-review.json` | `make kit-check`, `make toolchain-check` || [o] |
 | T1.46 | `make lint-ts`를 `CHECK_TARGETS`와 `ci.yml`에서 실행한다: kit 0.0.43에서 knip은 `packages/js/test/probe.mjs`를 쓰이지 않는 파일로 보고한다. kit의 knip entry는 layout에서 오고, 공통 검증기가 실행하는 probe는 그 entry가 아니기 때문이다. oxlint는 복사본 `scripts/kit/bootstrap/files.mts`와 `digest.mts`에서 `no-redundant-type-constituents`를 보고한다. 조건: retry: K145(저장소별 knip entry)를 가진 kit release. | `Makefile`, `.github/workflows/ci.yml`, `knip.json` | `make lint-ts` | [o] |
 | T1.47 | kit 0.0.44로 옮깁니다(kit K140, K144, K145, K147, K149–K151): 게시된 파일의 integrity로 pin하고, `make kit-sync`가 digest·file helper가 `Uint8Array`를 받는 bootstrap, cache를 `var/ruff`에 두는 `ruff.toml`, 주석 없는 `knip.json`, 추가형 root 파일을 가진 `config/layout.kit.yml`을 복사하므로 `config/layout.yml`은 `vars.root_files`에 `composer.json`과 `external-inputs.json`만 적고 `.gitignore`는 `.ruff_cache/`를 뺍니다. `make install-tools`는 CI의 docs job에 없던 `rust-toolchain.toml`의 Rust toolchain을 설치합니다: run 38569066074는 `release-config-check`가 `toolchain '1.99.0-x86_64-unknown-linux-gnu' is not installed`로 실패했습니다. | `package.json`, `package-lock.json`, kit의 복사본, `config/layout.yml`, `.gitignore`, `config/dependency-review.json` | `make kit-check`, `make toolchain-check`, `make layout-check`, `make dependency-policy-check` || [o] |
-| T1.48 | kit 0.0.45로 옮깁니다(kit K152–K154): 게시된 파일의 integrity로 pin하고, `make kit-sync`가 pin된 런타임의 binary를 무시하는 `knip.json`을 복사하며, `make dependency-review RECORD=1`의 검토가 새 lock을 기록합니다. | `package.json`, `package-lock.json`, `knip.json`, `config/dependency-review.json` | `make kit-check`, `make lint-ts`, `make dependency-policy-check` || [ ] |
+| T1.48 | kit 0.0.45로 옮깁니다(kit K152–K154): 게시된 파일의 integrity로 pin하고, `make kit-sync`가 pin된 런타임의 binary를 무시하는 `knip.json`을 복사하며, `make dependency-review RECORD=1`의 검토가 새 lock을 기록합니다. | `package.json`, `package-lock.json`, `knip.json`, `config/dependency-review.json` | `make kit-check`, `make lint-ts`, `make dependency-policy-check` || [o] |
