@@ -22,44 +22,12 @@ rules:
       # The node:test tests of the tools of scripts/ and benchmarks/run.mts (make test-scripts).
       - "!tests/scripts"
 
+  # S5: the root files of ordered-json beyond the list of kit (K145).
+  # composer.json: the root Composer package polyspec/ordered-json, whose version config/release.json checks.
+  # external-inputs.json: the pinned downloads of make install-external (the PIE PHAR and the supplementary suite),
+  # scripts/external-inputs.mts.
   - id: layout-root-files
-    paths:
-      - "*"
-      - "!README.md"
-      - "!README.ko.md"
-      - "!AGENTS.md"
-      - "!AGENTS.ko.md"
-      - "!PRINCIPLES.md"
-      - "!PRINCIPLES.ko.md"
-      - "!CHANGELOG.md"
-      - "!CHANGELOG.ko.md"
-      - "!LICENSE"
-      - "!Makefile"
-      - "!package.json"
-      - "!package-lock.json"
-      - "!tsconfig.json"
-      - "!.gitignore"
-      - "!.gitattributes"
-      - "!.node-version"
-      - "!mise.toml"
-      - "!mise.lock"
-      - "!.php-version"
-      - "!rust-toolchain.toml"
-      - "!ruff.toml"
-      - "!phpcs.xml.dist"
-      - "!phpstan.dist.neon"
-      - "!Cargo.toml"
-      - "!Cargo.lock"
-      - "!go.work"
-      - "!go.work.sum"
-      - "!.golangci.yml"
-      - "!.oxlintrc.json"
-      - "!knip.json"
-      - "!.editorconfig"
-      # The root Composer package polyspec/ordered-json, whose version config/release.json checks.
-      - "!composer.json"
-      # The pinned downloads of make install-external (the PIE PHAR and the supplementary suite), scripts/external-inputs.mts.
-      - "!external-inputs.json"
+    vars: { root_files: "{composer.json,external-inputs.json}" }
 
   - id: layout-infrastructure-typescript
     paths:
