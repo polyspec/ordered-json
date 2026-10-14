@@ -2,6 +2,9 @@
 # runs (kit K127). A recipe names it by its absolute path: GNU make execs a recipe line without shell metacharacters
 # directly, so a bare python3 would resolve through the PATH that make read at start (the system Python).
 PYTHON := $(CURDIR)/var/tools/mise/shims/python3
+# uv and Composer of mise.toml, by the absolute paths of their shims for the same reason.
+UV := $(CURDIR)/var/tools/mise/shims/uv
+COMPOSER := $(CURDIR)/var/tools/mise/shims/composer
 JSON_TEST_SUITE ?=
 PIE ?= .cache/pie/pie.phar
 
@@ -36,7 +39,7 @@ include scripts/kit/kit-bootstrap.mk
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
 CHECK_TARGETS := kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check documents-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check clippy go-vet pie-check python-package-check
 
-.PHONY: check test-scripts verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
+.PHONY: check test-scripts install-php install-python php-extension verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
 	benchmark benchmark-check python-parse-budget clippy go-vet python-package-check release-config-check install install-rust install-external
 
 # check runs the full suite once per committed tree, when no task of docs/plans/execution-checklist.md is [~]
@@ -45,13 +48,33 @@ check:
 	node $(KIT)/full-run.$(KIT_EXT) run $(CHECK_TARGETS)
 
 # install makes every download that the checks read after make install-packages: the tools of mise.lock, the Rust toolchain of
-# rust-toolchain.toml, the crates of packages/rust/Cargo.lock, and the PIE PHAR and the supplementary suite of external-inputs.json.
-# The Rust toolchain comes first because the build of cargo-audit in install-tools needs it.
+# rust-toolchain.toml, the crates of packages/rust/Cargo.lock, the Composer projects of the PHP packages with their PHPUnit,
+# the virtual environment of the Python package, and the PIE PHAR and the supplementary suite of external-inputs.json.
 # It is the only target that downloads, besides dependency-review and release-consumer-lock.
-install: install-rust install-tools cargo-downloads-fetch install-external
+install: install-rust install-tools cargo-downloads-fetch install-php install-python install-external
 
 install-rust:
 	$(ONLINE) rustup toolchain install --no-self-update
+
+# install-php installs the locked Composer packages of packages/php and packages/php-ext, PHPUnit among them, into their
+# vendor/, from which kit parity runs their tests (config/parity.json).
+install-php:
+	$(ONLINE) $(COMPOSER) install --no-interaction --no-progress --working-dir=packages/php
+	$(ONLINE) $(COMPOSER) install --no-interaction --no-progress --working-dir=packages/php-ext
+
+# install-python makes packages/python/.venv from the Python of mise.toml (python-venv of kit) and installs the package into
+# it, editable, with the uv of mise.toml; config/parity.json runs the Python tests with its interpreter.
+install-python:
+	$(MAKE) --no-print-directory python-venv DIR=packages/python/.venv
+	$(ONLINE) $(UV) pip install --python packages/python/.venv/bin/python --link-mode copy --no-deps -e packages/python
+
+# php-extension builds packages/php-ext/src/modules/ordered_json.so in place, with phpize and configure when the build has
+# no Makefile yet and then make, which rebuilds what changed. config/parity.json loads it for the tests of the
+# implementation php-extension, so parity-check of kit depends on it.
+php-extension:
+	cd packages/php-ext/src && { test -f Makefile || { phpize && ./configure --enable-ordered-json; }; } && $(MAKE)
+
+parity-check: php-extension
 
 install-external:
 	$(ONLINE) $(PYTHON) scripts/external_inputs.py

@@ -1,5 +1,5 @@
 <!-- doc-id: php-ext-overview -->
-<!-- source-sha256: daeb568e53ee04dccbb14308da90961654644bf44261c9e3bfa760d726591a1c -->
+<!-- source-sha256: 8612ecc2107f50e25a55e566d6c09212293846959cc717ad22b4604258ddc629 -->
 # ordered-json for PHP extension
 
 [English](README.md)
@@ -11,7 +11,7 @@
 
 PHP >= 8.2와 일치하는 개발 헤더를 요구하며 PIE 패키지는 `polyspec/ordered-json-extension`, 확장은 `ordered_json`입니다.
 
-소스 빌드는 `src/modules/ordered_json.so`를 생성합니다. PHP의 `-d extension=/absolute/path/to/ordered_json.so`로 로드합니다. [PHP 라이브러리](https://github.com/polyspec/ordered-json/tree/main/php)는 공통 Value API를 제공합니다.
+소스 빌드는 `src/modules/ordered_json.so`를 생성합니다. PHP의 `-d extension=/absolute/path/to/ordered_json.so`로 로드합니다. [PHP 라이브러리](https://github.com/polyspec/ordered-json/tree/main/packages/php)는 공통 Value API를 제공합니다.
 
 ~~~sh
 cd src

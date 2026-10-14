@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require dirname(__DIR__) . '/src/OrderedJson.php';
+require dirname(__DIR__) . '/vendor/autoload.php';
 use Polyspec\OrderedJson\{Value, ParseError};
 use function Polyspec\OrderedJson\parse;
 

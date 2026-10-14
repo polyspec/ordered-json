@@ -10,7 +10,7 @@ Strict JSON with associative objects that preserve document key order recursivel
 
 PHP >= 8.2 and matching development headers; PIE package `polyspec/ordered-json-extension`, extension `ordered_json`.
 
-The source build produces `src/modules/ordered_json.so`. Load it with PHP using `-d extension=/absolute/path/to/ordered_json.so`. The [PHP library](https://github.com/polyspec/ordered-json/tree/main/php) provides the common Value API.
+The source build produces `src/modules/ordered_json.so`. Load it with PHP using `-d extension=/absolute/path/to/ordered_json.so`. The [PHP library](https://github.com/polyspec/ordered-json/tree/main/packages/php) provides the common Value API.
 
 ~~~sh
 cd src

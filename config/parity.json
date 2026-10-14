@@ -88,7 +88,8 @@
       "symbols": {
         "extractor": "python",
         "entry": "packages/python/src/polyspec/ordered_json"
-      }
+      },
+      "command": "packages/python/.venv/bin/python"
     }
   ],
   "profiles": [
@@ -216,13 +217,27 @@
       "profile": "contract",
       "file": "examples/official.json",
       "cases": "$.cases[*].id",
-      "bindings": []
+      "bindings": [
+        {
+          "implementation": "js",
+          "test": "packages/js/test/official.test.mjs"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_official.py"
+        }
+      ]
     },
     {
       "id": "depth_argument_is_bounded",
       "kind": "feature",
       "profile": "contract",
       "bindings": [
+        {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "depth_argument_is_bounded"
+        },
         {
           "implementation": "rust",
           "test": "packages/rust/tests/api.rs",
@@ -232,6 +247,21 @@
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestDepthArgumentIsBounded"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testDepthArgumentIsBounded"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testDepthArgumentIsBounded"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_depth_argument_is_bounded"
         }
       ]
     },
@@ -241,6 +271,11 @@
       "profile": "contract",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "depth_limit_is_enforced"
+        },
+        {
           "implementation": "rust",
           "test": "packages/rust/tests/api.rs",
           "id": "depth_limit_is_enforced"
@@ -249,6 +284,21 @@
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestDepthLimitIsEnforced"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testDepthLimitIsEnforced"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testDepthLimitIsEnforced"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_depth_limit_is_enforced"
         }
       ]
     },
@@ -258,6 +308,11 @@
       "profile": "contract",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "parse_errors_report_offsets"
+        },
+        {
           "implementation": "rust",
           "test": "packages/rust/tests/api.rs",
           "id": "parse_errors_report_offsets"
@@ -266,6 +321,21 @@
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestParseErrorsReportOffsets"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testParseErrorsReportOffsets"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testParseErrorsReportOffsets"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_parse_errors_report_offsets"
         }
       ]
     },
@@ -275,6 +345,11 @@
       "profile": "contract",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "rejection_names_its_kind"
+        },
+        {
           "implementation": "rust",
           "test": "packages/rust/tests/api.rs",
           "id": "rejection_names_its_kind"
@@ -283,6 +358,21 @@
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestRejectionNamesItsKind"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testRejectionNamesItsKind"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testRejectionNamesItsKind"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_rejection_names_its_kind"
         }
       ]
     },
@@ -292,6 +382,11 @@
       "profile": "contract",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "wrong_kind_access_is_reported"
+        },
+        {
           "implementation": "rust",
           "test": "packages/rust/tests/api.rs",
           "id": "wrong_kind_access_is_reported"
@@ -300,6 +395,21 @@
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestWrongKindAccessIsReported"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testWrongKindAccessIsReported"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testWrongKindAccessIsReported"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_wrong_kind_access_is_reported"
         }
       ]
     },
@@ -309,6 +419,11 @@
       "profile": "contract",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "member_lookup_uses_decoded_names"
+        },
+        {
           "implementation": "rust",
           "test": "packages/rust/tests/api.rs",
           "id": "member_lookup_uses_decoded_names"
@@ -317,6 +432,21 @@
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestMemberLookupUsesDecodedNames"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testMemberLookupUsesDecodedNames"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testMemberLookupUsesDecodedNames"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_member_lookup_uses_decoded_names"
         }
       ]
     },
@@ -326,6 +456,11 @@
       "profile": "contract",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "repeated_key_keeps_first_position_and_last_value"
+        },
+        {
           "implementation": "rust",
           "test": "packages/rust/tests/api.rs",
           "id": "repeated_key_keeps_first_position_and_last_value"
@@ -334,6 +469,21 @@
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestRepeatedKeyKeepsFirstPositionAndLastValue"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testRepeatedKeyKeepsFirstPositionAndLastValue"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testRepeatedKeyKeepsFirstPositionAndLastValue"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_repeated_key_keeps_first_position_and_last_value"
         }
       ]
     },
@@ -343,6 +493,11 @@
       "profile": "contract",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "root_keeps_surrounding_text"
+        },
+        {
           "implementation": "rust",
           "test": "packages/rust/tests/api.rs",
           "id": "root_keeps_surrounding_text"
@@ -351,6 +506,21 @@
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestRootKeepsSurroundingText"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testRootKeepsSurroundingText"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testRootKeepsSurroundingText"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_root_keeps_surrounding_text"
         }
       ]
     },
@@ -360,6 +530,11 @@
       "profile": "contract",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "unpaired_surrogate_stays_in_units"
+        },
+        {
           "implementation": "rust",
           "test": "packages/rust/tests/api.rs",
           "id": "unpaired_surrogate_stays_in_units"
@@ -368,6 +543,21 @@
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestUnpairedSurrogateStaysInUnits"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testUnpairedSurrogateStaysInUnits"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testUnpairedSurrogateStaysInUnits"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_unpaired_surrogate_stays_in_units"
         }
       ]
     },
@@ -377,6 +567,11 @@
       "profile": "contract",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "surrogate_pair_decodes"
+        },
+        {
           "implementation": "rust",
           "test": "packages/rust/tests/api.rs",
           "id": "surrogate_pair_decodes"
@@ -385,6 +580,21 @@
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestSurrogatePairDecodes"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testSurrogatePairDecodes"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testSurrogatePairDecodes"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_surrogate_pair_decodes"
         }
       ]
     },
@@ -394,6 +604,11 @@
       "profile": "contract",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "factories_validate_arguments"
+        },
+        {
           "implementation": "rust",
           "test": "packages/rust/tests/api.rs",
           "id": "factories_validate_arguments"
@@ -402,6 +617,21 @@
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestFactoriesValidateArguments"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testFactoriesValidateArguments"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testFactoriesValidateArguments"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_factories_validate_arguments"
         }
       ]
     },
@@ -411,9 +641,29 @@
       "profile": "no-rust",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "values_come_only_from_the_library"
+        },
+        {
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestValuesComeOnlyFromTheLibrary"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testValuesComeOnlyFromTheLibrary"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testValuesComeOnlyFromTheLibrary"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_values_come_only_from_the_library"
         }
       ]
     },
@@ -423,9 +673,29 @@
       "profile": "no-rust",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "returned_collections_are_immutable"
+        },
+        {
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestReturnedCollectionsAreImmutable"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testReturnedCollectionsAreImmutable"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testReturnedCollectionsAreImmutable"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_returned_collections_are_immutable"
         }
       ]
     },
@@ -435,9 +705,29 @@
       "profile": "no-rust",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "host_serialization_boundary"
+        },
+        {
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestHostSerializationBoundary"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testHostSerializationBoundary"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testHostSerializationBoundary"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_host_serialization_boundary"
         }
       ]
     },
@@ -447,6 +737,11 @@
       "profile": "byte-input",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "bytes_input_is_validated"
+        },
+        {
           "implementation": "rust",
           "test": "packages/rust/tests/api.rs",
           "id": "bytes_input_is_validated"
@@ -455,6 +750,11 @@
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestBytesInputIsValidated"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_bytes_input_is_validated"
         }
       ]
     },
@@ -464,6 +764,11 @@
       "profile": "contract",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "invalid_utf8_reports_the_first_bad_byte"
+        },
+        {
           "implementation": "rust",
           "test": "packages/rust/tests/api.rs",
           "id": "invalid_utf8_reports_the_first_bad_byte"
@@ -472,6 +777,21 @@
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestInvalidUTF8ReportsTheFirstBadByte"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testInvalidUtf8ReportsTheFirstBadByte"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testInvalidUtf8ReportsTheFirstBadByte"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_invalid_utf8_reports_the_first_bad_byte"
         }
       ]
     },
@@ -489,6 +809,11 @@
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestOrderedMapRejectsNonStringKey"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_ordered_map_rejects_non_string_key"
         }
       ]
     },
@@ -498,9 +823,29 @@
       "profile": "duplicates",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "strict_parse_rejects_duplicate_keys"
+        },
+        {
           "implementation": "rust",
           "test": "packages/rust/tests/duplicate_keys.rs",
           "id": "strict_parse_rejects_duplicate_keys"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testStrictParseRejectsDuplicateKeys"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testStrictParseRejectsDuplicateKeys"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_strict_parse_rejects_duplicate_keys"
         }
       ]
     },
@@ -510,9 +855,29 @@
       "profile": "duplicates",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "strict_parse_accepts_unique_keys"
+        },
+        {
           "implementation": "rust",
           "test": "packages/rust/tests/duplicate_keys.rs",
           "id": "strict_parse_accepts_unique_keys"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testStrictParseAcceptsUniqueKeys"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testStrictParseAcceptsUniqueKeys"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_strict_parse_accepts_unique_keys"
         }
       ]
     },
@@ -772,73 +1137,150 @@
       "id": "utf8_validation_survives_low_pcre_limits",
       "kind": "feature",
       "profile": "contract",
-      "bindings": []
+      "bindings": [
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testUtf8ValidationSurvivesLowPcreLimits"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testUtf8ValidationSurvivesLowPcreLimits"
+        }
+      ]
     },
     {
       "id": "hydrate_without_the_value_class",
       "kind": "feature",
       "profile": "php-extension",
-      "bindings": []
+      "bindings": [
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueClassTest.php",
+          "id": "testHydrateWithoutTheValueClass"
+        }
+      ]
     },
     {
       "id": "hydrate_object_members",
       "kind": "feature",
       "profile": "php-extension",
-      "bindings": []
+      "bindings": [
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/DescriptorTest.php",
+          "id": "testHydrateObjectMembers"
+        }
+      ]
     },
     {
       "id": "hydrate_array_items",
       "kind": "feature",
       "profile": "php-extension",
-      "bindings": []
+      "bindings": [
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/DescriptorTest.php",
+          "id": "testHydrateArrayItems"
+        }
+      ]
     },
     {
       "id": "hydrate_rejects_malformed_descriptors",
       "kind": "feature",
       "profile": "php-extension",
-      "bindings": []
+      "bindings": [
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/DescriptorTest.php",
+          "id": "testHydrateRejectsMalformedDescriptors"
+        }
+      ]
     },
     {
       "id": "compact_node_rejects_mismatched_descriptors",
       "kind": "feature",
       "profile": "php-extension",
-      "bindings": []
+      "bindings": [
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/DescriptorTest.php",
+          "id": "testCompactNodeRejectsMismatchedDescriptors"
+        }
+      ]
     },
     {
       "id": "compact_node_copies_a_compact_token",
       "kind": "feature",
       "profile": "php-extension",
-      "bindings": []
+      "bindings": [
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/DescriptorTest.php",
+          "id": "testCompactNodeCopiesACompactToken"
+        }
+      ]
     },
     {
       "id": "scan_rejects_depth_outside_the_range",
       "kind": "feature",
       "profile": "php-extension",
-      "bindings": []
+      "bindings": [
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/DescriptorTest.php",
+          "id": "testScanRejectsDepthOutsideTheRange"
+        }
+      ]
     },
     {
       "id": "scan_reports_the_parse_error_offset",
       "kind": "feature",
       "profile": "php-extension",
-      "bindings": []
+      "bindings": [
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/DescriptorTest.php",
+          "id": "testScanReportsTheParseErrorOffset"
+        }
+      ]
     },
     {
       "id": "escaped_member_name_decodes",
       "kind": "feature",
       "profile": "php-extension",
-      "bindings": []
+      "bindings": [
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/DescriptorTest.php",
+          "id": "testEscapedMemberNameDecodes"
+        }
+      ]
     },
     {
       "id": "unpaired_surrogate_member_name_keeps_wtf8_identity",
       "kind": "feature",
       "profile": "php-extension",
-      "bindings": []
+      "bindings": [
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/DescriptorTest.php",
+          "id": "testUnpairedSurrogateMemberNameKeepsWtf8Identity"
+        }
+      ]
     },
     {
       "id": "text_input_rejects_lone_surrogates",
       "kind": "feature",
       "profile": "contract",
-      "bindings": []
+      "bindings": [
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_text_input_rejects_lone_surrogates"
+        }
+      ]
     },
     {
       "id": "api-parse",
@@ -2082,12 +2524,6 @@
   "exclusions": [
     {
       "unit": "official",
-      "implementation": "js",
-      "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
-      "item": "T1.38"
-    },
-    {
-      "unit": "official",
       "implementation": "rust",
       "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
       "item": "T1.38"
@@ -2111,390 +2547,6 @@
       "item": "T1.38"
     },
     {
-      "unit": "official",
-      "implementation": "python",
-      "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
-      "item": "T1.38"
-    },
-    {
-      "unit": "depth_argument_is_bounded",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "depth_argument_is_bounded",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "depth_argument_is_bounded",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "depth_argument_is_bounded",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "depth_limit_is_enforced",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "depth_limit_is_enforced",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "depth_limit_is_enforced",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "depth_limit_is_enforced",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "parse_errors_report_offsets",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "parse_errors_report_offsets",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "parse_errors_report_offsets",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "parse_errors_report_offsets",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "rejection_names_its_kind",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "rejection_names_its_kind",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "rejection_names_its_kind",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "rejection_names_its_kind",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "wrong_kind_access_is_reported",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "wrong_kind_access_is_reported",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "wrong_kind_access_is_reported",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "wrong_kind_access_is_reported",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "member_lookup_uses_decoded_names",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "member_lookup_uses_decoded_names",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "member_lookup_uses_decoded_names",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "member_lookup_uses_decoded_names",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "repeated_key_keeps_first_position_and_last_value",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "repeated_key_keeps_first_position_and_last_value",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "repeated_key_keeps_first_position_and_last_value",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "repeated_key_keeps_first_position_and_last_value",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "root_keeps_surrounding_text",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "root_keeps_surrounding_text",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "root_keeps_surrounding_text",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "root_keeps_surrounding_text",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "unpaired_surrogate_stays_in_units",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "unpaired_surrogate_stays_in_units",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "unpaired_surrogate_stays_in_units",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "unpaired_surrogate_stays_in_units",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "surrogate_pair_decodes",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "surrogate_pair_decodes",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "surrogate_pair_decodes",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "surrogate_pair_decodes",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "factories_validate_arguments",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "factories_validate_arguments",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "factories_validate_arguments",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "factories_validate_arguments",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "values_come_only_from_the_library",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "values_come_only_from_the_library",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "values_come_only_from_the_library",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "values_come_only_from_the_library",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "returned_collections_are_immutable",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "returned_collections_are_immutable",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "returned_collections_are_immutable",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "returned_collections_are_immutable",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "host_serialization_boundary",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "host_serialization_boundary",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "host_serialization_boundary",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "host_serialization_boundary",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "bytes_input_is_validated",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "bytes_input_is_validated",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "invalid_utf8_reports_the_first_bad_byte",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "invalid_utf8_reports_the_first_bad_byte",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "invalid_utf8_reports_the_first_bad_byte",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "invalid_utf8_reports_the_first_bad_byte",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "ordered_map_rejects_non_string_key",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
       "unit": "ordered_map_rejects_non_string_key",
       "implementation": "js",
       "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of rust, go, python",
@@ -2511,66 +2563,6 @@
       "implementation": "php-extension",
       "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of rust, go, python",
       "item": "T1.39"
-    },
-    {
-      "unit": "strict_parse_rejects_duplicate_keys",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "strict_parse_rejects_duplicate_keys",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "strict_parse_rejects_duplicate_keys",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "strict_parse_rejects_duplicate_keys",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "strict_parse_accepts_unique_keys",
-      "implementation": "js",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "strict_parse_accepts_unique_keys",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "strict_parse_accepts_unique_keys",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "strict_parse_accepts_unique_keys",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "utf8_validation_survives_low_pcre_limits",
-      "implementation": "php",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "utf8_validation_survives_low_pcre_limits",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
     },
     {
       "unit": "utf8_validation_survives_low_pcre_limits",
@@ -2595,72 +2587,6 @@
       "implementation": "python",
       "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of php, php-extension",
       "item": "T1.39"
-    },
-    {
-      "unit": "hydrate_without_the_value_class",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "hydrate_object_members",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "hydrate_array_items",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "hydrate_rejects_malformed_descriptors",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "compact_node_rejects_mismatched_descriptors",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "compact_node_copies_a_compact_token",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "scan_rejects_depth_outside_the_range",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "scan_reports_the_parse_error_offset",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "escaped_member_name_decodes",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "unpaired_surrogate_member_name_keeps_wtf8_identity",
-      "implementation": "php-extension",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
-    },
-    {
-      "unit": "text_input_rejects_lone_surrogates",
-      "implementation": "python",
-      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
-      "item": "T1.38"
     },
     {
       "unit": "text_input_rejects_lone_surrogates",

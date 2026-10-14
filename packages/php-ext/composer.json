@@ -3,9 +3,33 @@
   "version": "0.0.8",
   "description": "Native PHP extension for strict JSON with document-order associative objects",
   "type": "php-ext",
-  "require": {"php": ">=8.5"},
+  "license": "MIT",
+  "require": {
+    "php": ">=8.5"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "13.4.2",
+    "polyspec/ordered-json": "0.0.8"
+  },
+  "repositories": [
+    {
+      "type": "path",
+      "url": "../php"
+    }
+  ],
+  "autoload-dev": {
+    "psr-4": {
+      "Polyspec\\OrderedJson\\Extension\\Tests\\": "tests/",
+      "Polyspec\\OrderedJson\\Tests\\": "../php/tests/"
+    }
+  },
   "php-ext": {
     "extension-name": "ordered_json",
     "build-path": "src"
+  },
+  "config": {
+    "platform": {
+      "php": "8.5"
+    }
   }
 }
