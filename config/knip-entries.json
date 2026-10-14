@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "entries": {
+    "packages/js/test/probe.mjs": "The JavaScript probe of the shared verifier: make verify-all runs it through the command of scripts/registry.mts."
+  }
+}
