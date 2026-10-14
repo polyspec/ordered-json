@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Observe PyPI ojson without replacing its decoder or changing its defaults."""
 import json
 from pathlib import Path

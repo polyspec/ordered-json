@@ -7,7 +7,7 @@
 # past failures and writes a report: the log of each target, a summary with the first failure lines of each failed
 # target, which is also the job summary, and the versions of the toolchains of the job. Every job uploads its report
 # under `!cancelled()`. Every target of CHECK_TARGETS, the full suite of `make check`, runs in exactly one job of
-# ci.yml and push-gate.yml (scripts/tests/test_workflow_rules.py). No step or job has timeout-minutes: a build, an
+# ci.yml and push-gate.yml (tests/scripts/workflow-rules.test.mts). No step or job has timeout-minutes: a build, an
 # install or a whole suite is a long operation that the log shows line by line; only a test case and an adapter reply
 # have their own deadline. The runner image is ubuntu-24.04. Each action is pinned to the commit of a release; PHP comes
 # from the minor release of .php-version, and the records name the patch release that ran. Go, Python, Composer, alint
@@ -62,7 +62,7 @@ jobs:
         run: make install-tools
       - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci-targets TARGETS="kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check"
+        run: make ci-targets TARGETS="kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check test-scripts typecheck"
       # actions/upload-artifact v7.0.1: the report of this job, var/report/ci-targets.
       - name: report
         if: ${{ !cancelled() }}
@@ -105,7 +105,7 @@ jobs:
         if: ${{ !cancelled() }}
         env:
           JSON_TEST_SUITE: .cache/JSONTestSuite
-        run: make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all parity-check clippy go-vet pie-check"
+        run: make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go pie-check"
       - name: report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -113,45 +113,12 @@ jobs:
           name: report-suite
           path: var/report/ci-targets/
           if-no-files-found: error
-  # The Python package runs under the Python of mise.toml, which make install-tools installs; its minor release is
-  # also its requires-python (scripts/tests/test_python_requires.py). The job runs its package tests and its package data
-  # check (make python-package-check, scripts/python_check.py).
-  python:
-    runs-on: ubuntu-24.04
-    steps:
-      # actions/checkout v6.1.0
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-      # actions/setup-node v6.5.0
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
-        if: ${{ !cancelled() }}
-        with:
-          node-version-file: .node-version
-          package-manager-cache: false
-      - name: make install-tools TOOLS=npm
-        if: ${{ !cancelled() }}
-        run: make install-tools TOOLS=npm
-      - name: make install-packages
-        if: ${{ !cancelled() }}
-        run: make install-packages
-      - name: make install-tools
-        if: ${{ !cancelled() }}
-        run: make install-tools
-      - name: make ci-targets
-        if: ${{ !cancelled() }}
-        run: make ci-targets TARGETS="python-package-check"
-      - name: report
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: report-python
-          path: var/report/ci-targets/
-          if-no-files-found: error
   # The check of this workflow that the release workflow requires on the tagged commit. It runs after every other job,
   # also after a failed, skipped or cancelled one (if: always()), and make ci-passed fails unless every job of needs has
   # the result success, so a new job of this workflow is required once it is listed in needs.
   ci-passed:
     if: ${{ always() }}
-    needs: [docs, suite, python]
+    needs: [docs, suite]
     runs-on: ubuntu-24.04
     steps:
       # actions/checkout v6.1.0

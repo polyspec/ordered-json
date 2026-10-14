@@ -39,7 +39,7 @@ After a proposal is approved, update the specification and remove the proposal d
 <a id="checks"></a>
 ## Documentation checks
 
-`make documents-check` (check-documents of `@polyspec/kit`) checks document pairs, local link targets and anchors, matching section identifiers and code blocks, Korean translation revision hashes, the checklist, the values of the feature table, and the changelog sections. It also rejects local home-directory paths in documents. `make evidence-check` (`scripts/check_evidence.py`) checks the feature rows against the evidence they name and rejects local home-directory paths in reports. Neither compares verification records with the current sources, so a documentation review does not require a full verification run.
+`make documents-check` (check-documents of `@polyspec/kit`) checks document pairs, local link targets and anchors, matching section identifiers and code blocks, Korean translation revision hashes, the checklist, the values of the feature table, and the changelog sections. It also rejects local home-directory paths in documents. `make evidence-check` (`scripts/check-evidence.mts`) checks the feature rows against the evidence they name and rejects local home-directory paths in reports. Neither compares verification records with the current sources, so a documentation review does not require a full verification run.
 
 The Korean file's `source-sha256` comment records the English revision reviewed for that translation. Update it only after reviewing the translation. Matching hashes do not prove translation accuracy. The checker does not verify external website availability or prose meaning; those require review against code and test results.
 

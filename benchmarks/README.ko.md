@@ -1,8 +1,8 @@
 <!-- doc-id: performance-benchmarks -->
-<!-- source-sha256: f604a1f5eb992a4e9eb318d4dfb6fc53754e196da68531f166f844fea280f4df -->
+<!-- source-sha256: f96f54d06c94c66aeae7f211269525f506fc366ab6e6d45782b8c9953878c8e1 -->
 # 성능 벤치마크
 
-`run.py`는 모든 런타임에서 같은 입력 문서, 워밍업 횟수, 반복 횟수,
+`run.mts`는 모든 런타임에서 같은 입력 문서, 워밍업 횟수, 반복 횟수,
 샘플 수를 사용해 ordered-json 구현과 일반적인 네이티브 JSON 구현을
 비교합니다. Rust는 항상 release 프로필로 실행합니다.
 
@@ -57,9 +57,9 @@ fixture 비율의 median을 사용하므로 작은 fixture 하나의 타이머 �
 
 ~~~sh
 make benchmark
-python3 benchmarks/run.py --check
-python3 benchmarks/run.py --update-baseline
-python3 benchmarks/run.py --iterations 10000 --warmup 1000 --samples 9
+node benchmarks/run.mts --check
+node benchmarks/run.mts --update-baseline
+node benchmarks/run.mts --iterations 10000 --warmup 1000 --samples 9
 ~~~
 
 <a id="python-parse"></a>

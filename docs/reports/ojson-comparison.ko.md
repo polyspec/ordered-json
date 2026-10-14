@@ -1,5 +1,5 @@
 <!-- doc-id: ojson-comparison -->
-<!-- source-sha256: b459baf500c34a1486b99eceb41099d33d7f7412fb9c44f403cf694f1cfb7cc0 -->
+<!-- source-sha256: 4dc23f60280a38eea9d170de14b7b738d147fa699e71859c96054f18cb368a0c -->
 # ojson 비교
 
 [English](ojson-comparison.md)
@@ -21,7 +21,7 @@
 <a id="method"></a>
 ## 방법과 결과
 
-[compare_ojson.py](../../scripts/compare_ojson.py)는 공통 검증기의 입력과 기대 결과를 재사용합니다. 공식 예제 17개, 저장소 사례 98개, 추가 사례 318개입니다. 프로젝트별 기대값을 따로 사용하지 않습니다. 중복 키 기준은 최초 키 위치와 마지막 값입니다.
+[compare-ojson.mts](../../scripts/compare-ojson.mts)는 공통 검증기의 입력과 기대 결과를 재사용합니다. 공식 예제 17개, 저장소 사례 98개, 추가 사례 318개입니다. 프로젝트별 기대값을 따로 사용하지 않습니다. 중복 키 기준은 최초 키 위치와 마지막 값입니다.
 
 Python은 수정하지 않은 `ojson.loads(bytes)`와 `ojson.dumps(value)`를 기본 옵션으로 사용합니다. Erlang 모듈은 소스 변경 없이 컴파일하여 `ojson:decode/1`과 `ojson:encode/1`로 실행합니다. 파싱 허용 여부, 디코딩한 구조·순서, 디코딩한 값, 엄격한 JSON 출력, 출력 재파싱을 별도로 측정합니다.
 
@@ -48,7 +48,7 @@ curl -L https://files.pythonhosted.org/packages/96/f0/2990e30a4b1978a104ca66fdb7
 tar -xzf .cache/comparison/ojson-0.1.0.tar.gz -C .cache/comparison
 git clone https://github.com/potatosalad/erlang-ojson.git .cache/comparison/erlang-ojson
 git -C .cache/comparison/erlang-ojson checkout 5cd1de1a4a7622523c83d9464772b0f0926e654d
-python3 scripts/compare_ojson.py --suite .cache/JSONTestSuite
+node scripts/compare-ojson.mts --suite .cache/JSONTestSuite
 ~~~
 
 [PyPI](https://pypi.org/project/ojson/) 압축 파일의 SHA-256은 `94a1c628c0b4447680d9039c110dafe4efd6e3fdf77602b3ff543c2a278b7ec5`입니다. Erlang 런타임이 필요하며 `--erl /path/to/erl`로 특정 실행 파일을 지정합니다. 기록된 실행은 SHA-256이 `60e6425e089726bcae182f1856b01aa88de2782b94dedf71559e8efbc5eea0f3`인 격리된 Homebrew Erlang 29.0.6 압축 파일을 사용했습니다.

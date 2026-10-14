@@ -1,7 +1,7 @@
 <!-- doc-id: performance-benchmarks -->
 # Performance benchmarks
 
-`run.py` compares the ordered-json implementation with the conventional JSON
+`run.mts` compares the ordered-json implementation with the conventional JSON
 implementation available in each runtime. The benchmark uses the same input
 documents, warm-up count, iteration count, and sample count for every
 implementation. Rust always uses the release profile.
@@ -51,9 +51,9 @@ Run from the repository root:
 
 ```sh
 make benchmark
-python3 benchmarks/run.py --check
-python3 benchmarks/run.py --update-baseline
-python3 benchmarks/run.py --iterations 10000 --warmup 1000 --samples 9
+node benchmarks/run.mts --check
+node benchmarks/run.mts --update-baseline
+node benchmarks/run.mts --iterations 10000 --warmup 1000 --samples 9
 ```
 
 The Rust baseline is `serde_json`, because Rust does not provide a JSON parser

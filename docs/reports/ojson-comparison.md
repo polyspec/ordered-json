@@ -20,7 +20,7 @@ The second row is the `duplicate-keys` case. String sorting also produces `10, 2
 <a id="method"></a>
 ## Method and results
 
-[compare_ojson.py](../../scripts/compare_ojson.py) reuses the common verifier's inputs and expectations: 17 official examples, 98 repository fixtures, and 318 supplementary cases. No separate project-specific goldens are used. The duplicate-key criterion is the first key position and the last value.
+[compare-ojson.mts](../../scripts/compare-ojson.mts) reuses the common verifier's inputs and expectations: 17 official examples, 98 repository fixtures, and 318 supplementary cases. No separate project-specific goldens are used. The duplicate-key criterion is the first key position and the last value.
 
 Python uses unmodified `ojson.loads(bytes)` and `ojson.dumps(value)` with default options. Erlang modules are compiled without source changes and run through `ojson:decode/1` and `ojson:encode/1`. Parsing acceptance, decoded structure/order, decoded values, strict JSON output, and reparsed output are measured separately.
 
@@ -47,7 +47,7 @@ curl -L https://files.pythonhosted.org/packages/96/f0/2990e30a4b1978a104ca66fdb7
 tar -xzf .cache/comparison/ojson-0.1.0.tar.gz -C .cache/comparison
 git clone https://github.com/potatosalad/erlang-ojson.git .cache/comparison/erlang-ojson
 git -C .cache/comparison/erlang-ojson checkout 5cd1de1a4a7622523c83d9464772b0f0926e654d
-python3 scripts/compare_ojson.py --suite .cache/JSONTestSuite
+node scripts/compare-ojson.mts --suite .cache/JSONTestSuite
 ~~~
 
 The [PyPI](https://pypi.org/project/ojson/) archive SHA-256 is `94a1c628c0b4447680d9039c110dafe4efd6e3fdf77602b3ff543c2a278b7ec5`. An Erlang runtime is required; `--erl /path/to/erl` selects a specific executable. The recorded run used an isolated Homebrew Erlang 29.0.6 archive with SHA-256 `60e6425e089726bcae182f1856b01aa88de2782b94dedf71559e8efbc5eea0f3`.
