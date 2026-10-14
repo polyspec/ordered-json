@@ -199,11 +199,8 @@ function skipWhitespace() {
 
 function checkUnit(code) {
   if (code < 32) failAt('Unescaped control character', pos - 1);
-  if ((code & 0xf800) === 0xd800) {
-    const low = src.charCodeAt(pos);
-    if (code >= 0xdc00 || !(low >= 0xdc00 && low <= 0xdfff)) fail('Unescaped unpaired surrogate');
-    pos++;
-  }
+  // parse checked the text for unpaired surrogates, so a high surrogate starts a pair.
+  if ((code & 0xfc00) === 0xd800) pos++;
 }
 
 /** Reads the string token at pos and returns its decoded text. */
@@ -328,6 +325,9 @@ export function parse(source, {maxDepth = MAX_DEPTH, rejectDuplicates: reject = 
   if (!Number.isInteger(maxDepth) || maxDepth < 0 || maxDepth > MAX_DEPTH)
     throw new RangeError(`maxDepth must be between 0 and ${MAX_DEPTH}`);
   if (typeof reject !== 'boolean') throw new TypeError('rejectDuplicates must be a boolean');
+  // Text with an unpaired surrogate has no UTF-8 encoding, so it is rejected at that unit before its grammar is read, as
+  // parseBytes rejects invalid UTF-8.
+  if (!source.isWellFormed()) failAt('Unescaped unpaired surrogate', source.search(/\p{Cs}/u));
   src = source; pos = 0; depthLimit = maxDepth; whitespace = 0; duplicates = 0; rejectDuplicates = reject;
   try {
     const result = parseValue(0);

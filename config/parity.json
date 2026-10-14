@@ -120,16 +120,18 @@
       ]
     },
     {
-      "name": "byte-input",
+      "name": "no-php",
       "implementations": [
         "js",
         "rust",
         "go",
         "python"
       ],
-      "reason": "PHP strings are byte strings, so the PHP API and the extension take one string input and have no separate UTF-8 byte input",
+      "reason": "PHP has no form of these cases: its strings are byte strings, so the PHP API and the extension take one string input and no separate UTF-8 byte input, and its arrays key their members by string or by integer, the decimal string of a numeric key, so no object key can be other than a string",
       "spec": [
-        "docs/spec/api.md#values"
+        "docs/spec/api.md#values",
+        "docs/spec/api.md#objects",
+        "docs/spec/json-contract.md#strings"
       ]
     },
     {
@@ -201,6 +203,18 @@
       "spec": [
         "docs/spec/api.md#objects",
         "docs/spec/api.md#values"
+      ]
+    },
+    {
+      "name": "utf16-text",
+      "implementations": [
+        "js",
+        "python"
+      ],
+      "reason": "JavaScript and Python strings can hold an unpaired surrogate: text input can contain one, which the parser rejects, and string access returns one; Rust and Go strings are UTF-8 and PHP strings are bytes, which hold none",
+      "spec": [
+        "docs/spec/json-contract.md#parsing",
+        "docs/spec/json-contract.md#strings"
       ]
     }
   ],
@@ -739,7 +753,7 @@
     {
       "id": "bytes_input_is_validated",
       "kind": "feature",
-      "profile": "byte-input",
+      "profile": "no-php",
       "bindings": [
         {
           "implementation": "js",
@@ -803,8 +817,13 @@
     {
       "id": "ordered_map_rejects_non_string_key",
       "kind": "feature",
-      "profile": "contract",
+      "profile": "no-php",
       "bindings": [
+        {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "ordered_map_rejects_non_string_key"
+        },
         {
           "implementation": "rust",
           "test": "packages/rust/tests/api.rs",
@@ -1139,19 +1158,39 @@
       ]
     },
     {
-      "id": "utf8_validation_survives_low_pcre_limits",
+      "id": "utf8_validation_holds_for_long_multibyte_text",
       "kind": "feature",
       "profile": "contract",
       "bindings": [
         {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "utf8_validation_holds_for_long_multibyte_text"
+        },
+        {
+          "implementation": "rust",
+          "test": "packages/rust/tests/api.rs",
+          "id": "utf8_validation_holds_for_long_multibyte_text"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/go/api_test.go",
+          "id": "TestUtf8ValidationHoldsForLongMultibyteText"
+        },
+        {
           "implementation": "php",
           "test": "packages/php/tests/ValueApiTest.php",
-          "id": "testUtf8ValidationSurvivesLowPcreLimits"
+          "id": "testUtf8ValidationHoldsForLongMultibyteText"
         },
         {
           "implementation": "php-extension",
           "test": "packages/php-ext/tests/ValueApiTest.php",
-          "id": "testUtf8ValidationSurvivesLowPcreLimits"
+          "id": "testUtf8ValidationHoldsForLongMultibyteText"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_utf8_validation_holds_for_long_multibyte_text"
         }
       ]
     },
@@ -1278,8 +1317,13 @@
     {
       "id": "text_input_rejects_lone_surrogates",
       "kind": "feature",
-      "profile": "contract",
+      "profile": "utf16-text",
       "bindings": [
+        {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "text_input_rejects_lone_surrogates"
+        },
         {
           "implementation": "python",
           "test": "packages/python/tests/test_api.py",
@@ -1317,7 +1361,7 @@
     {
       "id": "api-parse-bytes",
       "kind": "api",
-      "profile": "byte-input",
+      "profile": "no-php",
       "symbols": [
         {
           "implementation": "js",
@@ -2221,6 +2265,23 @@
           "symbol": "github.com/polyspec/ordered-json/packages/go.ParseError.Message"
         }
       ]
+    },
+    {
+      "id": "string_value_keeps_an_unpaired_surrogate",
+      "kind": "feature",
+      "profile": "utf16-text",
+      "bindings": [
+        {
+          "implementation": "js",
+          "test": "packages/js/test/api.test.mjs",
+          "id": "string_value_keeps_an_unpaired_surrogate"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_string_value_keeps_an_unpaired_surrogate"
+        }
+      ]
     }
   ],
   "nativeOnly": [
@@ -2701,78 +2762,6 @@
       "implementation": "php-extension",
       "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
       "item": "T1.38"
-    },
-    {
-      "unit": "ordered_map_rejects_non_string_key",
-      "implementation": "js",
-      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of rust, go, python",
-      "item": "T1.39"
-    },
-    {
-      "unit": "ordered_map_rejects_non_string_key",
-      "implementation": "php",
-      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of rust, go, python",
-      "item": "T1.39"
-    },
-    {
-      "unit": "ordered_map_rejects_non_string_key",
-      "implementation": "php-extension",
-      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of rust, go, python",
-      "item": "T1.39"
-    },
-    {
-      "unit": "utf8_validation_survives_low_pcre_limits",
-      "implementation": "js",
-      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of php, php-extension",
-      "item": "T1.39"
-    },
-    {
-      "unit": "utf8_validation_survives_low_pcre_limits",
-      "implementation": "rust",
-      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of php, php-extension",
-      "item": "T1.39"
-    },
-    {
-      "unit": "utf8_validation_survives_low_pcre_limits",
-      "implementation": "go",
-      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of php, php-extension",
-      "item": "T1.39"
-    },
-    {
-      "unit": "utf8_validation_survives_low_pcre_limits",
-      "implementation": "python",
-      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of php, php-extension",
-      "item": "T1.39"
-    },
-    {
-      "unit": "text_input_rejects_lone_surrogates",
-      "implementation": "js",
-      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of python",
-      "item": "T1.39"
-    },
-    {
-      "unit": "text_input_rejects_lone_surrogates",
-      "implementation": "rust",
-      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of python",
-      "item": "T1.39"
-    },
-    {
-      "unit": "text_input_rejects_lone_surrogates",
-      "implementation": "go",
-      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of python",
-      "item": "T1.39"
-    },
-    {
-      "unit": "text_input_rejects_lone_surrogates",
-      "implementation": "php",
-      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of python",
-      "item": "T1.39"
-    },
-    {
-      "unit": "text_input_rejects_lone_surrogates",
-      "implementation": "php-extension",
-      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of python",
-      "item": "T1.39"
     }
   ]
 }

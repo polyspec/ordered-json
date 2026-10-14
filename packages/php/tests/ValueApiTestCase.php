@@ -210,9 +210,9 @@ abstract class ValueApiTestCase extends TestCase
         self::fail('expected ParseError for invalid UTF-8');
     }
 
-    // A backtrack or recursion limit must not be read as invalid UTF-8; only a UTF-8 error is one. Low limits are the
-    // configuration that caught this.
-    public function testUtf8ValidationSurvivesLowPcreLimits(): void
+    // Long multibyte text is valid UTF-8 and only a UTF-8 error is invalid. PHP validates with PCRE, whose backtrack or
+    // recursion limit must not be read as invalid UTF-8; low limits are the configuration that caught this.
+    public function testUtf8ValidationHoldsForLongMultibyteText(): void
     {
         $backtrack = ini_get('pcre.backtrack_limit');
         $recursion = ini_get('pcre.recursion_limit');

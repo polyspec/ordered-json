@@ -1,5 +1,5 @@
 <!-- doc-id: npm-changelog -->
-<!-- source-sha256: 975ae7163ac5eb8480b2458242ed7b8dd1d38565d088a75628effa12f288e3fa -->
+<!-- source-sha256: 4a3d2cbeebfb5b9c4a49f896e1e15fd5bdfc381a1972394913076d6bb54b1e7e -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- 단독 surrogate가 있는 텍스트 입력은 문법을 읽기 전에 surrogate의 위치에서 `unescaped_lone_surrogate`로 거부됩니다. 이전에는 surrogate 다음 단위를 가리켰고, root 뒤의 surrogate는 `trailing_input`이었습니다(T1.39).
 <a id="0-0-3"></a>
 ## 0.0.3
 

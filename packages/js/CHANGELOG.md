@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Text input with an unpaired surrogate is rejected with `unescaped_lone_surrogate` at the offset of the surrogate, before the grammar is read; it named the unit after the surrogate, and a surrogate after the root was `trailing_input` (T1.39).
 <a id="0-0-3"></a>
 ## 0.0.3
 

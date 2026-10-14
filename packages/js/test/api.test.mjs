@@ -119,8 +119,32 @@ test('surrogate_pair_decodes', () => {
 test('unpaired_surrogate_stays_in_units', () => {
   const lone = parse('"a\\ud800"');
   assert.deepEqual(lone.stringUnits(), [0x61, 0xd800]);
-  assert.equal(lone.stringValue().charCodeAt(1), 0xd800);
   assert.equal(stringify(lone), '"a\\ud800"');
+});
+
+test('string_value_keeps_an_unpaired_surrogate', () => {
+  assert.equal(parse('"a\\ud800"').stringValue(), 'a\ud800');
+});
+
+test('text_input_rejects_lone_surrogates', () => {
+  // The offset counts UTF-16 units and names the surrogate itself; the text is checked before its grammar, as bytes are
+  // checked for UTF-8 before theirs.
+  for (const [source, offset] of [['["\ud800"]', 2], ['["한\udc00"]', 3], ['{"\ud800":1}', 2], ['["한"]\ud800', 5]]) {
+    assert.throws(() => parse(source), {name: 'ParseError', kind: 'unescaped_lone_surrogate', offset}, source);
+  }
+});
+
+test('ordered_map_rejects_non_string_key', () => {
+  assert.throws(() => Value.object([[Value.number('1'), Value.null()]]), {name: 'TypeError', message: 'Expected string, got number'});
+  for (const key of [1, null]) assert.throws(() => Value.object([[key, Value.null()]]), {name: 'TypeError'});
+});
+
+test('utf8_validation_holds_for_long_multibyte_text', () => {
+  const text = '\ud55c\u{1f30d}'.repeat(64);
+  const encoded = new TextEncoder().encode(`{"key":"${text}"}`);
+  assert.equal(parseBytes(encoded).get('key').stringValue(), text);
+  assert.throws(() => parseBytes(new Uint8Array([0x5b, 0x22, 0xff, 0x22, 0x5d])),
+    {name: 'ParseError', kind: 'invalid_utf8', offset: 2});
 });
 
 test('factories_validate_arguments', () => {
