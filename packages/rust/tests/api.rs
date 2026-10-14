@@ -54,6 +54,16 @@ fn invalid_utf8_reports_the_first_bad_byte() {
 }
 
 #[test]
+fn utf8_validation_holds_for_long_multibyte_text() {
+    let text = "\u{d55c}\u{1f30d}".repeat(64);
+    let value = parse_bytes(format!("{{\"key\":\"{text}\"}}").as_bytes()).unwrap();
+    assert_eq!(value.get("key").unwrap().string_value().unwrap(), text);
+    let error = parse_bytes(b"[\"\xff\"]").unwrap_err();
+    assert_eq!(error.message, "invalid UTF-8");
+    assert_eq!(error.offset, 2);
+}
+
+#[test]
 fn parse_errors_report_offsets() {
     let error = parse("[1,]").unwrap_err();
     assert_eq!(error.offset, 3);

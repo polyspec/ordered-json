@@ -28,7 +28,7 @@ The parser accepts JSON objects, arrays, strings, numbers, booleans, and null at
 
 The maximum number of nested containers is 256. The caller can lower the limit to an integer from 0 through 256. A limit of 0 accepts scalar roots and rejects containers. The parser validates every input occurrence, including values subsequently replaced by a duplicate key.
 
-JavaScript text input also rejects literal unpaired UTF-16 surrogates. Escaped unpaired surrogates are accepted as described below. [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259) defines the JSON grammar and permits implementation limits.
+The text input of JavaScript and Python, whose strings can hold an unpaired UTF-16 surrogate, rejects a literal one with `unescaped_lone_surrogate` at its offset before the grammar is read, because such text has no UTF-8 encoding, as byte input is checked for UTF-8 first. Escaped unpaired surrogates are accepted as described below. [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259) defines the JSON grammar and permits implementation limits.
 
 <a id="rejection-kinds"></a>
 ### Rejection kinds
@@ -58,7 +58,7 @@ Numbers retain their JSON token text. The library does not convert them to float
 <a id="strings"></a>
 ## Strings
 
-Strings retain their decoded UTF-16 code units and parsed token text. Escaped unpaired surrogates can be inspected through the code-unit APIs. Rust, Go, and PHP reject conversion of an unpaired surrogate to an ordinary Unicode string. JavaScript can return the corresponding UTF-16 string.
+Strings retain their decoded UTF-16 code units and parsed token text. Escaped unpaired surrogates can be inspected through the code-unit APIs. Rust, Go, and PHP reject conversion of an unpaired surrogate to an ordinary Unicode string. JavaScript and Python return the corresponding string.
 
 PHP stores ordinary object keys as UTF-8 array keys. Escaped unpaired surrogates in keys use WTF-8 internally and are escaped when serialized. Numeric PHP array keys are serialized as JSON string keys.
 

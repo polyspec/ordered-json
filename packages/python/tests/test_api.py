@@ -94,7 +94,6 @@ class StandardCases(unittest.TestCase):
     def test_unpaired_surrogate_stays_in_units(self):
         value = parse('{"k":"\\ud800"}').get("k")
         self.assertEqual(value.string_units(), [0xD800])
-        self.assertEqual(value.string_value(), "\ud800")
         self.assertEqual(stringify(value), '"\\ud800"')
 
     def test_surrogate_pair_decodes(self):
@@ -198,6 +197,17 @@ class PackageCases(unittest.TestCase):
         self.assertEqual(caught.exception.kind, "invalid_utf8")
         with self.assertRaises(TypeError):
             parse("1", ParseOptions(reject_duplicates=1))
+
+    def test_string_value_keeps_an_unpaired_surrogate(self):
+        self.assertEqual(parse('"a\\ud800"').string_value(), "a\ud800")
+
+    def test_utf8_validation_holds_for_long_multibyte_text(self):
+        text = "\ud55c\U0001f30d" * 64
+        self.assertEqual(parse_bytes(f'{{"key":"{text}"}}'.encode()).get("key").string_value(), text)
+        with self.assertRaises(ParseError) as caught:
+            parse_bytes(b'["\xff"]')
+        self.assertEqual(caught.exception.kind, "invalid_utf8")
+        self.assertEqual(caught.exception.offset, 2)
 
     def test_text_input_rejects_lone_surrogates(self):
         with self.assertRaises(ParseError) as caught:

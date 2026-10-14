@@ -3,6 +3,7 @@ package orderedjson
 import (
 	"encoding/json"
 	"errors"
+	"strings"
 	"testing"
 )
 
@@ -232,6 +233,21 @@ func TestSurrogatePairDecodes(t *testing.T) {
 	}
 	if text, _ := pair.StringValue(); text != "🌍" {
 		t.Fatalf("StringValue() = %q", text)
+	}
+}
+
+func TestUtf8ValidationHoldsForLongMultibyteText(t *testing.T) {
+	text := strings.Repeat("\ud55c\U0001f30d", 64)
+	value, err := ParseBytes([]byte(`{"key":"` + text + `"}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, err := value.Get("key").StringValue(); err != nil || got != text {
+		t.Fatalf("StringValue() = %q, %v", got, err)
+	}
+	var parseError *ParseError
+	if _, err := ParseBytes([]byte("[\"\xff\"]")); !errors.As(err, &parseError) || parseError.Kind() != "invalid_utf8" || parseError.Offset != 2 {
+		t.Fatalf("ParseBytes of an invalid byte error = %v", err)
 	}
 }
 

@@ -1,5 +1,5 @@
 <!-- doc-id: json-contract -->
-<!-- source-sha256: 85d3315d59495c0081ae5460789356ec9f053d185385bea6fd47a8469c274176 -->
+<!-- source-sha256: b622bac31d44e7a5983f73c2faf693930d4162b7582c91614dfcf717829cdc9e -->
 # JSON 계약
 
 [English](json-contract.md)
@@ -29,7 +29,7 @@ JSON 배열은 입력 순서대로 값을 저장합니다. 빈 배열과 빈 객
 
 컨테이너 중첩 한도는 256입니다. 호출자는 한도를 0부터 256까지의 정수로 낮출 수 있습니다. 한도 0은 스칼라 루트를 허용하고 컨테이너를 거부합니다. 파서는 나중에 중복 키로 교체되는 값도 포함하여 모든 입력을 검사합니다.
 
-JavaScript 텍스트 입력은 이스케이프하지 않은 단독 UTF-16 surrogate도 거부합니다. 이스케이프된 단독 surrogate는 아래 규칙으로 허용합니다. [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259)는 JSON 문법을 정의하며 구현별 한도를 허용합니다.
+문자열이 단독 UTF-16 surrogate를 담을 수 있는 JavaScript와 Python의 텍스트 입력은 문법을 읽기 전에 이스케이프하지 않은 단독 surrogate를 그 위치에서 `unescaped_lone_surrogate`로 거부합니다. 그런 텍스트에는 UTF-8 인코딩이 없기 때문이며, 바이트 입력을 먼저 UTF-8로 검사하는 것과 같습니다. 이스케이프된 단독 surrogate는 아래 규칙으로 허용합니다. [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259)는 JSON 문법을 정의하며 구현별 한도를 허용합니다.
 
 <a id="rejection-kinds"></a>
 ### 거부 종류
@@ -59,7 +59,7 @@ JavaScript 텍스트 입력은 이스케이프하지 않은 단독 UTF-16 surrog
 <a id="strings"></a>
 ## 문자열
 
-문자열은 해석된 UTF-16 코드 단위와 파싱된 토큰 문자열을 유지합니다. 이스케이프된 단독 surrogate는 코드 단위 API로 조회할 수 있습니다. Rust, Go, PHP는 단독 surrogate를 일반 유니코드 문자열로 변환하는 것을 거부합니다. JavaScript는 해당 UTF-16 문자열을 반환할 수 있습니다.
+문자열은 해석된 UTF-16 코드 단위와 파싱된 토큰 문자열을 유지합니다. 이스케이프된 단독 surrogate는 코드 단위 API로 조회할 수 있습니다. Rust, Go, PHP는 단독 surrogate를 일반 유니코드 문자열로 변환하는 것을 거부합니다. JavaScript와 Python은 해당 문자열을 반환합니다.
 
 PHP는 일반 객체 키를 UTF-8 배열 키로 저장합니다. 키에 포함된 이스케이프된 단독 surrogate는 내부에서 WTF-8을 사용하며 직렬화할 때 이스케이프합니다. 숫자 PHP 배열 키는 JSON 문자열 키로 출력합니다.
 
