@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require dirname(__DIR__) . '/packages/php/src/OrderedJson.php';
+require dirname(__DIR__) . '/packages/php/vendor/autoload.php';
 
 use Polyspec\OrderedJson\Value;
 

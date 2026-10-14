@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The PHPUnit configuration of the PHP package; kit parity runs its tests with it (config/parity.json). -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         recordTestRunHistory="false"
+         failOnRisky="true"
+         failOnWarning="true"
+         failOnDeprecation="true"
+         failOnPhpunitDeprecation="true">
+    <testsuites>
+        <testsuite name="ordered-json">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

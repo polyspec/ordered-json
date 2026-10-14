@@ -3,7 +3,7 @@
 // (user and system time of getrusage). benchmarks/python-parse/run.py starts it with php -n.
 declare(strict_types=1);
 
-require dirname(__DIR__, 2) . '/packages/php/src/OrderedJson.php';
+require dirname(__DIR__, 2) . '/packages/php/vendor/autoload.php';
 
 function cpuSeconds(): float
 {

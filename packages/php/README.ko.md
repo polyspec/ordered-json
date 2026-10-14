@@ -1,5 +1,5 @@
 <!-- doc-id: php-overview -->
-<!-- source-sha256: 77726a039d724740d2c35b083f5eda1fcb45e4dff4c7503cbf5c9df06c8aff72 -->
+<!-- source-sha256: 75005f300c62444dec97a95e2fb1389cce5684a6982141f673a5bc6255697905 -->
 # ordered-json for PHP
 
 [English](README.md)
@@ -9,18 +9,18 @@
 <a id="usage"></a>
 ## 사용
 
-JSON 및 PCRE를 제공하는 PHP >= 8.2를 요구하며 Composer 패키지는 `polyspec/ordered-json`입니다.
+JSON 및 PCRE를 제공하는 PHP >= 8.5를 요구하며 Composer 패키지는 `polyspec/ordered-json`입니다. Composer는 그 class를 PSR-4로, 함수를 `files`로 load합니다.
 
 사용 코드의 `source` 또는 `$source`는 [공통 공식 예제](https://github.com/polyspec/ordered-json/blob/main/examples/official.json)의 객체 사례에서 가져옵니다.
 
 ~~~php
-require 'src/OrderedJson.php';
+require 'vendor/autoload.php';
 $value = Polyspec\OrderedJson\parse($source);
 $output = Polyspec\OrderedJson\stringify($value);
 ~~~
 
 
-[네이티브 확장](https://github.com/polyspec/ordered-json/tree/main/php-extension)은 별도의 선택적 패키지입니다. 순수 PHP에는 확장 체크아웃이 필요하지 않습니다. `parse()`는 확장이 로드되어 있으면 확장을, 그렇지 않으면 순수 PHP 구현을 사용합니다. 순수 구현 테스트는 `php -n`을 사용합니다.
+[네이티브 확장](https://github.com/polyspec/ordered-json/tree/main/packages/php-ext)은 별도의 선택적 패키지입니다. 순수 PHP에는 확장 체크아웃이 필요하지 않습니다. `parse()`는 확장이 로드되어 있으면 확장을, 그렇지 않으면 순수 PHP 구현을 사용합니다. 테스트는 PHPUnit으로 확장 없이 한 번, 확장과 함께 한 번 실행합니다(`config/parity.json`).
 
 `Polyspec\OrderedJson\Value::parseRejectDuplicates($source)`는 마지막 값을 유지하지 않고 어느 깊이든 해석된 객체 키가 반복되면 `duplicate_object_key` 종류의 `Polyspec\OrderedJson\ParseError`로 거부합니다. 확장이 로드되어 있어도 순수 PHP parser로 파싱합니다.
 

@@ -1,5 +1,5 @@
 <!-- doc-id: installation -->
-<!-- source-sha256: fa3680843f5fd2f4524da04ac3d4637d8fe86f3793b7d1f1caeec2b1a5e9fe56 -->
+<!-- source-sha256: a9006c96d7f1c415f72d2225838c4f37d72a309b5ed99313b0c1ea3fcbeac057 -->
 # 설치와 실행
 
 [English](installation.md)
@@ -34,7 +34,7 @@ cd ordered-json
 - JavaScript: `packages/js/index.js`에서 가져옵니다. TypeScript 선언은 `packages/js/index.d.ts`에 있습니다.
 - Rust: `path`가 `packages/rust/`를 지정하는 로컬 Cargo 의존성을 설정합니다.
 - Go: `github.com/polyspec/ordered-json/packages/go` 모듈의 로컬 `replace`가 `packages/go/`를 지정하도록 설정합니다.
-- PHP: `packages/php/src/OrderedJson.php`를 require하거나 `packages/php/`를 Composer path 저장소로 사용합니다.
+- PHP: `packages/php/`를 Composer path 저장소로 사용합니다. Composer는 그 class를 PSR-4로, 함수를 `files`로 load합니다.
 - Python: release의 wheel asset을 pip로 설치하거나 `packages/python/src`를 import 경로에 둡니다.
 
 ~~~sh

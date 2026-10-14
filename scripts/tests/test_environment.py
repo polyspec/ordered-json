@@ -60,13 +60,13 @@ class Environment(unittest.TestCase):
         self.assertRegex(text, r'(?m)^ONLINE := env' + ''.join(rf' -u {name}' for name in OFFLINE) + '$')
         downloading = sorted(target for target, lines in recipes(text).items()
                              if any(kind == 'recipe' and '$(ONLINE)' in line for kind, line in lines))
-        self.assertEqual(downloading, ['install-external', 'install-rust'])
+        self.assertEqual(downloading, ['install-external', 'install-php', 'install-python', 'install-rust'])
 
     def test_make_install_makes_every_download_of_the_checks(self):
         # The tools of mise.lock, the Rust toolchain, the crates of
         # packages/rust/Cargo.lock, the PIE PHAR and the supplementary suite.
         prerequisites = [item for kind, items in recipes(makefile())['install'] if kind == 'prerequisites' for item in items]
-        self.assertEqual(prerequisites, ['install-rust', 'install-tools', 'cargo-downloads-fetch', 'install-external'])
+        self.assertEqual(prerequisites, ['install-rust', 'install-tools', 'cargo-downloads-fetch', 'install-php', 'install-python', 'install-external'])
         downloads = dict(recipes(makefile()))
         self.assertEqual([line for kind, line in downloads['install-external'] if kind == 'recipe'],
                          ['$(ONLINE) $(PYTHON) scripts/external_inputs.py'])

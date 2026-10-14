@@ -6,5 +6,6 @@
   "license": "MIT",
   "require": {"php": ">=8.5", "ext-json": "*", "ext-pcre": "*"},
   "suggest": {"ext-ordered_json": "Native backend from the polyspec/ordered-json-extension PIE package"},
-  "autoload": {"files": ["packages/php/src/OrderedJson.php"]}
+  "autoload": {"psr-4": {"Polyspec\\OrderedJson\\": "packages/php/src/"}, "files": ["packages/php/src/OrderedJson.php"]},
+  "autoload-dev": {"psr-4": {"Polyspec\\OrderedJson\\Tests\\": "packages/php/tests/"}}
 }

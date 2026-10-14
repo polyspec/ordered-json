@@ -1,16 +1,11 @@
-#!/usr/bin/env python3
-"""The package tests of the ordered-json Python package.
+"""The package tests of the ordered-json Python package, run by unittest.
 
-Every case of the shared standard runs here, each a feature unit of
-config/parity.json, and the package cases cover the API of this binding
-alone.
+Every case of the shared standard runs here, each test method the feature unit of config/parity.json of its name without
+test_, and the package cases cover the API of this binding alone. The package is installed into packages/python/.venv,
+whose interpreter config/parity.json names.
 """
 import json
-import sys
 import unittest
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 
 from polyspec import ordered_json
 from polyspec.ordered_json import (MAX_DEPTH, ParseError, ParseOptions, Value, parse, parse_bytes,
@@ -179,7 +174,3 @@ class PackageCases(unittest.TestCase):
             parse('["한"]\ud800')
         self.assertEqual(caught.exception.kind, 'unescaped_lone_surrogate')
         self.assertEqual(caught.exception.offset, len('["한"]'.encode('utf-8')))
-
-
-if __name__ == '__main__':
-    unittest.main(verbosity=2)

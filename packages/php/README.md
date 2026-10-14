@@ -8,18 +8,18 @@ Strict JSON with associative objects that preserve document key order recursivel
 <a id="usage"></a>
 ## Usage
 
-PHP >= 8.2 with JSON and PCRE; Composer package `polyspec/ordered-json`.
+PHP >= 8.5 with JSON and PCRE; Composer package `polyspec/ordered-json`, whose classes Composer loads by PSR-4 and whose functions by `files`.
 
 The usage fragment takes `source` (or `$source`) from an object case in the [common official examples](https://github.com/polyspec/ordered-json/blob/main/examples/official.json).
 
 ~~~php
-require 'src/OrderedJson.php';
+require 'vendor/autoload.php';
 $value = Polyspec\OrderedJson\parse($source);
 $output = Polyspec\OrderedJson\stringify($value);
 ~~~
 
 
-The [native extension](https://github.com/polyspec/ordered-json/tree/main/php-extension) is a separate optional package. Pure PHP needs no extension checkout. `parse()` uses the extension when it is loaded and the pure PHP implementation otherwise. The pure test process uses `php -n`.
+The [native extension](https://github.com/polyspec/ordered-json/tree/main/packages/php-ext) is a separate optional package. Pure PHP needs no extension checkout. `parse()` uses the extension when it is loaded and the pure PHP implementation otherwise. The tests run with PHPUnit, once without the extension and once with it (`config/parity.json`).
 
 `Polyspec\OrderedJson\Value::parseRejectDuplicates($source)` rejects a repeated decoded object key at any depth with `Polyspec\OrderedJson\ParseError` of kind `duplicate_object_key` instead of keeping the last value. It parses with the pure PHP parser even when the extension is loaded.
 

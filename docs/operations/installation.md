@@ -33,7 +33,7 @@ The clone contains every implementation package. Use the package directory or a 
 - JavaScript: import from `packages/js/index.js`. TypeScript declarations are in `packages/js/index.d.ts`.
 - Rust: set a local Cargo dependency with `path` pointing to `packages/rust/`.
 - Go: use a local `replace` for module `github.com/polyspec/ordered-json/packages/go` pointing to `packages/go/`.
-- PHP: require `packages/php/src/OrderedJson.php` or use `packages/php/` as a Composer path repository.
+- PHP: use `packages/php/` as a Composer path repository; Composer loads its classes by PSR-4 and its functions by `files`.
 - Python: install the wheel asset of a release with pip, or put `packages/python/src` on the import path.
 
 ~~~sh

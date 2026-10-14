@@ -1,21 +1,18 @@
-// Package tests for the JavaScript value API. The shared cases exercise the
-// JSON contract through the adapter; construction guards, frozen results,
-// wrong-kind access, option validation and UTF-16 offsets live only here.
+// Package tests for the JavaScript value API, run by node:test; each test is the feature unit of config/parity.json
+// of the same name. The shared cases exercise the JSON contract through the adapter; construction guards, frozen
+// results, wrong-kind access, option validation and UTF-16 offsets live only here.
 import assert from 'node:assert/strict';
-import {writeSync} from 'node:fs';
+import {test} from 'node:test';
 import {MAX_DEPTH, ParseError, Value, parse, parseBytes, stringify} from '../index.js';
 
-const cases = new Map();
-const check = (id, body) => cases.set(id, body);
-
-check('values_come_only_from_the_library', () => {
+test('values_come_only_from_the_library', () => {
   assert.throws(() => new Value(), {name: 'TypeError', message: 'Use parse() or Value factories'});
   assert.throws(() => stringify({kind: 'array'}), {name: 'TypeError'});
   assert.throws(() => stringify(null), {name: 'TypeError'});
   assert.equal(stringify(parse('[1]')), '[1]');
 });
 
-check('returned_collections_are_immutable', () => {
+test('returned_collections_are_immutable', () => {
   const array = parse('[1,2]');
   assert.ok(Object.isFrozen(array.items));
   assert.throws(() => { array.items[0] = parse('9'); }, {name: 'TypeError'});
@@ -27,7 +24,7 @@ check('returned_collections_are_immutable', () => {
   assert.equal(object.members.size, 2, 'members returns a fresh map for each access');
 });
 
-check('wrong_kind_access_is_reported', () => {
+test('wrong_kind_access_is_reported', () => {
   assert.throws(() => parse('[]').members, {name: 'TypeError', message: 'Expected object, got array'});
   assert.throws(() => parse('{}').items, {name: 'TypeError', message: 'Expected array, got object'});
   assert.throws(() => parse('1').stringValue(), {name: 'TypeError', message: 'Expected string, got number'});
@@ -35,52 +32,52 @@ check('wrong_kind_access_is_reported', () => {
   assert.throws(() => parse('null').booleanValue(), {name: 'TypeError', message: 'Expected boolean, got null'});
 });
 
-check('member_lookup_uses_decoded_names', () => {
+test('member_lookup_uses_decoded_names', () => {
   const value = parse('{"a\\u00e9":1,"b":2}');
   assert.equal(value.get('aé').numberLiteral(), '1');
   assert.equal(value.get('missing'), undefined);
   assert.throws(() => value.get(1), {name: 'TypeError', message: 'Key must be a string'});
 });
 
-check('repeated_key_keeps_first_position_and_last_value', () => {
+test('repeated_key_keeps_first_position_and_last_value', () => {
   const members = parse('{"a":1,"b":2,"a":3}').members;
   assert.deepEqual([...members.keys()], ['a', 'b']);
   assert.equal(members.get('a').numberLiteral(), '3');
 });
 
-check('host_serialization_boundary', () => {
+test('host_serialization_boundary', () => {
   const value = parse('[1]');
   assert.throws(() => JSON.stringify(value), {name: 'TypeError', message: 'Use stringify(value) from ordered-json'});
   assert.equal(String(value), '[1]');
 });
 
-check('root_keeps_surrounding_text', () => {
+test('root_keeps_surrounding_text', () => {
   const value = parse('  [1] \n');
   assert.equal(value.raw, '  [1] \n');
   assert.equal(stringify(value), '[1]');
   assert.equal(value.items[0].raw, '1');
 });
 
-check('depth_argument_is_bounded', () => {
+test('depth_argument_is_bounded', () => {
   assert.throws(() => parse(123), {name: 'TypeError', message: 'Expected JSON text'});
   for (const maxDepth of [-1, MAX_DEPTH + 1, 1.5]) {
     assert.throws(() => parse('[]', {maxDepth}), {name: 'RangeError'});
   }
 });
 
-check('depth_limit_is_enforced', () => {
+test('depth_limit_is_enforced', () => {
   assert.equal(parse('[[1]]', {maxDepth: 2}).items.length, 1);
   assert.throws(() => parse('[[1]]', {maxDepth: 1}), {name: 'ParseError', message: /maximum nesting depth/i});
 });
 
-check('bytes_input_is_validated', () => {
+test('bytes_input_is_validated', () => {
   assert.throws(() => parseBytes([1, 2]), {name: 'TypeError', message: 'Expected Uint8Array'});
   assert.throws(() => parseBytes(new Uint8Array([0x5b, 0x22, 0xff, 0x22, 0x5d])),
     {name: 'ParseError', message: /Invalid UTF-8/});
   assert.equal(stringify(parseBytes(new TextEncoder().encode('{"a":1}'))), '{"a":1}');
 });
 
-check('rejection_names_its_kind', () => {
+test('rejection_names_its_kind', () => {
   // The wording is JavaScript's own; the kind is the shared contract.
   const kinds = new Map([
     ['[1,]', 'expected_value'],
@@ -96,7 +93,7 @@ check('rejection_names_its_kind', () => {
   }
 });
 
-check('invalid_utf8_reports_the_first_bad_byte', () => {
+test('invalid_utf8_reports_the_first_bad_byte', () => {
   // The bad byte sits at index 2 of ["<bad>"]; the error names that position.
   const bad = new Uint8Array([0x5b, 0x22, 0xff, 0x22, 0x5d]);
   const error = (() => { try { parseBytes(bad); } catch (failure) { return failure; } })();
@@ -105,7 +102,7 @@ check('invalid_utf8_reports_the_first_bad_byte', () => {
   assert.equal(error.offset, 2);
 });
 
-check('parse_errors_report_offsets', () => {
+test('parse_errors_report_offsets', () => {
   const plain = (() => { try { parse('[1,]'); } catch (error) { return error; } })();
   assert.ok(plain instanceof ParseError);
   assert.equal(plain.offset, 3);
@@ -114,19 +111,19 @@ check('parse_errors_report_offsets', () => {
   assert.equal(astral.offset, 6);
 });
 
-check('surrogate_pair_decodes', () => {
+test('surrogate_pair_decodes', () => {
   assert.deepEqual(parse('"\\ud83c\\udf0d"').stringUnits(), [0xd83c, 0xdf0d]);
   assert.equal(parse('"\\ud83c\\udf0d"').stringValue(), '🌍');
 });
 
-check('unpaired_surrogate_stays_in_units', () => {
+test('unpaired_surrogate_stays_in_units', () => {
   const lone = parse('"a\\ud800"');
   assert.deepEqual(lone.stringUnits(), [0x61, 0xd800]);
   assert.equal(lone.stringValue().charCodeAt(1), 0xd800);
   assert.equal(stringify(lone), '"a\\ud800"');
 });
 
-check('factories_validate_arguments', () => {
+test('factories_validate_arguments', () => {
   assert.throws(() => Value.string(1), {name: 'TypeError', message: 'Expected string'});
   assert.throws(() => Value.number(1), {name: 'TypeError', message: 'Pass a number literal as a string'});
   assert.throws(() => Value.number(' 1'), {name: 'TypeError', message: 'Number literal cannot contain whitespace'});
@@ -137,7 +134,7 @@ check('factories_validate_arguments', () => {
   assert.throws(() => Value.object([['a', {}]]), {name: 'TypeError'});
 });
 
-check('strict_parse_rejects_duplicate_keys', () => {
+test('strict_parse_rejects_duplicate_keys', () => {
   const sources = [
     '{"a":1,"a":2}',
     String.raw`{"a":1,"a":2}`,
@@ -157,7 +154,7 @@ check('strict_parse_rejects_duplicate_keys', () => {
   }
 });
 
-check('strict_parse_accepts_unique_keys', () => {
+test('strict_parse_accepts_unique_keys', () => {
   const source = '{"a":1,"nested":[{"b":2}],"state":null}';
   assert.equal(stringify(parse(source, {rejectDuplicates: true})), source);
   assert.equal(stringify(parseBytes(new TextEncoder().encode(source), {rejectDuplicates: true})), source);
@@ -169,23 +166,3 @@ check('strict_parse_accepts_unique_keys', () => {
       {name: 'TypeError', message: 'rejectDuplicates must be a boolean'});
   }
 });
-
-// Each case prints its id before it runs and its result after, with a
-// synchronous write, so the verifier can name a case that never ends.
-const failures = [];
-for (const [id, body] of cases) {
-  writeSync(1, `${id} `);
-  const started = performance.now();
-  let result = 'ok';
-  try {
-    body();
-  } catch (error) {
-    result = 'FAIL';
-    failures.push(`${id}: ${error.constructor.name}: ${error.message}`);
-  }
-  writeSync(1, `${result} (${Math.round(performance.now() - started)} ms)\n`);
-}
-if (failures.length) {
-  console.error(failures.join('\n'));
-  process.exit(1);
-}
