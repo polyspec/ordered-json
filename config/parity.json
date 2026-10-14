@@ -1293,6 +1293,10 @@
       "profile": "api",
       "symbols": [
         {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!parse:function(1)"
+        },
+        {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::parse"
         },
@@ -1316,6 +1320,10 @@
       "profile": "byte-input",
       "symbols": [
         {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!parseBytes:function(1)"
+        },
+        {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::parse_bytes"
         },
@@ -1334,6 +1342,10 @@
       "kind": "api",
       "profile": "api",
       "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!MAX_DEPTH:var"
+        },
         {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::MAX_DEPTH"
@@ -1358,6 +1370,10 @@
       "profile": "api",
       "symbols": [
         {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!ParseOptions#maxDepth:member"
+        },
+        {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::parse_with_max_depth"
         },
@@ -1380,6 +1396,10 @@
       "kind": "api",
       "profile": "api",
       "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!stringify:function(1)"
+        },
         {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::stringify"
@@ -1404,6 +1424,10 @@
       "profile": "api",
       "symbols": [
         {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value:class"
+        },
+        {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value"
         },
@@ -1426,6 +1450,10 @@
       "kind": "api",
       "profile": "api",
       "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!ParseError:class"
+        },
         {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Error"
@@ -1450,6 +1478,10 @@
       "profile": "api",
       "symbols": [
         {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!ParseError#kind:member"
+        },
+        {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Error::kind"
         },
@@ -1472,6 +1504,10 @@
       "kind": "api",
       "profile": "api",
       "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!ParseError#offset:member"
+        },
         {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Error::offset"
@@ -1496,6 +1532,10 @@
       "profile": "api",
       "symbols": [
         {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!stringify:function(1)"
+        },
+        {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::compact"
         },
@@ -1518,6 +1558,10 @@
       "kind": "api",
       "profile": "api",
       "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#raw:member"
+        },
         {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::raw"
@@ -1542,6 +1586,10 @@
       "profile": "api",
       "symbols": [
         {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#kind:member"
+        },
+        {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::kind"
         },
@@ -1564,6 +1612,10 @@
       "kind": "api",
       "profile": "api",
       "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#members:member"
+        },
         {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::members"
@@ -1588,6 +1640,10 @@
       "profile": "api",
       "symbols": [
         {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#get:member(1)"
+        },
+        {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::get"
         },
@@ -1610,6 +1666,10 @@
       "kind": "api",
       "profile": "api",
       "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#get:member(1)"
+        },
         {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::get_units"
@@ -1634,6 +1694,10 @@
       "profile": "api",
       "symbols": [
         {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#items:member"
+        },
+        {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::items"
         },
@@ -1656,6 +1720,10 @@
       "kind": "api",
       "profile": "api",
       "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#stringValue:member(1)"
+        },
         {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::string_value"
@@ -1680,6 +1748,10 @@
       "profile": "api",
       "symbols": [
         {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#stringUnits:member(1)"
+        },
+        {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::string_units"
         },
@@ -1702,6 +1774,10 @@
       "kind": "api",
       "profile": "api",
       "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#numberLiteral:member(1)"
+        },
         {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::number_literal"
@@ -1726,6 +1802,10 @@
       "profile": "api",
       "symbols": [
         {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#booleanValue:member(1)"
+        },
+        {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::boolean_value"
         },
@@ -1748,6 +1828,10 @@
       "kind": "api",
       "profile": "api",
       "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value.object:member(1)"
+        },
         {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::object"
@@ -1772,6 +1856,10 @@
       "profile": "api",
       "symbols": [
         {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value.array:member(1)"
+        },
+        {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::array"
         },
@@ -1794,6 +1882,10 @@
       "kind": "api",
       "profile": "api",
       "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value.string:member(1)"
+        },
         {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::string"
@@ -1818,6 +1910,10 @@
       "profile": "api",
       "symbols": [
         {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value.number:member(1)"
+        },
+        {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::number"
         },
@@ -1840,6 +1936,10 @@
       "kind": "api",
       "profile": "api",
       "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value.boolean:member(1)"
+        },
         {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::boolean"
@@ -1864,6 +1964,10 @@
       "profile": "api",
       "symbols": [
         {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value.null:member(1)"
+        },
+        {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::null"
         },
@@ -1886,6 +1990,10 @@
       "kind": "api",
       "profile": "api",
       "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value.string:member(1)"
+        },
         {
           "implementation": "rust",
           "symbol": "polyspec_ordered_json::Value::from_units"
@@ -2523,6 +2631,55 @@
       "reason": "the extension is the native backend of the PHP package; its scanner, hydration and compact functions exist only there",
       "spec": [
         "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "js",
+      "symbol": "@polyspec/ordered-json!Kind:type",
+      "reason": "the kinds of JavaScript are the strings of a TypeScript union type; Rust and Go name them with an enumeration",
+      "spec": [
+        "docs/spec/api.md#values"
+      ]
+    },
+    {
+      "implementation": "js",
+      "symbol": "@polyspec/ordered-json!ParseOptions:interface",
+      "reason": "the options of parse and parseBytes of JavaScript are a TypeScript interface, whose maxDepth is the depth limit and rejectDuplicates the duplicate-key rejection",
+      "spec": [
+        "docs/spec/api.md#values",
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "js",
+      "symbol": "@polyspec/ordered-json!ParseOptions#rejectDuplicates:member",
+      "reason": "the duplicate-key rejection of JavaScript is an option of its own, a binding extension",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "js",
+      "symbol": "@polyspec/ordered-json!Value#keys:member",
+      "reason": "a JavaScript object value returns its first parsed key tokens in order",
+      "spec": [
+        "docs/spec/api.md#objects"
+      ]
+    },
+    {
+      "implementation": "js",
+      "symbol": "@polyspec/ordered-json!Value#toJSON:member(1)",
+      "reason": "a JavaScript Value meets the host JSON.stringify at toJSON, which refuses it for stringify",
+      "spec": [
+        "docs/spec/api.md#values"
+      ]
+    },
+    {
+      "implementation": "js",
+      "symbol": "@polyspec/ordered-json!Value#toString:member(1)",
+      "reason": "a JavaScript Value converts to its compact text as a string",
+      "spec": [
+        "docs/spec/api.md#values"
       ]
     }
   ],

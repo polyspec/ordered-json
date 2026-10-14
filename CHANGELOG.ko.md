@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 56deb1346113497f6cb94b3542c81d67ac3d89b7e89c811f10d079b5ca50ee71 -->
+<!-- source-sha256: 884ab9995c89d9ff3eedfa4b26471b507ef63670b9c56868156f1c55b95f1ce2 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.43: `config/parity.json`은 모든 API unit을 kit의 TypeScript extractor가 `packages/js/index.d.ts`에서 읽는 JavaScript 공개 symbol에 API 계약의 표가 적는 대로 묶고(compact 출력과 UTF-16 생성 및 조회는 `stringify`, `Value.string`, `get`), JavaScript에만 있는 symbol `Kind`, `ParseOptions`, `rejectDuplicates`, `keys`, `toJSON`, `toString`을 이유와 함께 native-only로 선언합니다.
 - T1.38: 패키지 테스트는 kit parity가 실행하는 native runner로 실행하며, 각 테스트는 `config/parity.json`의 unit에 묶입니다. JavaScript는 node:test(`packages/js/test/api.test.mjs`, `official.test.mjs`), Python은 `make install-python`이 만드는 `packages/python/.venv`의 unittest(`tests/test_api.py`, `test_official.py`), PHP는 `make install-php`가 `packages/php`와 `packages/php-ext`에 설치하는 PHPUnit 13.4.2(`ValueApiTestCase`에서 나온 두 backend의 `ValueApiTest`, `DescriptorTest`, `ValueClassTest`)입니다. `make php-extension`은 `make parity-check`를 위해 확장을 제자리에서 빌드합니다. JavaScript와 Python은 공식 예제를 native로 실행합니다. PHP class `Value`, `ParseError`, `Tape`, `Parser`는 각자의 파일에서 PSR-4로, 함수와 `MAX_DEPTH`는 `files`로 load하며(S2), wheel의 release smoke는 `py.typed` 표시를 요구합니다.
 - T1.42: 폴더는 kit layout의 S5를 따릅니다. 패키지와 공유 fixture를 옮겼으며, consumer는 이 release를 넘어설 때 새 경로를 씁니다.
   - `packages/ordered-json-go` → `packages/go`: Go module `github.com/polyspec/ordered-json/packages/ordered-json-go`는 `github.com/polyspec/ordered-json/packages/go`이고, tag는 `packages/ordered-json-go/vX.Y.Z` 대신 `packages/go/vX.Y.Z`입니다.
