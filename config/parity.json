@@ -223,6 +223,11 @@
           "test": "packages/js/test/official.test.mjs"
         },
         {
+          "implementation": "go",
+          "test": "packages/go/official_test.go",
+          "symbol": "TestOfficial"
+        },
+        {
           "implementation": "python",
           "test": "packages/python/tests/test_official.py"
         }
@@ -2525,12 +2530,6 @@
     {
       "unit": "official",
       "implementation": "rust",
-      "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
-      "item": "T1.38"
-    },
-    {
-      "unit": "official",
-      "implementation": "go",
       "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
       "item": "T1.38"
     },
