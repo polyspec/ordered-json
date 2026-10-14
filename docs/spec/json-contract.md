@@ -33,7 +33,7 @@ The text input of JavaScript and Python, whose strings can hold an unpaired UTF-
 <a id="rejection-kinds"></a>
 ### Rejection kinds
 
-The shared list of the rejection kinds. Every implementation names one of them for each rejection of the shared grammar, and the shared verifier (`scripts/verify.py`) reads the list from this section and fails on a kind outside it.
+The shared list of the rejection kinds. Every implementation names one of them for each rejection of the shared grammar, and the shared verifier (`scripts/verify.mts`) reads the list from this section and fails on a kind outside it.
 
 - `expected_value`
 - `expected_digit`
@@ -83,7 +83,7 @@ The library uses the order supplied by a native collection. It does not reconstr
 <a id="acceptance"></a>
 ## Acceptance
 
-Every implementation receives the same official inputs and fixed expected results through the [shared verifier](../../scripts/verify.py). Verification compares input acceptance, node types and values, key and array order, raw source access, default and compact serialization, and reconstruction through constructors.
+Every implementation receives the same official inputs and fixed expected results through the [shared verifier](../../scripts/verify.mts). Verification compares input acceptance, node types and values, key and array order, raw source access, default and compact serialization, and reconstruction through constructors.
 
 Reconstruction inserts keys in their initial order, updates their values in reverse order, serializes the result, and validates that result with an independent parser. Generated objects must contain unique decoded keys. Number token text must remain exact; generated string-key escape spelling may differ.
 

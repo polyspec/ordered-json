@@ -22,8 +22,8 @@ The object entry list is a reporting format for comparing order. Internal object
 <a id="verification"></a>
 ## Adapters and reconstruction
 
-Each language adapter parses the same documents and reports results. [scripts/verify.py](../scripts/verify.py) performs every comparison. Additional inputs under `contracts/fixtures/` and the optional supplementary suite use an independent standard-library reference with object-pair and number-token callbacks.
+Each language probe parses the same documents and reports results. [scripts/verify.mts](../scripts/verify.mts) performs every comparison. Additional inputs under `contracts/fixtures/` and the optional supplementary suite use an independent reference ([scripts/reference.mts](../scripts/reference.mts)): strict UTF-8 parsed by momoa, a JSON parser that keeps every member in order with the source text of each token.
 
-Each adapter also parses its serialized output and serializes that value again. The verifier requires the second output and the second type tree to match the first output and type tree.
+Each probe also parses its serialized output and serializes that value again. The verifier requires the second output and the second type tree to match the first output and type tree.
 
 Reconstruction inserts each object's keys in source order with null values, updates their values in reverse order, and constructs JSON through the library's map and array APIs. The common verifier independently parses the generated JSON, rejects duplicate output keys, and compares the fixed expected tree. Generated strings use the shared canonical escape policy; decoded keys, order, values, and number tokens must match.

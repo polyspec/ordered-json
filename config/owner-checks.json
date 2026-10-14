@@ -27,7 +27,7 @@
     },
     {
       "paths": [
-        "scripts/tests/test_*.py"
+        "tests/scripts/*.test.mts"
       ],
       "targets": [
         "test-scripts"
@@ -36,8 +36,17 @@
     },
     {
       "paths": [
-        "scripts/registry.py",
-        "scripts/verify.py",
+        "tests/scripts/checkout.mts"
+      ],
+      "targets": [
+        "test-scripts"
+      ]
+    },
+    {
+      "paths": [
+        "scripts/registry.mts",
+        "scripts/reference.mts",
+        "scripts/verify.mts",
         "config/parity.json",
         "examples/official.json",
         "contracts/fixtures/**"
@@ -54,37 +63,27 @@
     },
     {
       "paths": [
-        "scripts/verification_record.py",
-        "scripts/check_pie.py",
-        "scripts/compare_ojson.py",
+        "scripts/records.mts",
+        "scripts/check-pie.mts",
+        "scripts/compare-ojson.mts",
         "scripts/comparison/*",
-        "scripts/python_check.py",
         ".gitignore",
         "Makefile",
-        "scripts/verification.py",
-        "scripts/unit_tests.py",
-        "scripts/external_inputs.py"
+        "scripts/external-inputs.mts",
+        "tsconfig.json"
       ],
       "targets": [
-        "test-scripts"
+        "test-scripts",
+        "typecheck"
       ]
     },
     {
       "paths": [
-        "scripts/lint.py"
+        "benchmarks/run.mts"
       ],
       "targets": [
         "test-scripts",
-        "clippy",
-        "go-vet"
-      ]
-    },
-    {
-      "paths": [
-        "benchmarks/run.py"
-      ],
-      "targets": [
-        "test-scripts",
+        "typecheck",
         "benchmark-check"
       ]
     },
@@ -258,7 +257,7 @@
     },
     {
       "paths": [
-        "scripts/check_evidence.py",
+        "scripts/check-evidence.mts",
         "docs/reports/*.json",
         "external-inputs.json"
       ],

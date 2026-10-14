@@ -1,5 +1,5 @@
 <!-- doc-id: documentation-plan -->
-<!-- source-sha256: 6c5a9eed1cecefb284b9198b0944d528e3ea6d8d9df7025afcd9c963114604a8 -->
+<!-- source-sha256: 8b511fb48071e9c97123894323000b19d4b793e86a1413eb54010a945cbea8af -->
 # 문서 관리
 
 [English](documentation-plan.md)
@@ -40,7 +40,7 @@
 <a id="checks"></a>
 ## 문서 검사
 
-`make documents-check`(`@polyspec/kit`의 check-documents)는 문서 쌍, 로컬 링크 대상과 앵커, 섹션 식별자와 코드 블록의 일치, 한국어 번역 기준 해시, 체크리스트, 기능 표의 값, 변경 기록의 section을 검사합니다. 문서에 로컬 홈 디렉터리 경로가 포함돼도 실패합니다. `make evidence-check`(`scripts/check_evidence.py`)는 기능 행을 그것이 가리키는 근거와 대조하고 보고서에 로컬 홈 디렉터리 경로가 있으면 실패합니다. 둘 다 검증 기록을 현재 소스와 비교하지 않으므로 문서 검토에는 전체 검증 실행이 필요하지 않습니다.
+`make documents-check`(`@polyspec/kit`의 check-documents)는 문서 쌍, 로컬 링크 대상과 앵커, 섹션 식별자와 코드 블록의 일치, 한국어 번역 기준 해시, 체크리스트, 기능 표의 값, 변경 기록의 section을 검사합니다. 문서에 로컬 홈 디렉터리 경로가 포함돼도 실패합니다. `make evidence-check`(`scripts/check-evidence.mts`)는 기능 행을 그것이 가리키는 근거와 대조하고 보고서에 로컬 홈 디렉터리 경로가 있으면 실패합니다. 둘 다 검증 기록을 현재 소스와 비교하지 않으므로 문서 검토에는 전체 검증 실행이 필요하지 않습니다.
 
 한국어 파일의 `source-sha256` 주석은 번역을 검토한 영어 개정본을 기록합니다. 번역 검토 후에만 갱신합니다. 해시 일치는 번역의 정확성을 증명하지 않습니다. 검사기는 외부 사이트의 접속 가능 여부나 문장의 의미를 검증하지 않으며, 코드와 테스트 결과를 읽고 확인해야 합니다.
 

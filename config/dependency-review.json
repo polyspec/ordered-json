@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "comment": "Written by make dependency-review RECORD=1 (scripts/kit/dependency-review.mts) from the registries; make dependency-policy-check compares the checkout with it without a network.",
-  "reviewed": "2026-10-14T08:35:42.158Z",
+  "reviewed": "2026-10-14T09:16:54.153Z",
   "locks": [
     {
       "lock": "package-lock.json",
-      "sha256": "17809ff31fd462cc6ee76d559d9454b2168d5c314bf988c76df27a5398d75f02",
+      "sha256": "4a5659c2f5c1c7fce26fb91a998267b00c145b66653b228bf6336b41ce074b18",
       "advisories": [
         {
           "package": "sprintf-js",
@@ -29,6 +29,76 @@
     }
   ],
   "dependencies": [
+    {
+      "ecosystem": "npm",
+      "manifest": "package.json",
+      "package": "@humanwhocodes/momoa",
+      "version": "3.3.13",
+      "latest": "3.3.13"
+    },
+    {
+      "ecosystem": "npm",
+      "manifest": "package.json",
+      "package": "@types/mdast",
+      "version": "4.0.4",
+      "latest": "4.0.4"
+    },
+    {
+      "ecosystem": "npm",
+      "manifest": "package.json",
+      "package": "@types/node",
+      "version": "26.6.5",
+      "latest": "26.6.5"
+    },
+    {
+      "ecosystem": "npm",
+      "manifest": "package.json",
+      "package": "mdast-util-from-markdown",
+      "version": "2.1.0",
+      "latest": "2.1.0"
+    },
+    {
+      "ecosystem": "npm",
+      "manifest": "package.json",
+      "package": "mdast-util-gfm",
+      "version": "3.1.0",
+      "latest": "3.1.0"
+    },
+    {
+      "ecosystem": "npm",
+      "manifest": "package.json",
+      "package": "mdast-util-to-string",
+      "version": "4.0.0",
+      "latest": "4.0.0"
+    },
+    {
+      "ecosystem": "npm",
+      "manifest": "package.json",
+      "package": "micromark-extension-gfm",
+      "version": "3.0.0",
+      "latest": "3.0.0"
+    },
+    {
+      "ecosystem": "npm",
+      "manifest": "package.json",
+      "package": "smol-toml",
+      "version": "1.9.1",
+      "latest": "1.9.1"
+    },
+    {
+      "ecosystem": "npm",
+      "manifest": "package.json",
+      "package": "typescript",
+      "version": "7.0.2",
+      "latest": "7.0.2"
+    },
+    {
+      "ecosystem": "npm",
+      "manifest": "package.json",
+      "package": "yaml",
+      "version": "2.9.1",
+      "latest": "2.9.1"
+    },
     {
       "ecosystem": "pypi",
       "manifest": "packages/python/pyproject.toml",

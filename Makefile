@@ -37,10 +37,10 @@ include scripts/kit/kit-bootstrap.mk
 
 # The targets of the full suite that make check runs through the guard of full-run of @polyspec/kit and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
-CHECK_TARGETS := kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check documents-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check clippy go-vet pie-check python-package-check
+CHECK_TARGETS := kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check documents-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go pie-check test-scripts typecheck
 
-.PHONY: check test-scripts install-php install-python php-extension verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
-	benchmark benchmark-check python-parse-budget clippy go-vet python-package-check release-config-check install install-rust install-external
+.PHONY: check test-scripts typecheck install-php install-python php-extension verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
+	benchmark benchmark-check python-parse-budget release-config-check install install-rust install-external
 
 # check runs the full suite once per committed tree, when no task of docs/plans/execution-checklist.md is [~]
 # (full-run of @polyspec/kit); it records its result in var/full-run.json. rerun-failed (kit.mk) reruns the targets that failed.
@@ -76,63 +76,50 @@ php-extension:
 
 parity-check: php-extension
 
+# install-external installs the PIE PHAR and the supplementary suite that external-inputs.json pins (scripts/external-inputs.mts).
 install-external:
-	$(ONLINE) $(PYTHON) scripts/external_inputs.py
+	$(ONLINE) node scripts/external-inputs.mts
 
-# test-scripts runs the verifier unit tests of scripts/tests: every module, or the files of TESTS.
+# test-scripts runs the node:test tool tests of tests/scripts, or the files of TESTS, through run-tests of @polyspec/kit, which
+# gives each test its own deadline; typecheck checks the TypeScript of scripts/, tests/scripts/ and benchmarks/ with the tsc
+# of package.json (tsconfig.json), which Node runs by type stripping and so never checks itself.
 test-scripts:
-	$(PYTHON) scripts/unit_tests.py $(if $(TESTS),$(basename $(notdir $(TESTS))),$(basename $(notdir $(wildcard scripts/tests/test_*.py))))
+	node $(KIT)/run-tests.$(KIT_EXT) node -- $(or $(TESTS),tests/scripts/)
 
-# verify-all runs the verifier unit tests, builds and verifies every implementation and writes var/records/verification.json
-# (scripts/verification.py); verify-<language> verifies one implementation and writes no record (scripts/verify.py).
+typecheck:
+	node node_modules/typescript/bin/tsc -p tsconfig.json
+
+# verify-all builds and verifies every implementation with the shared cases, writes var/records/verification.json and checks
+# it with the evidence check (scripts/verify.mts --record); verify-<implementation> verifies one implementation and writes no
+# record. The package tests of each implementation run in parity-check, with the native runner of its language.
 verify-all: toolchain-check cargo-downloads-check
-	$(PYTHON) scripts/verification.py$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
+	node scripts/verify.mts --record$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
 
-verify-js: toolchain-check cargo-downloads-check
-	$(PYTHON) scripts/verify.py --only js$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
-verify-rust: toolchain-check cargo-downloads-check
-	$(PYTHON) scripts/verify.py --only rust$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
-verify-go: toolchain-check cargo-downloads-check
-	$(PYTHON) scripts/verify.py --only go$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
-verify-php: toolchain-check cargo-downloads-check
-	$(PYTHON) scripts/verify.py --only php$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
-verify-php-extension: toolchain-check cargo-downloads-check
-	$(PYTHON) scripts/verify.py --only php-extension$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
-verify-python: toolchain-check cargo-downloads-check
-	$(PYTHON) scripts/verify.py --only python$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
-
-# clippy and go-vet run one lint of AGENTS (scripts/lint.py).
-clippy: toolchain-check cargo-downloads-check
-	$(PYTHON) scripts/lint.py clippy
-
-go-vet: toolchain-check cargo-downloads-check
-	$(PYTHON) scripts/lint.py go-vet
+verify-js verify-rust verify-go verify-php verify-php-extension verify-python: toolchain-check cargo-downloads-check
+	node scripts/verify.mts --only $(patsubst verify-%,%,$@)$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
 
 # evidence-check checks the feature rows against the evidence they name, the release assets of the published features and the
-# JSON reports of docs/ (scripts/check_evidence.py); verify-all runs it again with the verification records of the run.
+# JSON reports of docs/ (scripts/check-evidence.mts); verify-all runs it again with the verification records of the run.
 evidence-check:
-	$(PYTHON) scripts/check_evidence.py
-
-# python-package-check runs the declared package checks of the Python implementation with the pinned interpreter PYTHON
-# (scripts/python_check.py); the job python of the hosted CI runs it after make install-tools.
-python-package-check:
-	$(PYTHON) scripts/python_check.py
+	node scripts/check-evidence.mts
 
 # release-config-check runs the step versions of the release (release of @polyspec/kit, config/release.json) for the tag of the
-# version that packages/js/package.json declares: every manifest of config/release.json declares that version, the module path of
-# every Go module is the declared one, and CHANGELOG.md and CHANGELOG.ko.md hold the section of that version.
+# version of the root package.json, the version manifest of config/release.json: every manifest of config/release.json declares
+# that version, the module path of every Go module is the declared one, and CHANGELOG.md and CHANGELOG.ko.md hold its section.
 release-config-check:
-	node $(KIT)/release.$(KIT_EXT) versions "v$$(node -p "require('./packages/js/package.json').version")"
+	node $(KIT)/release.$(KIT_EXT) versions "v$$(node -p "require('./package.json').version")"
 
+# pie-check builds the extension with the PIE PHAR of external-inputs.json, verifies the module with the shared cases and writes
+# var/records/pie-verification.json (scripts/check-pie.mts).
 pie-check: toolchain-check cargo-downloads-check
-	$(PYTHON) scripts/check_pie.py --pie "$(PIE)" $(if $(JSON_TEST_SUITE),--suite "$(JSON_TEST_SUITE)")
+	node scripts/check-pie.mts --pie "$(PIE)"$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
 
 benchmark: toolchain-check cargo-downloads-check
-	$(PYTHON) benchmarks/run.py
+	node benchmarks/run.mts
 
 # benchmark-check measures the benchmark without replacing the committed result.
 benchmark-check: toolchain-check cargo-downloads-check
-	$(PYTHON) benchmarks/run.py --check
+	node benchmarks/run.mts --check
 
 # python-parse-budget compares the CPU time of the Python parse with the pure PHP parse on one generated document and fails
 # when the Python median exceeds three times the PHP median (benchmarks/python-parse/run.py). A person runs it after a

@@ -4,7 +4,7 @@
 # commit of every pull request: it fails while a task of the checklist is [~], naming each one, and when the commit does
 # not track .githooks/pre-push and .githooks/pre-commit with mode 100755. The release workflow requires this job on the
 # tagged commit, so it also runs the document check, make documents-check (check-documents of @polyspec/kit), the evidence
-# check, make evidence-check (scripts/check_evidence.py), and the check of the commit message, make commits-check: a
+# check, make evidence-check (scripts/check-evidence.mts), and the check of the commit message, make commits-check: a
 # commit whose documents, checklist, feature record or message fail their own checks does not reach a release. The
 # targets run through make ci-targets, which runs each after a failed one and writes the report. A step runs a make target, never a
 # script directly, so the environment and the prechecks of the Makefile apply. The full verification is not run here. The

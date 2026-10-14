@@ -1,5 +1,5 @@
 <!-- doc-id: distribution -->
-<!-- source-sha256: f2c24b60fde7970a599c800f3a4b5383ce711b6a7839ce7308331bbfedcdb4f6 -->
+<!-- source-sha256: a8e54d4a48dcb7465b452bb83eb0bf641b7829066f8206080381801d44e42d23 -->
 # 배포
 
 [English](distribution.md)
@@ -55,7 +55,7 @@ workflow는 `@polyspec/kit`의 `workflows/release.yml`의 사본입니다. `make
 
 consumer project `tests/release-consumer/npm`과 `tests/release-consumer/composer`는 tag의 archive를 저장소 밖에서 설치합니다(`make release-consumer TAG=<tag>`). 두 project의 lock은 release commit에서 `make release-consumer-lock TAG=<tag>`가 tag의 버전으로 쓰며, 이 저장소의 archive를 이름과 버전만으로 기록합니다. release가 만들어진 뒤 `make release-proof TAG=<tag>`가 GitHub Release, archive, git tag로 쓰는 Cargo 패키지, wheel, Go 모듈을 checkout 밖에서 설치합니다.
 
-tag는 환경 변수 `TAG`로 step에 전달됩니다. `scripts/tests/test_workflow_rules.py`는 trigger, 권한, step의 순서를 요구합니다.
+tag는 환경 변수 `TAG`로 step에 전달됩니다. `tests/scripts/workflow-rules.test.mts`는 trigger, 권한, step의 순서를 요구합니다.
 
 <a id="releases"></a>
 ## 레지스트리와 릴리스 기록

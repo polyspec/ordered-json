@@ -54,7 +54,7 @@ The workflow is the copy of `workflows/release.yml` of `@polyspec/kit`. `make in
 
 The consumer projects `tests/release-consumer/npm` and `tests/release-consumer/composer` install the archives of a tag outside the repository (`make release-consumer TAG=<tag>`); their locks are written for the version of a tag by `make release-consumer-lock TAG=<tag>` on the release commit and name the archives of this repository by name and version only. After the release exists, `make release-proof TAG=<tag>` installs the GitHub Release, the archives, the Cargo package by git tag, the wheel, and the Go module from outside the checkout.
 
-The tag reaches the steps through the environment variable `TAG`. `scripts/tests/test_workflow_rules.py` requires the trigger, the permission and the order of the steps.
+The tag reaches the steps through the environment variable `TAG`. `tests/scripts/workflow-rules.test.mts` requires the trigger, the permission and the order of the steps.
 
 <a id="releases"></a>
 ## Registry and release records
