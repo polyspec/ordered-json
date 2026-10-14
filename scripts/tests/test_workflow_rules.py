@@ -40,7 +40,7 @@ CHECK_WORKFLOWS = ('ci.yml', 'push-gate.yml')
 MAKE_STEP = r'make [^|;&`$()]*(\$\{\{[^}]*\}\}[^|;&`$()]*)*( [A-Z][A-Z_]*="\$[A-Z][A-Z_]*")*'
 # The first two make steps of every job of the check workflows: the targets of kit exist only after the package is installed.
 BOOTSTRAP_STEPS = ['make install-tools TOOLS=npm', 'make install-packages']
-RELEASE_STEPS = ['make install-tools TOOLS=npm', 'make install-packages', 'make release-tools', 'make release-tools-path', 'make release-verify', 'make release-versions', 'make release-assets', 'make release-publish',
+RELEASE_STEPS = ['make install-tools TOOLS=npm', 'make install-packages', 'make release-prepare', 'make release-tools', 'make release-tools-path', 'make release-verify', 'make release-versions', 'make release-assets', 'make release-publish',
                  'make release-proof TAG="$TAG"', 'make release-undraft TAG="$TAG"']
 
 
@@ -178,11 +178,15 @@ def violations(name, text):
             if 'run' in step and not re.fullmatch(MAKE_STEP, step['run']):
                 found.append(f"{name}: job {job} step {index} ({label}) runs `{step['run']}`; a step runs one make target, "
                              'never a script or a tool directly')
-            # uv installs the Python of pythonBuild (config/toolchain.json), so a step that installs python installs uv with it.
-            tools = re.fullmatch(r'make install-tools TOOLS="([^"]*)"', step.get('run', ''))
-            if tools and 'python' in tools.group(1).split() and 'uv' not in tools.group(1).split():
-                found.append(f"{name}: job {job} step {index} ({label}) installs python without uv, which installs it; "
-                             'name uv in TOOLS')
+            # mise installs Go, Python and the other tools of mise.toml at the digests of mise.lock (make install-tools), every
+            # tool at once: TOOLS names only npm, the bootstrap, and no setup action installs another Go or Python.
+            tools = re.fullmatch(r'make install-tools TOOLS=(.+)', step.get('run', ''))
+            if tools and tools.group(1) != 'npm':
+                found.append(f"{name}: job {job} step {index} ({label}) runs make install-tools TOOLS={tools.group(1)}; "
+                             'make install-tools installs every tool of mise.lock, and TOOLS names only npm')
+            if re.match(r'actions/setup-(python|go)@', step.get('uses', '')):
+                found.append(f"{name}: job {job} step {index} ({label}) installs a toolchain of mise.toml; make install-tools "
+                             'installs it')
         for index, step in enumerate(steps, 1):
             # setup-node caches the dependencies of the packageManager of package.json by default, with the npm of the
             # machine; the pinned npm of var/tools installs the packages of this repository (make install-packages).
@@ -268,11 +272,18 @@ class WorkflowRules(unittest.TestCase):
         elsewhere = text.replace(f'          path: {REPORT}\n', '          path: var/other/\n', 1)
         self.assertIn(message, violations('ci.yml', elsewhere))
 
-    def test_a_step_that_installs_python_installs_uv(self):
+    def test_the_tools_of_mise_are_installed_by_make_install_tools_alone(self):
         text = (WORKFLOWS / 'push-gate.yml').read_text()
-        broken = re.sub(r'run: make install-tools TOOLS="[^"]*"', 'run: make install-tools TOOLS="python"', text)
-        self.assertTrue(any('installs python without uv' in issue for issue in violations('push-gate.yml', broken)),
-                        violations('push-gate.yml', broken))
+        named = text.replace('run: make install-tools\n', 'run: make install-tools TOOLS="uv python"\n', 1)
+        self.assertNotEqual(named, text)
+        self.assertTrue(any('TOOLS names only npm' in issue for issue in violations('push-gate.yml', named)),
+                        violations('push-gate.yml', named))
+        setup = text.replace('      - name: make install-tools TOOLS=npm\n',
+                             '      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1\n'
+                             '      - name: make install-tools TOOLS=npm\n', 1)
+        self.assertNotEqual(setup, text)
+        self.assertTrue(any('installs a toolchain of mise.toml' in issue for issue in violations('push-gate.yml', setup)),
+                        violations('push-gate.yml', setup))
 
     def test_a_step_that_runs_a_script_or_a_tool_directly_fails(self):
         text = (WORKFLOWS / 'push-gate.yml').read_text()

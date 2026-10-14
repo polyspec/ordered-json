@@ -1,14 +1,15 @@
 """The environment of every run: the tools are the declared releases, a check reads no network, and make install is the only
 recipe that downloads.
 
-The releases are declared in .node-version, the packageManager of package.json, rust-toolchain.toml, config/toolchain.json,
-the pin files of the languages and the Go pin of @polyspec/kit, which the go line of the go.mod names; make toolchain-check
+The releases are declared in .node-version, the packageManager of package.json, rust-toolchain.toml, .php-version and
+mise.toml, whose Go and Python are the pins of @polyspec/kit and which the go line of the go.mod names; make toolchain-check
 compares the running tools with them, and make cargo-downloads-check names make install for a missing crate. The
 targets that run a tool depend on both checks, so no target works with a tool that no declaration names."""
 import json
 from pathlib import Path
 import re
 import sys
+import tomllib
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -62,7 +63,7 @@ class Environment(unittest.TestCase):
         self.assertEqual(downloading, ['install-external', 'install-rust'])
 
     def test_make_install_makes_every_download_of_the_checks(self):
-        # The npm, Go and Composer releases of config/toolchain.json and package.json, the Rust toolchain, the crates of
+        # The tools of mise.lock, the Rust toolchain, the crates of
         # packages/ordered-json-rust/Cargo.lock, the PIE PHAR and the supplementary suite.
         prerequisites = [item for kind, items in recipes(makefile())['install'] if kind == 'prerequisites' for item in items]
         self.assertEqual(prerequisites, ['install-rust', 'install-tools', 'cargo-downloads-fetch', 'install-external'])
@@ -85,14 +86,18 @@ class Environment(unittest.TestCase):
 
     def test_the_declarations_name_an_exact_release_or_a_minor_release(self):
         self.assertRegex((ROOT / '.node-version').read_text(), r'\A\d+\.\d+\.\d+\n\Z')
-        self.assertRegex((ROOT / '.python-version').read_text(), r'\A\d+\.\d+\n\Z')
+        self.assertFalse((ROOT / '.python-version').exists(), 'mise.toml pins Python; .python-version is gone')
+        tools = tomllib.loads((ROOT / 'mise.toml').read_text())['tools']
+        for tool in ('go', 'python'):
+            with self.subTest(tool=tool):
+                self.assertRegex(tools[tool], r'^\d+\.\d+\.\d+$')
         self.assertRegex((ROOT / '.php-version').read_text(), r'\A\d+\.\d+\n\Z')
         self.assertRegex((ROOT / 'rust-toolchain.toml').read_text(), r'(?m)^channel = "\d+\.\d+\.\d+"$')
         manager = json.loads((ROOT / 'package.json').read_text())['packageManager']
         self.assertRegex(manager, r'^npm@\d+\.\d+\.\d+\+sha512\.[0-9a-f]{128}$')
-        # Go is the pin of kit, which the go line names exactly; the go command drops a toolchain line equal to it.
+        # Go is the pin of kit, which mise.toml and the go line name exactly; the go command drops a toolchain line equal to it.
         go_mod = (ROOT / 'packages/ordered-json-go/go.mod').read_text()
-        self.assertRegex(go_mod, r'(?m)^go \d+\.\d+\.\d+$')
+        self.assertRegex(go_mod, rf'(?m)^go {re.escape(tools["go"])}$')
         self.assertNotRegex(go_mod, r'(?m)^toolchain ')
 
     def test_no_recipe_runs_a_pinned_tool_by_name(self):

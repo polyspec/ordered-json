@@ -1,12 +1,21 @@
 {
   "schema": 1,
-  "comment": "Written by make dependency-review RECORD=1 (scripts/kit/dependency-review.mjs) from the registries; make dependency-policy-check compares the checkout with it without a network.",
-  "reviewed": "2026-10-13T02:40:28.207Z",
+  "comment": "Written by make dependency-review RECORD=1 (scripts/kit/dependency-review.mts) from the registries; make dependency-policy-check compares the checkout with it without a network.",
+  "reviewed": "2026-10-14T08:17:57.717Z",
   "locks": [
     {
       "lock": "package-lock.json",
-      "sha256": "01bc50bd0c40678370e0662262eb61df8a6595080a068d780c64189a0c150293",
-      "advisories": []
+      "sha256": "17809ff31fd462cc6ee76d559d9454b2168d5c314bf988c76df27a5398d75f02",
+      "advisories": [
+        {
+          "package": "sprintf-js",
+          "version": "1.0.3",
+          "id": "1241202",
+          "severity": "moderate",
+          "title": "sprintf-js vulnerable to denial of service through unbounded precision specifiers",
+          "url": "https://github.com/advisories/GHSA-hp3w-g68c-fv3c"
+        }
+      ]
     },
     {
       "lock": "packages/ordered-json-python/pylock.toml",
@@ -26,6 +35,13 @@
       "package": "setuptools",
       "version": "84.0.0",
       "latest": "84.0.0"
+    },
+    {
+      "ecosystem": "pypi",
+      "manifest": "mise.toml",
+      "package": "ruff",
+      "version": "0.17.0",
+      "latest": "0.17.0"
     }
   ],
   "vcs": []

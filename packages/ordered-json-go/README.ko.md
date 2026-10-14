@@ -1,5 +1,5 @@
 <!-- doc-id: go-overview -->
-<!-- source-sha256: 10c0bc35137fbb93ea016fe625284ee2953a3387692c299a74444a8656b84b9d -->
+<!-- source-sha256: a77f29dfc2ab9f514a2d10191752fcf97fb23606127df05e336d869df0baadd7 -->
 # ordered-json for Go
 
 [English](README.md)
@@ -27,7 +27,7 @@ _ = output
 <a id="verification"></a>
 ## 검증
 
-`.python-version`이 지정한 minor release의 Python, Git, make, 해당 구현의 런타임·빌드 도구를 설치하고 이 체크아웃에서 실행합니다.
+Git, make, `.node-version`의 Node.js, 해당 구현의 런타임·빌드 도구를 설치하고, `mise.toml`의 Python, Go와 다른 도구를 `mise.lock`의 digest로 `var/tools`에 설치하는 `make install-tools TOOLS=npm`, `make install-packages`, `make install`을 실행한 뒤 이 체크아웃에서 실행합니다.
 
 ~~~sh
 make check

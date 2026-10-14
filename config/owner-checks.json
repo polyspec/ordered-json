@@ -278,7 +278,9 @@
     {
       "paths": [
         ".node-version",
-        ".python-version",
+        "mise.toml",
+        "mise.lock",
+        ".mise/**",
         ".php-version",
         "rust-toolchain.toml",
         "config/toolchain.json",
