@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 73706af87044376e372995806dbac0ef25dd240f10f34d22b25f0ab420fdaf14 -->
+<!-- source-sha256: 52d5e9e44704f0e67c6bf9edfdcd82490b286cd7072beb164149f79eaa55ae65 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+## 0.0.9
 
 - T1.49: `packages/php-ext`의 Composer manifest는 `repositories`와 `polyspec/ordered-json`의 개발 요구를 선언하지 않습니다. 그 test는 `autoload-dev`로 `../php/src`의 PHP 라이브러리를 읽으므로, extension의 release zip은 저장소 밖에서 설치되는 manifest를 담습니다.
 - T1.48: 공유 도구는 `@polyspec/kit` 0.0.45이며, 그 knip은 pin된 런타임의 binary를 무시합니다(kit K152).
