@@ -1,16 +1,16 @@
-# PYTHON is the pinned Python of var/tools (make install-tools installs it with uv, config/toolchain.json pythonBuild). A recipe names it by its
-# absolute path: GNU make execs a recipe line without shell metacharacters directly, so a bare python3 would resolve through
-# the PATH that make read at start (the system Python). The job python of ci.yml overrides it with the interpreter of its matrix.
-PYTHON ?= $(CURDIR)/var/tools/bin/python3
+# PYTHON is the python of mise.toml, which make install-tools installs with mise at the digest of mise.lock and its shim
+# runs (kit K127). A recipe names it by its absolute path: GNU make execs a recipe line without shell metacharacters
+# directly, so a bare python3 would resolve through the PATH that make read at start (the system Python).
+PYTHON := $(CURDIR)/var/tools/mise/shims/python3
 JSON_TEST_SUITE ?=
 PIE ?= .cache/pie/pie.phar
 
 # The tools of every run are the releases that the tracked declaration files name: Node.js in .node-version, npm in the
-# packageManager of package.json, Rust in rust-toolchain.toml, Go in the pin of @polyspec/kit, which the go line of
-# packages/ordered-json-go/go.mod names, Python in .python-version and PHP in .php-version. No command installs or selects a
-# toolchain on demand: make install installs npm, Go, uv and Python into var/tools (make install-tools of @polyspec/kit), which
-# comes first on PATH, so no npm or Go of the machine is used or changed, and make toolchain-check compares every tool with
-# its declaration.
+# packageManager of package.json, Rust in rust-toolchain.toml, PHP in .php-version, and Go, Python, Composer and the other
+# tools that mise installs in mise.toml at the digests of mise.lock. No command installs or selects a toolchain on demand:
+# make install-tools TOOLS=npm installs npm and mise into var/tools/bin and make install the tools of mise.lock into
+# var/tools/mise (make install-tools of @polyspec/kit), whose shims kit.mk puts first on PATH with var/tools/bin, so no tool
+# of the machine is used or changed, and make toolchain-check compares every tool with its declaration.
 export PATH := $(CURDIR)/var/tools/bin:$(PATH)
 export GOTOOLCHAIN := local
 export RUSTUP_AUTO_INSTALL := 0
@@ -44,7 +44,7 @@ CHECK_TARGETS := kit-check layout-check hooks-check owner-validate release-cover
 check:
 	node $(KIT)/full-run.$(KIT_EXT) run $(CHECK_TARGETS)
 
-# install makes every download that the checks read after make install-packages: the tools of config/toolchain.json, the Rust toolchain of
+# install makes every download that the checks read after make install-packages: the tools of mise.lock, the Rust toolchain of
 # rust-toolchain.toml, the crates of packages/ordered-json-rust/Cargo.lock, and the PIE PHAR and the supplementary suite of external-inputs.json.
 # The Rust toolchain comes first because the build of cargo-audit in install-tools needs it.
 # It is the only target that downloads, besides dependency-review and release-consumer-lock.

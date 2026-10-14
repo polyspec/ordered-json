@@ -1,5 +1,5 @@
 <!-- doc-id: distribution -->
-<!-- source-sha256: 26bbd81ccc7b7d7adea0434a706089cf3e40bcc7f61e1c732f3bacb097e31dd1 -->
+<!-- source-sha256: 08bce2e34cfa99bf0656c0fa0d3e5ac4c4c989082c6d15f6c06f8de637672fb4 -->
 # 배포
 
 [English](distribution.md)
@@ -44,7 +44,7 @@ make release-proof TAG="$TAG"
 make release-undraft TAG="$TAG"
 ~~~
 
-workflow는 `@polyspec/kit`의 `workflows/release.yml`의 사본입니다. `make install-tools TOOLS=npm`과 `make install-packages`는 npm과 package `@polyspec/kit`을 설치하며, 이어지는 step이 그 target을 실행합니다. `make release-tools`는 `config/release.json`이 필요로 하는 도구(npm, Composer, uv와 `pythonBuild`의 Python 및 그 build backend, git-tag proof를 위한 Rust)를 설치하고, `make release-tools-path`는 이어지는 step의 `PATH`에 `var/tools/bin`을 넣습니다.
+workflow는 `@polyspec/kit`의 `workflows/release.yml`의 사본입니다. `make install-tools TOOLS=npm`과 `make install-packages`는 npm과 package `@polyspec/kit`을 설치하며, 이어지는 step이 그 target을 실행합니다. `make release-tools`는 `config/release.json`이 필요로 하는 도구(npm, `mise.lock`의 도구와 Python build backend, git-tag proof를 위한 Rust)를 설치하고, `make release-tools-path`는 이어지는 step의 `PATH`에 `var/tools/bin`과 mise의 shim을 넣고 mise의 환경을 `GITHUB_ENV`에 씁니다.
 
 1. `make release-verify`는 tag된 commit이 `origin/main`의 조상이고(`git merge-base --is-ancestor`), Go 모듈의 tag `packages/ordered-json-go/vX.Y.Z`가 같은 commit에 있고, 그 commit의 최신 check run `push-gate`와 `ci-passed`(`gh api repos/<repository>/commits/<sha>/check-runs`)가 결론 `success`로 완료되었는지 확인합니다. 없거나 실패한 check의 이름을 적으며 테스트를 다시 실행하지 않습니다.
 2. `make release-versions`는 `config/release.json`의 모든 manifest, 곧 `package.json`, `packages/ordered-json-npm/package.json`, `composer.json`, `packages/ordered-json-php/composer.json`, `packages/ordered-json-php-ext/composer.json`, `packages/ordered-json-rust/Cargo.toml`, `packages/ordered-json-python/pyproject.toml`에 X.Y.Z가 있고(Composer artifact repository는 manifest의 버전을 읽으므로 archive로 릴리스하는 `composer.json`은 `version`을 선언합니다), `packages/ordered-json-go/go.mod`의 모듈 경로가 맞고, `CHANGELOG.md`와 `CHANGELOG.ko.md`에 section `## X.Y.Z`가 있는지 확인하며, 다른 파일마다 그 버전과 tag의 버전을 적습니다. `packages/ordered-json-go/vX.Y.Z`에는 `packages/ordered-json-go/go.mod`의 모듈 경로와 section을 확인합니다.
