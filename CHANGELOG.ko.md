@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 8e89721489520b54feacd592feed0c448cac130198629d3ff1ca4735a52b463e -->
+<!-- source-sha256: 73706af87044376e372995806dbac0ef25dd240f10f34d22b25f0ab420fdaf14 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.49: `packages/php-ext`의 Composer manifest는 `repositories`와 `polyspec/ordered-json`의 개발 요구를 선언하지 않습니다. 그 test는 `autoload-dev`로 `../php/src`의 PHP 라이브러리를 읽으므로, extension의 release zip은 저장소 밖에서 설치되는 manifest를 담습니다.
 - T1.48: 공유 도구는 `@polyspec/kit` 0.0.45이며, 그 knip은 pin된 런타임의 binary를 무시합니다(kit K152).
 - T1.46: kit의 oxlint와 knip인 `make lint-ts`가 전체 suite와 CI의 docs job에서 실행됩니다. `config/knip-entries.json`은 공통 검증기가 실행하는 JavaScript probe `packages/js/test/probe.mjs`를 knip의 entry로 선언합니다(kit K145).
 - T1.47: 공유 도구는 `@polyspec/kit` 0.0.44입니다: `make install-tools`는 CI의 docs job에 없던 `rust-toolchain.toml`의 Rust toolchain을 설치하고, ruff는 cache를 `var/ruff`에 두며, `config/layout.yml`은 kit의 목록을 반복하는 대신 kit의 root 파일에 `composer.json`과 `external-inputs.json`을 더합니다(kit K145, K147, K150, K151).
