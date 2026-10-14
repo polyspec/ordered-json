@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.49: the Composer manifest of `packages/php-ext` declares no `repositories` and no development requirement of `polyspec/ordered-json`; its tests load the PHP library from `../php/src` by `autoload-dev`, so the release zip of the extension carries a manifest that installs outside the repository.
 - T1.48: the shared tools are `@polyspec/kit` 0.0.45, whose knip ignores the binaries of the pinned runtimes (kit K152).
 - T1.46: `make lint-ts`, the oxlint and knip of kit, runs in the full suite and in the docs job of CI; `config/knip-entries.json` declares the JavaScript probe `packages/js/test/probe.mjs`, which the shared verifier runs, as an entry of knip (kit K145).
 - T1.47: the shared tools are `@polyspec/kit` 0.0.44: `make install-tools` installs the Rust toolchain of `rust-toolchain.toml`, which the docs job of CI lacked, ruff keeps its cache in `var/ruff`, and `config/layout.yml` adds `composer.json` and `external-inputs.json` to the root files of kit instead of repeating its list (kit K145, K147, K150, K151).
