@@ -1,9 +1,10 @@
 <?php
-// One parse of the document of argv[1] with the pure PHP package of this checkout; prints the CPU seconds of the parse
-// (user and system time of getrusage). benchmarks/python-parse/run.py starts it with php -n.
+// One parse of the document of argv[2] with the pure PHP package of the folder argv[1]; prints the CPU seconds of the
+// parse (user and system time of getrusage). benchmarks/python-parse/run.py starts it with php -n and the folder of the
+// implementation php of config/parity.json.
 declare(strict_types=1);
 
-require dirname(__DIR__, 2) . '/packages/php/vendor/autoload.php';
+require $argv[1] . '/vendor/autoload.php';
 
 function cpuSeconds(): float
 {
@@ -11,12 +12,12 @@ function cpuSeconds(): float
     return $usage['ru_utime.tv_sec'] + $usage['ru_utime.tv_usec'] / 1e6 + $usage['ru_stime.tv_sec'] + $usage['ru_stime.tv_usec'] / 1e6;
 }
 
-$data = file_get_contents($argv[1]);
+$data = file_get_contents($argv[2]);
 $started = cpuSeconds();
 $value = Polyspec\OrderedJson\parse($data);
 $elapsed = cpuSeconds() - $started;
-if (count($value->items()) !== (int) $argv[2]) {
-    fwrite(STDERR, 'parsed ' . count($value->items()) . ' items, not ' . $argv[2] . PHP_EOL);
+if (count($value->items()) !== (int) $argv[3]) {
+    fwrite(STDERR, 'parsed ' . count($value->items()) . ' items, not ' . $argv[3] . PHP_EOL);
     exit(1);
 }
 printf("%.6f\n", $elapsed);
