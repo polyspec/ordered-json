@@ -1,0 +1,59 @@
+# The folder layout of ordered-json (S5, S7, S9), checked by make layout-check: the common rules of config/layout.kit.yml,
+# a copy of @polyspec/kit, and the map of this repository. A rule named here replaces the field of the common rule, so a
+# list repeats the common entries and adds the entries of this repository, each with its reason right above it.
+version: 1
+extends:
+  - layout.kit.yml
+
+rules:
+  - extends_template: no-repository-prefix
+    id: layout-no-repository-prefix
+    vars: { repo: ordered-json }
+
+  - extends_template: go-module-path
+    id: layout-go-module-path
+    vars: { repo: ordered-json }
+
+  - id: layout-root-tests
+    paths:
+      - "tests/*"
+      # The consumer projects in which make release-consumer installs the release archives (config/release.json).
+      - "!tests/release-consumer"
+
+  - id: layout-root-files
+    paths:
+      - "*"
+      - "!README.md"
+      - "!README.ko.md"
+      - "!AGENTS.md"
+      - "!AGENTS.ko.md"
+      - "!PRINCIPLES.md"
+      - "!PRINCIPLES.ko.md"
+      - "!CHANGELOG.md"
+      - "!CHANGELOG.ko.md"
+      - "!LICENSE"
+      - "!Makefile"
+      - "!package.json"
+      - "!package-lock.json"
+      - "!tsconfig.json"
+      - "!.gitignore"
+      - "!.gitattributes"
+      - "!.node-version"
+      - "!.python-version"
+      - "!.php-version"
+      - "!rust-toolchain.toml"
+      - "!ruff.toml"
+      - "!phpcs.xml.dist"
+      - "!phpstan.dist.neon"
+      - "!Cargo.toml"
+      - "!Cargo.lock"
+      - "!go.work"
+      - "!go.work.sum"
+      - "!.golangci.yml"
+      - "!.oxlintrc.json"
+      - "!knip.json"
+      - "!.editorconfig"
+      # The root Composer package polyspec/ordered-json, whose version config/release.json checks.
+      - "!composer.json"
+      # The pinned downloads of make install-external (the PIE PHAR and the supplementary suite), scripts/external_inputs.py.
+      - "!external-inputs.json"

@@ -1,9 +1,9 @@
 """The environment of every run: the tools are the declared releases, a check reads no network, and make install is the only
 recipe that downloads.
 
-The releases are declared in .node-version, the packageManager of package.json, rust-toolchain.toml, config/toolchain.json
-and the pin files of the languages; scripts/kit/check-toolchain.mjs (make toolchain-check) compares the running tools with
-them, and scripts/kit/check-cargo-downloads.mjs (make cargo-downloads-check) names make install for a missing crate. The
+The releases are declared in .node-version, the packageManager of package.json, rust-toolchain.toml, config/toolchain.json,
+the pin files of the languages and the Go pin of @polyspec/kit, which the go line of the go.mod names; make toolchain-check
+compares the running tools with them, and make cargo-downloads-check names make install for a missing crate. The
 targets that run a tool depend on both checks, so no target works with a tool that no declaration names."""
 import json
 from pathlib import Path
@@ -90,10 +90,14 @@ class Environment(unittest.TestCase):
         self.assertRegex((ROOT / 'rust-toolchain.toml').read_text(), r'(?m)^channel = "\d+\.\d+\.\d+"$')
         manager = json.loads((ROOT / 'package.json').read_text())['packageManager']
         self.assertRegex(manager, r'^npm@\d+\.\d+\.\d+\+sha512\.[0-9a-f]{128}$')
-        self.assertRegex((ROOT / 'packages/ordered-json-go/go.mod').read_text(), r'(?m)^toolchain go\d+\.\d+\.\d+$')
+        # Go is the pin of kit, which the go line names exactly; the go command drops a toolchain line equal to it.
+        go_mod = (ROOT / 'packages/ordered-json-go/go.mod').read_text()
+        self.assertRegex(go_mod, r'(?m)^go \d+\.\d+\.\d+$')
+        self.assertNotRegex(go_mod, r'(?m)^toolchain ')
 
     def test_no_recipe_runs_a_pinned_tool_by_name(self):
-        # The tools of scripts/kit are started with node, whose release .node-version pins and make toolchain-check compares;
+        # The tools of kit ($(KIT), the dist of @polyspec/kit) are started with node, whose release .node-version pins and
+        # make toolchain-check compares;
         # every other tool starts from a script that sets the PATH of the run (GNU Make 3.81 looks a simple recipe command up
         # on its own PATH, not the exported one).
         lines = [line.strip() for line in makefile().splitlines() if line.startswith('\t')]
@@ -102,7 +106,7 @@ class Environment(unittest.TestCase):
             command = re.sub(r'^[@\-]*(\$\(ONLINE\) )?', '', line)
             with self.subTest(recipe=line):
                 self.assertNotRegex(re.sub(r'--only \S+', '', command), r'(^|[\s;&|(])(npm|npx|go|cargo|rustc)(\s|$)')
-                self.assertNotRegex(command, r'^node (?!scripts/kit/|-p )')
+                self.assertNotRegex(command, r'^node (?!\$\(KIT\)/|-p )')
 
     def test_every_cargo_command_uses_the_lock_file(self):
         implementation = REGISTRY['implementations']['rust']

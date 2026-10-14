@@ -11,6 +11,12 @@
         }
     ],
     "require": {
+        "php": ">=8.5",
         "polyspec/ordered-json": "0.0.8"
+    },
+    "config": {
+        "platform": {
+            "php": "8.5"
+        }
     }
 }

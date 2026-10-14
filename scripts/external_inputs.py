@@ -6,8 +6,8 @@
 Each input is an exact release or revision with its hash in external-inputs.json. The PHAR is downloaded from the PIE
 release and refused unless its SHA-256 is the pinned one; the suite is fetched at its pinned revision and refused unless its
 case count and inputs hash are the pinned ones. An input that is already installed with the pinned identity is not
-downloaded again, and a refused input leaves nothing installed. These are the only downloads of this repository that scripts/kit
-does not make: a check runs offline and names make install for a missing input."""
+downloaded again, and a refused input leaves nothing installed. These are the only downloads of this repository that the
+tools of @polyspec/kit do not make: a check runs offline and names make install for a missing input."""
 import hashlib
 import json
 import os

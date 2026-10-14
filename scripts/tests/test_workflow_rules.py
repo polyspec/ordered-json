@@ -6,8 +6,10 @@ every job that runs make ci-targets uploads its report after a failure too. Ever
 suite of make check, runs in exactly one job of ci.yml and push-gate.yml, and those jobs run no other target. No job or step has
 timeout-minutes. The last job of ci.yml is ci-passed, the check of ci.yml that the release workflow requires: it runs
 after every other job (`if: ${{ always() }}`), needs every other job of the workflow, runs on their runner and runs
-`make ci-passed` with the JSON of `needs`, so it passes only when every other job passed. The workflows are read as
-text with their two-space indentation; Python 3.9 has no YAML parser.
+`make ci-passed` with the JSON of `needs`, so it passes only when every other job passed. The make targets of kit come
+from the installed package @polyspec/kit, so every job of ci.yml and push-gate.yml installs npm and the packages of
+package-lock.json (`make install-tools TOOLS=npm`, `make install-packages`) before any other make step. The workflows are
+read as text with their two-space indentation.
 """
 from pathlib import Path
 import json
@@ -30,12 +32,15 @@ TRIGGERS = {
 }
 # The workflows whose checks the release workflow requires on the tagged commit; they run on every push.
 CHECK_WORKFLOWS = ('ci.yml', 'push-gate.yml')
-# The steps of release.yml in their order (scripts/kit/release.mjs): verify the tagged commit, check the versions, build the
-# archives, create the release.
+# The steps of release.yml in their order (the copy of workflows/release.yml of @polyspec/kit): install npm, the packages and
+# the release tools, put var/tools/bin on PATH, verify the tagged commit, check the versions, build the archives, create the
+# draft release, prove it and make it public.
 # A step runs one make target: its arguments hold no shell syntax except a ${{ }} expression and, at the end, make variables
 # that take an environment variable of the job by name (TAG="$TAG").
 MAKE_STEP = r'make [^|;&`$()]*(\$\{\{[^}]*\}\}[^|;&`$()]*)*( [A-Z][A-Z_]*="\$[A-Z][A-Z_]*")*'
-RELEASE_STEPS = ['make release-tools', 'make release-verify', 'make release-versions', 'make release-assets', 'make release-publish',
+# The first two make steps of every job of the check workflows: the targets of kit exist only after the package is installed.
+BOOTSTRAP_STEPS = ['make install-tools TOOLS=npm', 'make install-packages']
+RELEASE_STEPS = ['make install-tools TOOLS=npm', 'make install-packages', 'make release-tools', 'make release-tools-path', 'make release-verify', 'make release-versions', 'make release-assets', 'make release-publish',
                  'make release-proof TAG="$TAG"', 'make release-undraft TAG="$TAG"']
 
 
@@ -106,8 +111,8 @@ def ci_passed_violations(name, parsed):
         found.append(f"{name}: the job {CI_PASSED} runs on {keys[CI_PASSED].get('runs-on', '').strip()!r}, not on the "
                      f'runner of the other jobs {runners}')
     runs = [step['run'] for step in parsed[CI_PASSED]['steps'] if 'run' in step]
-    if runs != [CI_PASSED_RUN] or parsed[CI_PASSED]['steps'][-1].get('run') != CI_PASSED_RUN:
-        found.append(f'{name}: the job {CI_PASSED} runs {runs}, not the last step {CI_PASSED_RUN!r}')
+    if runs != BOOTSTRAP_STEPS + [CI_PASSED_RUN] or parsed[CI_PASSED]['steps'][-1].get('run') != CI_PASSED_RUN:
+        found.append(f'{name}: the job {CI_PASSED} runs {runs}, not {BOOTSTRAP_STEPS} and the last step {CI_PASSED_RUN!r}')
     return found
 
 
@@ -162,6 +167,10 @@ def violations(name, text):
         found += release_violations(name, text, parsed)
     for job, body in parsed.items():
         steps = body['steps']
+        makes = [step['run'] for step in steps if step.get('run', '').startswith('make ')]
+        if name in CHECK_WORKFLOWS and makes[:len(BOOTSTRAP_STEPS)] != BOOTSTRAP_STEPS:
+            found.append(f'{name}: job {job} runs {makes[:len(BOOTSTRAP_STEPS)]} first, not {BOOTSTRAP_STEPS}; the make targets '
+                         'of kit exist only after @polyspec/kit is installed')
         if not steps:
             found.append(f'{name}: job {job} has no steps')
         for index, step in enumerate(steps, 1):
@@ -175,11 +184,11 @@ def violations(name, text):
                 found.append(f"{name}: job {job} step {index} ({label}) installs python without uv, which installs it; "
                              'name uv in TOOLS')
         for index, step in enumerate(steps, 1):
-            # setup-node caches the dependencies of the packageManager of package.json by default and fails without
-            # a lock file with packages; the lock file of this repository lists none, since no npm package is installed.
+            # setup-node caches the dependencies of the packageManager of package.json by default, with the npm of the
+            # machine; the pinned npm of var/tools installs the packages of this repository (make install-packages).
             if step.get('uses', '').startswith('actions/setup-node@') and step.get('with.package-manager-cache') != 'false':
                 found.append(f'{name}: job {job} step {index} (setup-node) lacks package-manager-cache: false; the '
-                             'repository installs no npm package to cache')
+                             'npm of var/tools installs the packages')
         if any('strategy:' in line for line in body['lines']) and not any(
                 re.fullmatch(r'\s+fail-fast: false', line) for line in body['lines']):
             found.append(f'{name}: job {job} has a matrix without fail-fast: false; one failed job would cancel the others')
@@ -220,11 +229,12 @@ class WorkflowRules(unittest.TestCase):
     def test_the_ci_jobs_are_parsed_with_their_report_steps(self):
         body = jobs((WORKFLOWS / 'ci.yml').read_text())['suite']
         runs = [step['run'] for step in body['steps'] if 'run' in step]
-        self.assertEqual(runs, ['make install', 'make ci-targets TARGETS="kit-test toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check"'])
+        self.assertEqual(runs, BOOTSTRAP_STEPS + ['make install', 'make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check"'])
         self.assertEqual(body['steps'][-1]['with.path'], REPORT)
 
     def test_each_report_is_the_directory_that_make_ci_targets_writes(self):
-        makefile = (ROOT / 'scripts/kit/kit.mk').read_text()
+        # The kit.mk of the installed package, the version that package-lock.json resolves (make install-packages).
+        makefile = (ROOT / 'node_modules/@polyspec/kit/dist/kit.mk').read_text()
         self.assertIn(f'CI_REPORT ?= {REPORT.rstrip("/")}\n', makefile)
         for name in ('ci.yml', 'push-gate.yml'):
             for job, body in jobs((WORKFLOWS / name).read_text()).items():
@@ -266,7 +276,7 @@ class WorkflowRules(unittest.TestCase):
 
     def test_a_step_that_runs_a_script_or_a_tool_directly_fails(self):
         text = (WORKFLOWS / 'push-gate.yml').read_text()
-        for command in ('node scripts/kit/push-gate.mjs commit "${{ github.sha }}"', 'cargo test', 'make check && cargo test',
+        for command in ('node node_modules/@polyspec/kit/dist/push-gate.mjs commit "${{ github.sha }}"', 'cargo test', 'make check && cargo test',
                         '|', 'make release-proof TAG="$(cat tag)"', 'make release-proof TAG="$TAG" && cargo test'):
             with self.subTest(command=command):
                 broken = re.sub(r'run: make ci-targets .*', f'run: {command}', text)
@@ -278,14 +288,24 @@ class WorkflowRules(unittest.TestCase):
         timed = text.replace('    runs-on: ubuntu-24.04\n', '    runs-on: ubuntu-24.04\n    timeout-minutes: 60\n')
         self.assertTrue(any('timeout-minutes' in issue for issue in violations('ci.yml', timed)))
 
-    def test_setup_node_without_a_lock_file_disables_its_cache(self):
-        # In CI: setup-node failed with `Dependencies lock file is not found`.
+    def test_setup_node_disables_its_cache(self):
+        # In CI: setup-node failed with `Dependencies lock file is not found` while the lock listed no package. The lock now
+        # resolves @polyspec/kit, which the npm of var/tools installs, so the cache of setup-node stays off.
         lock = json.loads((ROOT / 'package-lock.json').read_text())
-        self.assertEqual(list(lock['packages']), [''], 'the lock lists the root package only')
+        self.assertIn('node_modules/@polyspec/kit', lock['packages'])
         self.assertEqual([name for name in ('npm-shrinkwrap.json', 'yarn.lock') if (ROOT / name).exists()], [])
         text = (WORKFLOWS / 'ci.yml').read_text()
         broken = text.replace('          package-manager-cache: false\n', '', 1)
         self.assertTrue(any('(setup-node) lacks package-manager-cache: false' in issue for issue in violations('ci.yml', broken)))
+
+    def test_a_job_that_does_not_install_the_kit_package_first_fails(self):
+        for name in CHECK_WORKFLOWS:
+            text = (WORKFLOWS / name).read_text()
+            broken = text.replace('run: make install-packages\n', 'run: make toolchain-check\n', 1)
+            self.assertNotEqual(broken, text, name)
+            with self.subTest(workflow=name):
+                self.assertTrue(any('the make targets of kit exist only after @polyspec/kit is installed' in issue
+                                    for issue in violations(name, broken)), violations(name, broken))
 
     def test_a_new_push_cancels_the_previous_run_of_ci_only(self):
         text = (WORKFLOWS / 'ci.yml').read_text()
@@ -341,7 +361,7 @@ class WorkflowRules(unittest.TestCase):
             'not always': "the job ci-passed has if: '${{ success() }}'",
             'needs no job': "the job ci-passed needs [], not every other job ['docs', 'suite', 'python']",
             'another runner': "the job ci-passed runs on 'ubuntu-26.04', not on the runner of the other jobs",
-            'another step': "the job ci-passed runs ['make ci-passed'], not the last step",
+            'another step': "the job ci-passed runs ['make install-tools TOOLS=npm', 'make install-packages', 'make ci-passed'], not",
         }
         for case, broken_text in broken.items():
             with self.subTest(case=case):

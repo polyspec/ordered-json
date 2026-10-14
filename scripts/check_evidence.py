@@ -3,7 +3,7 @@
 the JSON reports; with --records, the verification records of the checkout against the current sources.
 
 The documents themselves (translation pairs, links, anchors, code blocks, checklists, status values) are checked by
-scripts/kit/check-documents.mjs (make documents-check)."""
+check-documents of @polyspec/kit (make documents-check)."""
 import argparse
 from datetime import datetime
 import json

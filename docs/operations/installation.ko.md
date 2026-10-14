@@ -1,5 +1,5 @@
 <!-- doc-id: installation -->
-<!-- source-sha256: 2314cd3539e006a9bccdb797be4fa11d21e3b51399a50e9695a71b7726a6b620 -->
+<!-- source-sha256: c31732f34f4416a3249dfae0a548348f1c2115b8c248925ece24288276ef634a -->
 # 설치와 실행
 
 [English](installation.md)
@@ -17,7 +17,7 @@
 | 네이티브 PHP | 일치하는 PHP 개발 헤더, C 컴파일러, phpize, make | `ordered_json` 확장, 0.0.3 | [확장 소스](https://github.com/polyspec/ordered-json/blob/main/packages/ordered-json-php-ext/src/ordered_json.c) |
 | 저장소 검사 | 고정된 Python, Node.js, Rust, Go, npm release, Git, make, 위 PHP | `make install`, `make check` | [검증](validation.ko.md) |
 
-저장소 검사는 추적 파일이 고정한 정확한 release로 실행합니다. Node.js는 `.node-version`, Rust는 `rust-toolchain.toml`, Go는 `packages/ordered-json-go/go.mod`의 `toolchain` 줄, Python은 `.python-version`에 minor release로, PHP는 `.php-version`에 minor release로, npm은 `package.json`의 `packageManager` 필드에 registry tarball의 SHA-512와 함께 고정합니다. `make install`은 그 Rust toolchain을 rustup으로 설치하고, 그 npm과 Go release를 Git이 무시하고 Makefile이 `PATH` 앞에 두는 checkout의 `var/tools`에 설치합니다(`scripts/kit/install-tools.mjs`, `config/toolchain.json`에 선언). 기계의 npm과 Go는 사용하지도 바꾸지도 않습니다. `make toolchain-check`는 모든 도구를 선언과 비교하고, 도구를 실행하는 모든 target이 이에 의존하며, 다른 도구마다 기대 버전과 실제 버전을 밝히며 실패합니다. `GOTOOLCHAIN=local`과 `RUSTUP_AUTO_INSTALL=0`은 실행 중에 go와 rustup이 다른 toolchain을 내려받거나 설치하지 못하게 하고, 모든 cargo 명령은 `--locked`를 사용합니다.
+저장소 검사는 추적 파일이 고정한 정확한 release로 실행합니다. Node.js는 `.node-version`, Rust는 `rust-toolchain.toml`, Go는 `packages/ordered-json-go/go.mod`의 `go` 줄이 정확히 가리키는 `@polyspec/kit`의 pin, Python은 `.python-version`에 minor release로, PHP는 `.php-version`에 minor release로, npm은 `package.json`의 `packageManager` 필드에 registry tarball의 SHA-512와 함께 고정합니다. 새 checkout은 먼저 그 npm을 `var/tools`에 설치하는 `make install-tools TOOLS=npm`과, 그 npm으로 공유 도구의 package `@polyspec/kit`을 포함한 `package-lock.json`을 설치하는 `make install-packages`를 실행합니다. 그다음 `make install`은 그 Rust toolchain을 rustup으로 설치하고, Go release, uv, `pythonBuild`의 Python과 `config/toolchain.json`의 다른 도구를 Git이 무시하고 Makefile이 `PATH` 앞에 두는 checkout의 `var/tools`에 설치합니다(`@polyspec/kit`의 `make install-tools`). 기계의 npm과 Go는 사용하지도 바꾸지도 않습니다. `make toolchain-check`는 모든 도구를 선언과 비교하고, 도구를 실행하는 모든 target이 이에 의존하며, 다른 도구마다 기대 버전과 실제 버전을 밝히며 실패합니다. `GOTOOLCHAIN=local`과 `RUSTUP_AUTO_INSTALL=0`은 실행 중에 go와 rustup이 다른 toolchain을 내려받거나 설치하지 못하게 하고, 모든 cargo 명령은 `--locked`를 사용합니다.
 
 표는 선언된 최소 버전이며 모든 최소 버전에서 테스트했다는 의미는 아닙니다. 실제 버전은 commit을 검증하는 실행의 [기록](validation.ko.md#records)에 기록합니다. JavaScript, Rust, Go, Python은 외부 런타임 라이브러리에 의존하지 않습니다.
 
@@ -72,7 +72,7 @@ composer install
 
 Composer는 두 zip을 모두 읽습니다. type이 `php-ext`인 package `polyspec/ordered-json-extension`은 설치하지 않으며, PIE가 빌드하고 설치합니다([네이티브 PHP](#native-php)).
 
-이 저장소의 package는 다른 package에 의존하지 않으므로 저장소에는 npm workspaces와 비공개 개발 manifest가 없습니다. 루트의 `package.json`과 `composer.json`은 checkout에서 설치하도록 `packages/ordered-json-npm/`, `packages/ordered-json-php/`와 같은 package를 같은 `version`으로 선언하며 `repositories`가 없습니다. `make release-consumer TAG=<tag>`(`scripts/kit/release-consumer.mjs`)는 `var/release/assets`의 archive를, 저장소 밖의 임시 디렉터리에서 `tests/release-consumer`의 커밋된 consumer project로 consumer처럼 설치합니다. consumer project는 tarball에 릴리스 이름으로 의존하는 `package.json`과 그 `package-lock.json`, zip의 artifact repository에서 library를 요구하는 `composer.json`과 그 `composer.lock`입니다. archive를 실행에서 빌드하므로 각 lock은 `integrity` 없이 빈 `shasum`으로 이름과 버전만 기록하며, 제3자 package는 버전과 hash로 기록합니다. `npm ci`는 빈 cache와 도달할 수 없는 registry를 가리키는 scope `@polyspec`로, `composer install`은 빈 `COMPOSER_HOME`과 `COMPOSER_CACHE_DIR`로 실행합니다. `make release-consumer-lock TAG=<tag>`는 archive로 manifest와 lock을 쓰며, 릴리스 버전이나 의존성이 바뀌면 실행하고 release commit이 실행합니다.
+이 저장소의 package는 다른 package에 의존하지 않으므로 저장소에는 npm workspaces와 비공개 개발 manifest가 없습니다. 루트의 `package.json`과 `composer.json`은 checkout에서 설치하도록 `packages/ordered-json-npm/`, `packages/ordered-json-php/`와 같은 package를 같은 `version`으로 선언하며 `repositories`가 없습니다. `make release-consumer TAG=<tag>`(`@polyspec/kit`의 release-consumer)는 `var/release/assets`의 archive를, 저장소 밖의 임시 디렉터리에서 `tests/release-consumer`의 커밋된 consumer project로 consumer처럼 설치합니다. consumer project는 tarball에 릴리스 이름으로 의존하는 `package.json`과 그 `package-lock.json`, zip의 artifact repository에서 library를 요구하는 `composer.json`과 그 `composer.lock`입니다. archive를 실행에서 빌드하므로 각 lock은 `integrity` 없이 빈 `shasum`으로 이름과 버전만 기록하며, 제3자 package는 버전과 hash로 기록합니다. `npm ci`는 빈 cache와 도달할 수 없는 registry를 가리키는 scope `@polyspec`로, `composer install`은 빈 `COMPOSER_HOME`과 `COMPOSER_CACHE_DIR`로 실행합니다. `make release-consumer-lock TAG=<tag>`는 archive로 manifest와 lock을 쓰며, 릴리스 버전이나 의존성이 바뀌면 실행하고 release commit이 실행합니다.
 
 <a id="native-php"></a>
 ## 네이티브 PHP

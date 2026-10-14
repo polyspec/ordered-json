@@ -1,7 +1,9 @@
 # CI: the full suite of every pull request, of every push to main and of every manual run (workflow_dispatch). The
 # release workflow requires the job ci-passed, the last job, on the tagged commit; it passes only when every other job of
 # this workflow passed, so the run of a push to main is the evidence of the commit that main receives (AGENTS). Every job
-# runs its targets with `make ci-targets TARGETS="..."` (scripts/kit/ci-targets.mjs), which runs every target to its end
+# installs npm and the packages of package-lock.json first (`make install-tools TOOLS=npm`, `make install-packages`), because
+# the targets of kit come from the installed package @polyspec/kit. Every job runs its targets with
+# `make ci-targets TARGETS="..."` (ci-targets of @polyspec/kit), which runs every target to its end
 # past failures and writes a report: the log of each target, a summary with the first failure lines of each failed
 # target, which is also the job summary, and the versions of the toolchains of the job. Every job uploads its report
 # under `!cancelled()`. Every target of CHECK_TARGETS, the full suite of `make check`, runs in exactly one job of
@@ -33,24 +35,34 @@ jobs:
     steps:
       # actions/checkout v6.1.0
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-      # actions/setup-node v6.5.0: the Node.js of .node-version runs the tools of scripts/kit. The repository installs no
-      # npm package, so the cache of the packageManager of package.json, which setup-node enables by default, is off.
+      # actions/setup-node v6.5.0: the Node.js of .node-version runs the tools of @polyspec/kit. The pinned npm of var/tools
+      # installs the packages, so the cache of the packageManager of package.json, which setup-node enables by default, is off.
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         if: ${{ !cancelled() }}
         with:
           node-version-file: .node-version
           package-manager-cache: false
-      # shivammathur/setup-php 2.37.2: PHP of .php-version and the Composer release of config/toolchain.json, which
-      # make dependency-policy-check reads the Composer manifests with.
-      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+      # shivammathur/setup-php v2, the commit that the release workflow of @polyspec/kit pins: PHP of .php-version and the
+      # Composer release of config/toolchain.json, which make dependency-policy-check reads the Composer manifests with.
+      - uses: shivammathur/setup-php@d52fc211a0436f8839a587b3b5b8efddab4744ea
         if: ${{ !cancelled() }}
         with:
           php-version-file: .php-version
           tools: composer:2.10.3
           coverage: none
+      - name: make install-tools TOOLS=npm
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS=npm
+      - name: make install-packages
+        if: ${{ !cancelled() }}
+        run: make install-packages
+      # alint of config/toolchain.json, which make layout-check runs.
+      - name: make install-tools
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS=alint
       - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci-targets TARGETS="kit-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check"
+        run: make ci-targets TARGETS="kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check"
       # actions/upload-artifact v7.0.1: the report of this job, var/report/ci-targets.
       - name: report
         if: ${{ !cancelled() }}
@@ -75,22 +87,22 @@ jobs:
         with:
           node-version-file: .node-version
           package-manager-cache: false
-      # actions/setup-go v6.5.0: the toolchain line of packages/ordered-json-go/go.mod.
-      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
-        if: ${{ !cancelled() }}
-        with:
-          go-version-file: packages/ordered-json-go/go.mod
-          cache: false
-      # shivammathur/setup-php 2.37.2: the latest patch release of the minor release of .php-version, with phpize
-      # for the extension builds of the verification and PIE.
-      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+      # shivammathur/setup-php v2, the commit that the release workflow of @polyspec/kit pins: the latest patch release of
+      # the minor release of .php-version, with phpize for the extension builds of the verification and PIE.
+      - uses: shivammathur/setup-php@d52fc211a0436f8839a587b3b5b8efddab4744ea
         if: ${{ !cancelled() }}
         with:
           php-version-file: .php-version
           tools: composer:2.10.3
           coverage: none
-      # npm and Go of the checkout, the Rust toolchain of rust-toolchain.toml, the crates of packages/ordered-json-rust/Cargo.lock, the PIE
-      # PHAR and the supplementary suite of external-inputs.json; the only step that downloads.
+      - name: make install-tools TOOLS=npm
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS=npm
+      - name: make install-packages
+        if: ${{ !cancelled() }}
+        run: make install-packages
+      # The tools of config/toolchain.json and the Go of the kit pin, the Rust toolchain of rust-toolchain.toml, the crates of
+      # packages/ordered-json-rust/Cargo.lock, the PIE PHAR and the supplementary suite of external-inputs.json.
       - name: make install
         if: ${{ !cancelled() }}
         run: make install
@@ -98,7 +110,7 @@ jobs:
         if: ${{ !cancelled() }}
         env:
           JSON_TEST_SUITE: .cache/JSONTestSuite
-        run: make ci-targets TARGETS="kit-test toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check"
+        run: make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check"
       - name: report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -120,6 +132,12 @@ jobs:
         with:
           node-version-file: .node-version
           package-manager-cache: false
+      - name: make install-tools TOOLS=npm
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS=npm
+      - name: make install-packages
+        if: ${{ !cancelled() }}
+        run: make install-packages
       - name: make install-tools
         if: ${{ !cancelled() }}
         run: make install-tools TOOLS="uv python"
@@ -148,5 +166,9 @@ jobs:
         with:
           node-version-file: .node-version
           package-manager-cache: false
+      - name: make install-tools TOOLS=npm
+        run: make install-tools TOOLS=npm
+      - name: make install-packages
+        run: make install-packages
       - name: make ci-passed
         run: make ci-passed RESULTS='${{ toJSON(needs) }}'
