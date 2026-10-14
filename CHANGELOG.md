@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.48: the shared tools are `@polyspec/kit` 0.0.45, whose knip ignores the binaries of the pinned runtimes (kit K152).
 - T1.46: `make lint-ts`, the oxlint and knip of kit, runs in the full suite and in the docs job of CI; `config/knip-entries.json` declares the JavaScript probe `packages/js/test/probe.mjs`, which the shared verifier runs, as an entry of knip (kit K145).
 - T1.47: the shared tools are `@polyspec/kit` 0.0.44: `make install-tools` installs the Rust toolchain of `rust-toolchain.toml`, which the docs job of CI lacked, ruff keeps its cache in `var/ruff`, and `config/layout.yml` adds `composer.json` and `external-inputs.json` to the root files of kit instead of repeating its list (kit K145, K147, K150, K151).
 - T1.45: the shared tools are `@polyspec/kit` 0.0.43: parity reads the trials of libtest-mimic and the data sets of a PHPUnit test method, `no-floating-promises` allows the registrations of node:test, API Extractor no longer reports `ae-missing-release-tag`, and knip takes its entries from the layout.
