@@ -307,7 +307,7 @@ func writeString(out *strings.Builder, value string) error {
 		default:
 			if r < 0x20 {
 				out.WriteString(`\u00`)
-				out.WriteString(fmt.Sprintf("%02x", r))
+				fmt.Fprintf(out, "%02x", r)
 			} else {
 				out.WriteRune(r)
 			}

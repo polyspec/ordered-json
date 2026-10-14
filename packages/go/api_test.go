@@ -255,6 +255,9 @@ func TestFactoriesValidateArguments(t *testing.T) {
 	if compact, _ := text.Compact(); compact != `"\"q\""` {
 		t.Fatalf("String Compact() = %s", compact)
 	}
+	if compact, _ := Boolean(true).Compact(); compact != "true" {
+		t.Fatalf("Boolean(true) Compact() = %s", compact)
+	}
 }
 
 func TestValuesComeOnlyFromTheLibrary(t *testing.T) {
