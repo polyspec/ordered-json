@@ -10,13 +10,8 @@ if (extension_loaded('ordered_json')) {
     exit(1);
 }
 
-// A case listing prints case ids only, so the checks run without result lines.
-$failures = orderedJsonApiChecks(!in_array('--cases', $argv, true));
+$failures = orderedJsonApiChecks();
 if ($failures) {
     fwrite(STDERR, implode(PHP_EOL, $failures) . PHP_EOL);
     exit(1);
 }
-
-// The checks ran before the listing. The keys therefore describe executable
-// cases owned by this suite, rather than data copied from the standard.
-if (in_array('--cases', $argv, true)) echo implode(PHP_EOL, array_keys(orderedJsonApiCases())), PHP_EOL;

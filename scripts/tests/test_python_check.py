@@ -20,8 +20,7 @@ class PythonCheck(unittest.TestCase):
         with redirect_stdout(io.StringIO()) as out:
             self.assertEqual(python_check.main(), 0, out.getvalue())
         self.assertIn('package tests:', out.getvalue())
-        self.assertIn('case listing:', out.getvalue())
-        self.assertIn('symbol report:', out.getvalue())
+        self.assertIn('package data:', out.getvalue())
 
     def test_a_failing_command_names_its_check(self):
         original = python_check.REGISTRY['implementations']['python']['tests']

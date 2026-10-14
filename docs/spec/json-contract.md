@@ -22,13 +22,33 @@ A JSON array stores values in input order. Arrays and objects remain distinct, i
 <a id="parsing"></a>
 ## Parsing
 
-A rejection also names its kind, taken from one shared list, so the reason is the same everywhere while each binding keeps its own wording. A rejection reports the offset of the first byte that makes the document invalid: the unescaped control character itself, the first byte that is not the hex digit or escape the grammar requires, or the first invalid UTF-8 byte. Every implementation rejects the same input at the same position, and the shared check compares those positions.
+A rejection also names its kind, taken from one [shared list](#rejection-kinds), so the reason is the same everywhere while each binding keeps its own wording. A rejection reports the offset of the first byte that makes the document invalid: the unescaped control character itself, the first byte that is not the hex digit or escape the grammar requires, or the first invalid UTF-8 byte. Every implementation rejects the same input at the same position, and the shared check compares those positions.
 
 The parser accepts JSON objects, arrays, strings, numbers, booleans, and null at the root. Byte input must be UTF-8. The parser rejects comments, trailing commas, invalid number syntax, invalid escapes, unescaped control characters, invalid UTF-8, a byte order mark, and trailing input.
 
 The maximum number of nested containers is 256. The caller can lower the limit to an integer from 0 through 256. A limit of 0 accepts scalar roots and rejects containers. The parser validates every input occurrence, including values subsequently replaced by a duplicate key.
 
 JavaScript text input also rejects literal unpaired UTF-16 surrogates. Escaped unpaired surrogates are accepted as described below. [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259) defines the JSON grammar and permits implementation limits.
+
+<a id="rejection-kinds"></a>
+### Rejection kinds
+
+The shared list of the rejection kinds. Every implementation names one of them for each rejection of the shared grammar, and the shared verifier (`scripts/verify.py`) reads the list from this section and fails on a kind outside it.
+
+- `expected_value`
+- `expected_digit`
+- `expected_colon`
+- `expected_delimiter`
+- `expected_object_key`
+- `invalid_escape`
+- `invalid_unicode_escape`
+- `unfinished_escape`
+- `unterminated_string`
+- `unescaped_control_character`
+- `unescaped_lone_surrogate`
+- `invalid_utf8`
+- `maximum_depth_exceeded`
+- `trailing_input`
 
 <a id="numbers"></a>
 ## Numbers

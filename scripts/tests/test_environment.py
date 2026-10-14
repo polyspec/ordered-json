@@ -111,7 +111,7 @@ class Environment(unittest.TestCase):
     def test_every_cargo_command_uses_the_lock_file(self):
         implementation = REGISTRY['implementations']['rust']
         commands = [step['command'] for step in implementation['prepare']]
-        commands += [implementation[key]['command'] for key in ('tests', 'test_cases', 'api_symbols')]
+        commands.append(implementation['tests']['command'])
         for command in commands:
             if command[0] == '{cargo}' and command[1] != 'fmt':
                 with self.subTest(command=command):

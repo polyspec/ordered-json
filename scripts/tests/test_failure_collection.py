@@ -28,14 +28,15 @@ class FailureCollection(unittest.TestCase):
             implementations = {}
             for name, code in (('first', 'raise SystemExit(3)'), ('second', 'print("built")'), ('third', 'raise SystemExit(4)')):
                 (root / name).mkdir()
-                implementations[name] = {'repository': name, 'prepare': [
+                implementations[name] = {'prepare': [
                     {'cwd': '{' + name + '}', 'command': [sys.executable, '-c', code]},
                     {'cwd': '{' + name + '}', 'command': [sys.executable, '-c', 'open("after", "w").write("ran")']}],
                     'command': [sys.executable], 'runtime': {'version': [sys.executable, '--version']}}
-            (root / 'implementations.json').write_text(json.dumps({
-                'schema_version': 1, 'url': 'https://github.com/polyspec/ordered-json.git',
-                'repositories': {name: {'path': name} for name in implementations}, 'implementations': implementations}))
-            loaded = load_registry(root)
+            (root / 'config').mkdir()
+            (root / 'config/parity.json').write_text(json.dumps({
+                'schema': 1, 'implementations': [{'name': name, 'runner': 'python', 'roots': [name]} for name in implementations],
+                'profiles': [{'name': 'all', 'implementations': list(implementations)}], 'units': []}))
+            loaded = load_registry(root, implementations)
             with self.assertRaises(RuntimeError) as raised, redirect_stdout(io.StringIO()):
                 prepare(list(implementations), repository_paths(root, registry=loaded), root / 'cache', loaded)
             message = str(raised.exception)

@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: c111fa023a4199bc2bd4d6152829800e7edf1180892b1632dcb62322dbbd1353 -->
+<!-- source-sha256: 7a1a8e8bbc96fd8aef70414d3fe030b354ebc26a46b6e937533903adc3f024cb -->
 # 검증
 
 [English](validation.md)
@@ -59,7 +59,7 @@ cd ordered-json
 make check
 ~~~
 
-각 패키지는 독립 빌드 대상으로 유지하지만 공유 검사 명령은 루트 registry와 검증기가 정의합니다. 네이티브 확장은 `packages/ordered-json-php-ext/`에서 Git이 추적하는 소스 파일을 실행의 임시 디렉터리에 복사해 빌드하며 같은 체크아웃의 형제 PHP 패키지와 함께 검사합니다. 각 실행은 실행 디렉터리를 출력하고 끝날 때 제거하므로, 한 체크아웃의 실행들은 빌드 출력을 공유하지 않습니다. 실행의 모든 cargo 명령과 benchmark의 `cargo run`은 `CARGO_TARGET_DIR`를 그 실행 안의 디렉터리로 설정하므로, 환경이 지정하거나 다른 체크아웃이 채운 target 디렉터리가 Rust probe, package test, benchmark binary를 제공하지 않습니다.
+각 패키지는 독립 빌드 대상으로 유지하지만 공유 검사 명령은 `config/parity.json`의 구현에 대해 검증기(`scripts/registry.py`)가 정의합니다. 네이티브 확장은 `packages/ordered-json-php-ext/`에서 Git이 추적하는 소스 파일을 실행의 임시 디렉터리에 복사해 빌드하며 같은 체크아웃의 형제 PHP 패키지와 함께 검사합니다. 각 실행은 실행 디렉터리를 출력하고 끝날 때 제거하므로, 한 체크아웃의 실행들은 빌드 출력을 공유하지 않습니다. 실행의 모든 cargo 명령과 benchmark의 `cargo run`은 `CARGO_TARGET_DIR`를 그 실행 안의 디렉터리로 설정하므로, 환경이 지정하거나 다른 체크아웃이 채운 target 디렉터리가 Rust probe, package test, benchmark binary를 제공하지 않습니다.
 
 추가 입력은 `make check JSON_TEST_SUITE=/path/to/JSONTestSuite`로 검사합니다.
 
@@ -85,12 +85,12 @@ PIE 기록 `var/records/pie-verification.json`은 PIE 버전과 PHAR 해시, 실
 make install-tools TOOLS=npm
 make install-packages
 make install
-make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check" JSON_TEST_SUITE=.cache/JSONTestSuite
+make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all parity-check clippy go-vet pie-check" JSON_TEST_SUITE=.cache/JSONTestSuite
 make install-tools TOOLS=alint
-make ci-targets TARGETS="kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check"
+make ci-targets TARGETS="kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check"
 ~~~
 
-kit의 target은 설치된 package `@polyspec/kit`에서 오므로 모든 job은 먼저 `make install-tools TOOLS=npm`과 `make install-packages`를 실행합니다. job `suite`는 고정 파일에서 Python, Node.js, PHP를 설치하고, `config/toolchain.json`의 도구와 kit pin의 Go를 설치하는 `make install`을 실행한 뒤 target `toolchain-check`, `cargo-downloads-check`, `verify-all`, `clippy`, `go-vet`, `pie-check`를 실행합니다. `make pie-check`는 PIE 기록을, `make verify-all`은 통합 기록을 쓰고 그 근거 검사가 두 기록을 검사합니다. job `docs`는 Node.js, PHP와 `config/toolchain.json`의 Composer release, alint를 설치하고 `kit-check`, `layout-check`, `hooks-check`, `owner-validate`, `release-coverage`, `release-config-check`, `dependency-policy-check`, `dependency-policy-mutation-check`를 실행합니다. `push-gate.yml`의 job `push-gate`는 `push-gate-commit`, `documents-check`, `evidence-check`, `commits-check`를 실행합니다. job `python`은 자기 matrix의 interpreter, 바닥 minor 3.11과 `.python-version`의 minor release를 설치하고, 그 interpreter로 Python 구현의 패키지 test, 사례 목록, symbol 보고를 실행하는 `python-package-check`를 실행합니다(`scripts/python_check.py`). suite job이 저장소 도구 핀보다 낮은 minor에 대해 할 수 없는 일입니다. Makefile의 `CHECK_TARGETS`, 곧 `make check`의 전체 suite의 모든 target은 `ci.yml`과 `push-gate.yml`의 job 하나에서만 실행됩니다. 모든 step은 make target을 실행하고 실패한 step 뒤에도 실행됩니다(`if: !cancelled()`). `make ci-targets`(`@polyspec/kit`의 ci-targets)는 job의 모든 target을 끝까지 실행하고, 출력을 도착하는 대로 출력하며 `var/report/ci-targets/targets/<target>.log`에 쓰고, 각 target의 상태, 종료 상태, 시간을 `var/report/ci-targets/record.json`에 기록하며, 실패한 target마다 첫 실패 줄을 담은 `summary.md`를 쓰고 GitHub의 job summary에 덧붙입니다. step `report`는 실패 뒤에도 `var/report/ci-targets/`를 job의 artifact로 upload합니다. 어떤 step에도 시간 한도가 없습니다. job은 push gate처럼 `ubuntu-24.04`에서 실행하며, 기록은 실행한 Python과 PHP의 patch release를 적습니다.
+kit의 target은 설치된 package `@polyspec/kit`에서 오므로 모든 job은 먼저 `make install-tools TOOLS=npm`과 `make install-packages`를 실행합니다. job `suite`는 고정 파일에서 Python, Node.js, PHP를 설치하고, `config/toolchain.json`의 도구와 kit pin의 Go를 설치하는 `make install`을 실행한 뒤 target `toolchain-check`, `cargo-downloads-check`, `verify-all`, `parity-check`, `clippy`, `go-vet`, `pie-check`를 실행합니다. `make pie-check`는 PIE 기록을, `make verify-all`은 통합 기록을 쓰고 그 근거 검사가 두 기록을 검사합니다. job `docs`는 Node.js, PHP와 `config/toolchain.json`의 Composer release, alint를 설치하고 `kit-check`, `layout-check`, `hooks-check`, `owner-validate`, `release-coverage`, `release-config-check`, `dependency-policy-check`, `dependency-policy-mutation-check`, `parity-declarations-check`를 실행합니다. `push-gate.yml`의 job `push-gate`는 `push-gate-commit`, `documents-check`, `evidence-check`, `commits-check`를 실행합니다. job `python`은 자기 matrix의 interpreter, 바닥 minor 3.11과 `.python-version`의 minor release를 설치하고, 그 interpreter로 Python 구현의 패키지 test와 package data 검사를 실행하는 `python-package-check`를 실행합니다(`scripts/python_check.py`). suite job이 저장소 도구 핀보다 낮은 minor에 대해 할 수 없는 일입니다. Makefile의 `CHECK_TARGETS`, 곧 `make check`의 전체 suite의 모든 target은 `ci.yml`과 `push-gate.yml`의 job 하나에서만 실행됩니다. 모든 step은 make target을 실행하고 실패한 step 뒤에도 실행됩니다(`if: !cancelled()`). `make ci-targets`(`@polyspec/kit`의 ci-targets)는 job의 모든 target을 끝까지 실행하고, 출력을 도착하는 대로 출력하며 `var/report/ci-targets/targets/<target>.log`에 쓰고, 각 target의 상태, 종료 상태, 시간을 `var/report/ci-targets/record.json`에 기록하며, 실패한 target마다 첫 실패 줄을 담은 `summary.md`를 쓰고 GitHub의 job summary에 덧붙입니다. step `report`는 실패 뒤에도 `var/report/ci-targets/`를 job의 artifact로 upload합니다. 어떤 step에도 시간 한도가 없습니다. job은 push gate처럼 `ubuntu-24.04`에서 실행하며, 기록은 실행한 Python과 PHP의 patch release를 적습니다.
 
 `ci.yml`의 마지막 job `ci-passed`는 release workflow가 tag된 commit에 요구하는 이 workflow의 check입니다. workflow의 다른 모든 job을 need로 가지고, 그중 하나가 실패하거나 skip되거나 취소되어도 그 모든 job 뒤에 실행되며(`if: ${{ always() }}`), `make ci-passed RESULTS='${{ toJSON(needs) }}'`를 실행합니다. `@polyspec/kit`의 ci-passed는 need로 가진 모든 job의 결과를 출력하고, 하나라도 `success`가 아니면 실패합니다. `ci.yml`에 추가한 job은 `needs`에 넣으므로 필수 check가 그 job을 포함합니다. `scripts/tests/test_workflow_rules.py`는 `ci-passed`가 없거나, 마지막 job이 아니거나, `if: ${{ always() }}`가 없거나, 다른 모든 job을 need로 가지지 않거나, 다른 runner에서 실행되거나, 다른 step을 실행하면 실패합니다.
 

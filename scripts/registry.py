@@ -1,4 +1,4 @@
-"""Load implementation commands and resolve monorepo package paths."""
+"""The implementations of config/parity.json with the commands of the shared verifier, and the monorepo package paths."""
 from contextlib import contextmanager
 from dataclasses import dataclass
 import json
@@ -13,47 +13,286 @@ import tempfile
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
-# The machine formats of a case listing (scripts/verify.py listed_cases): one case id per line, the
-# terse list of the Rust test harness, and the JSON events of go test -json.
-LISTING_FORMATS = ('lines', 'cargo-terse', 'go-test-json')
+# config/parity.json, read by the parity check of @polyspec/kit, is the one source of the implementations of the
+# repository and of the directory of each (its one root). The shared verifier is a comparator of that declaration: it
+# builds each implementation, runs its adapter on the shared cases, its package tests and its runtime versions with the
+# commands below, keyed by the name of the implementation. A command names the directory of an implementation as
+# {<name>}, the run cache as {cache} and cargo and rustc as {cargo} and {rustc}.
+PARITY = 'config/parity.json'
+COMMANDS = {
+    "js": {
+        "command": [
+            "node",
+            "{js}/test/probe.mjs"
+        ],
+        "tests": {
+            "cwd": "{js}",
+            "command": [
+                "node",
+                "test/api.mjs"
+            ]
+        },
+        "runtime": {
+            "node": [
+                "node",
+                "--version"
+            ]
+        }
+    },
+    "rust": {
+        "env": {
+            "CARGO_TARGET_DIR": "{cache}/rust-target",
+            "RUSTUP_AUTO_INSTALL": "0"
+        },
+        "prepare": [
+            {
+                "cwd": "{rust}",
+                "command": [
+                    "{cargo}",
+                    "fmt",
+                    "--check"
+                ]
+            },
+            {
+                "cwd": "{rust}",
+                "command": [
+                    "{cargo}",
+                    "build",
+                    "--locked",
+                    "--quiet",
+                    "--example",
+                    "probe"
+                ]
+            }
+        ],
+        "command": [
+            "{cache}/rust-target/debug/examples/probe"
+        ],
+        "tests": {
+            "cwd": "{rust}",
+            "command": [
+                "{cargo}",
+                "test",
+                "--locked",
+                "--",
+                "--test-threads=1"
+            ]
+        },
+        "runtime": {
+            "rustc": [
+                "{rustc}",
+                "--version"
+            ]
+        }
+    },
+    "go": {
+        "env": {
+            "GOTOOLCHAIN": "local"
+        },
+        "prepare": [
+            {
+                "cwd": "{go}",
+                "command": [
+                    "go",
+                    "build",
+                    "-o",
+                    "{cache}/go-probe",
+                    "./internal/probe"
+                ]
+            }
+        ],
+        "command": [
+            "{cache}/go-probe"
+        ],
+        "tests": {
+            "cwd": "{go}",
+            "command": [
+                "go",
+                "test",
+                "-v",
+                "-p",
+                "1",
+                "./..."
+            ]
+        },
+        "runtime": {
+            "go": [
+                "go",
+                "version"
+            ]
+        }
+    },
+    "php": {
+        "command": [
+            "php",
+            "-n",
+            "{php}/tests/probe.php"
+        ],
+        "tests": {
+            "cwd": "{php}",
+            "command": [
+                "php",
+                "-n",
+                "tests/api.php"
+            ]
+        },
+        "runtime": {
+            "php": [
+                "php",
+                "-n",
+                "-r",
+                "echo PHP_VERSION;"
+            ]
+        }
+    },
+    "php-extension": {
+        "dependencies": [
+            "php"
+        ],
+        "build_in_copy": True,
+        "prepare": [
+            {
+                "cwd": "{php-extension}/src",
+                "if_exists": "{php-extension}/src/Makefile",
+                "command": [
+                    "make",
+                    "distclean"
+                ]
+            },
+            {
+                "cwd": "{php-extension}/src",
+                "command": [
+                    "phpize",
+                    "--clean"
+                ]
+            },
+            {
+                "cwd": "{php-extension}/src",
+                "command": [
+                    "phpize"
+                ]
+            },
+            {
+                "cwd": "{php-extension}/src",
+                "command": [
+                    "./configure",
+                    "--enable-ordered-json"
+                ]
+            },
+            {
+                "cwd": "{php-extension}/src",
+                "command": [
+                    "make",
+                    "-j2"
+                ]
+            }
+        ],
+        "command": [
+            "php",
+            "-n",
+            "-d",
+            "extension={php-extension}/src/modules/ordered_json.so",
+            "{php}/tests/probe.php",
+            "--native"
+        ],
+        "tests": {
+            "cwd": "{php-extension}",
+            "command": [
+                "php",
+                "-n",
+                "-d",
+                "extension={php-extension}/src/modules/ordered_json.so",
+                "tests/descriptors.php",
+                "{php}/src/OrderedJson.php"
+            ]
+        },
+        "runtime": {
+            "php": [
+                "php",
+                "-n",
+                "-r",
+                "echo PHP_VERSION;"
+            ],
+            "extension_version": [
+                "php",
+                "-n",
+                "-d",
+                "extension={php-extension}/src/modules/ordered_json.so",
+                "-r",
+                "$native = phpversion('ordered_json'); if ($native !== ORDERED_JSON_VERSION) { fwrite(STDERR, \"phpversion('ordered_json') \" . var_export($native, True) . \" differs from ORDERED_JSON_VERSION \" . ORDERED_JSON_VERSION . \"\\n\"); exit(1); } echo ORDERED_JSON_VERSION;"
+            ]
+        },
+        "artifacts": [
+            "{php-extension}/src/modules/ordered_json.so"
+        ]
+    },
+    "python": {
+        "command": [
+            "python3",
+            "{python}/tests/probe.py"
+        ],
+        "tests": {
+            "cwd": "{python}",
+            "command": [
+                "python3",
+                "tests/api.py"
+            ]
+        },
+        "package_data": {
+            "cwd": "{python}",
+            "command": [
+                "python3",
+                "tests/package_data.py"
+            ]
+        },
+        "runtime": {
+            "python": [
+                "python3",
+                "-c",
+                "import platform; print(platform.python_version())"
+            ]
+        }
+    }
+}
 
 
-def load_registry(root=ROOT):
-    registry = json.loads((root / 'implementations.json').read_text())
-    if registry.get('schema_version') != 1:
-        raise ValueError('Unsupported implementation registry schema')
-    repositories, implementations = registry['repositories'], registry['implementations']
-    if not repositories or not implementations:
-        raise ValueError('The registry requires repositories and implementations')
-    if not re.fullmatch(r'https://\S+\.git', registry.get('url', '')):
-        raise ValueError('The registry declares one repository URL for every package')
+def load_registry(root=ROOT, commands=COMMANDS):
+    """The implementations of config/parity.json of root, each with its directory and its verifier commands. Every
+    implementation has commands and every command set belongs to an implementation, so neither names a language that
+    the other lacks."""
+    declaration = json.loads((root / PARITY).read_text())
+    repositories = {}
+    for entry in declaration.get('implementations', []):
+        name, roots = entry['name'], entry['roots']
+        if len(roots) != 1:
+            raise ValueError(f'{PARITY}: the verifier needs one root of {name}, not {roots}')
+        repositories[name] = {'path': roots[0]}
+    if not repositories:
+        raise ValueError(f'{PARITY} declares no implementation')
+    if set(repositories) != set(commands):
+        raise ValueError(f'{PARITY} declares {sorted(repositories)}, but the verifier has commands for {sorted(commands)}')
+    registry = {'repositories': repositories,
+                'implementations': {name: {**commands[name], 'repository': name} for name in repositories}}
     for name, repository in repositories.items():
         if not re.fullmatch(r'[a-z][a-z0-9-]*', name):
-            raise ValueError('Invalid repository name: ' + name)
+            raise ValueError('Invalid implementation name: ' + name)
         path = Path(repository['path'])
         if path.is_absolute() or '..' in path.parts or str(path) == '.':
-            raise ValueError('Repository paths must be relative child directories')
-    for name, implementation in implementations.items():
-        if not re.fullmatch(r'[a-z][a-z0-9-]*', name):
-            raise ValueError('Invalid implementation name: ' + name)
-        required = [implementation['repository']] + implementation.get('dependencies', [])
-        if any(repository not in repositories for repository in required):
-            raise ValueError('Implementation references an unknown repository: ' + name)
-        commands = [implementation['command']] + list(implementation['runtime'].values())
-        commands += [step['command'] for step in implementation.get('prepare', [])]
-        for key in ('tests', 'test_cases', 'api_symbols'):
-            declaration = implementation.get(key)
-            if declaration is not None:
-                # A case listing also names the machine format of its output.
-                allowed = {'cwd', 'command', 'format'} if key == 'test_cases' else {'cwd', 'command'}
-                if (not isinstance(declaration, dict) or not {'cwd', 'command'} <= set(declaration) <= allowed
-                        or not declaration['cwd']):
+            raise ValueError('Implementation roots must be relative child directories')
+    for name, implementation in registry['implementations'].items():
+        if any(repository not in repositories for repository in implementation.get('dependencies', [])):
+            raise ValueError('Implementation references an unknown implementation: ' + name)
+        commands_of = [implementation['command']] + list(implementation['runtime'].values())
+        commands_of += [step['command'] for step in implementation.get('prepare', [])]
+        for key in ('tests', 'package_data'):
+            declaration_of = implementation.get(key)
+            if declaration_of is not None:
+                if (not isinstance(declaration_of, dict) or set(declaration_of) != {'cwd', 'command'}
+                        or not declaration_of['cwd']):
                     raise ValueError(f'{key} declares cwd and command: ' + name)
-                if key == 'test_cases' and declaration.get('format', 'lines') not in LISTING_FORMATS:
-                    raise ValueError(f'test_cases format is one of {", ".join(LISTING_FORMATS)}: ' + name)
-                commands.append(declaration['command'])
+                commands_of.append(declaration_of['command'])
         if any(not command or not isinstance(command, list) or
-               any(not isinstance(argument, str) for argument in command) for command in commands):
+               any(not isinstance(argument, str) for argument in command) for command in commands_of):
             raise ValueError('Commands must be nonempty argument lists: ' + name)
         if not isinstance(implementation.get('build_in_copy', False), bool):
             raise ValueError('build_in_copy is true or false: ' + name)
@@ -341,8 +580,6 @@ def declared_commands(key, selected, paths, cache, registry=REGISTRY):
             result[name] = {'cwd': expand(declaration['cwd'], variables),
                             'command': [expand(argument, variables) for argument in declaration['command']],
                             'declared': list(declaration['command'])}
-            if 'format' in declaration:
-                result[name]['format'] = declaration['format']
             environment = command_environment(name, variables, registry)
             if environment is not None:
                 result[name]['env'] = environment
@@ -352,16 +589,6 @@ def declared_commands(key, selected, paths, cache, registry=REGISTRY):
 def test_commands(selected, paths, cache, registry=REGISTRY):
     """Resolve each declared package test command."""
     return declared_commands('tests', selected, paths, cache, registry)
-
-
-def case_commands(selected, paths, cache, registry=REGISTRY):
-    """Resolve each declared command that lists the package test cases."""
-    return declared_commands('test_cases', selected, paths, cache, registry)
-
-
-def api_commands(selected, paths, cache, registry=REGISTRY):
-    """Resolve each declared command that lists the public API symbols."""
-    return declared_commands('api_symbols', selected, paths, cache, registry)
 
 
 def runtime_versions(selected, paths, cache, registry=REGISTRY):

@@ -170,11 +170,6 @@ check('strict_parse_accepts_unique_keys', () => {
   }
 });
 
-if (process.argv.includes('--cases')) {
-  console.log([...cases.keys()].join('\n'));
-  process.exit(0);
-}
-
 // Each case prints its id before it runs and its result after, with a
 // synchronous write, so the verifier can name a case that never ends.
 const failures = [];

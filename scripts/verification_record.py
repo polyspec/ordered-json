@@ -25,7 +25,7 @@ SOURCE_PATTERNS = (
     'packages/ordered-json-php/composer.json', 'packages/ordered-json-php-ext/src/*.c', 'packages/ordered-json-php-ext/src/*.h', 'packages/ordered-json-php-ext/src/*.stub.php',
     'packages/ordered-json-php-ext/src/config.m4', 'packages/ordered-json-php-ext/src/config.w32', 'scripts/**/*.py', 'scripts/**/*.erl',
     'examples/official.json', 'examples/README*.md', 'fixtures/**/*.json', 'docs/spec/*.md',
-    'implementations.json', 'package-tests.json',
+    'config/parity.json',
 )
 
 

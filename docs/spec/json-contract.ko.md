@@ -1,5 +1,5 @@
 <!-- doc-id: json-contract -->
-<!-- source-sha256: 61d5d65fdd9ebfc1a9a6a91568e60ef9e0f59f2bdf61892335763d6f8932738a -->
+<!-- source-sha256: 85d3315d59495c0081ae5460789356ec9f053d185385bea6fd47a8469c274176 -->
 # JSON 계약
 
 [English](json-contract.md)
@@ -23,13 +23,33 @@ JSON 배열은 입력 순서대로 값을 저장합니다. 빈 배열과 빈 객
 <a id="parsing"></a>
 ## 파싱
 
-거부는 공통 목록에서 고른 종류를 함께 알립니다. 문구는 바인딩마다 그 언어의 관습을 따르되 이유는 모든 구현에서 같습니다. 거부는 문서를 무효로 만든 첫 바이트의 위치를 보고합니다. 이스케이프하지 않은 제어 문자 자신, 문법이 요구하는 16진수나 이스케이프가 아닌 첫 바이트, 또는 잘못된 UTF-8의 첫 바이트입니다. 모든 구현은 같은 입력을 같은 위치에서 거부하며, 공통 검사가 그 위치를 비교합니다.
+거부는 [공통 목록](#rejection-kinds)에서 고른 종류를 함께 알립니다. 문구는 바인딩마다 그 언어의 관습을 따르되 이유는 모든 구현에서 같습니다. 거부는 문서를 무효로 만든 첫 바이트의 위치를 보고합니다. 이스케이프하지 않은 제어 문자 자신, 문법이 요구하는 16진수나 이스케이프가 아닌 첫 바이트, 또는 잘못된 UTF-8의 첫 바이트입니다. 모든 구현은 같은 입력을 같은 위치에서 거부하며, 공통 검사가 그 위치를 비교합니다.
 
 파서는 루트의 JSON 객체, 배열, 문자열, 숫자, 불리언, null을 허용합니다. 바이트 입력은 UTF-8이어야 합니다. 주석, 후행 쉼표, 잘못된 숫자 문법, 잘못된 이스케이프, 이스케이프하지 않은 제어 문자, 잘못된 UTF-8, 바이트 순서 표시, 후행 입력을 거부합니다.
 
 컨테이너 중첩 한도는 256입니다. 호출자는 한도를 0부터 256까지의 정수로 낮출 수 있습니다. 한도 0은 스칼라 루트를 허용하고 컨테이너를 거부합니다. 파서는 나중에 중복 키로 교체되는 값도 포함하여 모든 입력을 검사합니다.
 
 JavaScript 텍스트 입력은 이스케이프하지 않은 단독 UTF-16 surrogate도 거부합니다. 이스케이프된 단독 surrogate는 아래 규칙으로 허용합니다. [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259)는 JSON 문법을 정의하며 구현별 한도를 허용합니다.
+
+<a id="rejection-kinds"></a>
+### 거부 종류
+
+거부 종류의 공통 목록입니다. 모든 구현은 공통 문법의 거부마다 이 중 하나를 알리고, 공통 검증기(`scripts/verify.py`)는 이 절에서 목록을 읽어 목록 밖의 종류에서 실패합니다.
+
+- `expected_value`
+- `expected_digit`
+- `expected_colon`
+- `expected_delimiter`
+- `expected_object_key`
+- `invalid_escape`
+- `invalid_unicode_escape`
+- `unfinished_escape`
+- `unterminated_string`
+- `unescaped_control_character`
+- `unescaped_lone_surrogate`
+- `invalid_utf8`
+- `maximum_depth_exceeded`
+- `trailing_input`
 
 <a id="numbers"></a>
 ## 숫자

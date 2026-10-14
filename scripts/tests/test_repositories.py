@@ -10,10 +10,18 @@ import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from registry import (REGISTRY, adapter_commands, load_registry, parse_overrides, prepare,
+from registry import (COMMANDS, REGISTRY, ROOT, adapter_commands, load_registry, parse_overrides, prepare,
                       repository_paths, runtime_versions, test_commands)
-from verify import run_package_tests
+from verify import rejection_kinds, run_package_tests
 from verification_record import package_revisions
+
+
+def declare(root, roots):
+    """Write the config/parity.json of a fixture checkout: one implementation for each name with its one root."""
+    (root / 'config').mkdir(parents=True, exist_ok=True)
+    (root / 'config/parity.json').write_text(json.dumps({
+        'schema': 1, 'implementations': [{'name': name, 'runner': 'python', 'roots': [path]} for name, path in roots.items()],
+        'profiles': [{'name': 'all', 'implementations': list(roots)}], 'units': []}))
 
 
 class RepositoryChecks(unittest.TestCase):
@@ -69,7 +77,7 @@ class RepositoryChecks(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             candidate = Path(folder) / 'override with spaces'
             candidate.mkdir()
-            paths = repository_paths(overrides={'javascript': candidate})
+            paths = repository_paths(overrides={'js': candidate})
             command = adapter_commands(['js'], paths, Path(folder) / 'cache')['js']
             self.assertEqual(command, ['node', str(candidate.resolve() / 'test/probe.mjs')])
 
@@ -78,14 +86,12 @@ class RepositoryChecks(unittest.TestCase):
             root = Path(folder)
             candidate = root / 'future-language'
             candidate.mkdir()
-            registry = {'schema_version': 1, 'url': 'https://github.com/polyspec/ordered-json.git',
-                'repositories': {'future': {'path': 'future-language'}},
-                'implementations': {'future': {'repository': 'future',
-                    'prepare': [{'cwd': '{future}', 'command': [sys.executable, '-c', 'from pathlib import Path; Path("built").write_text("ok")']}],
-                    'command': [sys.executable, '-c', 'print("adapter")'],
-                    'runtime': {'version': [sys.executable, '-c', 'print("runtime")']}}}}
-            (root / 'implementations.json').write_text(json.dumps(registry))
-            loaded = load_registry(root)
+            declare(root, {'future': 'future-language'})
+            commands = {'future': {
+                'prepare': [{'cwd': '{future}', 'command': [sys.executable, '-c', 'from pathlib import Path; Path("built").write_text("ok")']}],
+                'command': [sys.executable, '-c', 'print("adapter")'],
+                'runtime': {'version': [sys.executable, '-c', 'print("runtime")']}}}
+            loaded = load_registry(root, commands)
             paths = repository_paths(root, registry=loaded)
             prepare(['future'], paths, root / 'cache', loaded)
             self.assertEqual((candidate / 'built').read_text(), 'ok')
@@ -106,13 +112,10 @@ class RepositoryChecks(unittest.TestCase):
             self.assertTrue(extension['command'][-1].endswith('/ordered-json-php/src/OrderedJson.php'))
 
     def test_registry_rejects_an_incomplete_test_declaration(self):
-        with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
-            registry = copy.deepcopy(REGISTRY)
-            registry['implementations']['go']['tests'] = {'command': ['go', 'test', './...']}
-            (root / 'implementations.json').write_text(json.dumps(registry))
-            with self.assertRaisesRegex(ValueError, 'cwd and command'):
-                load_registry(root)
+        commands = copy.deepcopy(COMMANDS)
+        commands['go']['tests'] = {'command': ['go', 'test', './...']}
+        with self.assertRaisesRegex(ValueError, 'cwd and command'):
+            load_registry(ROOT, commands)
 
     def test_failing_package_tests_of_every_language_are_reported_after_all_ran(self):
         # One failing package must not hide the result of the packages after it.
@@ -135,25 +138,45 @@ class RepositoryChecks(unittest.TestCase):
 
     def test_duplicate_repository_override_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'one --repository'):
-            parse_overrides(['javascript=/one', 'javascript=/two'])
+            parse_overrides(['js=/one', 'js=/two'])
 
-    def test_registry_declares_one_repository_url(self):
+    def test_the_implementations_are_those_of_the_parity_declaration(self):
+        # config/parity.json is the one source of the language set: the verifier reads its names and roots, and an
+        # implementation without verifier commands, or commands of no declared implementation, fail by name.
+        declared = json.loads((ROOT / 'config/parity.json').read_text())['implementations']
+        self.assertEqual(sorted(REGISTRY['implementations']), sorted(entry['name'] for entry in declared))
+        self.assertEqual({name: entry['path'] for name, entry in REGISTRY['repositories'].items()},
+                         {entry['name']: entry['roots'][0] for entry in declared})
+        self.assertFalse((ROOT / 'implementations.json').exists())
+        self.assertFalse((ROOT / 'package-tests.json').exists())
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
-            registry = copy.deepcopy(REGISTRY)
-            del registry['url']
-            (root / 'implementations.json').write_text(json.dumps(registry))
-            with self.assertRaisesRegex(ValueError, 'one repository URL'):
-                load_registry(root)
+            declare(root, {'js': 'packages/ordered-json-npm', 'future': 'packages/future'})
+            with self.assertRaisesRegex(ValueError, r"declares \['future', 'js'\], but the verifier has commands for"):
+                load_registry(root, {'js': COMMANDS['js']})
 
     def test_invalid_repository_path_is_rejected(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
-            registry = copy.deepcopy(REGISTRY)
-            registry['repositories']['javascript']['path'] = '../outside'
-            (root / 'implementations.json').write_text(json.dumps(registry))
+            declare(root, {'js': '../outside'})
             with self.assertRaisesRegex(ValueError, 'relative child directories'):
-                load_registry(root)
+                load_registry(root, {'js': COMMANDS['js']})
+
+    def test_the_rejection_kinds_are_the_list_of_the_json_contract(self):
+        # The shared list of rejection kinds lives in the JSON contract; the verifier reads it from its section.
+        kinds = rejection_kinds()
+        self.assertIn('invalid_utf8', kinds)
+        self.assertEqual(len(kinds), len(set(kinds)))
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / 'docs/spec').mkdir(parents=True)
+            (root / 'docs/spec/json-contract.md').write_text(
+                '# JSON contract\n\n<a id="rejection-kinds"></a>\n### Rejection kinds\n\nThe list.\n\n- `first_kind`\n'
+                '- `second_kind`\n\n<a id="numbers"></a>\n## Numbers\n\n- `not_a_kind`\n')
+            self.assertEqual(rejection_kinds(root), ['first_kind', 'second_kind'])
+            (root / 'docs/spec/json-contract.md').write_text('# JSON contract\n')
+            with self.assertRaisesRegex(ValueError, 'has no section'):
+                rejection_kinds(root)
 
     def test_monorepo_package_records_use_source_content(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -164,6 +187,6 @@ class RepositoryChecks(unittest.TestCase):
                 (path / 'source').write_text('first')
             before = package_revisions(root)
             self.assertEqual(set(before), set(REGISTRY['repositories']))
-            candidate = root / REGISTRY['repositories']['javascript']['path']
+            candidate = root / REGISTRY['repositories']['js']['path']
             (candidate / 'source').write_text('second')
-            self.assertNotEqual(before['javascript'], package_revisions(root)['javascript'])
+            self.assertNotEqual(before['js'], package_revisions(root)['js'])

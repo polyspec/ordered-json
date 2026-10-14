@@ -21,15 +21,15 @@ SLOW = 'import time; time.sleep(2); print("linked", flush=True)'
 
 class BuildRuns(unittest.TestCase):
     def registry(self, root, code):
-        registry = {'schema_version': 1, 'url': 'https://github.com/polyspec/ordered-json.git',
-                    'repositories': {'future': {'path': 'future'}},
-                    'implementations': {'future': {'repository': 'future',
-                        'prepare': [{'cwd': '{future}', 'command': [sys.executable, '-c', code]}],
-                        'command': [sys.executable, '-c', 'print("adapter")'],
-                        'runtime': {'version': [sys.executable, '-c', 'print("runtime")']}}}}
+        commands = {'future': {'prepare': [{'cwd': '{future}', 'command': [sys.executable, '-c', code]}],
+                               'command': [sys.executable, '-c', 'print("adapter")'],
+                               'runtime': {'version': [sys.executable, '-c', 'print("runtime")']}}}
         (root / 'future').mkdir()
-        (root / 'implementations.json').write_text(json.dumps(registry))
-        loaded = load_registry(root)
+        (root / 'config').mkdir()
+        (root / 'config/parity.json').write_text(json.dumps({
+            'schema': 1, 'implementations': [{'name': 'future', 'runner': 'python', 'roots': ['future']}],
+            'profiles': [{'name': 'all', 'implementations': ['future']}], 'units': []}))
+        loaded = load_registry(root, commands)
         return repository_paths(root, registry=loaded), loaded
 
     def test_a_silent_prepare_step_runs_past_any_limit_to_its_exit(self):
