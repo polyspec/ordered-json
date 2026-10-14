@@ -5,7 +5,7 @@
 // enforce are checked on its tokens: a string holds no unescaped control character, and the nesting is at most MAX_DEPTH.
 import { parse, type AnyNode, type DocumentNode, type MemberNode, type ValueNode } from '@humanwhocodes/momoa';
 
-export const MAX_DEPTH = 256;
+const MAX_DEPTH = 256;
 
 /** The tree of a value: `['object', [[name, tree]...]]`, `['array', [tree...]]`, `['string', s]`, `['number', token]`, `['boolean', b]`, `['null']`. */
 export type Tree = ['object', [string, Tree][]] | ['array', Tree[]] | ['string', string] | ['number', string] | ['boolean', boolean] | ['null'];

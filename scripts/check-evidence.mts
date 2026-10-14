@@ -75,7 +75,7 @@ export function featureRows(text: string): Map<string, Feature> {
  * of the feature table. A state is a code span or a table cell whose whole content is the state word; in prose the word is
  * ordinary English.
  */
-export function trackerErrors(name: string, text: string): string[] {
+function trackerErrors(name: string, text: string): string[] {
   const tree = markdown(text);
   const errors: [number, number, string][] = [];
   const outside = (node: Nodes) => errors.push([node.position!.start.line, node.position!.start.column, `state \`${toString(node).trim()}\` stands outside the Implementation cell of a feature row`]);
@@ -135,7 +135,7 @@ function checkSources(root: string, sources: Manifest | undefined, label: string
 type Implementation = { status?: string; cases?: number; runtime?: Record<string, string> };
 
 /** The aggregate record of make verify-all: every implementation passed every shared case of the current sources. */
-export function checkVerification(root: string, record: { schema_version?: number; status?: string; checked_at?: string; sources?: Manifest; cases: Counts; implementations: Record<string, Implementation>; packages?: unknown; supplementary?: unknown }): void {
+function checkVerification(root: string, record: { schema_version?: number; status?: string; checked_at?: string; sources?: Manifest; cases: Counts; implementations: Record<string, Implementation>; packages?: unknown; supplementary?: unknown }): void {
   if (record.schema_version !== 2 || record.status !== 'passed' || Number.isNaN(Date.parse(record.checked_at ?? ''))) throw new Error('the verification record is not a passed record of schema 2 with its time');
   checkSources(root, record.sources, 'the verification record', 'make verify-all');
   checkCounts(root, record.cases, 'the verification record');
@@ -150,7 +150,7 @@ export function checkVerification(root: string, record: { schema_version?: numbe
 }
 
 /** The PIE record of make pie-check: PIE built the extension, and its module passed every shared case of the current sources. */
-export function checkPieVerification(root: string, record: { schema_version?: number; scope?: string; status?: string; checked_at?: string; sources?: Manifest; packages?: unknown; package?: string; pie: { phar_sha256?: string; version?: string }; artifact?: Record<string, string>; commands: { arguments: string[]; exit_code: number }[]; cases: Counts; implementations: Record<string, Implementation>; supplementary?: unknown }): void {
+function checkPieVerification(root: string, record: { schema_version?: number; scope?: string; status?: string; checked_at?: string; sources?: Manifest; packages?: unknown; package?: string; pie: { phar_sha256?: string; version?: string }; artifact?: Record<string, string>; commands: { arguments: string[]; exit_code: number }[]; cases: Counts; implementations: Record<string, Implementation>; supplementary?: unknown }): void {
   if (record.schema_version !== 1 || record.scope !== 'pie-build' || record.status !== 'passed' || Number.isNaN(Date.parse(record.checked_at ?? ''))) throw new Error('the PIE record is not a passed pie-build record of schema 1 with its time');
   checkSources(root, record.sources, 'the PIE record', 'make pie-check');
   if (!isDeepStrictEqual(record.packages, packageRevisions(root))) throw new Error('the package revisions of the PIE record differ from the current sources');
@@ -169,7 +169,7 @@ export function checkPieVerification(root: string, record: { schema_version?: nu
 }
 
 /** The benchmark result: its timings are of one machine, so it is checked on what it names. */
-export function checkBenchmark(root: string, record: { schema_version?: number; source?: Record<string, unknown>; protocol?: unknown; fixtures?: unknown; comparison?: { status?: string } }): void {
+function checkBenchmark(root: string, record: { schema_version?: number; source?: Record<string, unknown>; protocol?: unknown; fixtures?: unknown; comparison?: { status?: string } }): void {
   if (record.schema_version !== 2) throw new Error(`the benchmark result has the schema ${record.schema_version}, not 2`);
   if (!isDeepStrictEqual(record.source, { dirty: false })) throw new Error('a benchmark result is evidence only when measured from a clean checkout, and its source holds only dirty');
   const workload = JSON.parse(readFileSync(path.join(root, 'benchmarks/workload.json'), 'utf8')) as { benchmark: unknown; fixtures: unknown };
