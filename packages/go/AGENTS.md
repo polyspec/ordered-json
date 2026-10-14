@@ -21,7 +21,7 @@ make docs-check
 git diff --check
 ~~~
 
-`make check` runs the shared verifier for this package alone (`scripts/verify.py --only`) and writes no record; `make docs-check` runs `make documents-check` of the repository root. `config/parity.json` at the repository root declares this package as an implementation with its units, and `scripts/registry.py` holds its build, package test, and adapter commands. The full suite of the repository root runs `cargo clippy --all-targets -- -D warnings` in `packages/rust/` and `go vet ./...` in `packages/go/`. Native source changes require a new build; the shared native check rebuilds automatically.
+`make check` runs the shared verifier for this package alone (`scripts/verify.mts --only`), which compares its adapter with the shared cases and writes no record; its package tests are native tests that `make parity-check` runs; `make docs-check` runs `make documents-check` of the repository root. `config/parity.json` at the repository root declares this package as an implementation with its units and their native tests, and `scripts/registry.mts` holds its build and adapter commands. The full suite of the repository root runs the lints of kit, `make lint-rust` and `make lint-go`, among them. Native source changes require a new build; the shared native check rebuilds automatically.
 
 <a id="completion"></a>
 ## Completion

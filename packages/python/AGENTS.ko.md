@@ -1,5 +1,5 @@
 <!-- doc-id: python-development -->
-<!-- source-sha256: 6ac30276764a50601d8c679cde78234642bd6ddad623d54b9fd6f951f0ce7724 -->
+<!-- source-sha256: 8bdaf478b4328f0dda86446ce7025bedb9397614133f436db89848086ba69115 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -22,7 +22,7 @@ make docs-check
 git diff --check
 ~~~
 
-`make check`는 이 패키지만 대상으로 공유 검증기를 실행하고(`scripts/verify.py --only`), `make docs-check`는 저장소 루트의 `make documents-check`를 실행합니다. 저장소 루트의 `config/parity.json`이 이 패키지를 unit과 함께 구현으로 선언하고, `scripts/registry.py`가 그 패키지 test, package data, adapter 명령을 가집니다.
+`make check`는 이 패키지만 공통 검증기로 검사하며(`scripts/verify.mts --only`) 그 어댑터를 공통 사례와 비교하고 기록을 쓰지 않습니다. 패키지 테스트는 `make parity-check`가 실행하는 native 테스트입니다. `make docs-check`는 저장소 루트의 `make documents-check`를 실행합니다. 저장소 루트의 `config/parity.json`이 이 패키지를 unit과 함께 구현으로 선언하고, 그 unit의 native 테스트를 묶으며, `scripts/registry.mts`가 그 빌드와 어댑터 명령을 가집니다.
 
 <a id="completion"></a>
 ## 완료
