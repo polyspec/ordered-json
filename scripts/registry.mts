@@ -113,7 +113,7 @@ export function trackedFiles(root: string): string[] {
 }
 
 /** The tracked files with `suffix` directly in `directory` (relative to `root`), as absolute paths in name order. */
-export function filesIn(root: string, directory: string, suffix: string): string[] {
+function filesIn(root: string, directory: string, suffix: string): string[] {
   const prefix = `${directory.replace(/\/$/, '')}/`;
   return trackedFiles(root).filter(name => name.startsWith(prefix) && name.endsWith(suffix) && !name.slice(prefix.length).includes('/')).map(name => path.join(root, name));
 }
@@ -130,7 +130,7 @@ export const officialCases = (root = ROOT): { id: string; input: string; tree: u
 export const fixturePaths = (root: string, category: 'valid' | 'invalid'): string[] => filesIn(root, `${FIXTURES}/${category}`, '.json');
 
 /** Replaces each {name} of `value` with its variable; a variable that none names fails. */
-export function expand(value: string, variables: Record<string, string>): string {
+function expand(value: string, variables: Record<string, string>): string {
   const expanded = value.replace(/\{([a-z][a-z0-9-]*)\}/g, (whole, name: string) => {
     const replacement = variables[name];
     if (replacement === undefined) throw new Error(`unknown command variable ${whole} in ${value}`);
@@ -182,7 +182,7 @@ export function copySources(source: string, target: string): void {
 const variablesOf = (run: Pick<Run, 'paths' | 'cache'>): Record<string, string> => ({ ...run.paths, cache: run.cache });
 
 /** The environment of the commands of `name`: the caller's, with the variables that the implementation declares. */
-export function environmentOf(name: string, run: Pick<Run, 'paths' | 'cache'>, registry = REGISTRY): NodeJS.ProcessEnv {
+function environmentOf(name: string, run: Pick<Run, 'paths' | 'cache'>, registry = REGISTRY): NodeJS.ProcessEnv {
   const declared = registry.commands[name]!.env ?? {};
   return { ...process.env, ...Object.fromEntries(Object.entries(declared).map(([key, value]) => [key, expand(value, variablesOf(run))])) };
 }

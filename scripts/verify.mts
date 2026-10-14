@@ -23,7 +23,7 @@ const FACTORY_STRING = '"quote \\" slash \\\\ line\\n \\ud55c \\ud83c\\udf0d"';
 const CONTRACT = 'docs/spec/json-contract.md';
 const KINDS_ANCHOR = '<a id="rejection-kinds"></a>';
 /** Each probe reply has this long after its request; a whole run has no limit. */
-export const CASE_SECONDS = 60;
+const CASE_SECONDS = 60;
 export const SUITE_FIX = 'run make install, which installs the suite of external-inputs.json into .cache/JSONTestSuite';
 
 type Expected = Accepted | { ok: false };
