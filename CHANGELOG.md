@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+## 0.0.9
+
 - T1.49: the Composer manifest of `packages/php-ext` declares no `repositories` and no development requirement of `polyspec/ordered-json`; its tests load the PHP library from `../php/src` by `autoload-dev`, so the release zip of the extension carries a manifest that installs outside the repository.
 - T1.48: the shared tools are `@polyspec/kit` 0.0.45, whose knip ignores the binaries of the pinned runtimes (kit K152).
 - T1.46: `make lint-ts`, the oxlint and knip of kit, runs in the full suite and in the docs job of CI; `config/knip-entries.json` declares the JavaScript probe `packages/js/test/probe.mjs`, which the shared verifier runs, as an entry of knip (kit K145).
