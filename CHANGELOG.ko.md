@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 3328d5503ad476c5e196ac3b02eb02d74f87407e36e109076ba9230d228aa5a4 -->
+<!-- source-sha256: 8e89721489520b54feacd592feed0c448cac130198629d3ff1ca4735a52b463e -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.48: 공유 도구는 `@polyspec/kit` 0.0.45이며, 그 knip은 pin된 런타임의 binary를 무시합니다(kit K152).
 - T1.46: kit의 oxlint와 knip인 `make lint-ts`가 전체 suite와 CI의 docs job에서 실행됩니다. `config/knip-entries.json`은 공통 검증기가 실행하는 JavaScript probe `packages/js/test/probe.mjs`를 knip의 entry로 선언합니다(kit K145).
 - T1.47: 공유 도구는 `@polyspec/kit` 0.0.44입니다: `make install-tools`는 CI의 docs job에 없던 `rust-toolchain.toml`의 Rust toolchain을 설치하고, ruff는 cache를 `var/ruff`에 두며, `config/layout.yml`은 kit의 목록을 반복하는 대신 kit의 root 파일에 `composer.json`과 `external-inputs.json`을 더합니다(kit K145, K147, K150, K151).
 - T1.45: 공유 도구는 `@polyspec/kit` 0.0.43입니다. parity는 libtest-mimic의 trial과 PHPUnit test method의 data set을 읽고, `no-floating-promises`는 node:test 등록을 허용하며, API Extractor는 더 이상 `ae-missing-release-tag`를 보고하지 않고, knip은 layout에서 entry를 가져옵니다.
