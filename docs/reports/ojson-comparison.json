@@ -11,7 +11,7 @@
   },
   "official_sha256": "008b05fe07142d9dcad9edd90fe6606926ccb279461664c19af5a3d0eedac830",
   "suite_commit": "1ef36fa01286573e846ac449e8683f8833c5b26a",
-  "case_source": "examples/official.json + fixtures/ + optional JSONTestSuite",
+  "case_source": "examples/official.json + contracts/fixtures/ + optional JSONTestSuite",
   "projects": {
     "pypi-ojson": {
       "summary": {
@@ -831,7 +831,7 @@
           }
         },
         {
-          "case": "fixtures/valid/bom-in-string.json",
+          "case": "contracts/fixtures/valid/bom-in-string.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -841,7 +841,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/container-depth-limit.json",
+          "case": "contracts/fixtures/valid/container-depth-limit.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -851,7 +851,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/controls-escaped.json",
+          "case": "contracts/fixtures/valid/controls-escaped.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -861,7 +861,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/decimal.json",
+          "case": "contracts/fixtures/valid/decimal.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -871,7 +871,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/duplicates.json",
+          "case": "contracts/fixtures/valid/duplicates.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -881,7 +881,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/empty-array.json",
+          "case": "contracts/fixtures/valid/empty-array.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -891,7 +891,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/empty-object.json",
+          "case": "contracts/fixtures/valid/empty-object.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -901,7 +901,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/empty-string.json",
+          "case": "contracts/fixtures/valid/empty-string.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -911,7 +911,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/escaped-keys.json",
+          "case": "contracts/fixtures/valid/escaped-keys.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -921,7 +921,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/escaped-solidus.json",
+          "case": "contracts/fixtures/valid/escaped-solidus.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -931,7 +931,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/escapes.json",
+          "case": "contracts/fixtures/valid/escapes.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -941,7 +941,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/exponent.json",
+          "case": "contracts/fixtures/valid/exponent.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -951,7 +951,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/false.json",
+          "case": "contracts/fixtures/valid/false.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -961,7 +961,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/huge-exponent.json",
+          "case": "contracts/fixtures/valid/huge-exponent.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -971,7 +971,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/huge-integer.json",
+          "case": "contracts/fixtures/valid/huge-integer.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -981,7 +981,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/integer.json",
+          "case": "contracts/fixtures/valid/integer.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -991,7 +991,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/line-separators.json",
+          "case": "contracts/fixtures/valid/line-separators.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1001,7 +1001,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/lone-high-surrogate.json",
+          "case": "contracts/fixtures/valid/lone-high-surrogate.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1011,7 +1011,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/lone-low-surrogate.json",
+          "case": "contracts/fixtures/valid/lone-low-surrogate.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1021,7 +1021,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/mixed-array.json",
+          "case": "contracts/fixtures/valid/mixed-array.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1031,7 +1031,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/mixed-surrogates.json",
+          "case": "contracts/fixtures/valid/mixed-surrogates.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1041,7 +1041,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/negative-zero.json",
+          "case": "contracts/fixtures/valid/negative-zero.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1051,7 +1051,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/nested-order.json",
+          "case": "contracts/fixtures/valid/nested-order.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1061,7 +1061,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/noncharacters.json",
+          "case": "contracts/fixtures/valid/noncharacters.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1071,7 +1071,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/null.json",
+          "case": "contracts/fixtures/valid/null.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1081,7 +1081,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/numeric-keys.json",
+          "case": "contracts/fixtures/valid/numeric-keys.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1091,7 +1091,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/prototype-keys.json",
+          "case": "contracts/fixtures/valid/prototype-keys.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1101,7 +1101,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/scalar-whitespace.json",
+          "case": "contracts/fixtures/valid/scalar-whitespace.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1111,7 +1111,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/surrogate-key.json",
+          "case": "contracts/fixtures/valid/surrogate-key.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1121,7 +1121,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/surrogate-pair.json",
+          "case": "contracts/fixtures/valid/surrogate-pair.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1131,7 +1131,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/tiny-exponent.json",
+          "case": "contracts/fixtures/valid/tiny-exponent.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1141,7 +1141,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/true.json",
+          "case": "contracts/fixtures/valid/true.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1151,7 +1151,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/unicode.json",
+          "case": "contracts/fixtures/valid/unicode.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1161,7 +1161,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/whitespace.json",
+          "case": "contracts/fixtures/valid/whitespace.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1171,7 +1171,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/zero.json",
+          "case": "contracts/fixtures/valid/zero.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -1181,324 +1181,324 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/invalid/array-double-comma.json",
+          "case": "contracts/fixtures/invalid/array-double-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/array-leading-comma.json",
+          "case": "contracts/fixtures/invalid/array-leading-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/array-trailing-comma.json",
+          "case": "contracts/fixtures/invalid/array-trailing-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/bare-minus.json",
+          "case": "contracts/fixtures/invalid/bare-minus.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/bom-trailing.json",
+          "case": "contracts/fixtures/invalid/bom-trailing.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/bom.json",
+          "case": "contracts/fixtures/invalid/bom.json",
           "acceptance_matches": false,
           "accepted": true,
           "decode_error": null
         },
         {
-          "case": "fixtures/invalid/colon-in-array.json",
+          "case": "contracts/fixtures/invalid/colon-in-array.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/comment-block.json",
+          "case": "contracts/fixtures/invalid/comment-block.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/comment-line.json",
+          "case": "contracts/fixtures/invalid/comment-line.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/continuation-utf8.json",
+          "case": "contracts/fixtures/invalid/continuation-utf8.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/depth-exceeded.json",
+          "case": "contracts/fixtures/invalid/depth-exceeded.json",
           "acceptance_matches": false,
           "accepted": true,
           "decode_error": null
         },
         {
-          "case": "fixtures/invalid/double-sign.json",
+          "case": "contracts/fixtures/invalid/double-sign.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/empty.json",
+          "case": "contracts/fixtures/invalid/empty.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/exponent-no-digit.json",
+          "case": "contracts/fixtures/invalid/exponent-no-digit.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/exponent-sign-no-digit.json",
+          "case": "contracts/fixtures/invalid/exponent-sign-no-digit.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/formfeed.json",
+          "case": "contracts/fixtures/invalid/formfeed.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/fraction-no-digit.json",
+          "case": "contracts/fixtures/invalid/fraction-no-digit.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/fraction-no-integer.json",
+          "case": "contracts/fixtures/invalid/fraction-no-integer.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/hex.json",
+          "case": "contracts/fixtures/invalid/hex.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/infinity.json",
+          "case": "contracts/fixtures/invalid/infinity.json",
           "acceptance_matches": false,
           "accepted": true,
           "decode_error": null
         },
         {
-          "case": "fixtures/invalid/invalid-escape.json",
+          "case": "contracts/fixtures/invalid/invalid-escape.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/invalid-u-hex.json",
+          "case": "contracts/fixtures/invalid/invalid-u-hex.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/invalid-u-short.json",
+          "case": "contracts/fixtures/invalid/invalid-u-short.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/invalid-utf8.json",
+          "case": "contracts/fixtures/invalid/invalid-utf8.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/leading-zero.json",
+          "case": "contracts/fixtures/invalid/leading-zero.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/literal-suffix.json",
+          "case": "contracts/fixtures/invalid/literal-suffix.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/missing-colon.json",
+          "case": "contracts/fixtures/invalid/missing-colon.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/missing-comma.json",
+          "case": "contracts/fixtures/invalid/missing-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/missing-member-comma.json",
+          "case": "contracts/fixtures/invalid/missing-member-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/missing-value.json",
+          "case": "contracts/fixtures/invalid/missing-value.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/nan.json",
+          "case": "contracts/fixtures/invalid/nan.json",
           "acceptance_matches": false,
           "accepted": true,
           "decode_error": null
         },
         {
-          "case": "fixtures/invalid/negative-infinity.json",
+          "case": "contracts/fixtures/invalid/negative-infinity.json",
           "acceptance_matches": false,
           "accepted": true,
           "decode_error": null
         },
         {
-          "case": "fixtures/invalid/negative-leading-zero.json",
+          "case": "contracts/fixtures/invalid/negative-leading-zero.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/non-json-whitespace.json",
+          "case": "contracts/fixtures/invalid/non-json-whitespace.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/null-suffix.json",
+          "case": "contracts/fixtures/invalid/null-suffix.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/number-key.json",
+          "case": "contracts/fixtures/invalid/number-key.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/number-suffix.json",
+          "case": "contracts/fixtures/invalid/number-suffix.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/object-double-comma.json",
+          "case": "contracts/fixtures/invalid/object-double-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/object-leading-comma.json",
+          "case": "contracts/fixtures/invalid/object-leading-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/object-trailing-comma.json",
+          "case": "contracts/fixtures/invalid/object-trailing-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/only-whitespace.json",
+          "case": "contracts/fixtures/invalid/only-whitespace.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/out-of-range-utf8.json",
+          "case": "contracts/fixtures/invalid/out-of-range-utf8.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/overlong-utf8.json",
+          "case": "contracts/fixtures/invalid/overlong-utf8.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/plus-number.json",
+          "case": "contracts/fixtures/invalid/plus-number.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/raw-newline.json",
+          "case": "contracts/fixtures/invalid/raw-newline.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/raw-nul.json",
+          "case": "contracts/fixtures/invalid/raw-nul.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/raw-tab.json",
+          "case": "contracts/fixtures/invalid/raw-tab.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/single-quote.json",
+          "case": "contracts/fixtures/invalid/single-quote.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/surrogate-utf8.json",
+          "case": "contracts/fixtures/invalid/surrogate-utf8.json",
           "acceptance_matches": false,
           "accepted": true,
           "decode_error": null
         },
         {
-          "case": "fixtures/invalid/truncated-utf8.json",
+          "case": "contracts/fixtures/invalid/truncated-utf8.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/two-values.json",
+          "case": "contracts/fixtures/invalid/two-values.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/unclosed-array.json",
+          "case": "contracts/fixtures/invalid/unclosed-array.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/unclosed-object.json",
+          "case": "contracts/fixtures/invalid/unclosed-object.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/undefined.json",
+          "case": "contracts/fixtures/invalid/undefined.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/unfinished-escape.json",
+          "case": "contracts/fixtures/invalid/unfinished-escape.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/unquoted-key.json",
+          "case": "contracts/fixtures/invalid/unquoted-key.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/unterminated-string.json",
+          "case": "contracts/fixtures/invalid/unterminated-string.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/upper-null.json",
+          "case": "contracts/fixtures/invalid/upper-null.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/upper-true.json",
+          "case": "contracts/fixtures/invalid/upper-true.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/upper-u.json",
+          "case": "contracts/fixtures/invalid/upper-u.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/utf16-encoding.json",
+          "case": "contracts/fixtures/invalid/utf16-encoding.json",
           "acceptance_matches": false,
           "accepted": true,
           "decode_error": null
         },
         {
-          "case": "fixtures/invalid/vertical-tab.json",
+          "case": "contracts/fixtures/invalid/vertical-tab.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/wrong-close.json",
+          "case": "contracts/fixtures/invalid/wrong-close.json",
           "acceptance_matches": true,
           "accepted": false
         },
@@ -4408,7 +4408,7 @@
           }
         },
         {
-          "case": "fixtures/valid/bom-in-string.json",
+          "case": "contracts/fixtures/valid/bom-in-string.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4418,7 +4418,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/container-depth-limit.json",
+          "case": "contracts/fixtures/valid/container-depth-limit.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4428,7 +4428,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/controls-escaped.json",
+          "case": "contracts/fixtures/valid/controls-escaped.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4438,7 +4438,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/decimal.json",
+          "case": "contracts/fixtures/valid/decimal.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4448,7 +4448,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/duplicates.json",
+          "case": "contracts/fixtures/valid/duplicates.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4458,7 +4458,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/empty-array.json",
+          "case": "contracts/fixtures/valid/empty-array.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4468,7 +4468,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/empty-object.json",
+          "case": "contracts/fixtures/valid/empty-object.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4478,7 +4478,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/empty-string.json",
+          "case": "contracts/fixtures/valid/empty-string.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4488,7 +4488,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/escaped-keys.json",
+          "case": "contracts/fixtures/valid/escaped-keys.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4498,7 +4498,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/escaped-solidus.json",
+          "case": "contracts/fixtures/valid/escaped-solidus.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4508,7 +4508,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/escapes.json",
+          "case": "contracts/fixtures/valid/escapes.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4518,7 +4518,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/exponent.json",
+          "case": "contracts/fixtures/valid/exponent.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4528,7 +4528,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/false.json",
+          "case": "contracts/fixtures/valid/false.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4538,7 +4538,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/huge-exponent.json",
+          "case": "contracts/fixtures/valid/huge-exponent.json",
           "acceptance_matches": false,
           "accepted": false,
           "structure_order_matches": false,
@@ -4549,7 +4549,7 @@
           "decode_error": "error"
         },
         {
-          "case": "fixtures/valid/huge-integer.json",
+          "case": "contracts/fixtures/valid/huge-integer.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4559,7 +4559,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/integer.json",
+          "case": "contracts/fixtures/valid/integer.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4569,7 +4569,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/line-separators.json",
+          "case": "contracts/fixtures/valid/line-separators.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4579,7 +4579,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/lone-high-surrogate.json",
+          "case": "contracts/fixtures/valid/lone-high-surrogate.json",
           "acceptance_matches": false,
           "accepted": false,
           "structure_order_matches": false,
@@ -4590,7 +4590,7 @@
           "decode_error": "error"
         },
         {
-          "case": "fixtures/valid/lone-low-surrogate.json",
+          "case": "contracts/fixtures/valid/lone-low-surrogate.json",
           "acceptance_matches": false,
           "accepted": false,
           "structure_order_matches": false,
@@ -4601,7 +4601,7 @@
           "decode_error": "error"
         },
         {
-          "case": "fixtures/valid/mixed-array.json",
+          "case": "contracts/fixtures/valid/mixed-array.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": false,
@@ -4611,7 +4611,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/mixed-surrogates.json",
+          "case": "contracts/fixtures/valid/mixed-surrogates.json",
           "acceptance_matches": false,
           "accepted": false,
           "structure_order_matches": false,
@@ -4622,7 +4622,7 @@
           "decode_error": "error"
         },
         {
-          "case": "fixtures/valid/negative-zero.json",
+          "case": "contracts/fixtures/valid/negative-zero.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4632,7 +4632,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/nested-order.json",
+          "case": "contracts/fixtures/valid/nested-order.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": false,
@@ -4642,7 +4642,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/noncharacters.json",
+          "case": "contracts/fixtures/valid/noncharacters.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4652,7 +4652,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/null.json",
+          "case": "contracts/fixtures/valid/null.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4662,7 +4662,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/numeric-keys.json",
+          "case": "contracts/fixtures/valid/numeric-keys.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": false,
@@ -4672,7 +4672,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/prototype-keys.json",
+          "case": "contracts/fixtures/valid/prototype-keys.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4682,7 +4682,7 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/valid/scalar-whitespace.json",
+          "case": "contracts/fixtures/valid/scalar-whitespace.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4692,7 +4692,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/surrogate-key.json",
+          "case": "contracts/fixtures/valid/surrogate-key.json",
           "acceptance_matches": false,
           "accepted": false,
           "structure_order_matches": false,
@@ -4703,7 +4703,7 @@
           "decode_error": "error"
         },
         {
-          "case": "fixtures/valid/surrogate-pair.json",
+          "case": "contracts/fixtures/valid/surrogate-pair.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4713,7 +4713,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/tiny-exponent.json",
+          "case": "contracts/fixtures/valid/tiny-exponent.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4723,37 +4723,7 @@
           "token_text_matches": false
         },
         {
-          "case": "fixtures/valid/true.json",
-          "acceptance_matches": true,
-          "accepted": true,
-          "structure_order_matches": true,
-          "decoded_tree_matches": true,
-          "strict_output": true,
-          "encoded_tree_matches": true,
-          "token_text_matches": true
-        },
-        {
-          "case": "fixtures/valid/unicode.json",
-          "acceptance_matches": true,
-          "accepted": true,
-          "structure_order_matches": false,
-          "decoded_tree_matches": false,
-          "strict_output": true,
-          "encoded_tree_matches": false,
-          "token_text_matches": false
-        },
-        {
-          "case": "fixtures/valid/whitespace.json",
-          "acceptance_matches": true,
-          "accepted": true,
-          "structure_order_matches": false,
-          "decoded_tree_matches": false,
-          "strict_output": true,
-          "encoded_tree_matches": false,
-          "token_text_matches": false
-        },
-        {
-          "case": "fixtures/valid/zero.json",
+          "case": "contracts/fixtures/valid/true.json",
           "acceptance_matches": true,
           "accepted": true,
           "structure_order_matches": true,
@@ -4763,321 +4733,351 @@
           "token_text_matches": true
         },
         {
-          "case": "fixtures/invalid/array-double-comma.json",
+          "case": "contracts/fixtures/valid/unicode.json",
+          "acceptance_matches": true,
+          "accepted": true,
+          "structure_order_matches": false,
+          "decoded_tree_matches": false,
+          "strict_output": true,
+          "encoded_tree_matches": false,
+          "token_text_matches": false
+        },
+        {
+          "case": "contracts/fixtures/valid/whitespace.json",
+          "acceptance_matches": true,
+          "accepted": true,
+          "structure_order_matches": false,
+          "decoded_tree_matches": false,
+          "strict_output": true,
+          "encoded_tree_matches": false,
+          "token_text_matches": false
+        },
+        {
+          "case": "contracts/fixtures/valid/zero.json",
+          "acceptance_matches": true,
+          "accepted": true,
+          "structure_order_matches": true,
+          "decoded_tree_matches": true,
+          "strict_output": true,
+          "encoded_tree_matches": true,
+          "token_text_matches": true
+        },
+        {
+          "case": "contracts/fixtures/invalid/array-double-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/array-leading-comma.json",
+          "case": "contracts/fixtures/invalid/array-leading-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/array-trailing-comma.json",
+          "case": "contracts/fixtures/invalid/array-trailing-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/bare-minus.json",
+          "case": "contracts/fixtures/invalid/bare-minus.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/bom-trailing.json",
+          "case": "contracts/fixtures/invalid/bom-trailing.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/bom.json",
+          "case": "contracts/fixtures/invalid/bom.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/colon-in-array.json",
+          "case": "contracts/fixtures/invalid/colon-in-array.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/comment-block.json",
+          "case": "contracts/fixtures/invalid/comment-block.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/comment-line.json",
+          "case": "contracts/fixtures/invalid/comment-line.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/continuation-utf8.json",
+          "case": "contracts/fixtures/invalid/continuation-utf8.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/depth-exceeded.json",
+          "case": "contracts/fixtures/invalid/depth-exceeded.json",
           "acceptance_matches": false,
           "accepted": true,
           "decode_error": null
         },
         {
-          "case": "fixtures/invalid/double-sign.json",
+          "case": "contracts/fixtures/invalid/double-sign.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/empty.json",
+          "case": "contracts/fixtures/invalid/empty.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/exponent-no-digit.json",
+          "case": "contracts/fixtures/invalid/exponent-no-digit.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/exponent-sign-no-digit.json",
+          "case": "contracts/fixtures/invalid/exponent-sign-no-digit.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/formfeed.json",
+          "case": "contracts/fixtures/invalid/formfeed.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/fraction-no-digit.json",
+          "case": "contracts/fixtures/invalid/fraction-no-digit.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/fraction-no-integer.json",
+          "case": "contracts/fixtures/invalid/fraction-no-integer.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/hex.json",
+          "case": "contracts/fixtures/invalid/hex.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/infinity.json",
+          "case": "contracts/fixtures/invalid/infinity.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/invalid-escape.json",
+          "case": "contracts/fixtures/invalid/invalid-escape.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/invalid-u-hex.json",
+          "case": "contracts/fixtures/invalid/invalid-u-hex.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/invalid-u-short.json",
+          "case": "contracts/fixtures/invalid/invalid-u-short.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/invalid-utf8.json",
+          "case": "contracts/fixtures/invalid/invalid-utf8.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/leading-zero.json",
+          "case": "contracts/fixtures/invalid/leading-zero.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/literal-suffix.json",
+          "case": "contracts/fixtures/invalid/literal-suffix.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/missing-colon.json",
+          "case": "contracts/fixtures/invalid/missing-colon.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/missing-comma.json",
+          "case": "contracts/fixtures/invalid/missing-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/missing-member-comma.json",
+          "case": "contracts/fixtures/invalid/missing-member-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/missing-value.json",
+          "case": "contracts/fixtures/invalid/missing-value.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/nan.json",
+          "case": "contracts/fixtures/invalid/nan.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/negative-infinity.json",
+          "case": "contracts/fixtures/invalid/negative-infinity.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/negative-leading-zero.json",
+          "case": "contracts/fixtures/invalid/negative-leading-zero.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/non-json-whitespace.json",
+          "case": "contracts/fixtures/invalid/non-json-whitespace.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/null-suffix.json",
+          "case": "contracts/fixtures/invalid/null-suffix.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/number-key.json",
+          "case": "contracts/fixtures/invalid/number-key.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/number-suffix.json",
+          "case": "contracts/fixtures/invalid/number-suffix.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/object-double-comma.json",
+          "case": "contracts/fixtures/invalid/object-double-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/object-leading-comma.json",
+          "case": "contracts/fixtures/invalid/object-leading-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/object-trailing-comma.json",
+          "case": "contracts/fixtures/invalid/object-trailing-comma.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/only-whitespace.json",
+          "case": "contracts/fixtures/invalid/only-whitespace.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/out-of-range-utf8.json",
+          "case": "contracts/fixtures/invalid/out-of-range-utf8.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/overlong-utf8.json",
+          "case": "contracts/fixtures/invalid/overlong-utf8.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/plus-number.json",
+          "case": "contracts/fixtures/invalid/plus-number.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/raw-newline.json",
+          "case": "contracts/fixtures/invalid/raw-newline.json",
           "acceptance_matches": false,
           "accepted": true,
           "decode_error": null
         },
         {
-          "case": "fixtures/invalid/raw-nul.json",
+          "case": "contracts/fixtures/invalid/raw-nul.json",
           "acceptance_matches": false,
           "accepted": true,
           "decode_error": null
         },
         {
-          "case": "fixtures/invalid/raw-tab.json",
+          "case": "contracts/fixtures/invalid/raw-tab.json",
           "acceptance_matches": false,
           "accepted": true,
           "decode_error": null
         },
         {
-          "case": "fixtures/invalid/single-quote.json",
+          "case": "contracts/fixtures/invalid/single-quote.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/surrogate-utf8.json",
+          "case": "contracts/fixtures/invalid/surrogate-utf8.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/truncated-utf8.json",
+          "case": "contracts/fixtures/invalid/truncated-utf8.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/two-values.json",
+          "case": "contracts/fixtures/invalid/two-values.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/unclosed-array.json",
+          "case": "contracts/fixtures/invalid/unclosed-array.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/unclosed-object.json",
+          "case": "contracts/fixtures/invalid/unclosed-object.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/undefined.json",
+          "case": "contracts/fixtures/invalid/undefined.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/unfinished-escape.json",
+          "case": "contracts/fixtures/invalid/unfinished-escape.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/unquoted-key.json",
+          "case": "contracts/fixtures/invalid/unquoted-key.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/unterminated-string.json",
+          "case": "contracts/fixtures/invalid/unterminated-string.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/upper-null.json",
+          "case": "contracts/fixtures/invalid/upper-null.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/upper-true.json",
+          "case": "contracts/fixtures/invalid/upper-true.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/upper-u.json",
+          "case": "contracts/fixtures/invalid/upper-u.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/utf16-encoding.json",
+          "case": "contracts/fixtures/invalid/utf16-encoding.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/vertical-tab.json",
+          "case": "contracts/fixtures/invalid/vertical-tab.json",
           "acceptance_matches": true,
           "accepted": false
         },
         {
-          "case": "fixtures/invalid/wrong-close.json",
+          "case": "contracts/fixtures/invalid/wrong-close.json",
           "acceptance_matches": true,
           "accepted": false
         },

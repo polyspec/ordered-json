@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 8c9981f88bc64d1e8118927e404f9e010431d772221e3de125cadd773a37d9a2 -->
+<!-- source-sha256: 7f074d25c9bbd00a3cf19deb4e74380b044695c4314f140d2c963df854ba5fec -->
 # 검증
 
 [English](validation.md)
@@ -59,7 +59,7 @@ cd ordered-json
 make check
 ~~~
 
-각 패키지는 독립 빌드 대상으로 유지하지만 공유 검사 명령은 `config/parity.json`의 구현에 대해 검증기(`scripts/registry.py`)가 정의합니다. 네이티브 확장은 `packages/ordered-json-php-ext/`에서 Git이 추적하는 소스 파일을 실행의 임시 디렉터리에 복사해 빌드하며 같은 체크아웃의 형제 PHP 패키지와 함께 검사합니다. 각 실행은 실행 디렉터리를 출력하고 끝날 때 제거하므로, 한 체크아웃의 실행들은 빌드 출력을 공유하지 않습니다. 실행의 모든 cargo 명령과 benchmark의 `cargo run`은 `CARGO_TARGET_DIR`를 그 실행 안의 디렉터리로 설정하므로, 환경이 지정하거나 다른 체크아웃이 채운 target 디렉터리가 Rust probe, package test, benchmark binary를 제공하지 않습니다.
+각 패키지는 독립 빌드 대상으로 유지하지만 공유 검사 명령은 `config/parity.json`의 구현에 대해 검증기(`scripts/registry.py`)가 정의합니다. 네이티브 확장은 `packages/php-ext/`에서 Git이 추적하는 소스 파일을 실행의 임시 디렉터리에 복사해 빌드하며 같은 체크아웃의 형제 PHP 패키지와 함께 검사합니다. 각 실행은 실행 디렉터리를 출력하고 끝날 때 제거하므로, 한 체크아웃의 실행들은 빌드 출력을 공유하지 않습니다. 실행의 모든 cargo 명령과 benchmark의 `cargo run`은 `CARGO_TARGET_DIR`를 그 실행 안의 디렉터리로 설정하므로, 환경이 지정하거나 다른 체크아웃이 채운 target 디렉터리가 Rust probe, package test, benchmark binary를 제공하지 않습니다.
 
 추가 입력은 `make check JSON_TEST_SUITE=/path/to/JSONTestSuite`로 검사합니다.
 

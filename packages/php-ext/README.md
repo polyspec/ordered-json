@@ -29,7 +29,7 @@ pie repository:add path .
 pie build 'polyspec/ordered-json-extension:*@dev'
 ~~~
 
-PIE configuration can be isolated with its `PIE_WORKING_DIRECTORY` environment variable. A build does not install or enable the extension. Windows binaries and ZTS builds have not been verified. PHP and extension versions are recorded separately by the shared check. The PHP library is the sibling `packages/ordered-json-php/` package in this monorepo; it remains separate from the native build and PIE package.
+PIE configuration can be isolated with its `PIE_WORKING_DIRECTORY` environment variable. A build does not install or enable the extension. Windows binaries and ZTS builds have not been verified. PHP and extension versions are recorded separately by the shared check. The PHP library is the sibling `packages/php/` package in this monorepo; it remains separate from the native build and PIE package.
 
 The [JSON contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.md) and [API contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.md) define behavior. Source is provided by this repository. Registry publication and versioned releases are not verified; a source version string is not a release record.
 

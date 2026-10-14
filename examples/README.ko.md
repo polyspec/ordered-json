@@ -1,5 +1,5 @@
 <!-- doc-id: official-examples -->
-<!-- source-sha256: eae1287a4345fe931f4cacd4766a04b5ef533f9e5664eb0c1e4fd32af811820d -->
+<!-- source-sha256: f9b8010f845b870c5404cda64eec2daa6dae3c827cb67dcbde68c06ef18fe89f -->
 # 공식 예제
 
 [English](README.md)
@@ -23,7 +23,7 @@
 <a id="verification"></a>
 ## 어댑터와 재구성
 
-각 언어 어댑터는 같은 문서를 파싱하고 결과를 보고합니다. 모든 비교는 [scripts/verify.py](../scripts/verify.py)에서 수행합니다. `fixtures/` 및 선택적 추가 사례는 객체 키·값 쌍과 숫자 토큰 콜백을 사용하는 독립 표준 라이브러리 참조 결과와 비교합니다.
+각 언어 어댑터는 같은 문서를 파싱하고 결과를 보고합니다. 모든 비교는 [scripts/verify.py](../scripts/verify.py)에서 수행합니다. `contracts/fixtures/` 및 선택적 추가 사례는 객체 키·값 쌍과 숫자 토큰 콜백을 사용하는 독립 표준 라이브러리 참조 결과와 비교합니다.
 
 각 어댑터는 직렬화한 결과를 다시 파싱하고 그 값을 다시 직렬화합니다. 검증기는 두 번째 출력과 두 번째 타입 트리가 첫 번째 출력 및 타입 트리와 같아야 한다고 요구합니다.
 

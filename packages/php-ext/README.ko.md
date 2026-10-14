@@ -1,5 +1,5 @@
 <!-- doc-id: php-ext-overview -->
-<!-- source-sha256: 6b52c1bc73de17b2000b0402eab4db6398c50216d45b295eb70b2daf98d03e3d -->
+<!-- source-sha256: daeb568e53ee04dccbb14308da90961654644bf44261c9e3bfa760d726591a1c -->
 # ordered-json for PHP extension
 
 [English](README.md)
@@ -30,7 +30,7 @@ pie repository:add path .
 pie build 'polyspec/ordered-json-extension:*@dev'
 ~~~
 
-PIE 설정은 `PIE_WORKING_DIRECTORY` 환경 변수로 격리할 수 있습니다. 빌드는 확장을 설치하거나 활성화하지 않습니다. Windows 바이너리와 ZTS 빌드는 검증되지 않았습니다. 공통 검사는 PHP 버전과 확장 버전을 별도로 기록합니다. PHP 라이브러리는 이 모노레포의 형제 `packages/ordered-json-php/` 패키지이며 네이티브 빌드나 PIE 패키지와는 별도입니다.
+PIE 설정은 `PIE_WORKING_DIRECTORY` 환경 변수로 격리할 수 있습니다. 빌드는 확장을 설치하거나 활성화하지 않습니다. Windows 바이너리와 ZTS 빌드는 검증되지 않았습니다. 공통 검사는 PHP 버전과 확장 버전을 별도로 기록합니다. PHP 라이브러리는 이 모노레포의 형제 `packages/php/` 패키지이며 네이티브 빌드나 PIE 패키지와는 별도입니다.
 
 동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
 

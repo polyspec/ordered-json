@@ -13,7 +13,7 @@
     {
       "tool": "rust",
       "channel": "nightly-2026-10-01",
-      "scope": "packages/ordered-json-rust",
+      "scope": "packages/rust",
       "reason": "the rust symbol extractor of the parity check reads the rustdoc JSON of the crate, which only a nightly writes (rust-lang/rust#76578)",
       "retry": "rustdoc JSON is stable"
     }

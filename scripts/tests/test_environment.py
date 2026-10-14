@@ -64,7 +64,7 @@ class Environment(unittest.TestCase):
 
     def test_make_install_makes_every_download_of_the_checks(self):
         # The tools of mise.lock, the Rust toolchain, the crates of
-        # packages/ordered-json-rust/Cargo.lock, the PIE PHAR and the supplementary suite.
+        # packages/rust/Cargo.lock, the PIE PHAR and the supplementary suite.
         prerequisites = [item for kind, items in recipes(makefile())['install'] if kind == 'prerequisites' for item in items]
         self.assertEqual(prerequisites, ['install-rust', 'install-tools', 'cargo-downloads-fetch', 'install-external'])
         downloads = dict(recipes(makefile()))
@@ -96,7 +96,7 @@ class Environment(unittest.TestCase):
         manager = json.loads((ROOT / 'package.json').read_text())['packageManager']
         self.assertRegex(manager, r'^npm@\d+\.\d+\.\d+\+sha512\.[0-9a-f]{128}$')
         # Go is the pin of kit, which mise.toml and the go line name exactly; the go command drops a toolchain line equal to it.
-        go_mod = (ROOT / 'packages/ordered-json-go/go.mod').read_text()
+        go_mod = (ROOT / 'packages/go/go.mod').read_text()
         self.assertRegex(go_mod, rf'(?m)^go {re.escape(tools["go"])}$')
         self.assertNotRegex(go_mod, r'(?m)^toolchain ')
 

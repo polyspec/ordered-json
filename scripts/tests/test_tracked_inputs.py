@@ -28,7 +28,7 @@ class TrackedInputs(unittest.TestCase):
         self.addCleanup(directory.cleanup)
         self.root = Path(directory.name).resolve()
         for name, text in {'scripts/tool.py': 'print(1)\n', 'README.md': '# Fixture\n',
-                           'docs/report.json': '{}\n', 'fixtures/valid/object.json': '{}'}.items():
+                           'docs/report.json': '{}\n', 'contracts/fixtures/valid/object.json': '{}'}.items():
             self.write(name, text)
         git(self.root, 'init', '--quiet')
         git(self.root, 'add', '.')
@@ -44,12 +44,12 @@ class TrackedInputs(unittest.TestCase):
         self.write('scripts/untracked.py', 'print(2)\n')
         self.write('notes.txt', 'draft\n')
         self.assertEqual(source_manifest(self.root), before)
-        self.assertEqual(sorted(before['files']), ['README.md', 'docs/report.json',
-                                                    'fixtures/valid/object.json', 'scripts/tool.py'])
+        self.assertEqual(sorted(before['files']), ['README.md', 'contracts/fixtures/valid/object.json',
+                                                    'docs/report.json', 'scripts/tool.py'])
 
     def test_an_untracked_report_or_fixture_is_not_read(self):
         self.write('docs/draft.json', '{"draft": true}\n')
-        self.write('fixtures/valid/draft.json', '[]')
+        self.write('contracts/fixtures/valid/draft.json', '[]')
         self.assertEqual([path.relative_to(self.root).as_posix() for path in report_paths(self.root)],
                          ['docs/report.json'])
         self.assertEqual([path.name for path in fixture_paths(self.root, 'valid')], ['object.json'])
@@ -57,8 +57,8 @@ class TrackedInputs(unittest.TestCase):
     def test_a_tree_without_git_reads_its_files(self):
         # A source archive has no Git metadata; every file in it is a source.
         plain = self.root / 'archive'
-        (plain / 'fixtures/valid').mkdir(parents=True)
-        (plain / 'fixtures/valid/a.json').write_text('1')
+        (plain / 'contracts/fixtures/valid').mkdir(parents=True)
+        (plain / 'contracts/fixtures/valid/a.json').write_text('1')
         subprocess.run(['rm', '-rf', str(self.root / '.git')], check=True)
         self.assertEqual([path.name for path in fixture_paths(plain, 'valid')], ['a.json'])
 
@@ -78,8 +78,8 @@ class TrackedInputs(unittest.TestCase):
             'exit 128\n')
         (scripts / 'git').chmod(0o755)
         plain = self.root / 'archive'
-        (plain / 'fixtures/valid').mkdir(parents=True)
-        (plain / 'fixtures/valid/a.json').write_text('1')
+        (plain / 'contracts/fixtures/valid').mkdir(parents=True)
+        (plain / 'contracts/fixtures/valid/a.json').write_text('1')
         with mock.patch.dict(os.environ, {'PATH': f'{scripts}:{os.environ["PATH"]}'}):
             self.assertEqual([path.name for path in fixture_paths(plain, 'valid')], ['a.json'])
 

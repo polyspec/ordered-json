@@ -5,19 +5,19 @@
   "changelogTranslations": ["CHANGELOG.ko.md"],
   "checks": ["push-gate", "ci-passed"],
   "packages": [
-    { "kind": "npm", "directory": "packages/ordered-json-npm", "name": "@polyspec/ordered-json" },
-    { "kind": "composer", "directory": "packages/ordered-json-php", "name": "polyspec/ordered-json" },
-    { "kind": "composer", "directory": "packages/ordered-json-php-ext", "name": "polyspec/ordered-json-extension" },
-    { "kind": "wheel", "directory": "packages/ordered-json-python", "name": "polyspec-ordered-json" }
+    { "kind": "npm", "directory": "packages/js", "name": "@polyspec/ordered-json" },
+    { "kind": "composer", "directory": "packages/php", "name": "polyspec/ordered-json" },
+    { "kind": "composer", "directory": "packages/php-ext", "name": "polyspec/ordered-json-extension" },
+    { "kind": "wheel", "directory": "packages/python", "name": "polyspec-ordered-json" }
   ],
   "manifests": {
     "package.json": "version",
-    "packages/ordered-json-npm/package.json": "archive",
+    "packages/js/package.json": "archive",
     "composer.json": "version",
-    "packages/ordered-json-php/composer.json": "archive",
-    "packages/ordered-json-php-ext/composer.json": "archive",
-    "packages/ordered-json-rust/Cargo.toml": "git-tag",
-    "packages/ordered-json-python/pyproject.toml": "archive"
+    "packages/php/composer.json": "archive",
+    "packages/php-ext/composer.json": "archive",
+    "packages/rust/Cargo.toml": "git-tag",
+    "packages/python/pyproject.toml": "archive"
   },
   "notReleased": {
     "tests/release-consumer/npm/package.json": "the npm consumer project of the release archives",
@@ -30,7 +30,7 @@
     "sha256": "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670"
   },
   "goModules": {
-    "packages/ordered-json-go": "github.com/polyspec/ordered-json/packages/ordered-json-go"
+    "packages/go": "github.com/polyspec/ordered-json/packages/go"
   },
   "consumers": {
     "npm": {
@@ -58,13 +58,13 @@
       "smoke": {
         "polyspec-ordered-json": ["python", "-c", "import polyspec.ordered_json"]
       },
-      "lock": { "polyspec-ordered-json": "packages/ordered-json-python/pylock.toml" },
+      "lock": { "polyspec-ordered-json": "packages/python/pylock.toml" },
       "polyspec": {}
     }
   },
   "proof": {
     "gitTag": {
-      "packages/ordered-json-rust/Cargo.toml": {
+      "packages/rust/Cargo.toml": {
         "kind": "rust",
         "name": "polyspec-ordered-json",
         "smoke": ["cargo", "check"]

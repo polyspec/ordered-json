@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 import time
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'packages/ordered-json-python/src'))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'packages/python/src'))
 from polyspec.ordered_json import parse_bytes
 
 data = Path(sys.argv[1]).read_bytes()

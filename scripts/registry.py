@@ -363,7 +363,7 @@ def files_under(root, directory, suffix, recursive):
 
 def fixture_paths(root, category):
     """The shared fixtures of one category, valid or invalid, in name order."""
-    return files_under(root, 'fixtures/' + category, '.json', recursive=False)
+    return files_under(root, 'contracts/fixtures/' + category, '.json', recursive=False)
 
 
 @dataclass(frozen=True)

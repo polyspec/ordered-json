@@ -1,5 +1,5 @@
 <!-- doc-id: repositories -->
-<!-- source-sha256: 4d42dac7e9df3b7f96c800f9f5aefa36bddd17e313ca13ead3c15c6d828e7e3e -->
+<!-- source-sha256: 3822ce9e2ea80d11caa1792012b753a49f73c5987e51976d03d63c46fce1b456 -->
 # 저장소 계약
 
 [English](repositories.md)
@@ -12,12 +12,12 @@
 | 패키지 | 경로 | 구현 |
 | --- | --- | --- |
 | common | . | 계약, fixture, 검증과 parity 선언 |
-| javascript | packages/ordered-json-npm | JavaScript |
-| rust | packages/ordered-json-rust | Rust |
-| go | packages/ordered-json-go | Go |
-| php | packages/ordered-json-php | 순수 PHP와 PHP Value API |
-| php-extension | packages/ordered-json-php-ext | 네이티브 PHP 확장 |
-| python | packages/ordered-json-python | Python |
+| javascript | packages/js | JavaScript |
+| rust | packages/rust | Rust |
+| go | packages/go | Go |
+| php | packages/php | 순수 PHP와 PHP Value API |
+| php-extension | packages/php-ext | 네이티브 PHP 확장 |
+| python | packages/python | Python |
 
 저장소는 공통 계약과 모든 구현체에 하나의 리비전을 사용합니다. 구현 디렉터리에는 중첩 Git 저장소를 두지 않습니다. 순수 PHP와 확장은 패키지 메타데이터와 빌드 절차를 별도로 유지하지만, 소스 변경은 같은 저장소 리비전에서 검토하고 검사합니다. 네이티브 구현은 같은 리비전의 PHP Value API와 함께 검사합니다.
 

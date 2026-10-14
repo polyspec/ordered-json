@@ -9,11 +9,11 @@
         "JavaScript"
       ],
       "roots": [
-        "packages/ordered-json-npm"
+        "packages/js"
       ],
       "symbols": {
         "extractor": "ts",
-        "entry": "packages/ordered-json-npm/index.d.ts"
+        "entry": "packages/js/index.d.ts"
       }
     },
     {
@@ -23,11 +23,11 @@
         "Rust"
       ],
       "roots": [
-        "packages/ordered-json-rust"
+        "packages/rust"
       ],
       "symbols": {
         "extractor": "rust",
-        "entry": "packages/ordered-json-rust/Cargo.toml"
+        "entry": "packages/rust/Cargo.toml"
       }
     },
     {
@@ -37,11 +37,11 @@
         "Go"
       ],
       "roots": [
-        "packages/ordered-json-go"
+        "packages/go"
       ],
       "symbols": {
         "extractor": "go",
-        "entry": "packages/ordered-json-go"
+        "entry": "packages/go"
       }
     },
     {
@@ -51,11 +51,11 @@
         "PHP"
       ],
       "roots": [
-        "packages/ordered-json-php"
+        "packages/php"
       ],
       "symbols": {
         "extractor": "php",
-        "entry": "packages/ordered-json-php/src"
+        "entry": "packages/php/src"
       }
     },
     {
@@ -65,15 +65,15 @@
         "PHP extension"
       ],
       "roots": [
-        "packages/ordered-json-php-ext"
+        "packages/php-ext"
       ],
       "args": [
         "-d",
-        "extension=packages/ordered-json-php-ext/src/modules/ordered_json.so"
+        "extension=packages/php-ext/src/modules/ordered_json.so"
       ],
       "symbols": {
         "extractor": "php",
-        "entry": "packages/ordered-json-php-ext/src/ordered_json.stub.php"
+        "entry": "packages/php-ext/src/ordered_json.stub.php"
       }
     },
     {
@@ -83,11 +83,11 @@
         "Python"
       ],
       "roots": [
-        "packages/ordered-json-python"
+        "packages/python"
       ],
       "symbols": {
         "extractor": "python",
-        "entry": "packages/ordered-json-python/src/polyspec/ordered_json"
+        "entry": "packages/python/src/polyspec/ordered_json"
       }
     }
   ],
@@ -225,12 +225,12 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/api.rs",
+          "test": "packages/rust/tests/api.rs",
           "id": "depth_argument_is_bounded"
         },
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestDepthArgumentIsBounded"
         }
       ]
@@ -242,12 +242,12 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/api.rs",
+          "test": "packages/rust/tests/api.rs",
           "id": "depth_limit_is_enforced"
         },
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestDepthLimitIsEnforced"
         }
       ]
@@ -259,12 +259,12 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/api.rs",
+          "test": "packages/rust/tests/api.rs",
           "id": "parse_errors_report_offsets"
         },
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestParseErrorsReportOffsets"
         }
       ]
@@ -276,12 +276,12 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/api.rs",
+          "test": "packages/rust/tests/api.rs",
           "id": "rejection_names_its_kind"
         },
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestRejectionNamesItsKind"
         }
       ]
@@ -293,12 +293,12 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/api.rs",
+          "test": "packages/rust/tests/api.rs",
           "id": "wrong_kind_access_is_reported"
         },
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestWrongKindAccessIsReported"
         }
       ]
@@ -310,12 +310,12 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/api.rs",
+          "test": "packages/rust/tests/api.rs",
           "id": "member_lookup_uses_decoded_names"
         },
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestMemberLookupUsesDecodedNames"
         }
       ]
@@ -327,12 +327,12 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/api.rs",
+          "test": "packages/rust/tests/api.rs",
           "id": "repeated_key_keeps_first_position_and_last_value"
         },
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestRepeatedKeyKeepsFirstPositionAndLastValue"
         }
       ]
@@ -344,12 +344,12 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/api.rs",
+          "test": "packages/rust/tests/api.rs",
           "id": "root_keeps_surrounding_text"
         },
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestRootKeepsSurroundingText"
         }
       ]
@@ -361,12 +361,12 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/api.rs",
+          "test": "packages/rust/tests/api.rs",
           "id": "unpaired_surrogate_stays_in_units"
         },
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestUnpairedSurrogateStaysInUnits"
         }
       ]
@@ -378,12 +378,12 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/api.rs",
+          "test": "packages/rust/tests/api.rs",
           "id": "surrogate_pair_decodes"
         },
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestSurrogatePairDecodes"
         }
       ]
@@ -395,12 +395,12 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/api.rs",
+          "test": "packages/rust/tests/api.rs",
           "id": "factories_validate_arguments"
         },
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestFactoriesValidateArguments"
         }
       ]
@@ -412,7 +412,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestValuesComeOnlyFromTheLibrary"
         }
       ]
@@ -424,7 +424,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestReturnedCollectionsAreImmutable"
         }
       ]
@@ -436,7 +436,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestHostSerializationBoundary"
         }
       ]
@@ -448,12 +448,12 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/api.rs",
+          "test": "packages/rust/tests/api.rs",
           "id": "bytes_input_is_validated"
         },
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestBytesInputIsValidated"
         }
       ]
@@ -465,12 +465,12 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/api.rs",
+          "test": "packages/rust/tests/api.rs",
           "id": "invalid_utf8_reports_the_first_bad_byte"
         },
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestInvalidUTF8ReportsTheFirstBadByte"
         }
       ]
@@ -482,12 +482,12 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/api.rs",
+          "test": "packages/rust/tests/api.rs",
           "id": "ordered_map_rejects_non_string_key"
         },
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestOrderedMapRejectsNonStringKey"
         }
       ]
@@ -499,7 +499,7 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/duplicate_keys.rs",
+          "test": "packages/rust/tests/duplicate_keys.rs",
           "id": "strict_parse_rejects_duplicate_keys"
         }
       ]
@@ -511,7 +511,7 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/duplicate_keys.rs",
+          "test": "packages/rust/tests/duplicate_keys.rs",
           "id": "strict_parse_accepts_unique_keys"
         }
       ]
@@ -523,7 +523,7 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/serde_binding.rs",
+          "test": "packages/rust/tests/serde_binding.rs",
           "id": "serde_wire_bytes_and_round_trip"
         }
       ]
@@ -535,7 +535,7 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/serde_binding.rs",
+          "test": "packages/rust/tests/serde_binding.rs",
           "id": "serde_manifest_bytes_and_round_trip"
         }
       ]
@@ -547,7 +547,7 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/serde_binding.rs",
+          "test": "packages/rust/tests/serde_binding.rs",
           "id": "serde_rejects_invalid_and_unconsumed_input"
         }
       ]
@@ -559,7 +559,7 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/serde_binding.rs",
+          "test": "packages/rust/tests/serde_binding.rs",
           "id": "serde_rejects_duplicate_struct_fields"
         }
       ]
@@ -571,7 +571,7 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/serde_binding.rs",
+          "test": "packages/rust/tests/serde_binding.rs",
           "id": "serde_embedded_values_preserve_order_and_number_tokens"
         }
       ]
@@ -583,7 +583,7 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/serde_binding.rs",
+          "test": "packages/rust/tests/serde_binding.rs",
           "id": "serde_value_respects_container_depth"
         }
       ]
@@ -595,7 +595,7 @@
       "bindings": [
         {
           "implementation": "rust",
-          "test": "packages/ordered-json-rust/tests/serde_binding.rs",
+          "test": "packages/rust/tests/serde_binding.rs",
           "id": "serde_value_preserves_unpaired_surrogate_token"
         }
       ]
@@ -607,7 +607,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/marshal_test.go",
+          "test": "packages/go/marshal_test.go",
           "id": "TestMarshalPreservesTypedJSONContract"
         }
       ]
@@ -619,7 +619,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/marshal_test.go",
+          "test": "packages/go/marshal_test.go",
           "id": "TestMarshalKeepsEmptyObjectAndArrayDistinct"
         }
       ]
@@ -631,7 +631,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/marshal_test.go",
+          "test": "packages/go/marshal_test.go",
           "id": "TestMarshalValidatesCustomMarshalerThroughOrderedParser"
         }
       ]
@@ -643,7 +643,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/marshal_test.go",
+          "test": "packages/go/marshal_test.go",
           "id": "TestMarshalRejectsUnsupportedMapKey"
         }
       ]
@@ -655,7 +655,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/marshal_test.go",
+          "test": "packages/go/marshal_test.go",
           "id": "TestMarshalWritesNullForNilValuePointer"
         }
       ]
@@ -667,7 +667,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/marshal_test.go",
+          "test": "packages/go/marshal_test.go",
           "id": "TestMarshalTimeAndBytesMatchTypedValues"
         }
       ]
@@ -679,7 +679,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/marshal_test.go",
+          "test": "packages/go/marshal_test.go",
           "id": "TestMarshalPromotesEmbeddedFields"
         }
       ]
@@ -691,7 +691,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/marshal_test.go",
+          "test": "packages/go/marshal_test.go",
           "id": "TestMarshalRejectsRepeatedFieldNames"
         }
       ]
@@ -703,7 +703,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/marshal_test.go",
+          "test": "packages/go/marshal_test.go",
           "id": "TestMarshalRejectsCyclicValues"
         }
       ]
@@ -715,7 +715,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/marshal_test.go",
+          "test": "packages/go/marshal_test.go",
           "id": "TestMarshalRejectsValuesDeeperThanTheParser"
         }
       ]
@@ -727,7 +727,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/marshal_fuzz_test.go",
+          "test": "packages/go/marshal_fuzz_test.go",
           "id": "TestMarshalMatchesHostEncoderStructures"
         }
       ]
@@ -739,7 +739,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/marshal_fuzz_test.go",
+          "test": "packages/go/marshal_fuzz_test.go",
           "id": "TestMarshalOmitRulesFollowTheHostEncoder"
         }
       ]
@@ -751,7 +751,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/marshal_fuzz_test.go",
+          "test": "packages/go/marshal_fuzz_test.go",
           "id": "TestMarshalReportsNonFiniteNumbers"
         }
       ]
@@ -763,7 +763,7 @@
       "bindings": [
         {
           "implementation": "go",
-          "test": "packages/ordered-json-go/api_test.go",
+          "test": "packages/go/api_test.go",
           "id": "TestBorrowedInputIsCopiedOnAccess"
         }
       ]
@@ -851,7 +851,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Parse"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Parse"
         },
         {
           "implementation": "php",
@@ -874,7 +874,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseBytes"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.ParseBytes"
         },
         {
           "implementation": "python",
@@ -893,7 +893,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.MaxDepth"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.MaxDepth"
         },
         {
           "implementation": "php",
@@ -916,7 +916,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseWithMaxDepth"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.ParseWithMaxDepth"
         },
         {
           "implementation": "php",
@@ -939,7 +939,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Stringify"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Stringify"
         },
         {
           "implementation": "php",
@@ -962,7 +962,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Value"
         },
         {
           "implementation": "php",
@@ -985,7 +985,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseError"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.ParseError"
         },
         {
           "implementation": "php",
@@ -1008,7 +1008,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseError.Kind"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.ParseError.Kind"
         },
         {
           "implementation": "php",
@@ -1031,7 +1031,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseError.Offset"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.ParseError.Offset"
         },
         {
           "implementation": "php",
@@ -1054,7 +1054,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.Compact"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Value.Compact"
         },
         {
           "implementation": "php",
@@ -1077,7 +1077,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.Raw"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Value.Raw"
         },
         {
           "implementation": "php",
@@ -1100,7 +1100,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.Kind"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Value.Kind"
         },
         {
           "implementation": "php",
@@ -1123,7 +1123,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.Members"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Value.Members"
         },
         {
           "implementation": "php",
@@ -1146,7 +1146,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.Get"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Value.Get"
         },
         {
           "implementation": "php",
@@ -1169,7 +1169,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.GetUnits"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Value.GetUnits"
         },
         {
           "implementation": "php",
@@ -1192,7 +1192,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.Items"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Value.Items"
         },
         {
           "implementation": "php",
@@ -1215,7 +1215,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.StringValue"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Value.StringValue"
         },
         {
           "implementation": "php",
@@ -1238,7 +1238,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.StringUnits"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Value.StringUnits"
         },
         {
           "implementation": "php",
@@ -1261,7 +1261,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.NumberLiteral"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Value.NumberLiteral"
         },
         {
           "implementation": "php",
@@ -1284,7 +1284,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.BooleanValue"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Value.BooleanValue"
         },
         {
           "implementation": "php",
@@ -1307,7 +1307,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Object"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Object"
         },
         {
           "implementation": "php",
@@ -1330,7 +1330,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Array"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Array"
         },
         {
           "implementation": "php",
@@ -1353,7 +1353,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.String"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.String"
         },
         {
           "implementation": "php",
@@ -1376,7 +1376,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Number"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Number"
         },
         {
           "implementation": "php",
@@ -1399,7 +1399,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Boolean"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Boolean"
         },
         {
           "implementation": "php",
@@ -1422,7 +1422,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Null"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Null"
         },
         {
           "implementation": "php",
@@ -1445,7 +1445,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.StringFromUnits"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.StringFromUnits"
         },
         {
           "implementation": "php",
@@ -1468,7 +1468,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.OrderedMap"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.OrderedMap"
         }
       ]
     },
@@ -1483,7 +1483,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.OrderedMap.Get"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.OrderedMap.Get"
         }
       ]
     },
@@ -1498,7 +1498,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.OrderedMap.GetUnits"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.OrderedMap.GetUnits"
         }
       ]
     },
@@ -1513,7 +1513,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.OrderedMap.Set"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.OrderedMap.Set"
         }
       ]
     },
@@ -1528,7 +1528,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.OrderedMap.Len"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.OrderedMap.Len"
         }
       ]
     },
@@ -1543,7 +1543,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.OrderedMap.Keys"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.OrderedMap.Keys"
         }
       ]
     },
@@ -1558,7 +1558,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Kind"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Kind"
         }
       ]
     },
@@ -1573,7 +1573,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ObjectKind"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.ObjectKind"
         }
       ]
     },
@@ -1588,7 +1588,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ArrayKind"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.ArrayKind"
         }
       ]
     },
@@ -1603,7 +1603,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.StringKind"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.StringKind"
         }
       ]
     },
@@ -1618,7 +1618,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.NumberKind"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.NumberKind"
         }
       ]
     },
@@ -1633,7 +1633,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.BooleanKind"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.BooleanKind"
         }
       ]
     },
@@ -1648,7 +1648,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.NullKind"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.NullKind"
         }
       ]
     },
@@ -1663,7 +1663,7 @@
         },
         {
           "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseError.Message"
+          "symbol": "github.com/polyspec/ordered-json/packages/go.ParseError.Message"
         }
       ]
     }
@@ -1759,7 +1759,7 @@
     },
     {
       "implementation": "go",
-      "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Marshal",
+      "symbol": "github.com/polyspec/ordered-json/packages/go.Marshal",
       "reason": "Marshal and its Marshaler boundary are a binding extension of Go",
       "spec": [
         "docs/spec/api.md#bindings"
@@ -1767,7 +1767,7 @@
     },
     {
       "implementation": "go",
-      "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Marshaler",
+      "symbol": "github.com/polyspec/ordered-json/packages/go.Marshaler",
       "reason": "Marshal and its Marshaler boundary are a binding extension of Go",
       "spec": [
         "docs/spec/api.md#bindings"
@@ -1775,7 +1775,7 @@
     },
     {
       "implementation": "go",
-      "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Marshaler.MarshalJSON",
+      "symbol": "github.com/polyspec/ordered-json/packages/go.Marshaler.MarshalJSON",
       "reason": "Marshal and its Marshaler boundary are a binding extension of Go",
       "spec": [
         "docs/spec/api.md#bindings"
@@ -1783,7 +1783,7 @@
     },
     {
       "implementation": "go",
-      "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseBytesBorrowed",
+      "symbol": "github.com/polyspec/ordered-json/packages/go.ParseBytesBorrowed",
       "reason": "ParseBytesBorrowed is the explicit zero-copy byte input of Go",
       "spec": [
         "docs/spec/api.md#objects"
@@ -1791,7 +1791,7 @@
     },
     {
       "implementation": "go",
-      "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseError.Error",
+      "symbol": "github.com/polyspec/ordered-json/packages/go.ParseError.Error",
       "reason": "a Go error implements the error interface with Error()",
       "spec": [
         "docs/spec/api.md#values"
@@ -1799,7 +1799,7 @@
     },
     {
       "implementation": "go",
-      "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.MarshalJSON",
+      "symbol": "github.com/polyspec/ordered-json/packages/go.Value.MarshalJSON",
       "reason": "a Go Value meets the host JSON encoder at the MarshalJSON boundary, which writes the ordered compact text, so the host encoder does not reorder it",
       "spec": [
         "docs/spec/api.md#values",
@@ -1808,7 +1808,7 @@
     },
     {
       "implementation": "go",
-      "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.String",
+      "symbol": "github.com/polyspec/ordered-json/packages/go.Value.String",
       "reason": "a Go Value prints its compact text through the fmt.Stringer interface",
       "spec": [
         "docs/spec/api.md#values"

@@ -45,13 +45,13 @@ class FailureMessages(unittest.TestCase):
 
     def test_a_stale_record_names_each_changed_added_and_removed_file(self):
         root = self.folder / 'repository'
-        (root / 'packages/ordered-json-npm').mkdir(parents=True)
+        (root / 'packages/js').mkdir(parents=True)
         for name in ('index.js', 'gone.js'):
-            (root / 'packages/ordered-json-npm' / name).write_text(name)
+            (root / 'packages/js' / name).write_text(name)
         recorded = source_manifest(root)
-        (root / 'packages/ordered-json-npm/index.js').write_text('changed')
-        (root / 'packages/ordered-json-npm/gone.js').unlink()
-        (root / 'packages/ordered-json-npm/added.js').write_text('added')
+        (root / 'packages/js/index.js').write_text('changed')
+        (root / 'packages/js/gone.js').unlink()
+        (root / 'packages/js/added.js').write_text('added')
         record = {'schema_version': 1, 'status': 'passed', 'checked_at': '2026-10-05T00:00:00+00:00',
                   'scope': 'pie-build', 'sources': recorded}
         for check in (check_verification, check_pie_verification):
@@ -59,9 +59,9 @@ class FailureMessages(unittest.TestCase):
                 check(root, record)
             message = str(raised.exception)
             self.assertIn('stale', message)
-            self.assertIn('changed packages/ordered-json-npm/index.js', message)
-            self.assertIn('added packages/ordered-json-npm/added.js', message)
-            self.assertIn('removed packages/ordered-json-npm/gone.js', message)
+            self.assertIn('changed packages/js/index.js', message)
+            self.assertIn('added packages/js/added.js', message)
+            self.assertIn('removed packages/js/gone.js', message)
 
     def test_a_failing_runtime_version_includes_the_tool_error(self):
         root = self.folder / 'repository'
@@ -96,7 +96,7 @@ class FailureMessages(unittest.TestCase):
 
     def test_each_package_script_runs_a_make_target_that_exists(self):
         targets = set(re.findall(r'(?m)^([a-z][a-z-]*):', (ROOT / 'Makefile').read_text()))
-        for manifest in ('package.json', 'packages/ordered-json-npm/package.json', 'packages/ordered-json-php/composer.json'):
+        for manifest in ('package.json', 'packages/js/package.json', 'packages/php/composer.json'):
             scripts = json.loads((ROOT / manifest).read_text()).get('scripts', {})
             self.assertTrue(scripts, manifest)
             for name, command in scripts.items():
