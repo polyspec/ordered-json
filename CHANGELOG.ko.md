@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: fc146e7731a2ac714cd57da7e92aea9b28f294fb839f8779390ea67fb7901524 -->
+<!-- source-sha256: 3328d5503ad476c5e196ac3b02eb02d74f87407e36e109076ba9230d228aa5a4 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.46: kit의 oxlint와 knip인 `make lint-ts`가 전체 suite와 CI의 docs job에서 실행됩니다. `config/knip-entries.json`은 공통 검증기가 실행하는 JavaScript probe `packages/js/test/probe.mjs`를 knip의 entry로 선언합니다(kit K145).
 - T1.47: 공유 도구는 `@polyspec/kit` 0.0.44입니다: `make install-tools`는 CI의 docs job에 없던 `rust-toolchain.toml`의 Rust toolchain을 설치하고, ruff는 cache를 `var/ruff`에 두며, `config/layout.yml`은 kit의 목록을 반복하는 대신 kit의 root 파일에 `composer.json`과 `external-inputs.json`을 더합니다(kit K145, K147, K150, K151).
 - T1.45: 공유 도구는 `@polyspec/kit` 0.0.43입니다. parity는 libtest-mimic의 trial과 PHPUnit test method의 data set을 읽고, `no-floating-promises`는 node:test 등록을 허용하며, API Extractor는 더 이상 `ae-missing-release-tag`를 보고하지 않고, knip은 layout에서 entry를 가져옵니다.
 - T1.42: 저장소 도구는 TypeScript입니다(S9). 공통 검증기(`scripts/verify.mts`와 그 registry, reference, records), 근거, PIE, 외부 입력, 비교 검사와 benchmark runner는 Node.js로 실행하고 `make typecheck`가 검사하며, 그 테스트는 `tests/scripts`의 node 테스트입니다(`make test-scripts`). 독립 참조는 momoa로 JSON을 읽습니다. 패키지 테스트는 검증기를 떠나 kit parity의 native runner로 옮겼고, kit의 `lint-rust`와 `lint-go`가 `scripts/lint.py`를 대신하며, CI의 job `python`은 없어졌습니다. 패키지 폴더는 `config/parity.json`에서, fixture 폴더는 registry에서 읽으며, 도구에 남은 Python은 이유와 함께 S9 예외인 `scripts/comparison`의 Python 라이브러리 ojson probe뿐입니다.
