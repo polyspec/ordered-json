@@ -66,13 +66,12 @@ class FailureMessages(unittest.TestCase):
     def test_a_failing_runtime_version_includes_the_tool_error(self):
         root = self.folder / 'repository'
         (root / 'future').mkdir(parents=True)
-        (root / 'implementations.json').write_text(json.dumps({
-            'schema_version': 1, 'url': 'https://github.com/polyspec/ordered-json.git',
-            'repositories': {'future': {'path': 'future'}},
-            'implementations': {'future': {'repository': 'future', 'command': [sys.executable],
-                                           'runtime': {'version': [sys.executable, '-c',
-                                                                   'import sys; sys.stderr.write("libfuture missing"); sys.exit(3)']}}}}))
-        loaded = load_registry(root)
+        (root / 'config').mkdir()
+        (root / 'config/parity.json').write_text(json.dumps({
+            'schema': 1, 'implementations': [{'name': 'future', 'runner': 'python', 'roots': ['future']}],
+            'profiles': [{'name': 'all', 'implementations': ['future']}], 'units': []}))
+        loaded = load_registry(root, {'future': {'command': [sys.executable], 'runtime': {'version': [
+            sys.executable, '-c', 'import sys; sys.stderr.write("libfuture missing"); sys.exit(3)']}}})
         with self.assertRaises(RuntimeError) as raised:
             runtime_versions(['future'], repository_paths(root, registry=loaded), root / 'cache', loaded)
         self.assertIn('exit 3', str(raised.exception))

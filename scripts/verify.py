@@ -13,16 +13,16 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 FACTORY_STRING = '"quote \\\" slash \\\\ line\\n \\ud55c \\ud83c\\udf0d"'
-STANDARD = json.loads((ROOT / 'package-tests.json').read_text(encoding='utf-8'))
-CASE_ID = re.compile(r'^[a-z][a-z0-9_]*$')
+# The shared list of rejection kinds: the items of the section of that anchor of the JSON contract.
+CONTRACT = 'docs/spec/json-contract.md'
+KINDS_ANCHOR = '<a id="rejection-kinds"></a>'
 # Each package test case and each adapter reply has this long after the previous
 # one ends; there is no limit for a whole run.
 CASE_SECONDS = 60
 TIMED_LINE = re.compile(r'\(\d+(?:\.\d+)?\s*m?s\)$')
 
-from registry import (IMPLEMENTATIONS, POLL_SECONDS, Failures, adapter_commands, api_commands, case_commands,
-                      end_group, fixture_paths, next_chunk, parse_overrides, prepare, repository_paths, run_directory,
-                      test_commands)
+from registry import (IMPLEMENTATIONS, POLL_SECONDS, Failures, adapter_commands, end_group, fixture_paths, next_chunk,
+                      parse_overrides, prepare, repository_paths, run_directory, test_commands)
 
 
 class ObjectPairs(list):
@@ -171,147 +171,14 @@ def verify(selected, suite=None, paths=None, build_warnings=None, run=None):
         build_warnings.extend(warnings)
     # A language whose build failed has no probe or artifact to list, test or compare.
     built = [language for language in selected if language not in failed]
-    failures += [f'{language}: the case and symbol listings, the package tests and the shared cases did not run '
-                 'because its build failed' for language in selected if language in failed]
-    step(compare_package_cases, case_commands(built, paths, cache), built)
-    step(compare_api_coverage, api_commands(built, paths, cache), built)
+    failures += [f'{language}: the package tests and the shared cases did not run because its build failed'
+                 for language in selected if language in failed]
     package_tests = step(run_package_tests, test_commands(built, paths, cache))
     adapters = step(verify_adapters, adapter_commands(built, paths, cache), suite) if built else None
     if failures:
         raise Failures(failures, failed)
     results, counts = adapters
     return results, counts, package_tests
-
-
-def case_identifier(name):
-    """Map a test name from any language to a case id; a run of capitals is one word."""
-    name = name.split(':')[0].strip()
-    name = re.sub(r'^Test', '', name)
-    name = re.sub(r'(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])', '_', name)
-    return name.lower()
-
-
-GO_TEST = re.compile(r'(?:Test|Fuzz|Example|Benchmark)[A-Za-z0-9_]*')
-
-
-def listed_cases(form, stdout):
-    """The test names of a case listing in its declared machine format, and the lines that are not one.
-
-    lines: every nonempty line is a case id. cargo-terse: every line is `<name>: test` or
-    `<name>: benchmark` (`cargo test -- --list --format terse`), and benchmarks are not cases.
-    go-test-json: the JSON events of `go test -list .* -json`; an output event holds a test name or
-    the summary line of its own package, as `ok  <package>` or `?   <package>`."""
-    names, noise = [], []
-    for line in stdout.splitlines():
-        if form == 'go-test-json':
-            try:
-                event = json.loads(line)
-            except ValueError:
-                noise.append(line)
-                continue
-            if event.get('Action') != 'output':
-                continue
-            text = event.get('Output', '').rstrip('\n')
-            summary = re.fullmatch(r'(?:ok|\?)\s+(\S+)(?:\s.*)?', text)
-            if GO_TEST.fullmatch(text):
-                names.append(text)
-            elif not (summary and summary[1] == event.get('Package')):
-                noise.append(text)
-        elif form == 'cargo-terse':
-            match = re.fullmatch(r'(.+): (test|benchmark)', line)
-            if not match:
-                noise.append(line)
-            elif match[2] == 'test':
-                names.append(match[1])
-        elif line.strip():
-            names.append(line.strip())
-    return names, noise
-
-
-def run_listing(language, entry, what):
-    """Run a declared listing command; a nonzero exit fails with its standard error, and standard error
-    of a listing that exits with 0 holds tool notices, which are printed and not judged."""
-    process = subprocess.run(entry['command'], cwd=entry['cwd'], env=entry.get('env'), text=True,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    if process.returncode:
-        raise RuntimeError(f'{language}: {what} failed with exit {process.returncode}:\n'
-                           f'{process.stderr.strip() or process.stdout.strip() or "no output"}')
-    for line in process.stderr.splitlines():
-        if line.strip():
-            print(f'{language} {what} notice: {line}', flush=True)
-    return process.stdout
-
-
-def compare_package_cases(commands, selected):
-    """Each package reports the cases it runs; the standard says which are required."""
-    problems = []
-    for language in selected:
-        entry = commands.get(language)
-        if entry is None:
-            problems.append(f'{language}: declares no package test case listing')
-            continue
-        try:
-            stdout = run_listing(language, entry, 'case listing')
-        except RuntimeError as error:
-            problems.append(str(error))
-            continue
-        names, noise = listed_cases(entry.get('format', 'lines'), stdout)
-        reported = {case_identifier(name) for name in names}
-        noise += [name for name in names if not CASE_ID.fullmatch(case_identifier(name))]
-        if noise:
-            problems.append(f'{language}: case listing ({entry.get("format", "lines")}) printed more than case names:\n'
-                            + '\n'.join(noise))
-            continue
-        required = {case['id'] for case in STANDARD['cases'] if language not in case.get('exemptions', {})}
-        required |= {case['id'] for case in STANDARD['package_cases'][language]}
-        problems += [f'{language}: missing case {identifier}' for identifier in sorted(required - reported)]
-        problems += [f'{language}: case {identifier} is not declared in the standard'
-                     for identifier in sorted(reported - required)]
-    if problems:
-        raise Failures(['Package test cases do not match package-tests.json: ' + problem for problem in problems],
-                       {problem.split(':')[0] for problem in problems})
-    print('package test cases match the standard', flush=True)
-
-
-def reported_lines(language, entry, what):
-    """Run a declared listing command and return its non-empty lines."""
-    return [line.strip() for line in run_listing(language, entry, what).splitlines() if line.strip()]
-
-
-def compare_api_coverage(commands, selected):
-    """Every public symbol names the cases that cover it, and every named symbol exists."""
-    coverage = STANDARD.get('api_coverage', {})
-    problems = []
-    for language in selected:
-        entry = commands.get(language)
-        if entry is None:
-            problems.append(f'{language}: declares no public API listing')
-            continue
-        try:
-            reported = set(reported_lines(language, entry, 'API listing'))
-        except RuntimeError as error:
-            problems.append(str(error))
-            continue
-        declared = coverage.get(language, {})
-        known = {case['id'] for case in STANDARD['cases'] if language not in case.get('exemptions', {})}
-        known |= {case['id'] for case in STANDARD['package_cases'][language]}
-        problems += [f'{language}: {symbol} is covered by no case' for symbol in sorted(reported - set(declared))]
-        problems += [f'{language}: {symbol} is declared but the package no longer exports it'
-                     for symbol in sorted(set(declared) - reported)]
-        for symbol, entry_value in sorted(declared.items()):
-            if isinstance(entry_value, dict):
-                if not str(entry_value.get('exempt', '')).strip():
-                    problems.append(f'{language}: {symbol} is exempt without a reason')
-                continue
-            cases = entry_value if isinstance(entry_value, list) else [entry_value]
-            if not cases:
-                problems.append(f'{language}: {symbol} names no case')
-            problems += [f'{language}: {symbol} names an unknown case {case}'
-                         for case in cases if case not in known]
-    if problems:
-        raise Failures(['Public API coverage does not match package-tests.json: ' + problem for problem in problems],
-                       {problem.split(':')[0] for problem in problems})
-    print('every public symbol names the cases that cover it', flush=True)
 
 
 def milliseconds(seconds):
@@ -421,9 +288,22 @@ def compare_error_positions(rejections, documents):
         print('rejection positions agree across implementations', flush=True)
 
 
-def compare_rejection_kinds(rejections):
-    """Every implementation names the same reason for rejecting a document."""
-    known = set(STANDARD['rejection_kinds'])
+def rejection_kinds(root=ROOT):
+    """The shared rejection kinds: the list items of the section that KINDS_ANCHOR opens in the JSON contract, each a
+    kind in a code span, up to the next heading or anchor."""
+    text = (root / CONTRACT).read_text(encoding='utf-8')
+    if KINDS_ANCHOR not in text:
+        raise ValueError(f'{CONTRACT} has no section {KINDS_ANCHOR}')
+    section = re.split(r'(?m)^(?:<a id=|#)', text.split(KINDS_ANCHOR, 1)[1].split('\n', 2)[2], maxsplit=1)[0]
+    kinds = re.findall(r'(?m)^- `([a-z][a-z0-9_]*)`', section)
+    if not kinds or len(kinds) != len(set(kinds)):
+        raise ValueError(f'{CONTRACT} lists no rejection kind, or one twice, in its section {KINDS_ANCHOR}: {kinds}')
+    return kinds
+
+
+def compare_rejection_kinds(rejections, known=None):
+    """Every implementation names the same reason for rejecting a document, one of the shared kinds."""
+    known = set(rejection_kinds() if known is None else known)
     missing, unknown, disagreements = set(), set(), []
     for name, reported in sorted(rejections.items()):
         seen = {}

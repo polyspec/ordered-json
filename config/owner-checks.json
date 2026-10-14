@@ -38,8 +38,7 @@
       "paths": [
         "scripts/registry.py",
         "scripts/verify.py",
-        "implementations.json",
-        "package-tests.json",
+        "config/parity.json",
         "examples/official.json",
         "fixtures/**"
       ],
@@ -163,6 +162,18 @@
       ],
       "targets": [
         "kit-check"
+      ]
+    },
+    {
+      "paths": [
+        "config/parity.json",
+        "examples/official.json",
+        "packages/**",
+        "docs/spec/*.md"
+      ],
+      "targets": [
+        "parity-declarations-check",
+        "parity-check"
       ]
     },
     {

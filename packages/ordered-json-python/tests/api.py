@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """The package tests of the ordered-json Python package.
 
-Every case of the shared standard of package-tests.json runs here, and
-the package cases cover the API of this binding alone. `--cases` lists
-the case ids one per line.
+Every case of the shared standard runs here, each a feature unit of
+config/parity.json, and the package cases cover the API of this binding
+alone.
 """
 import json
 import sys
@@ -181,18 +181,5 @@ class PackageCases(unittest.TestCase):
         self.assertEqual(caught.exception.offset, len('["한"]'.encode('utf-8')))
 
 
-def case_ids() -> list[str]:
-    loader = unittest.defaultTestLoader
-    suite = unittest.TestSuite(loader.loadTestsFromModule(sys.modules[__name__]))
-    ids = []
-    for group in suite:
-        for case in group:
-            ids.append(case.id().rsplit('.', 1)[1].removeprefix('test_'))
-    return sorted(ids)
-
-
 if __name__ == '__main__':
-    if '--cases' in sys.argv:
-        print('\n'.join(case_ids()))
-    else:
-        unittest.main(argv=[argument for argument in sys.argv if argument != '--cases'], verbosity=2)
+    unittest.main(verbosity=2)

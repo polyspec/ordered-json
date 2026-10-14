@@ -7,15 +7,13 @@ use Polyspec\OrderedJson\ParseError;
 use Polyspec\OrderedJson\Value;
 
 /**
- * Run one case. With $report the case id is written before it runs and its
- * result with elapsed time after, so the verifier can name a case that never ends.
+ * Run one case. The case id is written before it runs and its result with
+ * elapsed time after, so the verifier can name a case that never ends.
  */
-function check(array &$failures, string $name, callable $body, bool $report = true): void
+function check(array &$failures, string $name, callable $body): void
 {
-    if ($report) {
-        fwrite(STDOUT, $name . ' ');
-        fflush(STDOUT);
-    }
+    fwrite(STDOUT, $name . ' ');
+    fflush(STDOUT);
     $started = hrtime(true);
     $result = 'ok';
     try {
@@ -24,10 +22,8 @@ function check(array &$failures, string $name, callable $body, bool $report = tr
         $result = 'FAIL';
         $failures[] = $name . ': ' . get_class($error) . ': ' . $error->getMessage();
     }
-    if ($report) {
-        fwrite(STDOUT, $result . ' (' . intdiv(hrtime(true) - $started, 1000000) . ' ms)' . PHP_EOL);
-        fflush(STDOUT);
-    }
+    fwrite(STDOUT, $result . ' (' . intdiv(hrtime(true) - $started, 1000000) . ' ms)' . PHP_EOL);
+    fflush(STDOUT);
 }
 
 function expectThrows(string $class, string $message, callable $body): void
@@ -240,9 +236,9 @@ function orderedJsonApiCases(): array
 }
 
 /** @return list<string> Failure descriptions; empty when every case passes. */
-function orderedJsonApiChecks(bool $report = true): array
+function orderedJsonApiChecks(): array
 {
     $failures = [];
-    foreach (orderedJsonApiCases() as $id => $body) check($failures, $id, $body, $report);
+    foreach (orderedJsonApiCases() as $id => $body) check($failures, $id, $body);
     return $failures;
 }

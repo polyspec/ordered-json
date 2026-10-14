@@ -2,7 +2,7 @@
 """Runs the package checks of the Python implementation with the interpreter that runs it.
 
 Make passes the pinned interpreter of var/tools (PYTHON); this entry point checks no tool
-pin itself, and the registry runs the same package under that interpreter in the job python.
+pin itself, and the verifier runs the same package under that interpreter in the job python.
 Each declared command of the implementation runs to its end; a failure names the
 command, the exit status and the output.
 """
@@ -16,8 +16,6 @@ from registry import REGISTRY, ROOT, expand, repository_paths
 
 CHECKS = (
     ('package tests', 'tests'),
-    ('case listing', 'test_cases'),
-    ('symbol report', 'api_symbols'),
     ('package data', 'package_data'),
 )
 

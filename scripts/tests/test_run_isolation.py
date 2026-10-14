@@ -100,7 +100,7 @@ class RunIsolation(unittest.TestCase):
                 test_runner.build_extension()
         self.assertFalse(inside(captured['cwd']), captured['cwd'])
 
-    def test_rust_builds_runs_and_lists_in_the_run_target_directory(self):
+    def test_rust_builds_and_runs_in_the_run_target_directory(self):
         # A target directory outside the run, as CARGO_TARGET_DIR or build.target-dir name one, would
         # hold a probe that another checkout or an earlier tree built.
         built = []
@@ -115,8 +115,7 @@ class RunIsolation(unittest.TestCase):
             target = str(run.cache / 'rust-target')
             registry.prepare(['rust'], run.paths, run.cache)
             probe = registry.adapter_commands(['rust'], run.paths, run.cache)['rust'][0]
-            declared = {key: registry.declared_commands(key, ['rust'], run.paths, run.cache)['rust']
-                        for key in ('tests', 'test_cases', 'api_symbols')}
+            declared = {key: registry.declared_commands(key, ['rust'], run.paths, run.cache)['rust'] for key in ('tests',)}
         self.assertTrue(Path(probe).is_relative_to(target), probe)
         self.assertEqual([env.get('CARGO_TARGET_DIR') for _, env in built], [target] * len(built))
         for key, entry in declared.items():

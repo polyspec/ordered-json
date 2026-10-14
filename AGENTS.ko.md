@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 3f4f58565b4e77c2cfd9dea1616f519a4dc0a7ab17587617dfe3596060316352 -->
+<!-- source-sha256: 783b1014deb3316a7646898ef89c8a15ff1b7b94c375643af56adf5f4b801250 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -46,7 +46,7 @@ make test-scripts TESTS=scripts/tests/test_check_evidence.py
 git diff --check
 ~~~
 
-`make verify-<language>`(`scripts/verify.py --only`)는 선택한 구현을 빌드하고 그 구현의 케이스·심볼 목록, 선언된 패키지 테스트, 공통 사례를 실행하며 기록을 쓰지 않습니다. `make test-scripts`(`scripts/unit_tests.py`)는 `scripts/tests`의 검증기 unit test 또는 `TESTS`의 test 파일을 test마다 자기 시간 한도로 실행하며 기록을 쓰지 않습니다. test가 없는 module처럼 test를 하나도 고르지 않는 이름은 어떤 test도 실행하기 전에 `selected 0 tests`와 그 이름을 출력하며 실패합니다.
+`make verify-<language>`(`scripts/verify.py --only`)는 선택한 구현을 빌드하고 그 구현의 선언된 패키지 테스트와 공통 사례를 실행하며 기록을 쓰지 않습니다. `make test-scripts`(`scripts/unit_tests.py`)는 `scripts/tests`의 검증기 unit test 또는 `TESTS`의 test 파일을 test마다 자기 시간 한도로 실행하며 기록을 쓰지 않습니다. test가 없는 module처럼 test를 하나도 고르지 않는 이름은 어떤 test도 실행하기 전에 `selected 0 tests`와 그 이름을 출력하며 실패합니다.
 
 `make check`는 hosted CI가 모든 pull request와 모든 push to `main`에서 실행하는 전체 suite입니다. 로컬 실행은 선택이며, 활성 항목이 모두 끝난 뒤 tree마다 많아야 한 번 합니다. 추가 사례를 포함하면 그 실행은 다음과 같습니다.
 
@@ -66,7 +66,7 @@ push는 `[~]` 작업이 없을 때만 합니다. pre-push hook `.githooks/pre-pu
 
 문서만 검토할 때는 `make documents-check`와 `make evidence-check`를 실행합니다. 이 검사들은 검증 기록을 소스와 비교하지 않습니다. commit의 근거는 커밋된 파일이 아니라 그것을 검증하는 실행입니다. `make pie-check`는 PIE 기록 `var/records/pie-verification.json`을, `make verify-all`은 통합 기록 `var/records/verification.json`을 쓰며 Git은 이를 무시하고, `make verify-all` 마지막의 근거 검사는 두 기록을 현재 소스와 대조합니다([기록](docs/operations/validation.ko.md#records)). 기록은 모든 추적 파일을 해시하므로 커밋된 기록은 commit마다 오래된 기록이 됩니다. 어떤 기록도 커밋하지 않으며, 어떤 guard도 기록이 없다는 이유로 거부하지 않습니다. 검사를 통과시키기 위해 검증 결과나 소스 해시를 직접 수정하지 않습니다.
 
-[구현 등록 정보](implementations.json)는 패키지 경로·빌드·어댑터·패키지 테스트·런타임 명령을 정의합니다. `make check`는 선언된 패키지 테스트 명령을 모두 실행합니다. 공통 사례는 JSON 계약만 검사하므로 한 패키지에만 있는 API에는 닿지 않으며, 그런 API는 해당 패키지의 테스트가 필요합니다. [package-tests.json](package-tests.json)은 모든 구현이 실행하는 케이스, 사유를 적은 면제, 패키지 고유 케이스, 그리고 공개 심볼마다 그것을 검증하는 케이스를 정의합니다. `make check`는 이 표준과 각 패키지가 보고한 케이스·심볼을 대조해 누락된 케이스, 선언되지 않은 케이스, 검증되지 않는 심볼, 더 이상 내보내지 않는 심볼 선언이 있으면 실패합니다. 각 케이스 목록은 출력의 기계 형식을 선언합니다(`test_cases`의 `format`). 패키지 자신의 케이스 ID 목록은 `lines`, `cargo test -- --list --format terse`는 `cargo-terse`, `go test -list .* -json`의 event는 `go-test-json`입니다. 형식이 정의하지 않은 줄은 목록을 실패시키고, 0이 아닌 status로 끝난 목록은 standard error와 함께 실패하며, 성공한 목록의 standard error는 도구 알림으로 출력합니다. 공통 JSON 비교 알고리즘을 변경하지 않고 해당 등록 정보와 패키지 디렉터리로 새 언어를 추가합니다. 계약 변경은 같은 저장소 리비전에서 검증기와 관련 패키지를 갱신합니다. [저장소 계약](docs/spec/repositories.ko.md)을 참조합니다.
+[config/parity.json](config/parity.json)은 저장소 언어 집합의 유일한 출처인 구현과 각 구현의 디렉터리, 그리고 `@polyspec/kit`의 parity 검사에서 각 구현이 가지는 unit을 선언합니다: 공통 예제는 suite unit, 모든 패키지 테스트 케이스는 그것을 실행하는 native test에 묶인 feature unit, 그리고 공개 API입니다. `make parity-declarations-check`는 아무것도 실행하지 않고 선언을 검사하고, `make parity-check`는 binding을 실행하고 각 구현의 공개 심볼을 그 생태계의 표준 도구로 읽으므로, 빠진 케이스, 선언되지 않은 test, 선언되지 않은 공개 심볼은 실패합니다. 모든 구현보다 좁은 profile은 이유와 차이의 spec anchor를 적고, 구현이 아직 가지지 않은 unit은 그것을 제거하는 체크리스트 항목을 적은 exclusion이며, 그 항목이 끝날 때까지 검사를 실패시킵니다. 공통 검증기는 그 선언의 comparator입니다: `scripts/registry.py`는 `config/parity.json`의 이름과 디렉터리를 읽고 각 구현의 빌드·어댑터·패키지 테스트·런타임 명령을 가지며, `make check`는 패키지 테스트 명령을 모두 실행합니다. 공통 사례는 JSON 계약만 검사하므로 한 패키지에만 있는 API에는 닿지 않으며, 그런 API는 해당 패키지의 테스트가 필요합니다. 새 언어는 공통 JSON 비교 알고리즘을 변경하지 않고 `config/parity.json`, `scripts/registry.py`의 명령, 패키지 디렉터리에 추가합니다. 계약 변경은 같은 저장소 리비전에서 검증기와 관련 패키지를 갱신합니다. [저장소 계약](docs/spec/repositories.ko.md)을 참조합니다.
 
 모든 언어 어댑터는 [official.json](examples/official.json)과 [scripts/verify.py](scripts/verify.py)를 사용합니다. 공통 사례는 해당 파일이나 `fixtures/`에 추가합니다. 언어별로 다른 예제나 기대 결과를 만들지 않습니다.
 
@@ -109,7 +109,7 @@ Rust 코드는 `packages/ordered-json-rust/`에서 `cargo clippy --all-targets -
 - 실패는 기대값, 실제값, 도구 자신의 오류를 출력합니다. 일치한 줄, 다른 파일, 두 버전이나 hash, 종료 상태와 standard error입니다.
 - 빈 선택은 실패합니다. test를 고르지 않는 unit test 이름, 기능 행이 없는 기록, test를 찾지 못한 실행은 이름을 밝히며 실패합니다.
 - 자식 process는 명령이 끝나거나 호출자가 멈출 때 손자를 포함한 process group 단위로 회수하고(`end_group`), 임시 디렉터리는 `finally`나 context manager에서 제거합니다.
-- 어떤 검사도 사람이 읽는 도구 출력을 단언하지 않습니다. 케이스 목록은 기계 형식을 선언하고, standard error의 도구 알림은 출력하되 판단하지 않으며, `make`를 실행하는 test는 호출자의 make 변수를 제거합니다.
+- 어떤 검사도 사람이 읽는 도구 출력을 단언하지 않습니다. parity 검사는 각 native test runner의 기계 출력을 읽고, standard error의 도구 알림은 출력하되 판단하지 않으며, `make`를 실행하는 test는 호출자의 make 변수를 제거합니다.
 - 바뀐 모든 파일은 소유한 검사에 대응됩니다. `config/owner-checks.json`이 모든 추적 경로를 소유하고, `make owner-check`가 변경의 소유자를 실행하며, pre-commit hook은 대응되지 않은 경로를 거부합니다.
 - 공유 디렉터리, port, fixture는 lease나 실행별 디렉터리를 거칩니다. 각 실행, test, build는 자기 임시 디렉터리를 사용하고, guard는 `var/full-run.lock`을 잡아 한 checkout의 전체 실행이 한 번에 하나씩 실행되게 합니다.
 

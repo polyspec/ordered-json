@@ -1,0 +1,2696 @@
+{
+  "schema": 1,
+  "comment": "The implementations of ordered-json, the one source of its language set, which the shared verifier (scripts/registry.py) reads too, and the units that each holds: the shared examples, the package test cases of each implementation as feature units, and the public API. The verifier of scripts/ compares the outputs of every implementation on the shared cases.",
+  "implementations": [
+    {
+      "name": "js",
+      "runner": "node",
+      "prose": [
+        "JavaScript"
+      ],
+      "roots": [
+        "packages/ordered-json-npm"
+      ],
+      "symbols": {
+        "extractor": "ts",
+        "entry": "packages/ordered-json-npm/index.d.ts"
+      }
+    },
+    {
+      "name": "rust",
+      "runner": "cargo",
+      "prose": [
+        "Rust"
+      ],
+      "roots": [
+        "packages/ordered-json-rust"
+      ],
+      "symbols": {
+        "extractor": "rust",
+        "entry": "packages/ordered-json-rust/Cargo.toml"
+      }
+    },
+    {
+      "name": "go",
+      "runner": "go",
+      "prose": [
+        "Go"
+      ],
+      "roots": [
+        "packages/ordered-json-go"
+      ],
+      "symbols": {
+        "extractor": "go",
+        "entry": "packages/ordered-json-go"
+      }
+    },
+    {
+      "name": "php",
+      "runner": "php",
+      "prose": [
+        "PHP"
+      ],
+      "roots": [
+        "packages/ordered-json-php"
+      ],
+      "symbols": {
+        "extractor": "php",
+        "entry": "packages/ordered-json-php/src"
+      }
+    },
+    {
+      "name": "php-extension",
+      "runner": "php",
+      "prose": [
+        "PHP extension"
+      ],
+      "roots": [
+        "packages/ordered-json-php-ext"
+      ],
+      "args": [
+        "-d",
+        "extension=packages/ordered-json-php-ext/src/modules/ordered_json.so"
+      ],
+      "symbols": {
+        "extractor": "php",
+        "entry": "packages/ordered-json-php-ext/src/ordered_json.stub.php"
+      }
+    },
+    {
+      "name": "python",
+      "runner": "python",
+      "prose": [
+        "Python"
+      ],
+      "roots": [
+        "packages/ordered-json-python"
+      ],
+      "symbols": {
+        "extractor": "python",
+        "entry": "packages/ordered-json-python/src/polyspec/ordered_json"
+      }
+    }
+  ],
+  "profiles": [
+    {
+      "name": "contract",
+      "implementations": [
+        "js",
+        "rust",
+        "go",
+        "php",
+        "php-extension",
+        "python"
+      ]
+    },
+    {
+      "name": "no-rust",
+      "implementations": [
+        "js",
+        "go",
+        "php",
+        "php-extension",
+        "python"
+      ],
+      "reason": "Rust values have no public constructor and no invalid state, Rust returns members and items as shared references, and Rust has no host JSON encoder in its standard library, so the three cases of those properties have no Rust form",
+      "spec": [
+        "docs/spec/api.md#values",
+        "docs/spec/api.md#objects"
+      ]
+    },
+    {
+      "name": "byte-input",
+      "implementations": [
+        "js",
+        "rust",
+        "go",
+        "python"
+      ],
+      "reason": "PHP strings are byte strings, so the PHP API and the extension take one string input and have no separate UTF-8 byte input",
+      "spec": [
+        "docs/spec/api.md#values"
+      ]
+    },
+    {
+      "name": "duplicates",
+      "implementations": [
+        "js",
+        "rust",
+        "php",
+        "php-extension",
+        "python"
+      ],
+      "reason": "the duplicate-key rejection is a binding extension of JavaScript, Rust, PHP and Python; Go has none",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "name": "go",
+      "implementations": [
+        "go"
+      ],
+      "reason": "Marshal and ParseBytesBorrowed are binding extensions of Go",
+      "spec": [
+        "docs/spec/api.md#bindings",
+        "docs/spec/api.md#objects"
+      ]
+    },
+    {
+      "name": "rust",
+      "implementations": [
+        "rust"
+      ],
+      "reason": "the serde module is a binding extension of Rust",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "name": "php-extension",
+      "implementations": [
+        "php-extension"
+      ],
+      "reason": "the extension is the native backend of the PHP package: its scanner, hydration and compact functions and their descriptors exist only there",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "name": "api",
+      "implementations": [
+        "js",
+        "rust",
+        "go",
+        "php",
+        "python"
+      ],
+      "reason": "the PHP extension is the native backend of the PHP package: its public API is its scanner, hydration and compact functions, and the Value API of PHP comes from the PHP package",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "name": "typed",
+      "implementations": [
+        "rust",
+        "go"
+      ],
+      "reason": "Rust and Go return members as a typed ordered map, name the kinds with an enumeration and carry the message of a parse error as a field; JavaScript, PHP and Python return host mappings, name the kinds with strings and keep the message in the host exception",
+      "spec": [
+        "docs/spec/api.md#objects",
+        "docs/spec/api.md#values"
+      ]
+    }
+  ],
+  "suites": [
+    "examples/official.json"
+  ],
+  "comparators": [
+    "scripts"
+  ],
+  "units": [
+    {
+      "id": "official",
+      "kind": "suite",
+      "profile": "contract",
+      "file": "examples/official.json",
+      "cases": "$.cases[*].id",
+      "bindings": []
+    },
+    {
+      "id": "depth_argument_is_bounded",
+      "kind": "feature",
+      "profile": "contract",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/api.rs",
+          "id": "depth_argument_is_bounded"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestDepthArgumentIsBounded"
+        }
+      ]
+    },
+    {
+      "id": "depth_limit_is_enforced",
+      "kind": "feature",
+      "profile": "contract",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/api.rs",
+          "id": "depth_limit_is_enforced"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestDepthLimitIsEnforced"
+        }
+      ]
+    },
+    {
+      "id": "parse_errors_report_offsets",
+      "kind": "feature",
+      "profile": "contract",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/api.rs",
+          "id": "parse_errors_report_offsets"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestParseErrorsReportOffsets"
+        }
+      ]
+    },
+    {
+      "id": "rejection_names_its_kind",
+      "kind": "feature",
+      "profile": "contract",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/api.rs",
+          "id": "rejection_names_its_kind"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestRejectionNamesItsKind"
+        }
+      ]
+    },
+    {
+      "id": "wrong_kind_access_is_reported",
+      "kind": "feature",
+      "profile": "contract",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/api.rs",
+          "id": "wrong_kind_access_is_reported"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestWrongKindAccessIsReported"
+        }
+      ]
+    },
+    {
+      "id": "member_lookup_uses_decoded_names",
+      "kind": "feature",
+      "profile": "contract",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/api.rs",
+          "id": "member_lookup_uses_decoded_names"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestMemberLookupUsesDecodedNames"
+        }
+      ]
+    },
+    {
+      "id": "repeated_key_keeps_first_position_and_last_value",
+      "kind": "feature",
+      "profile": "contract",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/api.rs",
+          "id": "repeated_key_keeps_first_position_and_last_value"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestRepeatedKeyKeepsFirstPositionAndLastValue"
+        }
+      ]
+    },
+    {
+      "id": "root_keeps_surrounding_text",
+      "kind": "feature",
+      "profile": "contract",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/api.rs",
+          "id": "root_keeps_surrounding_text"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestRootKeepsSurroundingText"
+        }
+      ]
+    },
+    {
+      "id": "unpaired_surrogate_stays_in_units",
+      "kind": "feature",
+      "profile": "contract",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/api.rs",
+          "id": "unpaired_surrogate_stays_in_units"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestUnpairedSurrogateStaysInUnits"
+        }
+      ]
+    },
+    {
+      "id": "surrogate_pair_decodes",
+      "kind": "feature",
+      "profile": "contract",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/api.rs",
+          "id": "surrogate_pair_decodes"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestSurrogatePairDecodes"
+        }
+      ]
+    },
+    {
+      "id": "factories_validate_arguments",
+      "kind": "feature",
+      "profile": "contract",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/api.rs",
+          "id": "factories_validate_arguments"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestFactoriesValidateArguments"
+        }
+      ]
+    },
+    {
+      "id": "values_come_only_from_the_library",
+      "kind": "feature",
+      "profile": "no-rust",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestValuesComeOnlyFromTheLibrary"
+        }
+      ]
+    },
+    {
+      "id": "returned_collections_are_immutable",
+      "kind": "feature",
+      "profile": "no-rust",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestReturnedCollectionsAreImmutable"
+        }
+      ]
+    },
+    {
+      "id": "host_serialization_boundary",
+      "kind": "feature",
+      "profile": "no-rust",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestHostSerializationBoundary"
+        }
+      ]
+    },
+    {
+      "id": "bytes_input_is_validated",
+      "kind": "feature",
+      "profile": "byte-input",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/api.rs",
+          "id": "bytes_input_is_validated"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestBytesInputIsValidated"
+        }
+      ]
+    },
+    {
+      "id": "invalid_utf8_reports_the_first_bad_byte",
+      "kind": "feature",
+      "profile": "contract",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/api.rs",
+          "id": "invalid_utf8_reports_the_first_bad_byte"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestInvalidUTF8ReportsTheFirstBadByte"
+        }
+      ]
+    },
+    {
+      "id": "ordered_map_rejects_non_string_key",
+      "kind": "feature",
+      "profile": "contract",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/api.rs",
+          "id": "ordered_map_rejects_non_string_key"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestOrderedMapRejectsNonStringKey"
+        }
+      ]
+    },
+    {
+      "id": "strict_parse_rejects_duplicate_keys",
+      "kind": "feature",
+      "profile": "duplicates",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/duplicate_keys.rs",
+          "id": "strict_parse_rejects_duplicate_keys"
+        }
+      ]
+    },
+    {
+      "id": "strict_parse_accepts_unique_keys",
+      "kind": "feature",
+      "profile": "duplicates",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/duplicate_keys.rs",
+          "id": "strict_parse_accepts_unique_keys"
+        }
+      ]
+    },
+    {
+      "id": "serde_wire_bytes_and_round_trip",
+      "kind": "feature",
+      "profile": "rust",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/serde_binding.rs",
+          "id": "serde_wire_bytes_and_round_trip"
+        }
+      ]
+    },
+    {
+      "id": "serde_manifest_bytes_and_round_trip",
+      "kind": "feature",
+      "profile": "rust",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/serde_binding.rs",
+          "id": "serde_manifest_bytes_and_round_trip"
+        }
+      ]
+    },
+    {
+      "id": "serde_rejects_invalid_and_unconsumed_input",
+      "kind": "feature",
+      "profile": "rust",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/serde_binding.rs",
+          "id": "serde_rejects_invalid_and_unconsumed_input"
+        }
+      ]
+    },
+    {
+      "id": "serde_rejects_duplicate_struct_fields",
+      "kind": "feature",
+      "profile": "rust",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/serde_binding.rs",
+          "id": "serde_rejects_duplicate_struct_fields"
+        }
+      ]
+    },
+    {
+      "id": "serde_embedded_values_preserve_order_and_number_tokens",
+      "kind": "feature",
+      "profile": "rust",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/serde_binding.rs",
+          "id": "serde_embedded_values_preserve_order_and_number_tokens"
+        }
+      ]
+    },
+    {
+      "id": "serde_value_respects_container_depth",
+      "kind": "feature",
+      "profile": "rust",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/serde_binding.rs",
+          "id": "serde_value_respects_container_depth"
+        }
+      ]
+    },
+    {
+      "id": "serde_value_preserves_unpaired_surrogate_token",
+      "kind": "feature",
+      "profile": "rust",
+      "bindings": [
+        {
+          "implementation": "rust",
+          "test": "packages/ordered-json-rust/tests/serde_binding.rs",
+          "id": "serde_value_preserves_unpaired_surrogate_token"
+        }
+      ]
+    },
+    {
+      "id": "marshal_preserves_typed_json_contract",
+      "kind": "feature",
+      "profile": "go",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/marshal_test.go",
+          "id": "TestMarshalPreservesTypedJSONContract"
+        }
+      ]
+    },
+    {
+      "id": "marshal_keeps_empty_object_and_array_distinct",
+      "kind": "feature",
+      "profile": "go",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/marshal_test.go",
+          "id": "TestMarshalKeepsEmptyObjectAndArrayDistinct"
+        }
+      ]
+    },
+    {
+      "id": "marshal_validates_custom_marshaler_through_ordered_parser",
+      "kind": "feature",
+      "profile": "go",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/marshal_test.go",
+          "id": "TestMarshalValidatesCustomMarshalerThroughOrderedParser"
+        }
+      ]
+    },
+    {
+      "id": "marshal_rejects_unsupported_map_key",
+      "kind": "feature",
+      "profile": "go",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/marshal_test.go",
+          "id": "TestMarshalRejectsUnsupportedMapKey"
+        }
+      ]
+    },
+    {
+      "id": "marshal_writes_null_for_nil_value_pointer",
+      "kind": "feature",
+      "profile": "go",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/marshal_test.go",
+          "id": "TestMarshalWritesNullForNilValuePointer"
+        }
+      ]
+    },
+    {
+      "id": "marshal_time_and_bytes_match_typed_values",
+      "kind": "feature",
+      "profile": "go",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/marshal_test.go",
+          "id": "TestMarshalTimeAndBytesMatchTypedValues"
+        }
+      ]
+    },
+    {
+      "id": "marshal_promotes_embedded_fields",
+      "kind": "feature",
+      "profile": "go",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/marshal_test.go",
+          "id": "TestMarshalPromotesEmbeddedFields"
+        }
+      ]
+    },
+    {
+      "id": "marshal_rejects_repeated_field_names",
+      "kind": "feature",
+      "profile": "go",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/marshal_test.go",
+          "id": "TestMarshalRejectsRepeatedFieldNames"
+        }
+      ]
+    },
+    {
+      "id": "marshal_rejects_cyclic_values",
+      "kind": "feature",
+      "profile": "go",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/marshal_test.go",
+          "id": "TestMarshalRejectsCyclicValues"
+        }
+      ]
+    },
+    {
+      "id": "marshal_rejects_values_deeper_than_the_parser",
+      "kind": "feature",
+      "profile": "go",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/marshal_test.go",
+          "id": "TestMarshalRejectsValuesDeeperThanTheParser"
+        }
+      ]
+    },
+    {
+      "id": "marshal_matches_host_encoder_structures",
+      "kind": "feature",
+      "profile": "go",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/marshal_fuzz_test.go",
+          "id": "TestMarshalMatchesHostEncoderStructures"
+        }
+      ]
+    },
+    {
+      "id": "marshal_omit_rules_follow_the_host_encoder",
+      "kind": "feature",
+      "profile": "go",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/marshal_fuzz_test.go",
+          "id": "TestMarshalOmitRulesFollowTheHostEncoder"
+        }
+      ]
+    },
+    {
+      "id": "marshal_reports_non_finite_numbers",
+      "kind": "feature",
+      "profile": "go",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/marshal_fuzz_test.go",
+          "id": "TestMarshalReportsNonFiniteNumbers"
+        }
+      ]
+    },
+    {
+      "id": "borrowed_input_is_copied_on_access",
+      "kind": "feature",
+      "profile": "go",
+      "bindings": [
+        {
+          "implementation": "go",
+          "test": "packages/ordered-json-go/api_test.go",
+          "id": "TestBorrowedInputIsCopiedOnAccess"
+        }
+      ]
+    },
+    {
+      "id": "utf8_validation_survives_low_pcre_limits",
+      "kind": "feature",
+      "profile": "contract",
+      "bindings": []
+    },
+    {
+      "id": "hydrate_without_the_value_class",
+      "kind": "feature",
+      "profile": "php-extension",
+      "bindings": []
+    },
+    {
+      "id": "hydrate_object_members",
+      "kind": "feature",
+      "profile": "php-extension",
+      "bindings": []
+    },
+    {
+      "id": "hydrate_array_items",
+      "kind": "feature",
+      "profile": "php-extension",
+      "bindings": []
+    },
+    {
+      "id": "hydrate_rejects_malformed_descriptors",
+      "kind": "feature",
+      "profile": "php-extension",
+      "bindings": []
+    },
+    {
+      "id": "compact_node_rejects_mismatched_descriptors",
+      "kind": "feature",
+      "profile": "php-extension",
+      "bindings": []
+    },
+    {
+      "id": "compact_node_copies_a_compact_token",
+      "kind": "feature",
+      "profile": "php-extension",
+      "bindings": []
+    },
+    {
+      "id": "scan_rejects_depth_outside_the_range",
+      "kind": "feature",
+      "profile": "php-extension",
+      "bindings": []
+    },
+    {
+      "id": "scan_reports_the_parse_error_offset",
+      "kind": "feature",
+      "profile": "php-extension",
+      "bindings": []
+    },
+    {
+      "id": "escaped_member_name_decodes",
+      "kind": "feature",
+      "profile": "php-extension",
+      "bindings": []
+    },
+    {
+      "id": "unpaired_surrogate_member_name_keeps_wtf8_identity",
+      "kind": "feature",
+      "profile": "php-extension",
+      "bindings": []
+    },
+    {
+      "id": "text_input_rejects_lone_surrogates",
+      "kind": "feature",
+      "profile": "contract",
+      "bindings": []
+    },
+    {
+      "id": "api-parse",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::parse"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Parse"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\parse"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.parse"
+        }
+      ]
+    },
+    {
+      "id": "api-parse-bytes",
+      "kind": "api",
+      "profile": "byte-input",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::parse_bytes"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseBytes"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.parse_bytes"
+        }
+      ]
+    },
+    {
+      "id": "api-max-depth",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::MAX_DEPTH"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.MaxDepth"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\MAX_DEPTH"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.MAX_DEPTH"
+        }
+      ]
+    },
+    {
+      "id": "api-depth-limit",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::parse_with_max_depth"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseWithMaxDepth"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\parse"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.ParseOptions"
+        }
+      ]
+    },
+    {
+      "id": "api-stringify",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::stringify"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Stringify"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\stringify"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.stringify"
+        }
+      ]
+    },
+    {
+      "id": "api-value",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value"
+        }
+      ]
+    },
+    {
+      "id": "api-parse-error",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Error"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseError"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\ParseError"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.ParseError"
+        }
+      ]
+    },
+    {
+      "id": "api-parse-error-kind",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Error::kind"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseError.Kind"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\ParseError::$kind"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.ParseError"
+        }
+      ]
+    },
+    {
+      "id": "api-parse-error-offset",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Error::offset"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseError.Offset"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\ParseError::$offset"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.ParseError"
+        }
+      ]
+    },
+    {
+      "id": "api-value-compact",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::compact"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.Compact"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::compact"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.compact"
+        }
+      ]
+    },
+    {
+      "id": "api-value-raw",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::raw"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.Raw"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::raw"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.raw"
+        }
+      ]
+    },
+    {
+      "id": "api-value-kind",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::kind"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.Kind"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::kind"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.kind"
+        }
+      ]
+    },
+    {
+      "id": "api-value-members",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::members"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.Members"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::members"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.members"
+        }
+      ]
+    },
+    {
+      "id": "api-value-get",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::get"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.Get"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::get"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.get"
+        }
+      ]
+    },
+    {
+      "id": "api-value-get-units",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::get_units"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.GetUnits"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::getUnits"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.get_units"
+        }
+      ]
+    },
+    {
+      "id": "api-value-items",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::items"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.Items"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::items"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.items"
+        }
+      ]
+    },
+    {
+      "id": "api-value-string-value",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::string_value"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.StringValue"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::stringValue"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.string_value"
+        }
+      ]
+    },
+    {
+      "id": "api-value-string-units",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::string_units"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.StringUnits"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::stringUnits"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.string_units"
+        }
+      ]
+    },
+    {
+      "id": "api-value-number-literal",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::number_literal"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.NumberLiteral"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::numberLiteral"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.number_literal"
+        }
+      ]
+    },
+    {
+      "id": "api-value-boolean-value",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::boolean_value"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.BooleanValue"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::booleanValue"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.boolean_value"
+        }
+      ]
+    },
+    {
+      "id": "api-factory-object",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::object"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Object"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::object"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.object"
+        }
+      ]
+    },
+    {
+      "id": "api-factory-array",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::array"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Array"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::array"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.array"
+        }
+      ]
+    },
+    {
+      "id": "api-factory-string",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::string"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.String"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::string"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.string"
+        }
+      ]
+    },
+    {
+      "id": "api-factory-number",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::number"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Number"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::number"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.number"
+        }
+      ]
+    },
+    {
+      "id": "api-factory-boolean",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::boolean"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Boolean"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::boolean"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.boolean"
+        }
+      ]
+    },
+    {
+      "id": "api-factory-null",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::null"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Null"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::null"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.null"
+        }
+      ]
+    },
+    {
+      "id": "api-factory-from-units",
+      "kind": "api",
+      "profile": "api",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::from_units"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.StringFromUnits"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::fromUnits"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.from_units"
+        }
+      ]
+    },
+    {
+      "id": "api-ordered-map",
+      "kind": "api",
+      "profile": "typed",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::OrderedMap"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.OrderedMap"
+        }
+      ]
+    },
+    {
+      "id": "api-ordered-map-get",
+      "kind": "api",
+      "profile": "typed",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::OrderedMap::get"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.OrderedMap.Get"
+        }
+      ]
+    },
+    {
+      "id": "api-ordered-map-get-units",
+      "kind": "api",
+      "profile": "typed",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::OrderedMap::get_units"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.OrderedMap.GetUnits"
+        }
+      ]
+    },
+    {
+      "id": "api-ordered-map-insert",
+      "kind": "api",
+      "profile": "typed",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::OrderedMap::insert"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.OrderedMap.Set"
+        }
+      ]
+    },
+    {
+      "id": "api-ordered-map-len",
+      "kind": "api",
+      "profile": "typed",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::OrderedMap::len"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.OrderedMap.Len"
+        }
+      ]
+    },
+    {
+      "id": "api-ordered-map-keys",
+      "kind": "api",
+      "profile": "typed",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::OrderedMap::iter"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.OrderedMap.Keys"
+        }
+      ]
+    },
+    {
+      "id": "api-kind-type",
+      "kind": "api",
+      "profile": "typed",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Kind"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Kind"
+        }
+      ]
+    },
+    {
+      "id": "api-kind-object",
+      "kind": "api",
+      "profile": "typed",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Kind::Object"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ObjectKind"
+        }
+      ]
+    },
+    {
+      "id": "api-kind-array",
+      "kind": "api",
+      "profile": "typed",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Kind::Array"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ArrayKind"
+        }
+      ]
+    },
+    {
+      "id": "api-kind-string",
+      "kind": "api",
+      "profile": "typed",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Kind::String"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.StringKind"
+        }
+      ]
+    },
+    {
+      "id": "api-kind-number",
+      "kind": "api",
+      "profile": "typed",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Kind::Number"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.NumberKind"
+        }
+      ]
+    },
+    {
+      "id": "api-kind-boolean",
+      "kind": "api",
+      "profile": "typed",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Kind::Boolean"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.BooleanKind"
+        }
+      ]
+    },
+    {
+      "id": "api-kind-null",
+      "kind": "api",
+      "profile": "typed",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Kind::Null"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.NullKind"
+        }
+      ]
+    },
+    {
+      "id": "api-parse-error-message",
+      "kind": "api",
+      "profile": "typed",
+      "symbols": [
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Error::message"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseError.Message"
+        }
+      ]
+    }
+  ],
+  "nativeOnly": [
+    {
+      "implementation": "rust",
+      "symbol": "polyspec_ordered_json::serde",
+      "reason": "the serde module is a binding extension of Rust",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "rust",
+      "symbol": "polyspec_ordered_json::serde::Error",
+      "reason": "the serde module is a binding extension of Rust",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "rust",
+      "symbol": "polyspec_ordered_json::serde::Error::Encode",
+      "reason": "the serde module is a binding extension of Rust",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "rust",
+      "symbol": "polyspec_ordered_json::serde::Error::Json",
+      "reason": "the serde module is a binding extension of Rust",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "rust",
+      "symbol": "polyspec_ordered_json::serde::Error::Typed",
+      "reason": "the serde module is a binding extension of Rust",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "rust",
+      "symbol": "polyspec_ordered_json::serde::from_slice",
+      "reason": "the serde module is a binding extension of Rust",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "rust",
+      "symbol": "polyspec_ordered_json::serde::from_str",
+      "reason": "the serde module is a binding extension of Rust",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "rust",
+      "symbol": "polyspec_ordered_json::serde::to_string",
+      "reason": "the serde module is a binding extension of Rust",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "rust",
+      "symbol": "polyspec_ordered_json::parse_bytes_reject_duplicates",
+      "reason": "the duplicate-key rejection of Rust is a function of its own, a binding extension",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "rust",
+      "symbol": "polyspec_ordered_json::OrderedMap::new",
+      "reason": "a Rust map is built empty by its constructor, then filled with insert",
+      "spec": [
+        "docs/spec/api.md#objects"
+      ]
+    },
+    {
+      "implementation": "rust",
+      "symbol": "polyspec_ordered_json::OrderedMap::is_empty",
+      "reason": "the Rust collection convention pairs len with is_empty",
+      "spec": [
+        "docs/spec/api.md#objects"
+      ]
+    },
+    {
+      "implementation": "go",
+      "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Marshal",
+      "reason": "Marshal and its Marshaler boundary are a binding extension of Go",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "go",
+      "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Marshaler",
+      "reason": "Marshal and its Marshaler boundary are a binding extension of Go",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "go",
+      "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Marshaler.MarshalJSON",
+      "reason": "Marshal and its Marshaler boundary are a binding extension of Go",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "go",
+      "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseBytesBorrowed",
+      "reason": "ParseBytesBorrowed is the explicit zero-copy byte input of Go",
+      "spec": [
+        "docs/spec/api.md#objects"
+      ]
+    },
+    {
+      "implementation": "go",
+      "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.ParseError.Error",
+      "reason": "a Go error implements the error interface with Error()",
+      "spec": [
+        "docs/spec/api.md#values"
+      ]
+    },
+    {
+      "implementation": "go",
+      "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.MarshalJSON",
+      "reason": "a Go Value meets the host JSON encoder at the MarshalJSON boundary, which writes the ordered compact text, so the host encoder does not reorder it",
+      "spec": [
+        "docs/spec/api.md#values",
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "go",
+      "symbol": "github.com/polyspec/ordered-json/packages/ordered-json-go.Value.String",
+      "reason": "a Go Value prints its compact text through the fmt.Stringer interface",
+      "spec": [
+        "docs/spec/api.md#values"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Value::parse",
+      "reason": "the PHP Value class parses text with the depth limit of the parse operation, as the PHP backends describe",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Value::parseRejectDuplicates",
+      "reason": "the duplicate-key rejection of PHP is a method of its own, a binding extension",
+      "spec": [
+        "docs/spec/api.md#bindings"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\ParseError::__construct",
+      "reason": "a PHP exception is created by the constructor of its class",
+      "spec": [
+        "docs/spec/api.md#values"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Value::__toString",
+      "reason": "a PHP Value converts to its compact text as a string",
+      "spec": [
+        "docs/spec/api.md#values"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Value::jsonSerialize",
+      "reason": "a PHP Value meets the host json_encode at the JsonSerializable boundary, which the PHP backends describe",
+      "spec": [
+        "docs/spec/api.md#values"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Parser",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Parser::__construct",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Parser::parse",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Tape",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Tape::ARRAY",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Tape::BOOLEAN",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Tape::COMPACT",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Tape::ESCAPED",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Tape::KIND",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Tape::KINDS",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Tape::LINK",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Tape::NULL",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Tape::NUMBER",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Tape::OBJECT",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Tape::SKIP",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\Tape::STRING",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\invalidUtf8Offset",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\keyText",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\quoteKey",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\quoteUnits",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\textUnits",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\tokenText",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\tokenUnits",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\unitsToUtf8",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php",
+      "symbol": "Polyspec\\OrderedJson\\utf8Units",
+      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php-extension",
+      "symbol": "ordered_json_scan",
+      "reason": "the extension is the native backend of the PHP package; its scanner, hydration and compact functions exist only there",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php-extension",
+      "symbol": "ordered_json_hydrate",
+      "reason": "the extension is the native backend of the PHP package; its scanner, hydration and compact functions exist only there",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    },
+    {
+      "implementation": "php-extension",
+      "symbol": "ordered_json_compact_node",
+      "reason": "the extension is the native backend of the PHP package; its scanner, hydration and compact functions exist only there",
+      "spec": [
+        "docs/spec/api.md#php"
+      ]
+    }
+  ],
+  "exclusions": [
+    {
+      "unit": "official",
+      "implementation": "js",
+      "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
+      "item": "T1.38"
+    },
+    {
+      "unit": "official",
+      "implementation": "rust",
+      "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
+      "item": "T1.38"
+    },
+    {
+      "unit": "official",
+      "implementation": "go",
+      "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
+      "item": "T1.38"
+    },
+    {
+      "unit": "official",
+      "implementation": "php",
+      "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
+      "item": "T1.38"
+    },
+    {
+      "unit": "official",
+      "implementation": "php-extension",
+      "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
+      "item": "T1.38"
+    },
+    {
+      "unit": "official",
+      "implementation": "python",
+      "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
+      "item": "T1.38"
+    },
+    {
+      "unit": "depth_argument_is_bounded",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "depth_argument_is_bounded",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "depth_argument_is_bounded",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "depth_argument_is_bounded",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "depth_limit_is_enforced",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "depth_limit_is_enforced",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "depth_limit_is_enforced",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "depth_limit_is_enforced",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "parse_errors_report_offsets",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "parse_errors_report_offsets",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "parse_errors_report_offsets",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "parse_errors_report_offsets",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "rejection_names_its_kind",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "rejection_names_its_kind",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "rejection_names_its_kind",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "rejection_names_its_kind",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "wrong_kind_access_is_reported",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "wrong_kind_access_is_reported",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "wrong_kind_access_is_reported",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "wrong_kind_access_is_reported",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "member_lookup_uses_decoded_names",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "member_lookup_uses_decoded_names",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "member_lookup_uses_decoded_names",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "member_lookup_uses_decoded_names",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "repeated_key_keeps_first_position_and_last_value",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "repeated_key_keeps_first_position_and_last_value",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "repeated_key_keeps_first_position_and_last_value",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "repeated_key_keeps_first_position_and_last_value",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "root_keeps_surrounding_text",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "root_keeps_surrounding_text",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "root_keeps_surrounding_text",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "root_keeps_surrounding_text",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "unpaired_surrogate_stays_in_units",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "unpaired_surrogate_stays_in_units",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "unpaired_surrogate_stays_in_units",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "unpaired_surrogate_stays_in_units",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "surrogate_pair_decodes",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "surrogate_pair_decodes",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "surrogate_pair_decodes",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "surrogate_pair_decodes",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "factories_validate_arguments",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "factories_validate_arguments",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "factories_validate_arguments",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "factories_validate_arguments",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "values_come_only_from_the_library",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "values_come_only_from_the_library",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "values_come_only_from_the_library",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "values_come_only_from_the_library",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "returned_collections_are_immutable",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "returned_collections_are_immutable",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "returned_collections_are_immutable",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "returned_collections_are_immutable",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "host_serialization_boundary",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "host_serialization_boundary",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "host_serialization_boundary",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "host_serialization_boundary",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "bytes_input_is_validated",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "bytes_input_is_validated",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "invalid_utf8_reports_the_first_bad_byte",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "invalid_utf8_reports_the_first_bad_byte",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "invalid_utf8_reports_the_first_bad_byte",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "invalid_utf8_reports_the_first_bad_byte",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "ordered_map_rejects_non_string_key",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "ordered_map_rejects_non_string_key",
+      "implementation": "js",
+      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of rust, go, python",
+      "item": "T1.39"
+    },
+    {
+      "unit": "ordered_map_rejects_non_string_key",
+      "implementation": "php",
+      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of rust, go, python",
+      "item": "T1.39"
+    },
+    {
+      "unit": "ordered_map_rejects_non_string_key",
+      "implementation": "php-extension",
+      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of rust, go, python",
+      "item": "T1.39"
+    },
+    {
+      "unit": "strict_parse_rejects_duplicate_keys",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "strict_parse_rejects_duplicate_keys",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "strict_parse_rejects_duplicate_keys",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "strict_parse_rejects_duplicate_keys",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "strict_parse_accepts_unique_keys",
+      "implementation": "js",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "strict_parse_accepts_unique_keys",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "strict_parse_accepts_unique_keys",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "strict_parse_accepts_unique_keys",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "utf8_validation_survives_low_pcre_limits",
+      "implementation": "php",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "utf8_validation_survives_low_pcre_limits",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "utf8_validation_survives_low_pcre_limits",
+      "implementation": "js",
+      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of php, php-extension",
+      "item": "T1.39"
+    },
+    {
+      "unit": "utf8_validation_survives_low_pcre_limits",
+      "implementation": "rust",
+      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of php, php-extension",
+      "item": "T1.39"
+    },
+    {
+      "unit": "utf8_validation_survives_low_pcre_limits",
+      "implementation": "go",
+      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of php, php-extension",
+      "item": "T1.39"
+    },
+    {
+      "unit": "utf8_validation_survives_low_pcre_limits",
+      "implementation": "python",
+      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of php, php-extension",
+      "item": "T1.39"
+    },
+    {
+      "unit": "hydrate_without_the_value_class",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "hydrate_object_members",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "hydrate_array_items",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "hydrate_rejects_malformed_descriptors",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "compact_node_rejects_mismatched_descriptors",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "compact_node_copies_a_compact_token",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "scan_rejects_depth_outside_the_range",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "scan_reports_the_parse_error_offset",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "escaped_member_name_decodes",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "unpaired_surrogate_member_name_keeps_wtf8_identity",
+      "implementation": "php-extension",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "text_input_rejects_lone_surrogates",
+      "implementation": "python",
+      "reason": "its package test runs the case with a runner of its own, not with the native runner of kit parity",
+      "item": "T1.38"
+    },
+    {
+      "unit": "text_input_rejects_lone_surrogates",
+      "implementation": "js",
+      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of python",
+      "item": "T1.39"
+    },
+    {
+      "unit": "text_input_rejects_lone_surrogates",
+      "implementation": "rust",
+      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of python",
+      "item": "T1.39"
+    },
+    {
+      "unit": "text_input_rejects_lone_surrogates",
+      "implementation": "go",
+      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of python",
+      "item": "T1.39"
+    },
+    {
+      "unit": "text_input_rejects_lone_surrogates",
+      "implementation": "php",
+      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of python",
+      "item": "T1.39"
+    },
+    {
+      "unit": "text_input_rejects_lone_surrogates",
+      "implementation": "php-extension",
+      "reason": "the implementation does not run the case: kit parity declares a narrower profile only for two or more units, and the case is the only unit of python",
+      "item": "T1.39"
+    }
+  ]
+}

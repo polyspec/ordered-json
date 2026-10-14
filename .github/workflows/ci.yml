@@ -62,7 +62,7 @@ jobs:
         run: make install-tools TOOLS=alint
       - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci-targets TARGETS="kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check"
+        run: make ci-targets TARGETS="kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check"
       # actions/upload-artifact v7.0.1: the report of this job, var/report/ci-targets.
       - name: report
         if: ${{ !cancelled() }}
@@ -110,7 +110,7 @@ jobs:
         if: ${{ !cancelled() }}
         env:
           JSON_TEST_SUITE: .cache/JSONTestSuite
-        run: make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check"
+        run: make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all parity-check clippy go-vet pie-check"
       - name: report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -119,8 +119,8 @@ jobs:
           path: var/report/ci-targets/
           if-no-files-found: error
   # The Python package runs under the pinned interpreter of make install-tools, the minor release of .python-version, which
-  # is also its requires-python (scripts/tests/test_python_requires.py). The job runs its package tests, its case listing and
-  # its symbol report (make python-package-check, scripts/python_check.py).
+  # is also its requires-python (scripts/tests/test_python_requires.py). The job runs its package tests and its package data
+  # check (make python-package-check, scripts/python_check.py).
   python:
     runs-on: ubuntu-24.04
     steps:
