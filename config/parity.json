@@ -242,6 +242,21 @@
           "symbol": "TestOfficial"
         },
         {
+          "implementation": "rust",
+          "test": "packages/rust/tests/official.rs",
+          "symbol": "official"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/OfficialTest.php",
+          "symbol": "Polyspec\\OrderedJson\\Tests\\OfficialTest::testCase"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/OfficialTest.php",
+          "symbol": "Polyspec\\OrderedJson\\Extension\\Tests\\OfficialTest::testCase"
+        },
+        {
           "implementation": "python",
           "test": "packages/python/tests/test_official.py"
         }
@@ -2744,26 +2759,7 @@
       ]
     }
   ],
-  "exclusions": [
-    {
-      "unit": "official",
-      "implementation": "rust",
-      "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
-      "item": "T1.38"
-    },
-    {
-      "unit": "official",
-      "implementation": "php",
-      "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
-      "item": "T1.38"
-    },
-    {
-      "unit": "official",
-      "implementation": "php-extension",
-      "reason": "no native test of this implementation runs examples/official.json; the shared verifier runs the cases through its adapter",
-      "item": "T1.38"
-    }
-  ],
+  "exclusions": [],
   "tools": [
     {
       "root": "tests/scripts",

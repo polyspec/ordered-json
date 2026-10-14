@@ -18,8 +18,14 @@ name = "polyspec_ordered_json"
 path = "src/lib.rs"
 
 [dev-dependencies]
+libtest-mimic = "=0.8.2"
 sha2 = "0.10"
 serde_json = "1"
+
+# The official examples run as the trials of libtest-mimic, one test per case, so the harness of the test is its own.
+[[test]]
+name = "official"
+harness = false
 
 # The crate is its own workspace, whose lints kit requires (config/cargo.schema.json): no unsafe code, and every allow
 # attribute names its reason.
