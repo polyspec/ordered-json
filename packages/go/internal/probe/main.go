@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/polyspec/ordered-json/packages/ordered-json-go"
+	"github.com/polyspec/ordered-json/packages/go"
 	"os"
 	"strings"
 )

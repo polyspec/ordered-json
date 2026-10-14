@@ -22,7 +22,7 @@ The object entry list is a reporting format for comparing order. Internal object
 <a id="verification"></a>
 ## Adapters and reconstruction
 
-Each language adapter parses the same documents and reports results. [scripts/verify.py](../scripts/verify.py) performs every comparison. Additional inputs under `fixtures/` and the optional supplementary suite use an independent standard-library reference with object-pair and number-token callbacks.
+Each language adapter parses the same documents and reports results. [scripts/verify.py](../scripts/verify.py) performs every comparison. Additional inputs under `contracts/fixtures/` and the optional supplementary suite use an independent standard-library reference with object-pair and number-token callbacks.
 
 Each adapter also parses its serialized output and serializes that value again. The verifier requires the second output and the second type tree to match the first output and type tree.
 

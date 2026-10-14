@@ -1,5 +1,5 @@
-<!-- doc-id: php-development -->
-<!-- source-sha256: fe2c5ccf0002497530645b84f147dae6fe313620b2176b00aea16db188b8208d -->
+<!-- doc-id: npm-development -->
+<!-- source-sha256: 1f9d319534bca12f064601c5b848b926519461512356d4f08e3491d60d8e93de -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -22,7 +22,7 @@ make docs-check
 git diff --check
 ~~~
 
-`make check`는 이 패키지만 공통 검증기로 검사하며(`scripts/verify.py --only`) 기록을 쓰지 않습니다. `make docs-check`는 저장소 루트의 `make documents-check`를 실행합니다. 저장소 루트의 `config/parity.json`이 이 패키지를 unit과 함께 구현으로 선언하고, `scripts/registry.py`가 그 빌드, 패키지 테스트, 어댑터 명령을 가집니다. 저장소 루트의 전체 suite는 `packages/ordered-json-rust/`에서 `cargo clippy --all-targets -- -D warnings`, `packages/ordered-json-go/`에서 `go vet ./...`을 실행합니다. 네이티브 소스를 변경하면 새로 빌드해야 하며 공통 네이티브 검사는 자동으로 다시 빌드합니다.
+`make check`는 이 패키지만 공통 검증기로 검사하며(`scripts/verify.py --only`) 기록을 쓰지 않습니다. `make docs-check`는 저장소 루트의 `make documents-check`를 실행합니다. 저장소 루트의 `config/parity.json`이 이 패키지를 unit과 함께 구현으로 선언하고, `scripts/registry.py`가 그 빌드, 패키지 테스트, 어댑터 명령을 가집니다. 저장소 루트의 전체 suite는 `packages/rust/`에서 `cargo clippy --all-targets -- -D warnings`, `packages/go/`에서 `go vet ./...`을 실행합니다. 네이티브 소스를 변경하면 새로 빌드해야 하며 공통 네이티브 검사는 자동으로 다시 빌드합니다.
 
 <a id="completion"></a>
 ## 완료

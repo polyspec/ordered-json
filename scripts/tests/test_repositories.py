@@ -48,21 +48,21 @@ class RepositoryChecks(unittest.TestCase):
         # github.com/polyspec/<repository>, and the PHP classes and functions in the namespace Polyspec\<Name>.
         root = Path(__file__).resolve().parents[2]
         composer = {name: json.loads((root / name).read_text())['name']
-                    for name in ('composer.json', 'packages/ordered-json-php/composer.json', 'packages/ordered-json-php-ext/composer.json')}
-        self.assertEqual(composer, {'composer.json': 'polyspec/ordered-json', 'packages/ordered-json-php/composer.json': 'polyspec/ordered-json',
-                                    'packages/ordered-json-php-ext/composer.json': 'polyspec/ordered-json-extension'})
-        for name in ('composer.json', 'packages/ordered-json-php/composer.json'):
+                    for name in ('composer.json', 'packages/php/composer.json', 'packages/php-ext/composer.json')}
+        self.assertEqual(composer, {'composer.json': 'polyspec/ordered-json', 'packages/php/composer.json': 'polyspec/ordered-json',
+                                    'packages/php-ext/composer.json': 'polyspec/ordered-json-extension'})
+        for name in ('composer.json', 'packages/php/composer.json'):
             self.assertIn('polyspec/ordered-json-extension', json.loads((root / name).read_text())['suggest']['ext-ordered_json'])
-        npm = {name: json.loads((root / name).read_text())['name'] for name in ('package.json', 'packages/ordered-json-npm/package.json')}
-        self.assertEqual(npm, {'package.json': '@polyspec/ordered-json', 'packages/ordered-json-npm/package.json': '@polyspec/ordered-json'})
-        cargo = (root / 'packages/ordered-json-rust/Cargo.toml').read_text()
+        npm = {name: json.loads((root / name).read_text())['name'] for name in ('package.json', 'packages/js/package.json')}
+        self.assertEqual(npm, {'package.json': '@polyspec/ordered-json', 'packages/js/package.json': '@polyspec/ordered-json'})
+        cargo = (root / 'packages/rust/Cargo.toml').read_text()
         self.assertIn('[package]\nname = "polyspec-ordered-json"\n', cargo)
         self.assertIn('[lib]\nname = "polyspec_ordered_json"\n', cargo)
-        self.assertIn('name = "polyspec-ordered-json"\n', (root / 'packages/ordered-json-rust/Cargo.lock').read_text())
-        self.assertEqual((root / 'packages/ordered-json-go/go.mod').read_text().splitlines()[0], 'module github.com/polyspec/ordered-json/packages/ordered-json-go')
-        php = (root / 'packages/ordered-json-php/src/OrderedJson.php').read_text()
+        self.assertIn('name = "polyspec-ordered-json"\n', (root / 'packages/rust/Cargo.lock').read_text())
+        self.assertEqual((root / 'packages/go/go.mod').read_text().splitlines()[0], 'module github.com/polyspec/ordered-json/packages/go')
+        php = (root / 'packages/php/src/OrderedJson.php').read_text()
         self.assertIn('\nnamespace Polyspec\\OrderedJson;\n', php)
-        native = (root / 'packages/ordered-json-php-ext/src/ordered_json.c').read_text() + (root / 'packages/ordered-json-php-ext/src/hydrate.c').read_text()
+        native = (root / 'packages/php-ext/src/ordered_json.c').read_text() + (root / 'packages/php-ext/src/hydrate.c').read_text()
         self.assertIn('"Polyspec\\\\OrderedJson\\\\NativeParseError"', native)
         self.assertIn('"Polyspec\\\\OrderedJson\\\\Value"', native)
         # No tracked file keeps an old name: the Composer vendor ordered-json/, the namespace OrderedJson\, the global
@@ -109,7 +109,7 @@ class RepositoryChecks(unittest.TestCase):
                                               'declared': ['go', 'test', '-v', '-p', '1', './...']})
             extension = test_commands(['php-extension'], paths, Path(folder) / 'cache')['php-extension']
             self.assertEqual(extension['declared'][-1], '{php}/src/OrderedJson.php')
-            self.assertTrue(extension['command'][-1].endswith('/ordered-json-php/src/OrderedJson.php'))
+            self.assertTrue(extension['command'][-1].endswith('/php/src/OrderedJson.php'))
 
     def test_registry_rejects_an_incomplete_test_declaration(self):
         commands = copy.deepcopy(COMMANDS)
@@ -151,7 +151,7 @@ class RepositoryChecks(unittest.TestCase):
         self.assertFalse((ROOT / 'package-tests.json').exists())
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
-            declare(root, {'js': 'packages/ordered-json-npm', 'future': 'packages/future'})
+            declare(root, {'js': 'packages/js', 'future': 'packages/future'})
             with self.assertRaisesRegex(ValueError, r"declares \['future', 'js'\], but the verifier has commands for"):
                 load_registry(root, {'js': COMMANDS['js']})
 

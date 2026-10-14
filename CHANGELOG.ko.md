@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 86a807ebc8dede8af91b4fd485a7fcc33d1c4709df05d3ea1617ad964196c862 -->
+<!-- source-sha256: c22034d3884dba581b5a68a4df62aa22f0e2054dc53ba522a9f677f6c2d41a79 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,13 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.42: 폴더는 kit layout의 S5를 따릅니다. 패키지와 공유 fixture를 옮겼으며, consumer는 이 release를 넘어설 때 새 경로를 씁니다.
+  - `packages/ordered-json-go` → `packages/go`: Go module `github.com/polyspec/ordered-json/packages/ordered-json-go`는 `github.com/polyspec/ordered-json/packages/go`이고, tag는 `packages/ordered-json-go/vX.Y.Z` 대신 `packages/go/vX.Y.Z`입니다.
+  - `packages/ordered-json-npm` → `packages/js`. npm package `@polyspec/ordered-json`과 archive 이름은 같습니다.
+  - `packages/ordered-json-php` → `packages/php`, `packages/ordered-json-php-ext` → `packages/php-ext`. Composer 이름과 archive 이름은 같습니다.
+  - `packages/ordered-json-python` → `packages/python`: Git source는 `subdirectory=packages/python`을 적습니다.
+  - `packages/ordered-json-rust` → `packages/rust`.
+  - `fixtures/` → `contracts/fixtures/`.
 - T1.44: 공유 도구는 `@polyspec/kit` 0.0.42입니다. Go, uv와 함께 Python, Composer, alint, ruff, vulture, golangci-lint, deadcode, govulncheck, cargo-audit는 `mise.toml`의 정확한 release인 도구이며, Go와 Python은 kit의 pin이고, `mise.lock`이 digest로 잠그며 `make install-tools`가 `var/tools/mise`에 설치합니다. `config/toolchain.json`은 mise의 release를 두고, `.python-version`은 제거합니다. CI는 setup-python과 setup-php의 Composer 대신 `make install-tools`로 설치하며, workflow 규칙은 `npm` 이외의 `TOOLS`와 Go나 Python의 setup action을 거부합니다. kit이 가져오는 sprintf-js advisory는 kit이 받아들이는 대로 받아들입니다.
 - T1.41: Python parser는 문서를 compiled `re` pattern의 한 pass로, member, item, root 값마다 match 하나로 읽으며, 문법은 scan과 모든 오류 offset에 대해 한 번 정의됩니다. `make python-parse-budget`는 평평한 객체 50,000개에서 그 CPU 시간을 순수 PHP parser와 비교하며, 비율은 4.44에서 2.34-2.94로 내려갔습니다. 모든 vector에서 결과와 오류 offset은 같습니다.
 - T1.37: `config/parity.json`은 `@polyspec/kit`의 parity 검사(`make parity-declarations-check`, `make parity-check`)가 읽는, 구현과 그 케이스와 공개 API의 유일한 선언입니다. `implementations.json`과 `package-tests.json`은 제거합니다. 검증기는 구현을 그곳에서 읽고 명령을 `scripts/registry.py`에 두며, 패키지의 케이스·심볼 목록은 제거하고, rejection kind는 JSON 계약에 나열합니다.

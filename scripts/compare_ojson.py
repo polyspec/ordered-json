@@ -118,7 +118,7 @@ def main():
                   'erlang_package': {'commit': commit, 'runtime': runtime, 'compile_warnings': warnings},
                   'official_sha256': hashlib.sha256((ROOT / 'examples/official.json').read_bytes()).hexdigest(),
                   'suite_commit': suite_commit,
-                  'case_source': 'examples/official.json + fixtures/ + optional JSONTestSuite', 'projects': {}}
+                  'case_source': 'examples/official.json + contracts/fixtures/ + optional JSONTestSuite', 'projects': {}}
         commands = {
             'pypi-ojson': [sys.executable, str(ROOT / 'scripts/comparison/python_ojson_probe.py'), str(args.python_package)],
             'erlang-ojson': [str(erl), '+S', '2:2', '-noshell', '-pa', str(beam), '-s', 'ojson_comparison', 'main', '-s', 'init', 'stop'],

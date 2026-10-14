@@ -126,7 +126,7 @@ def prepare_cases(directory, suite):
     for category in ['valid', 'invalid']:
         for path in fixture_paths(ROOT, category):
             expected = reference(path.read_bytes()) if category == 'valid' else {'ok': False}
-            cases.append(('fixtures/' + category + '/' + path.name, path, expected))
+            cases.append(('contracts/fixtures/' + category + '/' + path.name, path, expected))
     if suite:
         files = sorted((suite / 'test_parsing').glob('*.json'))
         if not files:
@@ -466,7 +466,7 @@ def verify_adapters(commands, suite=None):
                   f'{len(cases)-official_count} shared cases passed ({elapsed})', flush=True)
             results[language] = {'status': 'passed', 'cases': len(cases)}
         counts = {'official': official_count,
-                  'fixtures': sum(name.startswith('fixtures/') for name, _, _ in cases),
+                  'fixtures': sum(name.startswith('contracts/fixtures/') for name, _, _ in cases),
                   'supplementary': sum(name.startswith('JSONTestSuite/') for name, _, _ in cases)}
         for compare in (lambda: compare_error_positions(rejections, documents), lambda: compare_rejection_kinds(rejections)):
             try:

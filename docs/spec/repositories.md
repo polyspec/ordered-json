@@ -11,12 +11,12 @@ The repository owns the JSON specification, official inputs and expected results
 | Package | Checkout path | Implementation |
 | --- | --- | --- |
 | common | . | Contract, fixtures, verification and parity declaration |
-| javascript | packages/ordered-json-npm | JavaScript |
-| rust | packages/ordered-json-rust | Rust |
-| go | packages/ordered-json-go | Go |
-| php | packages/ordered-json-php | Pure PHP and the PHP Value API |
-| php-extension | packages/ordered-json-php-ext | Native PHP extension |
-| python | packages/ordered-json-python | Python |
+| javascript | packages/js | JavaScript |
+| rust | packages/rust | Rust |
+| go | packages/go | Go |
+| php | packages/php | Pure PHP and the PHP Value API |
+| php-extension | packages/php-ext | Native PHP extension |
+| python | packages/python | Python |
 
 The repository records one revision for the common contract and all implementations. The implementation directories do not contain nested Git repositories. Pure PHP and the extension retain separate package metadata and build processes, but their source changes are reviewed and verified in the same repository revision. The native implementation is tested against the PHP Value API in that same revision.
 

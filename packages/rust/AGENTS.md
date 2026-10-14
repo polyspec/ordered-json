@@ -1,4 +1,4 @@
-<!-- doc-id: npm-development -->
+<!-- doc-id: rust-development -->
 # Development procedure
 
 [한국어](AGENTS.ko.md)
@@ -21,7 +21,7 @@ make docs-check
 git diff --check
 ~~~
 
-`make check` runs the shared verifier for this package alone (`scripts/verify.py --only`) and writes no record; `make docs-check` runs `make documents-check` of the repository root. `config/parity.json` at the repository root declares this package as an implementation with its units, and `scripts/registry.py` holds its build, package test, and adapter commands. The full suite of the repository root runs `cargo clippy --all-targets -- -D warnings` in `packages/ordered-json-rust/` and `go vet ./...` in `packages/ordered-json-go/`. Native source changes require a new build; the shared native check rebuilds automatically.
+`make check` runs the shared verifier for this package alone (`scripts/verify.py --only`) and writes no record; `make docs-check` runs `make documents-check` of the repository root. `config/parity.json` at the repository root declares this package as an implementation with its units, and `scripts/registry.py` holds its build, package test, and adapter commands. The full suite of the repository root runs `cargo clippy --all-targets -- -D warnings` in `packages/rust/` and `go vet ./...` in `packages/go/`. Native source changes require a new build; the shared native check rebuilds automatically.
 
 <a id="completion"></a>
 ## Completion

@@ -1,12 +1,12 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 20ea465f1d3bde98f864cf5939cfd5c97f030d889d4c8497cf90821dc53c4286 -->
+<!-- source-sha256: ce024a8e5f2efb33d5b60cfb7fbb22d0ec624c6d6d15d74bee90f1020df63412 -->
 # API 계약
 
 [English](api.md)
 
 [JSON 계약](json-contract.ko.md)은 모든 구현의 공통 동작을 정의합니다. 이 문서는 현재 언어별 API를 정의합니다. 현재 식별자는 [설치 문서](../operations/installation.ko.md)에 작성합니다.
 
-프로젝트는 `ordered-json`이고 모든 패키지 이름은 polyspec 관례를 따릅니다. JavaScript는 npm 패키지 `@polyspec/ordered-json`을 사용합니다. Rust는 Cargo 패키지 `polyspec-ordered-json`을 사용하며 `polyspec_ordered_json`으로 가져옵니다. Go는 `github.com/polyspec/ordered-json/packages/ordered-json-go` 모듈과 `orderedjson` 패키지를 사용합니다. PHP는 `polyspec/ordered-json` Composer 패키지, `Polyspec\OrderedJson` 네임스페이스, PIE 패키지 `polyspec/ordered-json-extension`의 `ordered_json` 확장을 사용하며, 확장은 `Polyspec\OrderedJson\NativeParseError`를 발생시킵니다. 네이티브 함수와 상수 접두사는 `ordered_json_`과 `ORDERED_JSON_`입니다. Python은 패키지 `polyspec-ordered-json`을 사용하며 `polyspec` 아래 namespace package인 `polyspec.ordered_json`으로 가져옵니다.
+프로젝트는 `ordered-json`이고 모든 패키지 이름은 polyspec 관례를 따릅니다. JavaScript는 npm 패키지 `@polyspec/ordered-json`을 사용합니다. Rust는 Cargo 패키지 `polyspec-ordered-json`을 사용하며 `polyspec_ordered_json`으로 가져옵니다. Go는 `github.com/polyspec/ordered-json/packages/go` 모듈과 `orderedjson` 패키지를 사용합니다. PHP는 `polyspec/ordered-json` Composer 패키지, `Polyspec\OrderedJson` 네임스페이스, PIE 패키지 `polyspec/ordered-json-extension`의 `ordered_json` 확장을 사용하며, 확장은 `Polyspec\OrderedJson\NativeParseError`를 발생시킵니다. 네이티브 함수와 상수 접두사는 `ordered_json_`과 `ORDERED_JSON_`입니다. Python은 패키지 `polyspec-ordered-json`을 사용하며 `polyspec` 아래 namespace package인 `polyspec.ordered_json`으로 가져옵니다.
 
 <a id="values"></a>
 ## 값과 파싱

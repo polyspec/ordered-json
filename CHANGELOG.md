@@ -6,6 +6,13 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.42: the folders follow S5 of kit's layout. The packages and the shared fixtures moved; a consumer takes the new paths when it moves past this release:
+  - `packages/ordered-json-go` → `packages/go`: the Go module `github.com/polyspec/ordered-json/packages/ordered-json-go` is `github.com/polyspec/ordered-json/packages/go`, and its tags are `packages/go/vX.Y.Z` instead of `packages/ordered-json-go/vX.Y.Z`.
+  - `packages/ordered-json-npm` → `packages/js`; the npm package `@polyspec/ordered-json` and its archive name are unchanged.
+  - `packages/ordered-json-php` → `packages/php` and `packages/ordered-json-php-ext` → `packages/php-ext`; the Composer names and archive names are unchanged.
+  - `packages/ordered-json-python` → `packages/python`: a Git source names `subdirectory=packages/python`.
+  - `packages/ordered-json-rust` → `packages/rust`.
+  - `fixtures/` → `contracts/fixtures/`.
 - T1.44: the shared tools are `@polyspec/kit` 0.0.42. Go, Python with uv, Composer, alint, ruff, vulture, golangci-lint, deadcode, govulncheck and cargo-audit are tools of `mise.toml` at exact releases, Go and Python at the pins of kit, locked by their digests in `mise.lock` and installed by `make install-tools` into `var/tools/mise`; `config/toolchain.json` keeps the release of mise, and `.python-version` is removed. CI installs them with `make install-tools` instead of setup-python and the Composer of setup-php, and the workflow rule refuses `TOOLS` other than `npm` and a setup action of Go or Python. The sprintf-js advisory that kit brings is accepted as kit accepts it.
 - T1.41: the Python parser reads a document in one pass of compiled `re` patterns, one match per member, item or root value, with the grammar defined once for the scan and for every error offset; `make python-parse-budget` compares its CPU time with the pure PHP parser on 50,000 flat objects, where the ratio fell from 4.44 to 2.34-2.94. Results and error offsets are unchanged on every vector.
 - T1.37: `config/parity.json` is the one declaration of the implementations, their cases and their public API, read by the parity check of `@polyspec/kit` (`make parity-declarations-check`, `make parity-check`); `implementations.json` and `package-tests.json` are removed. The verifier reads the implementations from it and keeps their commands in `scripts/registry.py`, the case and symbol listings of the packages are removed, and the rejection kinds are listed in the JSON contract.

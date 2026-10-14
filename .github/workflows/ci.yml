@@ -97,7 +97,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: make install-packages
       # The tools of mise.lock (Go, Python, Composer, cargo-audit and the rest), the Rust toolchain of rust-toolchain.toml, the crates of
-      # packages/ordered-json-rust/Cargo.lock, the PIE PHAR and the supplementary suite of external-inputs.json.
+      # packages/rust/Cargo.lock, the PIE PHAR and the supplementary suite of external-inputs.json.
       - name: make install
         if: ${{ !cancelled() }}
         run: make install

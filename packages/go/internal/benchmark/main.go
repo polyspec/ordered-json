@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	orderedjson "github.com/polyspec/ordered-json/packages/ordered-json-go"
+	orderedjson "github.com/polyspec/ordered-json/packages/go"
 )
 
 func digest(value []byte) string { sum := sha256.Sum256(value); return hex.EncodeToString(sum[:]) }

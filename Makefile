@@ -45,7 +45,7 @@ check:
 	node $(KIT)/full-run.$(KIT_EXT) run $(CHECK_TARGETS)
 
 # install makes every download that the checks read after make install-packages: the tools of mise.lock, the Rust toolchain of
-# rust-toolchain.toml, the crates of packages/ordered-json-rust/Cargo.lock, and the PIE PHAR and the supplementary suite of external-inputs.json.
+# rust-toolchain.toml, the crates of packages/rust/Cargo.lock, and the PIE PHAR and the supplementary suite of external-inputs.json.
 # The Rust toolchain comes first because the build of cargo-audit in install-tools needs it.
 # It is the only target that downloads, besides dependency-review and release-consumer-lock.
 install: install-rust install-tools cargo-downloads-fetch install-external
@@ -96,10 +96,10 @@ python-package-check:
 	$(PYTHON) scripts/python_check.py
 
 # release-config-check runs the step versions of the release (release of @polyspec/kit, config/release.json) for the tag of the
-# version that packages/ordered-json-npm/package.json declares: every manifest of config/release.json declares that version, the module path of
+# version that packages/js/package.json declares: every manifest of config/release.json declares that version, the module path of
 # every Go module is the declared one, and CHANGELOG.md and CHANGELOG.ko.md hold the section of that version.
 release-config-check:
-	node $(KIT)/release.$(KIT_EXT) versions "v$$(node -p "require('./packages/ordered-json-npm/package.json').version")"
+	node $(KIT)/release.$(KIT_EXT) versions "v$$(node -p "require('./packages/js/package.json').version")"
 
 pie-check: toolchain-check cargo-downloads-check
 	$(PYTHON) scripts/check_pie.py --pie "$(PIE)" $(if $(JSON_TEST_SUITE),--suite "$(JSON_TEST_SUITE)")

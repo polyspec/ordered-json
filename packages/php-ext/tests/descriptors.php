@@ -3,7 +3,7 @@
 // API checks so both PHP backends answer identically.
 declare(strict_types=1);
 
-$library = $argv[1] ?? dirname(__DIR__, 2) . '/ordered-json-php/src/OrderedJson.php';
+$library = $argv[1] ?? dirname(__DIR__, 2) . '/php/src/OrderedJson.php';
 require dirname($library, 2) . '/tests/api_checks.php';
 
 /** @return list<string> Raw tokens of hydrated children. */
