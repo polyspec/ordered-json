@@ -13,6 +13,7 @@
             <file>tests/ValueClassTest.php</file>
             <file>tests/DescriptorTest.php</file>
             <file>tests/ValueApiTest.php</file>
+            <file>tests/OfficialTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>

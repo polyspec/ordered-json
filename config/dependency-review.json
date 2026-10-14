@@ -24,7 +24,7 @@
     },
     {
       "lock": "packages/rust/Cargo.lock",
-      "sha256": "dfc9acff442a8af771f6d11d1636e9a9b5e2f4078be41aa0e1ee27d5bdd5189d",
+      "sha256": "c088e2da94eea9b19071c3b2ef687a97d3350b59e989cb5211ec5f1236d4141f",
       "advisories": []
     }
   ],
