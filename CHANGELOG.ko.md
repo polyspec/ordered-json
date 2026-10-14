@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: a1151f903fdaac410c1a23044056070066e45dc6b688e05c8b9a5fb997c39679 -->
+<!-- source-sha256: de61461ed8be282b5f80459fc74169fe3975c4da5bee1b52848c67a06207b980 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -8,6 +8,7 @@
 ## Unreleased
 
 - T1.41: Python parser는 문서를 compiled `re` pattern의 한 pass로, member, item, root 값마다 match 하나로 읽으며, 문법은 scan과 모든 오류 offset에 대해 한 번 정의됩니다. `make python-parse-budget`는 평평한 객체 50,000개에서 그 CPU 시간을 순수 PHP parser와 비교하며, 비율은 4.44에서 2.34-2.94로 내려갔습니다. 모든 vector에서 결과와 오류 offset은 같습니다.
+- T1.36: 공유 도구는 vendor한 `scripts/kit/`과 `tests/kit/` 대신 package `@polyspec/kit`(release asset으로 고정한 devDependency)입니다. 새 checkout은 먼저 `make install-tools TOOLS=npm`과 `make install-packages`를 실행합니다. `make kit-sync`가 package의 사본을 쓰고, `config/layout.yml`이 `make layout-check`의 폴더 지도이며, toolchain 하한은 kit의 pin인 Node.js 26.11.1, PHP 8.5, Go 1.27.2, Rust 1.99.0입니다.
 
 - T1.35: Python 패키지의 `parse_bytes`는 Python으로 byte마다 검사하지 않고 `bytes.decode('utf-8')`로 UTF-8을 검증하며, 이전과 같은 offset인 `UnicodeDecodeError`의 `start`에서 `invalid_utf8`을 보고합니다. `ParseError`는 그 error에서 발생합니다.
 

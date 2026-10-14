@@ -6,10 +6,11 @@ JSON_TEST_SUITE ?=
 PIE ?= .cache/pie/pie.phar
 
 # The tools of every run are the releases that the tracked declaration files name: Node.js in .node-version, npm in the
-# packageManager of package.json, Rust in rust-toolchain.toml, Go in the toolchain line of packages/ordered-json-go/go.mod (config/toolchain.json),
-# Python in .python-version and PHP in .php-version. No command installs or selects a toolchain on demand: make install
-# installs npm and Go into var/tools (scripts/kit/install-tools.mjs), which comes first on PATH, so no npm or Go of the
-# machine is used or changed, and make toolchain-check compares every tool with its declaration.
+# packageManager of package.json, Rust in rust-toolchain.toml, Go in the pin of @polyspec/kit, which the go line of
+# packages/ordered-json-go/go.mod names, Python in .python-version and PHP in .php-version. No command installs or selects a
+# toolchain on demand: make install installs npm, Go, uv and Python into var/tools (make install-tools of @polyspec/kit), which
+# comes first on PATH, so no npm or Go of the machine is used or changed, and make toolchain-check compares every tool with
+# its declaration.
 export PATH := $(CURDIR)/var/tools/bin:$(PATH)
 export GOTOOLCHAIN := local
 export RUSTUP_AUTO_INSTALL := 0
@@ -25,23 +26,25 @@ ONLINE := env -u CARGO_NET_OFFLINE -u GOPROXY -u npm_config_offline -u COMPOSER_
 # another checkout would let it take binaries built from other sources as fresh.
 unexport CARGO_TARGET_DIR
 
-# The shared targets of kit (scripts/kit/kit.mk, vendored by make kit-sync): the gates, the document, owner and CI report
-# tools, the toolchains, the release steps. They read the configuration in config/*.json.
-include scripts/kit/kit.mk
+# The shared targets of kit: scripts/kit/kit-bootstrap.mk, a copy that make kit-sync writes, includes the kit.mk of the
+# installed package @polyspec/kit (node_modules/@polyspec/kit/dist): the gates, the document, owner and CI report tools, the
+# toolchains, the layout check, the release steps. They read the configuration in config/*.json. A new checkout runs
+# make install-tools TOOLS=npm and make install-packages first; until then no other target runs.
+include scripts/kit/kit-bootstrap.mk
 
-# The targets of the full suite that make check runs through the guard of scripts/kit/full-run.mjs and that the jobs of
+# The targets of the full suite that make check runs through the guard of full-run of @polyspec/kit and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
-CHECK_TARGETS := kit-check kit-test hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check documents-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check python-package-check
+CHECK_TARGETS := kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check documents-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all clippy go-vet pie-check python-package-check
 
 .PHONY: check test-scripts verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
 	benchmark benchmark-check python-parse-budget clippy go-vet python-package-check release-config-check install install-rust install-external
 
 # check runs the full suite once per committed tree, when no task of docs/plans/execution-checklist.md is [~]
-# (scripts/kit/full-run.mjs); it records its result in var/full-run.json. rerun-failed (kit.mk) reruns the targets that failed.
+# (full-run of @polyspec/kit); it records its result in var/full-run.json. rerun-failed (kit.mk) reruns the targets that failed.
 check:
-	node scripts/kit/full-run.mjs run $(CHECK_TARGETS)
+	node $(KIT)/full-run.$(KIT_EXT) run $(CHECK_TARGETS)
 
-# install makes every download that the checks read: npm and Go (config/toolchain.json), the Rust toolchain of
+# install makes every download that the checks read after make install-packages: the tools of config/toolchain.json, the Rust toolchain of
 # rust-toolchain.toml, the crates of packages/ordered-json-rust/Cargo.lock, and the PIE PHAR and the supplementary suite of external-inputs.json.
 # The Rust toolchain comes first because the build of cargo-audit in install-tools needs it.
 # It is the only target that downloads, besides dependency-review and release-consumer-lock.
@@ -92,11 +95,11 @@ evidence-check:
 python-package-check:
 	$(PYTHON) scripts/python_check.py
 
-# release-config-check runs the step versions of the release (scripts/kit/release.mjs, config/release.json) for the tag of the
+# release-config-check runs the step versions of the release (release of @polyspec/kit, config/release.json) for the tag of the
 # version that packages/ordered-json-npm/package.json declares: every manifest of config/release.json declares that version, the module path of
 # every Go module is the declared one, and CHANGELOG.md and CHANGELOG.ko.md hold the section of that version.
 release-config-check:
-	node scripts/kit/release.mjs versions "v$$(node -p "require('./packages/ordered-json-npm/package.json').version")"
+	node $(KIT)/release.$(KIT_EXT) versions "v$$(node -p "require('./packages/ordered-json-npm/package.json').version")"
 
 pie-check: toolchain-check cargo-downloads-check
 	$(PYTHON) scripts/check_pie.py --pie "$(PIE)" $(if $(JSON_TEST_SUITE),--suite "$(JSON_TEST_SUITE)")

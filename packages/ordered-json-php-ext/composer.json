@@ -3,7 +3,7 @@
   "version": "0.0.8",
   "description": "Native PHP extension for strict JSON with document-order associative objects",
   "type": "php-ext",
-  "require": {"php": ">=8.2"},
+  "require": {"php": ">=8.5"},
   "php-ext": {
     "extension-name": "ordered_json",
     "build-path": "src"

@@ -2,7 +2,6 @@
   "schema": 1,
   "comment": "The Markdown documents of the repository, common and package documents alike. The feature record docs/features.md is a status table whose values are closed sets; the evidence it names is checked by scripts/check_evidence.py.",
   "include": ["**/*.md"],
-  "exclude": ["tests/kit/**"],
   "statusTables": [
     {
       "path": "docs/features.md",
