@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: d1d77df641bfbb0e1090d0a5d03e0033b9772a47dceef4afab0a298f9db538e3 -->
+<!-- source-sha256: 2ed26f3417e32ba3ae2ff9c16c1fa3a7501dd88dfb15e6d8d277fef438f2d727 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.42: 저장소 도구는 TypeScript입니다(S9). 공통 검증기(`scripts/verify.mts`와 그 registry, reference, records), 근거, PIE, 외부 입력, 비교 검사와 benchmark runner는 Node.js로 실행하고 `make typecheck`가 검사하며, 그 테스트는 `tests/scripts`의 node 테스트입니다(`make test-scripts`). 독립 참조는 momoa로 JSON을 읽습니다. 패키지 테스트는 검증기를 떠나 kit parity의 native runner로 옮겼고, kit의 `lint-rust`와 `lint-go`가 `scripts/lint.py`를 대신하며, CI의 job `python`은 없어졌습니다. 패키지 폴더는 `config/parity.json`에서, fixture 폴더는 registry에서 읽으며, 도구에 남은 Python은 이유와 함께 S9 예외인 `scripts/comparison`의 Python 라이브러리 ojson probe뿐입니다.
 - T1.39: 모든 unit은 제외 없이 그 profile의 각 구현에서 실행합니다. `ordered_map_rejects_non_string_key`는 JavaScript에서도 실행하며, PHP 배열은 문자열이나 정수로 key를 두므로 byte 입력과 함께 profile `no-php`에 속합니다. `utf8_validation_holds_for_long_multibyte_text`(이전 `utf8_validation_survives_low_pcre_limits`)는 모든 구현에서 실행하며 PHP는 낮은 PCRE 한도에서 실행합니다. `text_input_rejects_lone_surrogates`와 새 `string_value_keeps_an_unpaired_surrogate`는 JavaScript와 Python의 profile `utf16-text`를 이룹니다. 단독 surrogate가 있는 JavaScript 텍스트 입력은 문법보다 먼저, 그 다음 단위가 아니라 surrogate의 위치에서 거부되며, root 뒤의 surrogate는 Python처럼 `trailing_input` 대신 `unescaped_lone_surrogate`입니다.
 - T1.43: `config/parity.json`은 모든 API unit을 kit의 TypeScript extractor가 `packages/js/index.d.ts`에서 읽는 JavaScript 공개 symbol에 API 계약의 표가 적는 대로 묶고(compact 출력과 UTF-16 생성 및 조회는 `stringify`, `Value.string`, `get`), JavaScript에만 있는 symbol `Kind`, `ParseOptions`, `rejectDuplicates`, `keys`, `toJSON`, `toString`을 이유와 함께 native-only로 선언합니다.
 - T1.38: 패키지 테스트는 kit parity가 실행하는 native runner로 실행하며, 각 테스트는 `config/parity.json`의 unit에 묶입니다. JavaScript는 node:test(`packages/js/test/api.test.mjs`, `official.test.mjs`), Python은 `make install-python`이 만드는 `packages/python/.venv`의 unittest(`tests/test_api.py`, `test_official.py`), PHP는 `make install-php`가 `packages/php`와 `packages/php-ext`에 설치하는 PHPUnit 13.4.2(`ValueApiTestCase`에서 나온 두 backend의 `ValueApiTest`, `DescriptorTest`, `ValueClassTest`)입니다. `make php-extension`은 `make parity-check`를 위해 확장을 제자리에서 빌드합니다. JavaScript와 Python은 공식 예제를 native로 실행합니다. PHP class `Value`, `ParseError`, `Tape`, `Parser`는 각자의 파일에서 PSR-4로, 함수와 `MAX_DEPTH`는 `files`로 load하며(S2), wheel의 release smoke는 `py.typed` 표시를 요구합니다.

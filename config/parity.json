@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "comment": "The implementations of ordered-json, the one source of its language set, which the shared verifier (scripts/registry.py) reads too, and the units that each holds: the shared examples, the package test cases of each implementation as feature units, and the public API. The verifier of scripts/ compares the outputs of every implementation on the shared cases.",
+  "comment": "The implementations of ordered-json, the one source of its language set and of their folders, which the shared verifier (scripts/registry.mts) reads too, and the units that each holds: the official examples as a suite, the package tests of each implementation as feature units, each bound to the native test that runs it, and the public API. The verifier of scripts/, the comparator, compares the outputs of every implementation on the shared cases.",
   "implementations": [
     {
       "name": "js",

@@ -21,7 +21,7 @@ make docs-check
 git diff --check
 ~~~
 
-`make check` runs the shared verifier for this package alone (`scripts/verify.py --only`); `make docs-check` runs `make documents-check` of the repository root. `config/parity.json` at the repository root declares this package as an implementation with its units, and `scripts/registry.py` holds its package test, package data and adapter commands.
+`make check` runs the shared verifier for this package alone (`scripts/verify.mts --only`), which compares its adapter with the shared cases and writes no record; its package tests are native tests that `make parity-check` runs; `make docs-check` runs `make documents-check` of the repository root. `config/parity.json` at the repository root declares this package as an implementation with its units and their native tests, and `scripts/registry.mts` holds its build and adapter commands.
 
 <a id="completion"></a>
 ## Completion

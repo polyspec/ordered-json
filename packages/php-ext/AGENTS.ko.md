@@ -1,5 +1,5 @@
 <!-- doc-id: php-ext-development -->
-<!-- source-sha256: 0d7fa4a81fcea97b16b05f53d62aeb2919d2c275c6d265f1ab0b8d1c645cf461 -->
+<!-- source-sha256: e7fb16dabf141f935f80d25234b498ec27fb39fd4082f881de3b32f9ee29db45 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -22,7 +22,7 @@ make docs-check
 git diff --check
 ~~~
 
-`make check`는 이 패키지만 공통 검증기로 검사하며(`scripts/verify.py --only`) 기록을 쓰지 않습니다. `make docs-check`는 저장소 루트의 `make documents-check`를 실행합니다. 저장소 루트의 `config/parity.json`이 이 패키지를 unit과 함께 구현으로 선언하고, `scripts/registry.py`가 그 빌드, 패키지 테스트, 어댑터 명령을 가집니다. 저장소 루트의 전체 suite는 `packages/rust/`에서 `cargo clippy --all-targets -- -D warnings`, `packages/go/`에서 `go vet ./...`을 실행합니다. 네이티브 소스를 변경하면 새로 빌드해야 하며 공통 네이티브 검사는 자동으로 다시 빌드합니다.
+`make check`는 이 패키지만 공통 검증기로 검사하며(`scripts/verify.mts --only`) 그 어댑터를 공통 사례와 비교하고 기록을 쓰지 않습니다. 패키지 테스트는 `make parity-check`가 실행하는 native 테스트입니다. `make docs-check`는 저장소 루트의 `make documents-check`를 실행합니다. 저장소 루트의 `config/parity.json`이 이 패키지를 unit과 함께 구현으로 선언하고, 그 unit의 native 테스트를 묶으며, `scripts/registry.mts`가 그 빌드와 어댑터 명령을 가집니다. 저장소 루트의 전체 suite는 kit의 lint인 `make lint-rust`와 `make lint-go`도 실행합니다. 네이티브 소스를 변경하면 새로 빌드해야 하며 공통 네이티브 검사는 자동으로 다시 빌드합니다.
 
 <a id="completion"></a>
 ## 완료
