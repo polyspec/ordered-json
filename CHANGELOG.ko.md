@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: f215b53c0301c070d0ba1b97df339e0f2d6d08b198df5b5a1f5a3daba7f4dd00 -->
+<!-- source-sha256: 84f96d48b8aef41a2ace125a1a55ef9810ec82bc358a8e4e35e2962e1a07d1e1 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.58: AGENTS는 kit `docs/plans/local-links.md`의 local link를 가리킵니다. polyspec 버전이 0.0.x인 동안 개발 checkout은 설치된 polyspec package를 그 source에 link하며, link는 commit하지 않습니다.
 - T1.57: 공유 도구는 `@polyspec/kit` 0.0.53입니다.
 - T1.56: 공유 도구는 `@polyspec/kit` 0.0.52입니다. `.php-version`이 모든 workflow가 설정하는 PHP 8.5를 선언하며, release workflow는 모든 release 단계 앞에서 `make kit-check`를 실행합니다(kit K193).
 - T1.55: 공유 도구는 `@polyspec/kit` 0.0.50입니다. knip은 script와 테스트가 실행하는 binary를 `config/knip-entries.json`의 `binaries`에서 읽으며(kit K176), `make dependency-policy-check`는 checkout의 모든 Composer manifest를 검사하듯 루트 `composer.json`을 package를 잠그지 않는 커밋된 `composer.lock`과 함께 검사합니다(kit K181).
