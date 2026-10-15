@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: d8bcbbb00cff1e3bf4b2086e123f333dd67f0cdf80f1eaa322d80de31caf6ab4 -->
+<!-- source-sha256: e6f21a400f38d3fae79d10c5f5b28dbfad4da1e57a155b0c6c9a353b59b58e20 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.54: `packages/php`와 `packages/php-ext`의 Composer lock이 다시 최신입니다. T1.50의 version 0.0.9가 새 lock 없이 두 manifest의 content hash를 바꿨습니다. `config/dependency-policy.json`은 두 Composer project를 PHP 8.5.0으로 선언하므로 `make dependency-policy-check`는 `composer validate --strict`가 오래되었다고 보는 lock에서 실패하고, 그 PHPUnit과 lock을 검토합니다. 두 lock은 모든 package version을 유지합니다.
 - T1.53: kit의 ruff와 vulture인 `make lint-python`이 전체 suite와 CI의 docs job에서 실행됩니다. `scripts/comparison`의 PyPI ojson probe는 더 이상 `sys.path`를 바꾸지 않습니다(S3). `make install-comparison`이 ojson 0.1.0을 가상 환경 `.cache/comparison/ojson-venv`에 설치하고, `scripts/compare-ojson.mts`는 그 환경의 Python으로 probe를 실행합니다(`--python`이 `--python-package`를 대신합니다).
 - T1.52: kit의 phpcs와 PHPStan인 `make lint-php`가 전체 suite와 CI의 suite job에서 실행됩니다. `make install-php`는 루트 package를 `vendor/`에 설치하고 PHPStan은 그 autoloader로 `benchmarks/`의 PHP를 읽으며, 패키지·테스트·benchmark의 PHP는 PSR-12를 따르고, 공통 검증기의 probe는 직렬화를 `Polyspec\OrderedJson\Tests\ProbeTree`에서 읽습니다.
 - T1.51: 공유 도구는 `@polyspec/kit` 0.0.48입니다. checkout은 `mise.toml`의 Node.js 26.12.0을 `var/tools`에서 실행하고, `.node-version`은 없어졌으며 모든 `engines.node`는 `>=26.12.0`입니다(kit K171). workflow는 각 action을 SHA와 version으로 고정하고(kit K169), script와 test는 JSON을 schema로 읽고 읽은 값을 단언하지 않고 검사합니다(kit K155–K158).
