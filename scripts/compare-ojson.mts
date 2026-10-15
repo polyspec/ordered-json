@@ -3,7 +3,9 @@
 // through scripts/comparison/ojson_comparison.erl. Each probe answers one JSON line for each document path, as the probes of the
 // shared verifier do.
 //
-//   node scripts/compare-ojson.mts [--python-package <ojson-0.1.0>] [--erlang-source <checkout>] [--erl <erl>] [--suite <checkout>] [--output <file>]
+// PyPI ojson runs in the Python of the environment that make install-comparison makes, which --python names.
+//
+//   node scripts/compare-ojson.mts [--python <python>] [--erlang-source <checkout>] [--erl <erl>] [--suite <checkout>] [--output <file>]
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -91,12 +93,15 @@ function erlang(given: string | undefined): string {
 }
 
 async function main(): Promise<void> {
-  const { values } = parseArgs({ options: { 'python-package': { type: 'string' }, 'erlang-source': { type: 'string' }, erl: { type: 'string' }, suite: { type: 'string' }, output: { type: 'string' } } });
-  const pythonPackage = path.resolve(values['python-package'] ?? path.join(ROOT, '.cache/comparison/ojson-0.1.0'));
+  const { values } = parseArgs({ options: { python: { type: 'string' }, 'erlang-source': { type: 'string' }, erl: { type: 'string' }, suite: { type: 'string' }, output: { type: 'string' } } });
+  const python = path.resolve(values.python ?? path.join(ROOT, '.cache/comparison/ojson-venv/bin/python'));
   const erlangSource = path.resolve(values['erlang-source'] ?? path.join(ROOT, '.cache/comparison/erlang-ojson'));
   const suite = values.suite === undefined ? undefined : path.resolve(values.suite);
   const output = path.resolve(values.output ?? path.join(ROOT, 'docs/reports/ojson-comparison.json'));
-  if (!existsSync(path.join(pythonPackage, 'ojson/ojson.py'))) throw new Error(`${pythonPackage} holds no ojson/ojson.py; extract the ojson 0.1.0 source distribution there first`);
+  if (!existsSync(python)) throw new Error(`${python} is missing; run make install-comparison, which installs ojson 0.1.0 into its environment`);
+  // The version, the module file and the runtime of the installed ojson, as the Python of its environment reports them.
+  const pythonValue = (code: string) => execFileSync(python, ['-c', code], { encoding: 'utf8' }).trim();
+  const ojsonModule = pythonValue('import ojson.ojson; print(ojson.ojson.__file__)');
   const erl = erlang(values.erl);
   // The compiled modules and the case files belong to this run alone.
   const directory = mkdtempSync(path.join(tmpdir(), 'ojson-comparison-'));
@@ -105,12 +110,11 @@ async function main(): Promise<void> {
     mkdirSync(path.join(directory, 'cases'));
     const warnings = await compileErlang(erl, erlangSource, beam);
     const git = (folder: string) => execFileSync('git', ['-C', folder, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
-    const version = /^Version: (.*)$/m.exec(readFileSync(path.join(pythonPackage, 'PKG-INFO'), 'utf8'))?.[1];
     const report = {
       python_package: {
-        version,
-        runtime: execFileSync('python3', ['-c', 'import platform; print(platform.python_version())'], { encoding: 'utf8' }).trim(),
-        module_sha256: sha256(readFileSync(path.join(pythonPackage, 'ojson/ojson.py'))),
+        version: pythonValue('import importlib.metadata; print(importlib.metadata.version("ojson"))'),
+        runtime: pythonValue('import platform; print(platform.python_version())'),
+        module_sha256: sha256(readFileSync(ojsonModule)),
       },
       erlang_package: { commit: git(erlangSource), runtime: execFileSync(erl, ['+S', '2:2', '-noshell', '-eval', 'io:format("~s", [erlang:system_info(system_version)]), halt().'], { encoding: 'utf8' }).trim(), compile_warnings: warnings },
       official_sha256: sha256(readFileSync(path.join(ROOT, OFFICIAL))),
@@ -119,7 +123,7 @@ async function main(): Promise<void> {
       projects: {} as Record<string, unknown>,
     };
     const commands: Record<string, Argv> = {
-      'pypi-ojson': ['python3', path.join(ROOT, 'scripts/comparison/python_ojson_probe.py'), pythonPackage],
+      'pypi-ojson': [python, path.join(ROOT, 'scripts/comparison/python_ojson_probe.py')],
       'erlang-ojson': [erl, '+S', '2:2', '-noshell', '-pa', beam, '-s', 'ojson_comparison', 'main', '-s', 'init', 'stop'],
     };
     const { cases, counts } = sharedCases(path.join(directory, 'cases'), suite);

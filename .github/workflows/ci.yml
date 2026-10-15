@@ -56,13 +56,13 @@ jobs:
       - name: make install-packages
         if: ${{ !cancelled() }}
         run: make install-packages
-      # The tools of mise.lock: alint, which make layout-check runs, and Composer.
+      # The tools of mise.lock: alint, which make layout-check runs, ruff and vulture, which make lint-python runs, and Composer.
       - name: make install-tools
         if: ${{ !cancelled() }}
         run: make install-tools
       - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci-targets TARGETS="kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check test-scripts typecheck lint-ts"
+        run: make ci-targets TARGETS="kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check test-scripts typecheck lint-ts lint-python"
       # actions/upload-artifact v7.0.1: the report of this job, var/report/ci-targets.
       - name: report
         if: ${{ !cancelled() }}

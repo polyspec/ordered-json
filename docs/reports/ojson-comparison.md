@@ -44,13 +44,13 @@ Prepare the packages and the [supplementary inputs](../operations/validation.md#
 ~~~sh
 mkdir -p .cache/comparison
 curl -L https://files.pythonhosted.org/packages/96/f0/2990e30a4b1978a104ca66fdb7aa5d0956dcf11aaf136a36e9659a699791/ojson-0.1.0.tar.gz -o .cache/comparison/ojson-0.1.0.tar.gz
-tar -xzf .cache/comparison/ojson-0.1.0.tar.gz -C .cache/comparison
+make install-comparison
 git clone https://github.com/potatosalad/erlang-ojson.git .cache/comparison/erlang-ojson
 git -C .cache/comparison/erlang-ojson checkout 5cd1de1a4a7622523c83d9464772b0f0926e654d
 node scripts/compare-ojson.mts --suite .cache/JSONTestSuite
 ~~~
 
-The [PyPI](https://pypi.org/project/ojson/) archive SHA-256 is `94a1c628c0b4447680d9039c110dafe4efd6e3fdf77602b3ff543c2a278b7ec5`. An Erlang runtime is required; `--erl /path/to/erl` selects a specific executable. The recorded run used an isolated Homebrew Erlang 29.0.6 archive with SHA-256 `60e6425e089726bcae182f1856b01aa88de2782b94dedf71559e8efbc5eea0f3`.
+The [PyPI](https://pypi.org/project/ojson/) archive SHA-256 is `94a1c628c0b4447680d9039c110dafe4efd6e3fdf77602b3ff543c2a278b7ec5`. `make install-comparison` installs that archive into the virtual environment `.cache/comparison/ojson-venv` of the Python of `mise.toml`, and the script runs the probe with the Python of that environment, which `--python` can name instead; the report records the version, the Python release and the module hash of the installed ojson. An Erlang runtime is required; `--erl /path/to/erl` selects a specific executable. The recorded run used an isolated Homebrew Erlang 29.0.6 archive with SHA-256 `60e6425e089726bcae182f1856b01aa88de2782b94dedf71559e8efbc5eea0f3`.
 
 The script prints the Erlang compiler output as it arrives with the exit status and elapsed time; the build has no time limit, and its exit status and output decide the result. Each project then receives one case at a time, and the script prints each case with its result and elapsed time. A reply has 60 s, the per-case deadline of the shared verifier; a project that misses it is stopped and the case is named. No limit applies to the whole run.
 

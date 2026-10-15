@@ -54,12 +54,13 @@ test('no command installs or selects another toolchain', () => {
   assert.equal(commandsOf('rust').env?.RUSTUP_AUTO_INSTALL, '0');
 });
 
+// install-comparison downloads the build of PyPI ojson for scripts/compare-ojson.mts, which no check runs.
 test('every check runs offline and only make install downloads', () => {
   const text = makefile();
   for (const [name, value] of Object.entries(OFFLINE)) assert.match(text, new RegExp(`^export ${name} := ${value}$`, 'm'));
   assert.match(text, new RegExp(`^ONLINE := env${Object.keys(OFFLINE).map(name => ` -u ${name}`).join('')}$`, 'm'));
   const downloading = [...recipes(text)].filter(([, rule]) => rule.recipe.some(line => line.includes('$(ONLINE)'))).map(([target]) => target).sort();
-  assert.deepEqual(downloading, ['install-external', 'install-php', 'install-python', 'install-rust']);
+  assert.deepEqual(downloading, ['install-comparison', 'install-external', 'install-php', 'install-python', 'install-rust']);
 });
 
 test('make install makes every download of the checks', () => {
