@@ -312,6 +312,7 @@
         "packages/go/go.mod",
         "package.json",
         "composer.json",
+        "composer.lock",
         "packages/php/composer.json",
         "packages/php-ext/composer.json",
         "packages/js/package.json"
