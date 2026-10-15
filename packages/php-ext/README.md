@@ -36,7 +36,7 @@ The [JSON contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec
 <a id="verification"></a>
 ## Verification
 
-Install Git, make, the Node.js of `.node-version` and this implementation's runtime/build tools, then run `make install-tools TOOLS=npm`, `make install-packages` and `make install`, which install Python, Go and the other tools of `mise.toml` into `var/tools` at the digests of `mise.lock`. Run from this checkout:
+Install Git, make, any Node.js to start the bootstrap and this implementation's runtime/build tools, then run `make install-tools TOOLS=npm`, `make install-packages` and `make install`, which install Node.js, Python, Go and the other tools of `mise.toml` into `var/tools` at the digests of `mise.lock`. Run from this checkout:
 
 ~~~sh
 make check

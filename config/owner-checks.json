@@ -276,7 +276,6 @@
     },
     {
       "paths": [
-        ".node-version",
         "mise.toml",
         "mise.lock",
         ".mise/**",

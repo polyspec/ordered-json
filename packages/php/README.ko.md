@@ -1,5 +1,5 @@
 <!-- doc-id: php-overview -->
-<!-- source-sha256: 75005f300c62444dec97a95e2fb1389cce5684a6982141f673a5bc6255697905 -->
+<!-- source-sha256: 410bd0147b375597b238aa6e4903956bbc28cae33cbc3343ded0d39deb55215f -->
 # ordered-json for PHP
 
 [English](README.md)
@@ -29,7 +29,7 @@ $output = Polyspec\OrderedJson\stringify($value);
 <a id="verification"></a>
 ## 검증
 
-Git, make, `.node-version`의 Node.js, 해당 구현의 런타임·빌드 도구를 설치하고, `mise.toml`의 Python, Go와 다른 도구를 `mise.lock`의 digest로 `var/tools`에 설치하는 `make install-tools TOOLS=npm`, `make install-packages`, `make install`을 실행한 뒤 이 체크아웃에서 실행합니다.
+Git, make, bootstrap을 시작할 Node.js, 해당 구현의 런타임·빌드 도구를 설치하고, `mise.toml`의 Node.js, Python, Go와 다른 도구를 `mise.lock`의 digest로 `var/tools`에 설치하는 `make install-tools TOOLS=npm`, `make install-packages`, `make install`을 실행한 뒤 이 체크아웃에서 실행합니다.
 
 ~~~sh
 make check

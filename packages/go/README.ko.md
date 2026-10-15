@@ -1,5 +1,5 @@
 <!-- doc-id: go-overview -->
-<!-- source-sha256: e6dd84da9a5dd3f53319d1a55d3179dc0c67b196d1c90b900ad5f6a18b3e645f -->
+<!-- source-sha256: bc7d1d0b5ba307b2cda7188a17a3396593177a6644e31c9a82ad6debd29cdd7f -->
 # ordered-json for Go
 
 [English](README.md)
@@ -27,7 +27,7 @@ _ = output
 <a id="verification"></a>
 ## 검증
 
-Git, make, `.node-version`의 Node.js, 해당 구현의 런타임·빌드 도구를 설치하고, `mise.toml`의 Python, Go와 다른 도구를 `mise.lock`의 digest로 `var/tools`에 설치하는 `make install-tools TOOLS=npm`, `make install-packages`, `make install`을 실행한 뒤 이 체크아웃에서 실행합니다.
+Git, make, bootstrap을 시작할 Node.js, 해당 구현의 런타임·빌드 도구를 설치하고, `mise.toml`의 Node.js, Python, Go와 다른 도구를 `mise.lock`의 digest로 `var/tools`에 설치하는 `make install-tools TOOLS=npm`, `make install-packages`, `make install`을 실행한 뒤 이 체크아웃에서 실행합니다.
 
 ~~~sh
 make check

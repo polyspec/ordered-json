@@ -1,5 +1,5 @@
 <!-- doc-id: php-ext-overview -->
-<!-- source-sha256: 8612ecc2107f50e25a55e566d6c09212293846959cc717ad22b4604258ddc629 -->
+<!-- source-sha256: a609a2c7ed5a9cebaf83a488c9f5c56067830cd6ea04683c98705d464d0176d7 -->
 # ordered-json for PHP extension
 
 [English](README.md)
@@ -37,7 +37,7 @@ PIE 설정은 `PIE_WORKING_DIRECTORY` 환경 변수로 격리할 수 있습니�
 <a id="verification"></a>
 ## 검증
 
-Git, make, `.node-version`의 Node.js, 해당 구현의 런타임·빌드 도구를 설치하고, `mise.toml`의 Python, Go와 다른 도구를 `mise.lock`의 digest로 `var/tools`에 설치하는 `make install-tools TOOLS=npm`, `make install-packages`, `make install`을 실행한 뒤 이 체크아웃에서 실행합니다.
+Git, make, bootstrap을 시작할 Node.js, 해당 구현의 런타임·빌드 도구를 설치하고, `mise.toml`의 Node.js, Python, Go와 다른 도구를 `mise.lock`의 digest로 `var/tools`에 설치하는 `make install-tools TOOLS=npm`, `make install-packages`, `make install`을 실행한 뒤 이 체크아웃에서 실행합니다.
 
 ~~~sh
 make check

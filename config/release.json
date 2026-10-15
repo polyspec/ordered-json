@@ -21,13 +21,7 @@
   },
   "notReleased": {
     "tests/release-consumer/npm/package.json": "the npm consumer project of the release archives",
-    "tests/release-consumer/composer/composer.json": "the Composer consumer project of the release archives",
-    ".mise/locks/pypi-vulture/2.16/pyproject.toml": "the uv project of the lock of vulture, a tool of mise.toml, which make toolchain-lock writes",
-    "config/php-lint/composer.json": "the Composer project of the PHP lint tools of kit (phpcs, phpstan), which make install-tools installs into var/tools"
-  },
-  "buildBackend": {
-    "requirement": "setuptools==84.0.0",
-    "sha256": "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670"
+    "tests/release-consumer/composer/composer.json": "the Composer consumer project of the release archives"
   },
   "goModules": {
     "packages/go": "github.com/polyspec/ordered-json/packages/go"
