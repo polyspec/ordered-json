@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "A package.json or composer.json: the package name that tests/scripts/registry.test.mts checks against the polyspec naming convention.",
+  "type": "object",
+  "required": ["name"],
+  "properties": {
+    "name": { "type": "string" }
+  }
+}

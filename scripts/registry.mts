@@ -4,20 +4,24 @@
 // each implementation, runs its probe on the shared cases and reads its runtime versions with the commands below. A command
 // names the directory of an implementation as {<name>} and the cache of the run as {cache}.
 import { execFileSync, spawn } from 'node:child_process';
-import { copyFileSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { copyFileSync, existsSync, lstatSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import readline from 'node:readline';
+import { readJsonFile } from './json.mts';
+import type { Tree } from './reference.mts';
 
 export const ROOT = path.resolve(import.meta.dirname, '..');
 const PARITY = 'config/parity.json';
 
-type Step = { cwd: string; command: string[]; ifExists?: string };
+/** A command line: the program and its arguments. */
+export type Argv = [string, ...string[]];
+type Step = { cwd: string; command: Argv; ifExists?: string };
 export type Commands = {
   /** The probe: one document path in on each line, one JSON reply out. */
-  command: string[];
+  command: Argv;
   prepare?: Step[];
-  runtime: Record<string, string[]>;
+  runtime: Record<string, Argv>;
   env?: Record<string, string>;
   /** The repository is copied into the run before its build, so a build never cleans files of the checkout. */
   buildInCopy?: boolean;
@@ -70,18 +74,39 @@ export const COMMANDS: Record<string, Commands> = {
 };
 
 export type Registry = { roots: Record<string, string>; commands: Record<string, Commands> };
+/** An official example of examples/official.json. */
+export type OfficialCase = { id: string; input: string; tree: Tree; compact: string };
+
+/** The commands of the implementation `name`; an implementation without commands is an error. */
+export function commandsOf(name: string, registry = REGISTRY): Commands {
+  const entry = registry.commands[name];
+  if (entry === undefined) throw new Error(`the verifier has no commands of the implementation ${name}`);
+  return entry;
+}
+
+/** The directory of the implementation `name` in `paths`; a missing one is an error. */
+export function pathOf(paths: Record<string, string>, name: string): string {
+  const directory = paths[name];
+  if (directory === undefined) throw new Error(`the run has no directory of the implementation ${name}`);
+  return directory;
+}
+
+/** The errno code of an error of node, such as ENOENT; undefined for any other value. */
+export function errorCode(error: unknown): string | undefined {
+  return error instanceof Error && 'code' in error && typeof error.code === 'string' ? error.code : undefined;
+}
 
 /**
  * The implementations of config/parity.json of `root`, each with its one root and its commands. Every implementation has
  * commands and every command set belongs to an implementation, so neither names a language that the other lacks.
  */
 export function loadRegistry(root = ROOT, commands = COMMANDS): Registry {
-  const declared = (JSON.parse(readFileSync(path.join(root, PARITY), 'utf8')) as { implementations?: { name: string; roots: string[] }[] }).implementations ?? [];
+  const { implementations: declared } = readJsonFile<{ implementations: { name: string; roots: string[] }[] }>(path.join(root, PARITY), 'parity-implementations.schema.json');
   if (declared.length === 0) throw new Error(`${PARITY} declares no implementation`);
   const roots: Record<string, string> = {};
   for (const { name, roots: folders } of declared) {
-    if (folders.length !== 1) throw new Error(`${PARITY}: the verifier needs one root of ${name}, not ${JSON.stringify(folders)}`);
-    const folder = folders[0]!;
+    const [folder, ...others] = folders;
+    if (folder === undefined || others.length) throw new Error(`${PARITY}: the verifier needs one root of ${name}, not ${JSON.stringify(folders)}`);
     if (path.isAbsolute(folder) || folder.split('/').includes('..') || folder === '.') throw new Error(`${PARITY}: the root of ${name} is ${folder}, not a child directory of the repository`);
     roots[name] = folder;
   }
@@ -124,8 +149,8 @@ export const OFFICIAL = 'examples/official.json';
 export const FIXTURES = 'contracts/fixtures';
 
 /** The official examples of `root`. */
-export const officialCases = (root = ROOT): { id: string; input: string; tree: unknown; compact: string }[] =>
-  (JSON.parse(readFileSync(path.join(root, OFFICIAL), 'utf8')) as { cases: { id: string; input: string; tree: unknown; compact: string }[] }).cases;
+export const officialCases = (root = ROOT): OfficialCase[] =>
+  readJsonFile<{ cases: OfficialCase[] }>(path.join(root, OFFICIAL), 'official-examples.schema.json').cases;
 
 export const fixturePaths = (root: string, category: 'valid' | 'invalid'): string[] => filesIn(root, `${FIXTURES}/${category}`, '.json');
 
@@ -138,6 +163,10 @@ function expand(value: string, variables: Record<string, string>): string {
   });
   return expanded;
 }
+
+/** The command line `argv` with each {name} replaced with its variable. */
+const expandArgv = ([program, ...args]: Argv, variables: Record<string, string>): Argv =>
+  [expand(program, variables), ...args.map(argument => expand(argument, variables))];
 
 /** One verification run: its temporary root, the directories that its commands use and the cache of its built probes. */
 export type Run = { root: string; paths: Record<string, string>; cache: string };
@@ -153,9 +182,9 @@ export async function withRun<T>(selected: string[], body: (run: Run) => Promise
   try {
     const paths = repositoryPaths(root, registry);
     for (const name of selected) {
-      if (!registry.commands[name]!.buildInCopy) continue;
-      const copy = path.join(directory, registry.roots[name]!);
-      copySources(paths[name]!, copy);
+      if (!commandsOf(name, registry).buildInCopy) continue;
+      const copy = path.join(directory, pathOf(registry.roots, name));
+      copySources(pathOf(paths, name), copy);
       paths[name] = copy;
     }
     const cache = path.join(directory, 'cache');
@@ -183,7 +212,7 @@ const variablesOf = (run: Pick<Run, 'paths' | 'cache'>): Record<string, string> 
 
 /** The environment of the commands of `name`: the caller's, with the variables that the implementation declares. */
 function environmentOf(name: string, run: Pick<Run, 'paths' | 'cache'>, registry = REGISTRY): NodeJS.ProcessEnv {
-  const declared = registry.commands[name]!.env ?? {};
+  const declared = commandsOf(name, registry).env ?? {};
   return { ...process.env, ...Object.fromEntries(Object.entries(declared).map(([key, value]) => [key, expand(value, variablesOf(run))])) };
 }
 
@@ -194,7 +223,8 @@ export function endGroup(pid: number | undefined): void {
     process.kill(-pid, 'SIGKILL');
   } catch (error) {
     // ESRCH: the group has ended; EPERM (macOS): its remaining members are exited processes not yet reaped.
-    if (!['ESRCH', 'EPERM'].includes((error as NodeJS.ErrnoException).code ?? '')) throw error;
+    const code = errorCode(error);
+    if (code !== 'ESRCH' && code !== 'EPERM') throw error;
   }
 }
 
@@ -203,10 +233,11 @@ export function endGroup(pid: number | undefined): void {
  * output and standard error) and the exit status with the elapsed time. A build has no time limit; the caller judges its
  * exit status and its lines. The group, grandchildren included, ends with the command.
  */
-export async function runStreamed(label: string, command: string[], cwd: string, env: NodeJS.ProcessEnv = process.env): Promise<{ code: number; lines: string[] }> {
+export async function runStreamed(label: string, command: Argv, cwd: string, env: NodeJS.ProcessEnv = process.env): Promise<{ code: number; lines: string[] }> {
   console.log(`${label}: start`);
   const started = performance.now();
-  const child = spawn(command[0]!, command.slice(1), { cwd, env, detached: true, stdio: ['ignore', 'pipe', 'pipe'] });
+  const [program, ...args] = command;
+  const child = spawn(program, args, { cwd, env, detached: true, stdio: ['ignore', 'pipe', 'pipe'] });
   const lines: string[] = [];
   const read = (stream: NodeJS.ReadableStream) => new Promise<void>((resolve) => {
     readline.createInterface({ input: stream, crlfDelay: Infinity }).on('line', (line) => {
@@ -253,16 +284,16 @@ export async function prepare(selected: string[], run: Pick<Run, 'paths' | 'cach
   const failures: string[] = [];
   const failed = new Set<string>();
   for (const name of selected) {
-    for (const dependency of [name, ...(registry.commands[name]!.dependencies ?? [])]) {
-      if (!existsSync(run.paths[dependency]!)) throw new Error(`the package directory of ${dependency} does not exist: ${run.paths[dependency]}`);
+    for (const dependency of [name, ...(commandsOf(name, registry).dependencies ?? [])]) {
+      if (!existsSync(pathOf(run.paths, dependency))) throw new Error(`the package directory of ${dependency} does not exist: ${run.paths[dependency]}`);
     }
   }
   for (const name of selected) {
-    const steps = registry.commands[name]!.prepare ?? [];
+    const steps = commandsOf(name, registry).prepare ?? [];
     for (const [index, step] of steps.entries()) {
       if (step.ifExists !== undefined && !existsSync(expand(step.ifExists, variables))) continue;
-      const command = step.command.map(argument => expand(argument, variables));
-      const label = `${name} prepare ${index + 1}/${steps.length} (${path.basename(command[0]!)})`;
+      const command = expandArgv(step.command, variables);
+      const label = `${name} prepare ${index + 1}/${steps.length} (${path.basename(command[0])})`;
       const { code, lines } = await runStreamed(label, command, expand(step.cwd, variables), environmentOf(name, run, registry));
       const errors = lines.filter(line => /Permission denied|error:/i.test(line));
       if (code !== 0) failures.push(`${label}: exit ${code}: ${command.join(' ')}`);
@@ -283,12 +314,12 @@ export async function prepare(selected: string[], run: Pick<Run, 'paths' | 'cach
 }
 
 /** The probe command of each selected implementation in the run. */
-export const probeCommands = (selected: string[], run: Pick<Run, 'paths' | 'cache'>, registry = REGISTRY): Record<string, string[]> =>
-  Object.fromEntries(selected.map(name => [name, registry.commands[name]!.command.map(argument => expand(argument, variablesOf(run)))]));
+export const probeCommands = (selected: string[], run: Pick<Run, 'paths' | 'cache'>, registry = REGISTRY): Record<string, Argv> =>
+  Object.fromEntries(selected.map(name => [name, expandArgv(commandsOf(name, registry).command, variablesOf(run))]));
 
 /** The files that the build of `name` leaves behind, as its commands declare them. */
 export const artifactPaths = (name: string, run: Pick<Run, 'paths' | 'cache'>, registry = REGISTRY): string[] =>
-  (registry.commands[name]!.artifacts ?? []).map(value => expand(value, variablesOf(run)));
+  (commandsOf(name, registry).artifacts ?? []).map(value => expand(value, variablesOf(run)));
 
 /**
  * The runtime versions of every selected implementation, each command run in the directory of its implementation, whose pin
@@ -300,14 +331,17 @@ export function runtimeVersions(selected: string[], run: Pick<Run, 'paths' | 'ca
   const failed = new Set<string>();
   for (const name of selected) {
     result[name] = {};
-    for (const [key, command] of Object.entries(registry.commands[name]!.runtime)) {
-      const resolved = command.map(argument => expand(argument, variablesOf(run)));
+    for (const [key, command] of Object.entries(commandsOf(name, registry).runtime)) {
+      const resolved = expandArgv(command, variablesOf(run));
       let value: string;
       try {
-        value = execFileSync(resolved[0]!, resolved.slice(1), { cwd: run.paths[name], encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env: environmentOf(name, run, registry) }).trim();
+        value = execFileSync(resolved[0], resolved.slice(1), { cwd: run.paths[name], encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env: environmentOf(name, run, registry) }).trim();
       } catch (error) {
-        const { status, stderr, message } = error as { status?: number; stderr?: string; message: string };
-        failures.push(`${name}/${key}: ${resolved.join(' ')} failed${status === undefined ? '' : ` with exit ${status}`}: ${stderr?.trim() || message}`);
+        // execFileSync throws an Error with the exit status and the standard error of the command.
+        const status = error instanceof Error && 'status' in error && typeof error.status === 'number' ? error.status : undefined;
+        const stderr = error instanceof Error && 'stderr' in error && typeof error.stderr === 'string' ? error.stderr.trim() : '';
+        const message = error instanceof Error ? error.message : String(error);
+        failures.push(`${name}/${key}: ${resolved.join(' ')} failed${status === undefined ? '' : ` with exit ${status}`}: ${stderr || message}`);
         failed.add(name);
         continue;
       }

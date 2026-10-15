@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "benchmarks/results.json as evidence: the fields that scripts/check-evidence.mts checks, the schema, the clean source, the protocol, the inputs and the comparison.",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "integer"
+    },
+    "source": {
+      "type": "object"
+    },
+    "protocol": {},
+    "fixtures": {},
+    "comparison": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

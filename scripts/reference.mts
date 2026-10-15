@@ -3,7 +3,7 @@
 // momoa, an established JSON parser that keeps every member of an object in order, the source range of every token and
 // lone surrogate escapes, so no implementation of this repository judges itself. Two rules of RFC 8259 that momoa does not
 // enforce are checked on its tokens: a string holds no unescaped control character, and the nesting is at most MAX_DEPTH.
-import { parse, type AnyNode, type DocumentNode, type MemberNode, type ValueNode } from '@humanwhocodes/momoa';
+import { parse, type AnyNode, type DocumentNode, type MemberNode, type Range, type ValueNode } from '@humanwhocodes/momoa';
 
 const MAX_DEPTH = 256;
 
@@ -21,18 +21,25 @@ const DECODER = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
 /** Whether `error` is a rejection of the reference: invalid UTF-8, a syntax error of momoa, or a nesting too deep for the parser. */
 function rejection(error: unknown): string | undefined {
   if (error instanceof Rejected) return error.message;
-  if (error instanceof TypeError && (error as NodeJS.ErrnoException).code === 'ERR_ENCODING_INVALID_ENCODED_DATA') return `invalid UTF-8: ${error.message}`;
+  if (error instanceof TypeError && 'code' in error && error.code === 'ERR_ENCODING_INVALID_ENCODED_DATA') return `invalid UTF-8: ${error.message}`;
   // momoa reports a syntax error with its position (ErrorWithLocation, which the package does not export).
-  if (error instanceof Error && typeof (error as { line?: unknown }).line === 'number' && typeof (error as { column?: unknown }).column === 'number') return error.message;
+  if (error instanceof Error && 'line' in error && typeof error.line === 'number' && 'column' in error && typeof error.column === 'number') return error.message;
   if (error instanceof RangeError) return `the nesting is deeper than the parser reaches: ${error.message}`;
   return undefined;
+}
+
+/** The source range of a token or node; parse with ranges: true gives every one its range. */
+function rangeOf(item: { range?: Range }): Range {
+  if (item.range === undefined) throw new Error('momoa gave a token or node without its range');
+  return item.range;
 }
 
 function document(text: string): DocumentNode {
   const parsed = parse(text, { mode: 'json', ranges: true, tokens: true });
   for (const token of parsed.tokens ?? []) {
     if (token.type !== 'String') continue;
-    for (let at = token.range![0]; at < token.range![1]; at += 1) {
+    const [start, end] = rangeOf(token);
+    for (let at = start; at < end; at += 1) {
       const unit = text.charCodeAt(at);
       if (unit < 0x20) throw new Rejected(`an unescaped control character U+${unit.toString(16).padStart(4, '0')} in a string at ${at}`);
     }
@@ -40,11 +47,11 @@ function document(text: string): DocumentNode {
   return parsed;
 }
 
-const source = (text: string, node: AnyNode): string => text.slice(node.range![0], node.range![1]);
+const source = (text: string, node: AnyNode): string => text.slice(...rangeOf(node));
 
 /** The decoded name of a member; JSON names are strings (an identifier is JSON5, which mode json refuses). */
 function nameOf(member: MemberNode): string {
-  if (member.name.type !== 'String') throw new Rejected(`the name at ${member.name.range![0]} is no string`);
+  if (member.name.type !== 'String') throw new Rejected(`the name at ${rangeOf(member.name)[0]} is no string`);
   return member.name.value;
 }
 

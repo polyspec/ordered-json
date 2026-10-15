@@ -64,6 +64,9 @@
     {
       "paths": [
         "scripts/records.mts",
+        "scripts/json.mts",
+        "scripts/present.mts",
+        "scripts/schema/*.schema.json",
         "scripts/check-pie.mts",
         "scripts/compare-ojson.mts",
         "scripts/comparison/*",

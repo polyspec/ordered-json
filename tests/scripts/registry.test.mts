@@ -5,22 +5,24 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
-import { COMMANDS, REGISTRY, ROOT, copySources, loadRegistry, prepare, probeCommands, runStreamed, runtimeVersions, withRun, type Commands } from '../../scripts/registry.mts';
+import { checkJson, parseJson, readJsonFile } from '../../scripts/json.mts';
+import { COMMANDS, REGISTRY, ROOT, commandsOf, copySources, pathOf, loadRegistry, prepare, probeCommands, runStreamed, runtimeVersions, withRun, type Commands } from '../../scripts/registry.mts';
 import { parse } from 'smol-toml';
-import { checkout } from './checkout.mts';
+import { checkout, known } from './checkout.mts';
 
 /** Writes the config/parity.json of a synthetic checkout: one implementation for each name with its one root. */
 const declare = (json: (file: string, data: unknown) => void, roots: Record<string, string>) =>
   json('config/parity.json', { schema: 1, implementations: Object.entries(roots).map(([name, folder]) => ({ name, runner: 'python', roots: [folder] })), units: [] });
 
 test('the implementations are those of the parity declaration', (context) => {
-  const declared = (JSON.parse(readFileSync(path.join(ROOT, 'config/parity.json'), 'utf8')) as { implementations: { name: string; roots: string[] }[] }).implementations;
+  const declared = readJsonFile<{ implementations: { name: string; roots: string[] }[] }>(path.join(ROOT, 'config/parity.json'), 'parity-implementations.schema.json').implementations;
   assert.deepEqual(REGISTRY.roots, Object.fromEntries(declared.map(entry => [entry.name, entry.roots[0]])));
   const { root, json } = checkout(context);
   declare(json, { js: 'packages/js', future: 'packages/future' });
-  assert.throws(() => loadRegistry(root, { js: COMMANDS.js! }), /declares \["future","js"\], but the verifier has commands for \["js"\]/);
+  const js = known(COMMANDS.js, 'the commands of js');
+  assert.throws(() => loadRegistry(root, { js }), /declares \["future","js"\], but the verifier has commands for \["js"\]/);
   declare(json, { js: '../outside' });
-  assert.throws(() => loadRegistry(root, { js: COMMANDS.js! }), /not a child directory/);
+  assert.throws(() => loadRegistry(root, { js }), /not a child directory/);
 });
 
 test('a new language builds, answers and names its runtime with the commands of the registry', async (context) => {
@@ -37,16 +39,16 @@ test('a new language builds, answers and names its runtime with the commands of 
     await prepare(['future'], run, registry);
     assert.equal(readFileSync(path.join(root, 'future-language/built'), 'utf8'), 'ok');
     assert.deepEqual(runtimeVersions(['future'], run, registry), { future: { version: 'runtime' } });
-    const [command, ...args] = probeCommands(['future'], run, registry).future!;
-    assert.equal(execFileSync(command!, args, { encoding: 'utf8' }).trim(), 'probe');
+    const [command, ...args] = known(probeCommands(['future'], run, registry).future, 'the probe command of future');
+    assert.equal(execFileSync(command, args, { encoding: 'utf8' }).trim(), 'probe');
   }, root, registry);
 });
 
 test('a run builds the extension in a copy that ends with the run', async () => {
   const directory = await withRun(['php-extension'], async (run) => {
-    assert.ok(run.paths['php-extension']!.startsWith(run.root));
-    assert.equal(run.paths.php, path.join(ROOT, REGISTRY.roots.php!));
-    assert.ok(existsSync(path.join(run.paths['php-extension']!, 'src/config.m4')));
+    assert.ok(pathOf(run.paths, 'php-extension').startsWith(run.root));
+    assert.equal(run.paths.php, path.join(ROOT, pathOf(REGISTRY.roots, 'php')));
+    assert.ok(existsSync(path.join(pathOf(run.paths, 'php-extension'), 'src/config.m4')));
     return run.root;
   });
   assert.equal(existsSync(directory), false);
@@ -78,20 +80,21 @@ test('a build step streams its lines and ends with its grandchildren', async (co
 });
 
 test('the Rust build runs in the target directory of the run', () => {
-  assert.equal(REGISTRY.commands.rust!.env?.CARGO_TARGET_DIR, '{cache}/rust-target');
-  assert.deepEqual(REGISTRY.commands.rust!.command, ['{cache}/rust-target/debug/examples/probe']);
+  assert.equal(commandsOf('rust').env?.CARGO_TARGET_DIR, '{cache}/rust-target');
+  assert.deepEqual(commandsOf('rust').command, ['{cache}/rust-target/debug/examples/probe']);
 });
 
 test('the packages follow the polyspec naming convention and each Cargo package has one manifest', () => {
-  const [js, php, extension, rust, go] = ['js', 'php', 'php-extension', 'rust', 'go'].map(name => REGISTRY.roots[name]!) as [string, string, string, string, string];
+  const [js, php, extension, rust, go] = (['js', 'php', 'php-extension', 'rust', 'go'] as const).map(name => pathOf(REGISTRY.roots, name));
+  assert.ok(js !== undefined && php !== undefined && extension !== undefined && rust !== undefined && go !== undefined, 'the roots of the five packages');
   const read = (file: string) => readFileSync(path.join(ROOT, file), 'utf8');
-  const name = (file: string) => (JSON.parse(read(file)) as { name: string }).name;
+  const name = (file: string) => readJsonFile<{ name: string }>(path.join(ROOT, file), 'package-name.schema.json').name;
   assert.deepEqual(['composer.json', `${php}/composer.json`, `${extension}/composer.json`].map(name), ['polyspec/ordered-json', 'polyspec/ordered-json', 'polyspec/ordered-json-extension']);
   assert.deepEqual(['package.json', `${js}/package.json`].map(name), ['@polyspec/ordered-json', '@polyspec/ordered-json']);
-  const cargo = parse(read(`${rust}/Cargo.toml`)) as { package: { name: string }; lib: { name: string } };
+  const cargo = checkJson<{ package: { name: string }; lib: { name: string } }>(parse(read(`${rust}/Cargo.toml`)), 'cargo-manifest.schema.json', `${rust}/Cargo.toml`);
   assert.deepEqual([cargo.package.name, cargo.lib.name], ['polyspec-ordered-json', 'polyspec_ordered_json']);
   // The module path of the Go package is the repository path followed by its folder (S5 of kit).
-  assert.equal((JSON.parse(execFileSync('go', ['mod', 'edit', '-json'], { cwd: path.join(ROOT, go), encoding: 'utf8' })) as { Module: { Path: string } }).Module.Path, `github.com/polyspec/ordered-json/${go}`);
+  assert.equal(parseJson<{ Module: { Path: string } }>(execFileSync('go', ['mod', 'edit', '-json'], { cwd: path.join(ROOT, go), encoding: 'utf8' }), 'go-mod-edit.schema.json', 'go mod edit -json').Module.Path, `github.com/polyspec/ordered-json/${go}`);
   assert.ok(read(`${php}/src/OrderedJson.php`).includes('\nnamespace Polyspec\\OrderedJson;\n'));
   // A Git dependency on this repository reads every tracked Cargo.toml; two manifests of one package make Cargo skip one.
   const manifests = execFileSync('git', ['ls-files', '-z', '--', '*Cargo.toml'], { cwd: ROOT, encoding: 'utf8' }).split('\0').filter(Boolean)

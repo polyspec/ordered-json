@@ -6,7 +6,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import test, { type TestContext } from 'node:test';
 import { installPie, installSuite } from '../../scripts/external-inputs.mts';
-import { sha256, supplementaryManifest } from '../../scripts/records.mts';
+import { externalPins, sha256, supplementaryManifest } from '../../scripts/records.mts';
 import { ROOT } from '../../scripts/registry.mts';
 import { checkout } from './checkout.mts';
 
@@ -49,7 +49,7 @@ test('the pinned suite revision is installed once, and a suite with other inputs
   installSuite(root);
   assert.ok(existsSync(path.join(root, '.cache/JSONTestSuite/test_parsing/y_object.json')));
   installSuite(root);
-  const pins = JSON.parse(readFileSync(path.join(root, 'external-inputs.json'), 'utf8')) as { supplementary: Record<string, unknown> };
+  const pins = externalPins(root);
   json('external-inputs.json', { ...pins, supplementary: { ...pins.supplementary, cases: 2 } });
   assert.throws(() => installSuite(root), /JSONTestSuite cases: expected 2, actual 1/);
   assert.ok(existsSync(path.join(suite.root, 'test_parsing')));

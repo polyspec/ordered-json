@@ -9,14 +9,14 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { PIE_FIX } from './external-inputs.mts';
 import { PIE_RECORD, externalPins, inputIssues, manifestDifferences, packageRevisions, sha256, sourceManifest, supplementaryManifest, writeRecord } from './records.mts';
-import { ROOT, artifactPaths, probeCommands, runStreamed, runtimeVersions, withRun, type Run } from './registry.mts';
+import { ROOT, artifactPaths, pathOf, probeCommands, runStreamed, runtimeVersions, withRun, type Run } from './registry.mts';
 import { SUITE_FIX, verifyProbes } from './verify.mts';
 
 const PACKAGE = 'polyspec/ordered-json-extension:*@dev';
 
 /** Runs PIE with `args` in the extension of the run; a nonzero exit or a line that reports a build or tool error fails. */
 export async function pieCommand(run: Run, pie: string, args: string[], commands: { arguments: string[]; exit_code: number }[], warnings: string[]): Promise<string> {
-  const { code, lines } = await runStreamed(`pie ${args[0]}`, ['php', pie, ...args, '--no-interaction', '--no-ansi'], run.paths['php-extension']!, { ...process.env, PIE_WORKING_DIRECTORY: path.join(run.root, 'pie') });
+  const { code, lines } = await runStreamed(`pie ${args[0]}`, ['php', pie, ...args, '--no-interaction', '--no-ansi'], pathOf(run.paths, 'php-extension'), { ...process.env, PIE_WORKING_DIRECTORY: path.join(run.root, 'pie') });
   if (code !== 0) throw new Error(`pie ${args.join(' ')} failed with exit ${code}`);
   const errors = lines.filter(line => /Permission denied|error:|build tools are missing/i.test(line));
   if (errors.length) throw new Error(`pie ${args[0]} reported a build or tool error in ${errors.length} lines:\n${errors.join('\n')}`);

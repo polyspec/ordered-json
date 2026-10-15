@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "The parsed mise.toml: its tools, each a version or a table of options, which tests/scripts/environment.test.mts reads.",
+  "type": "object",
+  "required": [
+    "tools"
+  ],
+  "properties": {
+    "tools": {
+      "type": "object"
+    }
+  }
+}

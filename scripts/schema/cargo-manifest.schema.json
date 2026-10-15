@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "The parsed Cargo.toml of the Rust package: the names of [package] and [lib] that tests/scripts/registry.test.mts reads.",
+  "type": "object",
+  "required": [
+    "package",
+    "lib"
+  ],
+  "properties": {
+    "package": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "lib": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

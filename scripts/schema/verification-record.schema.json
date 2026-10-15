@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "The aggregate record of make verify-all (var/records): the fields that scripts/check-evidence.mts checks against the current sources.",
+  "type": "object",
+  "required": [
+    "cases",
+    "implementations"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer"
+    },
+    "status": {
+      "type": "string"
+    },
+    "checked_at": {
+      "type": "string"
+    },
+    "sources": {
+      "$ref": "#/$defs/manifest"
+    },
+    "packages": {},
+    "supplementary": {},
+    "cases": {
+      "$ref": "#/$defs/counts"
+    },
+    "implementations": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/implementation"
+      }
+    }
+  },
+  "$defs": {
+    "manifest": {
+      "type": "object",
+      "required": [
+        "sha256",
+        "files"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string"
+        },
+        "files": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "required": [
+        "official",
+        "fixtures",
+        "supplementary",
+        "total"
+      ],
+      "properties": {
+        "official": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fixtures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "supplementary": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "implementation": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "cases": {
+          "type": "number"
+        },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

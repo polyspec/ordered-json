@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "benchmarks/workload.json: the measurement protocol of the benchmark and each input with its size, sha256 and structure, which benchmarks/run.mts and the evidence check read.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "benchmark",
+    "fixtures"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer"
+    },
+    "benchmark": {
+      "type": "object",
+      "required": [
+        "warmup",
+        "warmup_ms",
+        "iterations",
+        "samples",
+        "median_tolerance",
+        "p95_tolerance"
+      ],
+      "properties": {
+        "warmup": {
+          "type": "number"
+        },
+        "warmup_ms": {
+          "type": "number"
+        },
+        "iterations": {
+          "type": "number"
+        },
+        "samples": {
+          "type": "number"
+        },
+        "median_tolerance": {
+          "type": "number"
+        },
+        "p95_tolerance": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fixtures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "file",
+          "input_bytes",
+          "sha256",
+          "objects",
+          "arrays",
+          "strings",
+          "numbers",
+          "booleans",
+          "nulls",
+          "nodes",
+          "max_depth"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "input_bytes": {
+            "type": "number"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "objects": {
+            "type": "number"
+          },
+          "arrays": {
+            "type": "number"
+          },
+          "strings": {
+            "type": "number"
+          },
+          "numbers": {
+            "type": "number"
+          },
+          "booleans": {
+            "type": "number"
+          },
+          "nulls": {
+            "type": "number"
+          },
+          "nodes": {
+            "type": "number"
+          },
+          "max_depth": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

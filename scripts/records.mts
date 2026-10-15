@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { readJsonFile } from './json.mts';
 import { REGISTRY, ROOT, trackedFiles } from './registry.mts';
 
 export const AGGREGATE_RECORD = 'var/records/verification.json';
@@ -79,14 +80,9 @@ export type Supplementary = { project: string; revision: string; cases: number; 
 
 /** The identity that external-inputs.json pins for each external input that a record may name. */
 export function externalPins(root = ROOT): Pins {
-  const pins = JSON.parse(readFileSync(path.join(root, 'external-inputs.json'), 'utf8')) as Pins & { schema_version: number };
-  if (pins.schema_version !== 1) throw new Error(`external-inputs.json has the schema ${pins.schema_version}, not 1`);
-  if (!pins.pie?.release || !/^[a-f0-9]{64}$/.test(pins.pie.phar_sha256 ?? '')) throw new Error('external-inputs.json pins PIE without a release and the sha256 of its PHAR');
-  const suite = pins.supplementary;
-  if (!/^[a-f0-9]{40}$/.test(suite?.revision ?? '') || !/^[a-f0-9]{64}$/.test(suite?.inputs_sha256 ?? '') || !Number.isInteger(suite.cases) || suite.cases <= 0) {
-    throw new Error('external-inputs.json pins the supplementary suite without a revision, an inputs sha256 and a case count');
-  }
-  return pins;
+  // The schema requires schema 1, the release of PIE with the sha256 of its PHAR, and the revision, the inputs sha256 and a
+  // positive case count of the supplementary suite.
+  return readJsonFile<Pins>(path.join(root, 'external-inputs.json'), 'external-inputs.schema.json');
 }
 
 /** The supplementary suite of the checkout `suite`: its project, revision, case count and the digest of its inputs. */

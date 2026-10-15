@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "examples/official.json, the shared examples with their golden results: the cases that the verifier and the evidence check read.",
+  "type": "object",
+  "required": [
+    "cases"
+  ],
+  "properties": {
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "input",
+          "tree",
+          "compact"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "input": {
+            "type": "string"
+          },
+          "tree": {
+            "$ref": "#/$defs/tree"
+          },
+          "compact": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "tree": {
+      "description": "The tree of scripts/reference.mts: ['object', [[name, tree]...]], ['array', [tree...]], ['string', s], ['number', token], ['boolean', b] or ['null'].",
+      "oneOf": [
+        {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "object"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/$defs/tree"
+                  }
+                ],
+                "items": false,
+                "minItems": 2
+              }
+            }
+          ],
+          "items": false,
+          "minItems": 2
+        },
+        {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "array"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/tree"
+              }
+            }
+          ],
+          "items": false,
+          "minItems": 2
+        },
+        {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "string"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "items": false,
+          "minItems": 2
+        },
+        {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "items": false,
+          "minItems": 2
+        },
+        {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "boolean"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "items": false,
+          "minItems": 2
+        },
+        {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "null"
+            }
+          ],
+          "items": false,
+          "minItems": 1
+        }
+      ]
+    }
+  }
+}
