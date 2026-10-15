@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Polyspec\OrderedJson\Tests;
@@ -73,7 +74,10 @@ abstract class OfficialTestCase extends TestCase
         $kind = $parts[0]->stringValue();
         return match ($kind) {
             'object' => ['object', array_map(
-                static fn(Value $member) => [$member->items()[0]->stringUnits(), self::expectedTree($member->items()[1])],
+                static fn(Value $member) => [
+                    $member->items()[0]->stringUnits(),
+                    self::expectedTree($member->items()[1]),
+                ],
                 $parts[1]->items(),
             )],
             'array' => ['array', array_map(self::expectedTree(...), $parts[1]->items())],

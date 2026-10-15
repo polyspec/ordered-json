@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: de4f5febee5ec1cc7fc068bc1ccb316a4aa276a333f5021502568784136f56f8 -->
+<!-- source-sha256: 7edfa8bca8d50fdf69756395ea8d13d83a2122754f71c0e1dea6b2080ceae3f3 -->
 # 개발 절차
 
 [English](AGENTS.md)
@@ -70,7 +70,7 @@ push는 `[~]` 작업이 없을 때만 합니다. pre-push hook `.githooks/pre-pu
 
 모든 언어 probe는 [official.json](examples/official.json)과 [scripts/verify.mts](scripts/verify.mts)를 사용합니다. 공통 사례는 해당 파일이나 `contracts/fixtures/`에 추가합니다. 언어별로 다른 예제나 기대 결과를 만들지 않습니다.
 
-Rust 코드는 `@polyspec/kit`의 lint인 `make lint-rust`(Cargo workspace마다 `-D warnings`의 cargo clippy)를, Go 코드는 `make lint-go`(`.golangci.yml`의 golangci-lint와 deadcode)를 통과합니다. 둘은 `CHECK_TARGETS`의 target이므로 hosted CI가 모든 pull request와 `main`의 모든 push에서 실행합니다. 네이티브 코드를 변경하면 PHP 확장을 다시 빌드합니다. 이전 바이너리나 이전 결과를 변경된 코드의 검증 근거로 사용하지 않습니다.
+Rust 코드는 `@polyspec/kit`의 lint인 `make lint-rust`(Cargo workspace마다 `-D warnings`의 cargo clippy)를, Go 코드는 `make lint-go`(`.golangci.yml`의 golangci-lint와 deadcode)를, PHP 코드는 `make lint-php`(`phpcs.xml.dist`의 phpcs와 `phpstan.dist.neon`의 PHPStan)를 통과합니다. 셋은 `CHECK_TARGETS`의 target이므로 hosted CI가 모든 pull request와 `main`의 모든 push에서 실행합니다. 네이티브 코드를 변경하면 PHP 확장을 다시 빌드합니다. 이전 바이너리나 이전 결과를 변경된 코드의 검증 근거로 사용하지 않습니다.
 
 <a id="release"></a>
 ## 릴리스

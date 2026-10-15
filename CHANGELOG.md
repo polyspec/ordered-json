@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.52: `make lint-php`, the phpcs and PHPStan of kit, runs in the full suite and in the suite job of CI; `make install-php` installs the root package into `vendor/`, whose autoloader PHPStan reads for the PHP of `benchmarks/`, and the PHP of the packages, the tests and the benchmarks follows PSR-12, the probe of the shared verifier reading its serializations from `Polyspec\OrderedJson\Tests\ProbeTree`.
 - T1.51: the shared tools are `@polyspec/kit` 0.0.48: the checkout runs the Node.js 26.12.0 of `mise.toml` from `var/tools`, `.node-version` is gone and every `engines.node` is `>=26.12.0` (kit K171); the workflows pin each action by its SHA with its version (kit K169); the scripts and tests read JSON through schemas and check the values that they read instead of asserting them (kit K155–K158).
 
 ## 0.0.9

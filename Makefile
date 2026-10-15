@@ -37,7 +37,7 @@ include scripts/kit/kit-bootstrap.mk
 
 # The targets of the full suite that make check runs through the guard of full-run of @polyspec/kit and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
-CHECK_TARGETS := kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check documents-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go pie-check test-scripts typecheck lint-ts
+CHECK_TARGETS := kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check documents-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php pie-check test-scripts typecheck lint-ts
 
 .PHONY: check test-scripts typecheck install-php install-python php-extension verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
 	benchmark benchmark-check python-parse-budget release-config-check install install-rust install-external
@@ -57,8 +57,11 @@ install-rust:
 	$(ONLINE) rustup toolchain install --no-self-update
 
 # install-php installs the locked Composer packages of packages/php and packages/php-ext, PHPUnit among them, into their
-# vendor/, from which kit parity runs their tests (config/parity.json).
+# vendor/, from which kit parity runs their tests (config/parity.json), and the root package, the published composer.json,
+# into vendor/, whose autoloader PHPStan of make lint-php reads for the PHP of benchmarks/. The root package requires only
+# the platform, so its install downloads nothing; it has no lock, as the published package keeps none (.gitignore).
 install-php:
+	$(ONLINE) $(COMPOSER) install --no-interaction --no-progress
 	$(ONLINE) $(COMPOSER) install --no-interaction --no-progress --working-dir=packages/php
 	$(ONLINE) $(COMPOSER) install --no-interaction --no-progress --working-dir=packages/php-ext
 
