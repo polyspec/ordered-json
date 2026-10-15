@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "comment": "Written by make dependency-review RECORD=1 (scripts/kit/dependency-review.mts) from the registries; make dependency-policy-check compares the checkout with it without a network.",
-  "reviewed": "2026-10-15T01:02:32.985Z",
+  "reviewed": "2026-10-15T03:27:13.606Z",
   "locks": [
     {
       "lock": "package-lock.json",
-      "sha256": "60f3db2677050c8d0727b1ce370ad18f17767b36fa9379420b1acf36d21b189b",
+      "sha256": "f5205a7511841d7e6a41a2aad8225bcecf17e6b1f9cef9bbfab6d11c75ad7bb7",
       "advisories": [
         {
           "package": "sprintf-js",
@@ -16,6 +16,11 @@
           "url": "https://github.com/advisories/GHSA-hp3w-g68c-fv3c"
         }
       ]
+    },
+    {
+      "lock": "composer.lock",
+      "sha256": "ee129c937cead6523dce31a75b28780a05b8240f6a2901281f85bb4d490315cd",
+      "advisories": []
     },
     {
       "lock": "packages/php/composer.lock",

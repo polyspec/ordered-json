@@ -60,7 +60,8 @@ install-rust:
 # install-php installs the locked Composer packages of packages/php and packages/php-ext, PHPUnit among them, into their
 # vendor/, from which kit parity runs their tests (config/parity.json), and the root package, the published composer.json,
 # into vendor/, whose autoloader PHPStan of make lint-php reads for the PHP of benchmarks/. The root package requires only
-# the platform, so its install downloads nothing; it has no lock, as the published package keeps none (.gitignore).
+# the platform, so its install downloads nothing; its composer.lock, which composerPlatforms of config/dependency-policy.json
+# checks as every Composer manifest of the checkout (kit K181), locks no package.
 install-php:
 	$(ONLINE) $(COMPOSER) install --no-interaction --no-progress
 	$(ONLINE) $(COMPOSER) install --no-interaction --no-progress --working-dir=packages/php

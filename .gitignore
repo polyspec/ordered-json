@@ -7,4 +7,3 @@ __pycache__/
 /var/
 .venv/
 *.egg-info/
-/composer.lock
