@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "comment": "Written by make dependency-review RECORD=1 (scripts/kit/dependency-review.mts) from the registries; make dependency-policy-check compares the checkout with it without a network.",
-  "reviewed": "2026-10-15T00:40:16.320Z",
+  "reviewed": "2026-10-15T01:02:32.985Z",
   "locks": [
     {
       "lock": "package-lock.json",
@@ -16,6 +16,16 @@
           "url": "https://github.com/advisories/GHSA-hp3w-g68c-fv3c"
         }
       ]
+    },
+    {
+      "lock": "packages/php/composer.lock",
+      "sha256": "468c6e1ca0ea3ec55eaab9447f205bbefe1518a0fbb00604e615c3ccf95105bf",
+      "advisories": []
+    },
+    {
+      "lock": "packages/php-ext/composer.lock",
+      "sha256": "5ff215f511dca15670383eca9cc28620163aaf9ada7bad7eaeb1637b4e956d78",
+      "advisories": []
     },
     {
       "lock": "packages/python/pylock.toml",
@@ -105,6 +115,20 @@
       "package": "yaml",
       "version": "2.9.1",
       "latest": "2.9.1"
+    },
+    {
+      "ecosystem": "composer",
+      "manifest": "packages/php/composer.json",
+      "package": "phpunit/phpunit",
+      "version": "13.4.2",
+      "latest": "13.4.2"
+    },
+    {
+      "ecosystem": "composer",
+      "manifest": "packages/php-ext/composer.json",
+      "package": "phpunit/phpunit",
+      "version": "13.4.2",
+      "latest": "13.4.2"
     },
     {
       "ecosystem": "pypi",
