@@ -8,14 +8,24 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { parse } from 'smol-toml';
-import { REGISTRY, ROOT } from '../../scripts/registry.mts';
+import { checkJson, parseJson, readJsonFile } from '../../scripts/json.mts';
+import { REGISTRY, ROOT, commandsOf } from '../../scripts/registry.mts';
+import { known } from './checkout.mts';
 
 const OFFLINE = { CARGO_NET_OFFLINE: 'true', GOPROXY: 'off', npm_config_offline: 'true', COMPOSER_DISABLE_NETWORK: '1' };
 // The targets whose recipe builds or runs an implementation.
 const TOOL_TARGETS = ['verify-all', 'verify-js', 'verify-rust', 'verify-go', 'verify-php', 'verify-php-extension', 'verify-python', 'pie-check', 'benchmark', 'benchmark-check'];
 const makefile = () => readFileSync(path.join(ROOT, 'Makefile'), 'utf8');
 const read = (file: string) => readFileSync(path.join(ROOT, file), 'utf8');
-const miseTools = () => (parse(read('mise.toml')) as { tools: Record<string, string> }).tools;
+/** The version that mise.toml declares for the tool `name`. */
+function miseVersion(name: string): string {
+  const { tools } = checkJson<{ tools: Record<string, unknown> }>(parse(read('mise.toml')), 'mise-config.schema.json', 'mise.toml');
+  const version = tools[name];
+  assert.ok(typeof version === 'string', `mise.toml declares the version of ${name}`);
+  return version;
+}
+/** The directory of the implementation `name` in config/parity.json. */
+const rootOf = (name: string): string => known(REGISTRY.roots[name], `the root of ${name}`);
 
 /** The prerequisites and the recipe lines of each target of a Makefile; a rule of several targets gives each of them. */
 function recipes(text: string): Map<string, { prerequisites: string[]; recipe: string[] }> {
@@ -24,8 +34,10 @@ function recipes(text: string): Map<string, { prerequisites: string[]; recipe: s
   for (const line of text.split('\n')) {
     const header = /^([A-Za-z0-9_.-]+(?: [A-Za-z0-9_.-]+)*):(?!=)(.*)$/.exec(line);
     if (header && !line.startsWith('\t')) {
-      current = { prerequisites: header[2]!.split('#')[0]!.trim().split(/\s+/).filter(Boolean), recipe: [] };
-      for (const target of header[1]!.split(' ')) found.set(target, current);
+      const [, targets, prerequisites] = header;
+      assert.ok(targets !== undefined && prerequisites !== undefined, line);
+      current = { prerequisites: known(prerequisites.split('#')[0], line).trim().split(/\s+/).filter(Boolean), recipe: [] };
+      for (const target of targets.split(' ')) found.set(target, current);
     } else if (line.startsWith('\t') && current) {
       current.recipe.push(line.trim());
     } else if (line.trim() && !line.startsWith('#')) {
@@ -38,8 +50,8 @@ function recipes(text: string): Map<string, { prerequisites: string[]; recipe: s
 test('no command installs or selects another toolchain', () => {
   assert.match(makefile(), /^export GOTOOLCHAIN := local$/m);
   assert.match(makefile(), /^export RUSTUP_AUTO_INSTALL := 0$/m);
-  assert.equal(REGISTRY.commands.go!.env?.GOTOOLCHAIN, 'local');
-  assert.equal(REGISTRY.commands.rust!.env?.RUSTUP_AUTO_INSTALL, '0');
+  assert.equal(commandsOf('go').env?.GOTOOLCHAIN, 'local');
+  assert.equal(commandsOf('rust').env?.RUSTUP_AUTO_INSTALL, '0');
 });
 
 test('every check runs offline and only make install downloads', () => {
@@ -52,16 +64,17 @@ test('every check runs offline and only make install downloads', () => {
 
 test('make install makes every download of the checks', () => {
   const table = recipes(makefile());
-  assert.deepEqual(table.get('install')!.prerequisites, ['install-rust', 'install-tools', 'cargo-downloads-fetch', 'install-php', 'install-python', 'install-external']);
-  assert.deepEqual(table.get('install-external')!.recipe, ['$(ONLINE) $(NODE) scripts/external-inputs.mts']);
-  assert.deepEqual(table.get('install-rust')!.recipe, ['$(ONLINE) rustup toolchain install --no-self-update']);
+  assert.deepEqual(known(table.get('install'), 'the target install').prerequisites, ['install-rust', 'install-tools', 'cargo-downloads-fetch', 'install-php', 'install-python', 'install-external']);
+  assert.deepEqual(known(table.get('install-external'), 'the target install-external').recipe, ['$(ONLINE) $(NODE) scripts/external-inputs.mts']);
+  assert.deepEqual(known(table.get('install-rust'), 'the target install-rust').recipe, ['$(ONLINE) rustup toolchain install --no-self-update']);
 });
 
 test('a target that runs a tool depends on the toolchain and download checks', () => {
   const table = recipes(makefile());
   for (const target of TOOL_TARGETS) {
-    assert.ok(table.get(target)!.prerequisites.includes('toolchain-check'), target);
-    assert.ok(table.get(target)!.prerequisites.includes('cargo-downloads-check'), target);
+    const { prerequisites } = known(table.get(target), `the target ${target}`);
+    assert.ok(prerequisites.includes('toolchain-check'), target);
+    assert.ok(prerequisites.includes('cargo-downloads-check'), target);
   }
 });
 
@@ -72,16 +85,15 @@ test('the tools of the checkout come first on the path', () => {
 test('the declarations name an exact release or a minor release', () => {
   assert.equal(existsSync(path.join(ROOT, '.node-version')), false, 'mise.toml pins Node.js; .node-version is gone');
   assert.equal(existsSync(path.join(ROOT, '.python-version')), false, 'mise.toml pins Python; .python-version is gone');
-  const tools = miseTools();
-  assert.match(tools.node!, /^\d+\.\d+\.\d+$/);
-  assert.match(tools.go!, /^\d+\.\d+\.\d+$/);
-  assert.match(tools.python!, /^\d+\.\d+\.\d+$/);
+  assert.match(miseVersion('node'), /^\d+\.\d+\.\d+$/);
+  assert.match(miseVersion('go'), /^\d+\.\d+\.\d+$/);
+  assert.match(miseVersion('python'), /^\d+\.\d+\.\d+$/);
   assert.match(read('.php-version'), /^\d+\.\d+\n$/);
   assert.match(read('rust-toolchain.toml'), /^channel = "\d+\.\d+\.\d+"$/m);
-  assert.match((JSON.parse(read('package.json')) as { packageManager: string }).packageManager, /^npm@\d+\.\d+\.\d+\+sha512\.[0-9a-f]{128}$/);
+  assert.match(known(readJsonFile<{ packageManager?: string }>(path.join(ROOT, 'package.json'), 'npm-manifest.schema.json').packageManager, 'packageManager of package.json'), /^npm@\d+\.\d+\.\d+\+sha512\.[0-9a-f]{128}$/);
   // Go is the pin of kit, which mise.toml and the go directive name exactly; the go command drops a toolchain line equal to it.
-  const goMod = JSON.parse(execFileSync('go', ['mod', 'edit', '-json'], { cwd: path.join(ROOT, REGISTRY.roots.go!), encoding: 'utf8' })) as { Go: string; Toolchain?: unknown };
-  assert.equal(goMod.Go, tools.go);
+  const goMod = parseJson<{ Go: string; Toolchain?: unknown }>(execFileSync('go', ['mod', 'edit', '-json'], { cwd: path.join(ROOT, rootOf('go')), encoding: 'utf8' }), 'go-mod-edit.schema.json', 'go mod edit -json');
+  assert.equal(goMod.Go, miseVersion('go'));
   assert.equal(goMod.Toolchain, undefined);
 });
 
@@ -97,7 +109,7 @@ test('no recipe runs a pinned tool by name', () => {
 });
 
 test('every cargo command uses the lock file', () => {
-  for (const { command } of REGISTRY.commands.rust!.prepare!) {
+  for (const { command } of known(commandsOf('rust').prepare, 'the prepare steps of rust')) {
     if (command[0] === 'cargo' && command[1] !== 'fmt') assert.ok(command.includes('--locked'), command.join(' '));
   }
   assert.match(read('benchmarks/run.mts'), /\['cargo', 'run', '--locked',/);
@@ -105,7 +117,7 @@ test('every cargo command uses the lock file', () => {
 
 test('requires-python of the Python package is the minor release of the python of mise.toml', () => {
   // CI runs the package only under the python of mise.toml, so requires-python states its minor release and nothing older.
-  const pyproject = parse(read(path.join(REGISTRY.roots.python!, 'pyproject.toml'))) as { project: { 'requires-python': string } };
-  const minor = miseTools().python!.split('.').slice(0, 2).join('.');
+  const pyproject = checkJson<{ project: { 'requires-python'?: string } }>(parse(read(path.join(rootOf('python'), 'pyproject.toml'))), 'pyproject.schema.json', 'pyproject.toml');
+  const minor = miseVersion('python').split('.').slice(0, 2).join('.');
   assert.equal(pyproject.project['requires-python'], `>=${minor}`);
 });

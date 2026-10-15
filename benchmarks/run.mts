@@ -11,8 +11,10 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { isDeepStrictEqual, parseArgs } from 'node:util';
+import { parseJson, readJsonFile } from '../scripts/json.mts';
+import { present } from '../scripts/present.mts';
 import { writeRecord } from '../scripts/records.mts';
-import { ROOT, artifactPaths, prepare, repositoryPaths, withRun } from '../scripts/registry.mts';
+import { ROOT, artifactPaths, pathOf, prepare, repositoryPaths, withRun, type Argv } from '../scripts/registry.mts';
 
 type Protocol = { warmup: number; warmup_ms: number; iterations: number; samples: number; median_tolerance: number; p95_tolerance: number };
 type Entry = { file: string; input_bytes: number; sha256: string } & Record<(typeof COUNTS)[number] | 'max_depth', number>;
@@ -66,9 +68,9 @@ export function validateWorkload(entries: Entry[], directory = FIXTURES): void {
 export const sourceState = (): { dirty: boolean } => ({ dirty: execFileSync('git', ['status', '--porcelain'], { cwd: ROOT, encoding: 'utf8' }).trim() !== '' });
 
 /** The first line that `command` prints, or `unavailable`. */
-function version(command: string[]): string {
-  const result = spawnSync(command[0]!, command.slice(1), { cwd: ROOT, encoding: 'utf8' });
-  return result.status === 0 ? `${result.stdout}${result.stderr}`.split('\n')[0]! : 'unavailable';
+function version([program, ...args]: Argv): string {
+  const result = spawnSync(program, args, { cwd: ROOT, encoding: 'utf8' });
+  return result.status === 0 ? present(`${result.stdout}${result.stderr}`.split('\n')[0], 'the first line of a version') : 'unavailable';
 }
 
 const environment = () => ({
@@ -79,14 +81,18 @@ const environment = () => ({
 });
 
 /** The rows that a harness prints. */
-function measure(label: string, command: string[], cwd: string, env: NodeJS.ProcessEnv): Row[] {
-  const result = spawnSync(command[0]!, command.slice(1), { cwd, env, encoding: 'utf8', maxBuffer: 1 << 28 });
+function measure(label: string, command: Argv, cwd: string, env: NodeJS.ProcessEnv): Row[] {
+  const [program, ...args] = command;
+  const result = spawnSync(program, args, { cwd, env, encoding: 'utf8', maxBuffer: 1 << 28 });
   if (result.status !== 0) throw new Error(`benchmark ${label} failed with exit ${result.status}: ${command.join(' ')}\n${result.stderr.trim() || result.stdout.trim() || result.error?.message || 'no output'}`);
   return result.stdout.split('\n').filter(Boolean).map((line) => {
-    const [file, name, parse, stringify, roundtrip, parse95, stringify95, roundtrip95, samples, sha256, input, output] = line.split('\t') as [string, ...string[]];
+    const fields = line.split('\t');
+    if (fields.length !== 12) throw new Error(`benchmark ${label} printed a row of ${fields.length} fields, not 12: ${line}`);
+    const [file, name, parse, stringify, roundtrip, parse95, stringify95, roundtrip95, samples, sha256, input, output] = fields;
     return {
-      file: path.basename(file), implementation: `${label}:${name}`, parse_ns: Number(parse), stringify_ns: Number(stringify), roundtrip_ns: Number(roundtrip),
-      parse_p95_ns: Number(parse95), stringify_p95_ns: Number(stringify95), roundtrip_p95_ns: Number(roundtrip95), samples: JSON.parse(samples!), sha256: sha256!,
+      file: path.basename(present(file, 'the file of a row')), implementation: `${label}:${present(name, 'the name of a row')}`, parse_ns: Number(parse), stringify_ns: Number(stringify), roundtrip_ns: Number(roundtrip),
+      parse_p95_ns: Number(parse95), stringify_p95_ns: Number(stringify95), roundtrip_p95_ns: Number(roundtrip95),
+      samples: parseJson<unknown>(present(samples, 'the samples of a row'), 'json-value.schema.json', `the samples of benchmark ${label}`), sha256: present(sha256, 'the sha256 of a row'),
       input_bytes: Number(input), output_bytes: Number(output),
     };
   });
@@ -118,7 +124,7 @@ export function compare(previous: { environment?: unknown; protocol?: unknown; r
   }
   for (const { implementation, metric, tolerance, values } of ratios.values()) {
     values.sort((a, b) => a - b);
-    const aggregate = values[Math.floor(values.length / 2)]!;
+    const aggregate = present(values[Math.floor(values.length / 2)], 'the median ratio');
     if (aggregate > 1 + tolerance) failures.push({ implementation, metric, aggregate_ratio: aggregate, tolerance, fixture_ratios: values });
   }
   return { status: failures.length ? 'failed' : 'passed', failures };
@@ -126,7 +132,7 @@ export function compare(previous: { environment?: unknown; protocol?: unknown; r
 
 async function main(): Promise<void> {
   const { values } = parseArgs({ options: { iterations: { type: 'string' }, warmup: { type: 'string' }, samples: { type: 'string' }, check: { type: 'boolean' }, 'update-baseline': { type: 'boolean' } } });
-  const workload = JSON.parse(readFileSync(path.join(ROOT, 'benchmarks/workload.json'), 'utf8')) as { schema_version: number; benchmark: Protocol; fixtures: Entry[] };
+  const workload = readJsonFile<{ schema_version: number; benchmark: Protocol; fixtures: Entry[] }>(path.join(ROOT, 'benchmarks/workload.json'), 'benchmark-workload.schema.json');
   if (workload.schema_version !== 2) throw new Error(`benchmarks/workload.json has the schema ${workload.schema_version}, not 2`);
   const count = (given: string | undefined, declared: number) => {
     const value = given === undefined ? declared : Number(given);
@@ -144,13 +150,13 @@ async function main(): Promise<void> {
     // The directory of each implementation is its root in config/parity.json.
     const packages = repositoryPaths();
     const php = { ...env, OJ_PACKAGE: packages.php };
-    const commands: [string, string, string[], NodeJS.ProcessEnv][] = [
+    const commands: [string, string, Argv, NodeJS.ProcessEnv][] = [
       ['js', ROOT, ['node', 'benchmarks/js.mjs', ...files], { ...env, OJ_PACKAGE: packages.js }],
-      ['go', packages.go!, ['go', 'run', './internal/benchmark', ...files], env],
+      ['go', pathOf(packages, 'go'), ['go', 'run', './internal/benchmark', ...files], env],
       ['php', ROOT, ['php', '-n', 'benchmarks/php.php', 'custom', ...files], php],
       ['php-native', ROOT, ['php', '-n', 'benchmarks/php.php', 'native-json', ...files], php],
       ['php-extension', ROOT, ['php', '-n', '-d', `extension=${extension}`, 'benchmarks/php.php', 'extension', ...files], php],
-      ['rust', ROOT, ['cargo', 'run', '--locked', '--release', '--quiet', '--manifest-path', path.join(packages.rust!, 'Cargo.toml'), '--example', 'benchmark', '--', ...files], { ...env, CARGO_TARGET_DIR: path.join(run.cache, 'rust-target') }],
+      ['rust', ROOT, ['cargo', 'run', '--locked', '--release', '--quiet', '--manifest-path', path.join(pathOf(packages, 'rust'), 'Cargo.toml'), '--example', 'benchmark', '--', ...files], { ...env, CARGO_TARGET_DIR: path.join(run.cache, 'rust-target') }],
     ];
     return commands.flatMap(([label, cwd, command, environment]) => measure(label, command, cwd, environment));
   });
@@ -163,10 +169,10 @@ async function main(): Promise<void> {
     throw new Error(`the benchmark rows are incomplete or repeated: expected ${expected.length * files.length}, got ${rows.length}`);
   }
   for (const row of rows) {
-    if (row.input_bytes !== workload.fixtures.find(entry => entry.file === row.file)!.input_bytes) throw new Error(`the input size of ${row.implementation}/${row.file} differs from the workload`);
+    if (row.input_bytes !== present(workload.fixtures.find(entry => entry.file === row.file), `the workload entry of ${row.file}`).input_bytes) throw new Error(`the input size of ${row.implementation}/${row.file} differs from the workload`);
   }
   const current = { environment: environment(), protocol, results: rows };
-  const previous = existsSync(RESULTS) ? JSON.parse(readFileSync(RESULTS, 'utf8')) : undefined;
+  const previous = existsSync(RESULTS) ? readJsonFile<{ environment?: unknown; protocol?: unknown; results: Row[] }>(RESULTS, 'benchmark-results.schema.json') : undefined;
   const comparison = values['update-baseline'] ? { status: 'baseline-updated' } : compare(previous, current);
   const record = { schema_version: 2, source: sourceState(), protocol, environment: current.environment, fixtures: workload.fixtures, results: rows, comparison };
   const failed = comparison.status === 'failed';

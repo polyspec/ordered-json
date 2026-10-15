@@ -8,7 +8,8 @@ import { checkEvidence, featureRows } from '../../scripts/check-evidence.mts';
 import { AGGREGATE_RECORD, PIE_RECORD, sha256, sourceManifest, writeRecord } from '../../scripts/records.mts';
 import { FIXTURES, IMPLEMENTATIONS, OFFICIAL, REGISTRY } from '../../scripts/registry.mts';
 import { createRecord } from '../../scripts/verify.mts';
-import { checkout } from './checkout.mts';
+import { readJsonFile } from '../../scripts/json.mts';
+import { checkout, known } from './checkout.mts';
 
 const HEADER = '| ID | Feature | Implementation | Verification | Evidence | Distribution | Specification |\n| --- | --- | --- | --- | --- | --- | --- |\n';
 const ROW = '| F-ORDER | Order | implemented | shared-suite | [result](operations/validation.md#records) | source-only | [contract](../README.md#contract) |\n';
@@ -27,7 +28,7 @@ function evidence(context: TestContext, { before = '', after = '' } = {}) {
   };
   pair(`# Features\n\n<a id="state"></a>\n## State\n\n${before}${HEADER}${ROW}${after}`);
   write(SOURCE, 'export const fixture = true;\n');
-  json(OFFICIAL, { cases: [{ id: 'fixture' }] });
+  json(OFFICIAL, { cases: [{ id: 'fixture', input: '{}', tree: ['object', []], compact: '{}' }] });
   write(`${FIXTURES}/valid/object.json`, '{}');
   json('external-inputs.json', { schema_version: 1, pie: { release: 'synthetic', url: 'https://example.invalid/pie', phar_sha256: sha256('pie tool') }, supplementary: { ...SUPPLEMENTARY, url: 'https://example.invalid/suite' } });
   const record = (supplementary = 0) => createRecord(root, sourceManifest(root), Object.fromEntries(IMPLEMENTATIONS.map(name => [name, { status: 'passed', cases: 2 + supplementary }])), { official: 1, fixtures: 1, supplementary }, VERSIONS, supplementary ? SUPPLEMENTARY : null);
@@ -110,8 +111,8 @@ test('the records are the output of the run in var/records, not committed files'
 
 test('the record names every implementation and the extension version apart from PHP', (context) => {
   const { root, fails } = evidence(context);
-  const record = JSON.parse(readFileSync(path.join(root, AGGREGATE_RECORD), 'utf8')) as { implementations: Record<string, { runtime: Record<string, string> }> };
-  delete record.implementations['php-extension']!.runtime.extension_version;
+  const record = readJsonFile<{ implementations: Record<string, { runtime?: Record<string, string> }> }>(path.join(root, AGGREGATE_RECORD), 'verification-record.schema.json');
+  delete known(known(record.implementations['php-extension'], 'the result of php-extension').runtime, 'the runtime of php-extension').extension_version;
   writeRecord(path.join(root, AGGREGATE_RECORD), record, root);
   fails('names the PHP release and the extension version separately');
   delete record.implementations['php-extension'];

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "benchmarks/results.json, the recorded result of make benchmark: the fields that benchmarks/run.mts compares a new measurement with.",
+  "type": "object",
+  "required": [
+    "results"
+  ],
+  "properties": {
+    "environment": {},
+    "protocol": {},
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "file",
+          "implementation",
+          "parse_ns",
+          "stringify_ns",
+          "roundtrip_ns",
+          "parse_p95_ns",
+          "stringify_p95_ns",
+          "roundtrip_p95_ns",
+          "samples",
+          "sha256",
+          "input_bytes",
+          "output_bytes"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "implementation": {
+            "type": "string"
+          },
+          "parse_ns": {
+            "type": "number"
+          },
+          "stringify_ns": {
+            "type": "number"
+          },
+          "roundtrip_ns": {
+            "type": "number"
+          },
+          "parse_p95_ns": {
+            "type": "number"
+          },
+          "stringify_p95_ns": {
+            "type": "number"
+          },
+          "roundtrip_p95_ns": {
+            "type": "number"
+          },
+          "samples": {},
+          "sha256": {
+            "type": "string"
+          },
+          "input_bytes": {
+            "type": "number"
+          },
+          "output_bytes": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

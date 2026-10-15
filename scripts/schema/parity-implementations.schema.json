@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "config/parity.json, the declaration of the parity check of @polyspec/kit: the implementations and their roots, the fields that the verifier of scripts/registry.mts and its tests read.",
+  "type": "object",
+  "required": ["implementations"],
+  "properties": {
+    "implementations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "roots"],
+        "properties": {
+          "name": { "type": "string" },
+          "roots": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

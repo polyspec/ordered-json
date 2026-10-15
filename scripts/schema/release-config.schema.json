@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "config/release.json of @polyspec/kit: the Go modules and the required checks that tests/scripts/workflow-rules.test.mts reads.",
+  "type": "object",
+  "required": [
+    "goModules",
+    "checks"
+  ],
+  "properties": {
+    "goModules": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

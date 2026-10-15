@@ -15,7 +15,9 @@ import path from 'node:path';
 import { isDeepStrictEqual, parseArgs } from 'node:util';
 import { reference, Rejected, type Accepted } from './reference.mts';
 import { AGGREGATE_RECORD, externalPins, inputIssues, manifestDifferences, packageRevisions, sourceManifest, supplementaryManifest, writeRecord, type Manifest, type Supplementary } from './records.mts';
-import { Failures, IMPLEMENTATIONS, ROOT, officialCases, endGroup, fixturePaths, prepare, probeCommands, runtimeVersions, withRun, type Run } from './registry.mts';
+import { parseJson } from './json.mts';
+import { present } from './present.mts';
+import { Failures, IMPLEMENTATIONS, ROOT, officialCases, endGroup, fixturePaths, prepare, probeCommands, runtimeVersions, withRun, type Argv, type Run } from './registry.mts';
 
 /** The text that every probe builds through its string factory, compact. */
 const FACTORY_STRING = '"quote \\" slash \\\\ line\\n \\ud55c \\ud83c\\udf0d"';
@@ -44,7 +46,7 @@ function referenceOrRejection(bytes: Uint8Array): Expected {
 /** The shared cases: the official examples (written into `directory`), the fixtures and the cases of the optional suite. */
 export function sharedCases(directory: string, suite?: string, root = ROOT): { cases: Case[]; counts: Counts } {
   const cases: Case[] = [];
-  const official = officialCases(root) as { id: string; input: string; tree: Accepted['tree']; compact: string }[];
+  const official = officialCases(root);
   for (const example of official) {
     const file = path.join(directory, `${example.id}.json`);
     writeFileSync(file, example.input);
@@ -91,8 +93,9 @@ export function positionDisagreements(rejections: Map<string, Map<string, Reply>
   for (const [name, reported] of [...rejections].sort(([a], [b]) => (a < b ? -1 : 1))) {
     if (reported.size < 2) continue;
     const resolved = [...reported].sort(([a], [b]) => (a < b ? -1 : 1)).map(([language, reply]) => {
-      if (!Number.isInteger(reply.offset)) throw new Error(`${language} ${name}: a rejection reports its offset`);
-      return [language, byteOffset(documents.get(name)!, reply.offset as number, reply.unit)] as const;
+      const { offset } = reply;
+      if (typeof offset !== 'number' || !Number.isInteger(offset)) throw new Error(`${language} ${name}: a rejection reports its offset`);
+      return [language, byteOffset(present(documents.get(name), `the document of ${name}`), offset, reply.unit)] as const;
     });
     if (new Set(resolved.map(([, offset]) => offset)).size > 1) disagreements.push(`${name}: ${resolved.map(([language, offset]) => `${language}=${offset}`).join(', ')}`);
   }
@@ -104,8 +107,9 @@ export function rejectionKinds(root = ROOT): string[] {
   const text = readFileSync(path.join(root, CONTRACT), 'utf8');
   const start = text.indexOf(KINDS_ANCHOR);
   if (start < 0) throw new Error(`${CONTRACT} has no section ${KINDS_ANCHOR}`);
-  const section = text.slice(start).split('\n').slice(2).join('\n').split(/^(?:<a id=|#)/m)[0]!;
-  const kinds = [...section.matchAll(/^- `([a-z][a-z0-9_]*)`/gm)].map(match => match[1]!);
+  const [section] = text.slice(start).split('\n').slice(2).join('\n').split(/^(?:<a id=|#)/m);
+  if (section === undefined) throw new Error(`${CONTRACT} has no text after ${KINDS_ANCHOR}`);
+  const kinds = [...section.matchAll(/^- `([a-z][a-z0-9_]*)`/gm)].map(match => present(match[1], 'the kind of a list item'));
   if (kinds.length === 0 || new Set(kinds).size !== kinds.length) throw new Error(`${CONTRACT} lists no rejection kind, or one twice, in its section ${KINDS_ANCHOR}: ${kinds.join(', ')}`);
   return kinds;
 }
@@ -149,10 +153,10 @@ export class Probe {
   private readonly seconds: number;
 
   /** A probe of `language` started with `command`, whose replies and exit each have `seconds`. */
-  constructor(language: string, command: string[], seconds = CASE_SECONDS) {
+  constructor(language: string, [program, ...args]: Argv, seconds = CASE_SECONDS) {
     this.language = language;
     this.seconds = seconds;
-    this.child = spawn(command[0]!, command.slice(1), { detached: true, stdio: ['pipe', 'pipe', 'pipe'] });
+    this.child = spawn(program, args, { detached: true, stdio: ['pipe', 'pipe', 'pipe'] });
     this.child.stdout.setEncoding('utf8').on('data', (chunk: string) => { this.stdout += chunk; this.wake?.(); });
     this.child.stderr.setEncoding('utf8').on('data', (chunk: string) => { this.stderr += chunk; });
     // A probe that has gone away is reported by the reply it does not give.
@@ -223,7 +227,9 @@ function mismatches(language: string, name: string, expected: Expected, reply: R
   let actual: Reply = reply;
   let wanted: Record<string, unknown> = expected;
   if (reply.ok) {
-    wanted = { ...expected, roundtrip: (expected as Accepted).compact, roundtrip_tree: (expected as Accepted).tree, factory: FACTORY_STRING };
+    // An expected rejection has no compact text or tree, so an accepted reply differs from it in those fields too.
+    const accepted = expected.ok ? expected : undefined;
+    wanted = { ...expected, roundtrip: accepted?.compact, roundtrip_tree: accepted?.tree, factory: FACTORY_STRING };
     // Constructors may quote names differently, so the rebuilt JSON is compared by its tree, with unique names.
     try {
       actual = { ...reply, rebuilt: reference(Buffer.from(String(reply.rebuilt)), true).tree };
@@ -241,7 +247,7 @@ function mismatches(language: string, name: string, expected: Expected, reply: R
  * Sends every shared case to the probe of each implementation and compares the replies. Every case of every probe runs; a
  * probe that stops answering ends its own cases only. Failures names every failure after all ran.
  */
-export async function verifyProbes(commands: Record<string, string[]>, suite?: string, root = ROOT): Promise<{ results: Record<string, { status: 'passed'; cases: number }>; counts: Counts }> {
+export async function verifyProbes(commands: Record<string, Argv>, suite?: string, root = ROOT): Promise<{ results: Record<string, { status: 'passed'; cases: number }>; counts: Counts }> {
   const directory = mkdtempSync(path.join(tmpdir(), 'ordered-json-examples-'));
   try {
     const { cases, counts } = sharedCases(directory, suite, root);
@@ -256,10 +262,10 @@ export async function verifyProbes(commands: Record<string, string[]>, suite?: s
       try {
         for (const { name, file, expected } of cases) {
           const [line, elapsed] = await probe.exchange(name, file);
-          let reply = JSON.parse(line) as Reply;
+          let reply = parseJson<Reply>(line, 'probe-reply.schema.json', `${language} ${name}`);
           if (!reply.ok) {
             // A rejection also reports where it stopped and why; those are compared across implementations.
-            rejections.set(name, (rejections.get(name) ?? new Map()).set(language, reply));
+            rejections.set(name, (rejections.get(name) ?? new Map<string, Reply>()).set(language, reply));
             reply = { ok: false };
           }
           const differences = mismatches(language, name, expected, reply);
@@ -269,7 +275,7 @@ export async function verifyProbes(commands: Record<string, string[]>, suite?: s
         await probe.finish();
       } catch (error) {
         // The probe stopped answering or broke the protocol; its remaining cases cannot run.
-        found.push((error as Error).message);
+        found.push(error instanceof Error ? error.message : String(error));
       } finally {
         probe.stop();
       }
@@ -316,7 +322,8 @@ export async function verify(selected: string[], run: Run, suite?: string, warni
     }
   }
   if (failures.length) throw new Failures(failures, failed);
-  return verified!;
+  if (verified === undefined) throw new Error('no implementation was selected');
+  return verified;
 }
 
 /**

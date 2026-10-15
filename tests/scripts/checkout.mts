@@ -1,4 +1,5 @@
 // A synthetic Git checkout for the tests of the tools: a temporary directory whose files are tracked, removed when the test ends.
+import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -24,4 +25,10 @@ export function checkout(context: TestContext): Checkout {
     execFileSync('git', ['add', '--', file], { cwd: root });
   };
   return { root, write, json: (file, data) => write(file, `${JSON.stringify(data, null, 2)}\n`) };
+}
+
+/** The value that a test expects to be there, such as a group of a match or an entry of a record; an assertion fails without it. */
+export function known<T>(value: T | undefined, what: string): T {
+  assert.ok(value !== undefined, `${what} is missing`);
+  return value;
 }

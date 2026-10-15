@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "The parsed pyproject.toml of the Python package: the fields of [project] that the tests read.",
+  "type": "object",
+  "required": [
+    "project"
+  ],
+  "properties": {
+    "project": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "requires-python": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

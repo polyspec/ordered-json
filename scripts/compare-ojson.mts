@@ -11,7 +11,8 @@ import path from 'node:path';
 import { isDeepStrictEqual, parseArgs } from 'node:util';
 import { reference, Rejected, type Accepted, type Tree } from './reference.mts';
 import { sha256, writeRecord } from './records.mts';
-import { FIXTURES, OFFICIAL, ROOT, runStreamed } from './registry.mts';
+import { parseJson } from './json.mts';
+import { FIXTURES, OFFICIAL, ROOT, runStreamed, type Argv } from './registry.mts';
 import { Probe, sharedCases } from './verify.mts';
 
 type Reply = { ok: boolean; tree?: Tree; output?: string; decode_error?: string };
@@ -58,13 +59,13 @@ async function compileErlang(erl: string, source: string, out: string): Promise<
 }
 
 /** The replies of a project to every case, one at a time under the deadline of a probe. */
-async function observe(project: string, command: string[], cases: { name: string; file: string }[]): Promise<Reply[]> {
+async function observe(project: string, command: Argv, cases: { name: string; file: string }[]): Promise<Reply[]> {
   const probe = new Probe(project, command);
   try {
     const replies: Reply[] = [];
     for (const { name, file } of cases) {
       const [line, elapsed] = await probe.exchange(name, file);
-      const reply = JSON.parse(line) as Reply;
+      const reply = parseJson<Reply>(line, 'comparison-reply.schema.json', `${project} ${name}`);
       console.log(`${project}: ${name} ${reply.ok ? 'accepted' : 'rejected'} (${Math.round(elapsed)} ms)`);
       replies.push(reply);
     }
@@ -83,8 +84,9 @@ function erlang(given: string | undefined): string {
   } catch {
     const base = path.join(ROOT, '.cache/comparison/runtime/erlang');
     const runtimes = existsSync(base) ? readdirSync(base).sort().map(name => path.join(base, name, 'lib/erlang/bin/erl')).filter(file => existsSync(file)) : [];
-    if (!runtimes.length) throw new Error('no Erlang runtime: give one with --erl');
-    return runtimes.at(-1)!;
+    const newest = runtimes.at(-1);
+    if (newest === undefined) throw new Error('no Erlang runtime: give one with --erl');
+    return newest;
   }
 }
 
@@ -116,7 +118,7 @@ async function main(): Promise<void> {
       case_source: `${OFFICIAL} + ${FIXTURES}/ + optional JSONTestSuite`,
       projects: {} as Record<string, unknown>,
     };
-    const commands: Record<string, string[]> = {
+    const commands: Record<string, Argv> = {
       'pypi-ojson': ['python3', path.join(ROOT, 'scripts/comparison/python_ojson_probe.py'), pythonPackage],
       'erlang-ojson': [erl, '+S', '2:2', '-noshell', '-pa', beam, '-s', 'ojson_comparison', 'main', '-s', 'init', 'stop'],
     };
@@ -124,7 +126,8 @@ async function main(): Promise<void> {
     for (const [project, command] of Object.entries(commands)) {
       const replies = await observe(project, command, cases);
       const results = cases.map(({ name, expected }, index) => {
-        const actual = replies[index]!;
+        const actual = replies[index];
+        if (actual === undefined) throw new Error(`${project} gave no reply to ${name}`);
         const verdict = assess(expected, actual);
         return { case: name, ...verdict, ...(name.startsWith('official/') ? { observed: actual } : verdict.acceptance_matches ? {} : { decode_error: actual.decode_error }) };
       });

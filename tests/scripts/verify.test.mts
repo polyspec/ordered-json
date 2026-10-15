@@ -5,12 +5,12 @@ import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { sourceManifest } from '../../scripts/records.mts';
-import { FIXTURES, Failures, IMPLEMENTATIONS, OFFICIAL, REGISTRY, ROOT, fixturePaths, officialCases } from '../../scripts/registry.mts';
+import { FIXTURES, Failures, IMPLEMENTATIONS, OFFICIAL, REGISTRY, ROOT, fixturePaths, officialCases, type Argv } from '../../scripts/registry.mts';
 import { Probe, byteOffset, createRecord, kindDisagreements, positionDisagreements, rejectionKinds, sharedCases, verifyProbes } from '../../scripts/verify.mts';
-import { checkout } from './checkout.mts';
+import { checkout, known } from './checkout.mts';
 
 /** A probe that runs `source` with node. */
-const node = (source: string) => [process.execPath, '-e', source];
+const node = (source: string): Argv => [process.execPath, '-e', source];
 
 test('the rejection kinds are the list of the section of the JSON contract', (context) => {
   const kinds = rejectionKinds();
@@ -35,11 +35,11 @@ test('the implementations reject the same input at the same position with the sa
   const documents = new Map([['case', Buffer.from('[1,]')]]);
   const replies = (a: object, b: object) => new Map([['case', new Map([['js', { ok: false, ...a }], ['go', { ok: false, ...b }]])]]);
   assert.deepEqual(positionDisagreements(replies({ offset: 3, unit: 'utf16' }, { offset: 3, unit: 'byte' }), documents), []);
-  assert.match(positionDisagreements(replies({ offset: 3, unit: 'byte' }, { offset: 2, unit: 'byte' }), documents)[0]!, /case: go=2, js=3/);
-  const known = ['expected_value', 'trailing_input'];
-  assert.deepEqual(kindDisagreements(replies({ kind: 'expected_value' }, { kind: 'expected_value' }), known), []);
-  assert.match(kindDisagreements(replies({ kind: 'expected_value' }, { kind: 'trailing_input' }), known)[0]!, /case: expected_value=js, trailing_input=go/);
-  assert.match(kindDisagreements(replies({ kind: 'other' }, {}), known)[0]!, /go: rejections report no kind\njs: unknown rejection kind other/);
+  assert.match(known(positionDisagreements(replies({ offset: 3, unit: 'byte' }, { offset: 2, unit: 'byte' }), documents)[0], 'the disagreement'), /case: go=2, js=3/);
+  const kinds = ['expected_value', 'trailing_input'];
+  assert.deepEqual(kindDisagreements(replies({ kind: 'expected_value' }, { kind: 'expected_value' }), kinds), []);
+  assert.match(known(kindDisagreements(replies({ kind: 'expected_value' }, { kind: 'trailing_input' }), kinds)[0], 'the disagreement'), /case: expected_value=js, trailing_input=go/);
+  assert.match(known(kindDisagreements(replies({ kind: 'other' }, {}), kinds)[0], 'the disagreement'), /go: rejections report no kind\njs: unknown rejection kind other/);
 });
 
 test('a probe answers each request with one line and fails by name at its deadline', async (context) => {
@@ -79,7 +79,7 @@ test('only a complete run of the current sources makes a record', (context) => {
   const { root, write, json } = checkout(context);
   const source = `${REGISTRY.roots.js}/index.js`;
   write(source, 'export const fixture = true;\n');
-  json(OFFICIAL, { cases: [{ id: 'fixture' }] });
+  json(OFFICIAL, { cases: [{ id: 'fixture', input: '{}', tree: ['object', []], compact: '{}' }] });
   write(`${FIXTURES}/valid/object.json`, '{}');
   const counts = { official: 1, fixtures: 1, supplementary: 0 };
   const results = Object.fromEntries(IMPLEMENTATIONS.map(name => [name, { status: 'passed', cases: 2 }]));

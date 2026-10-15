@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "One reply line of a probe of the shared verifier (scripts/verify.mts): an object whose fields the verifier compares with the expected result; ok tells an accepted document from a rejection.",
+  "type": "object",
+  "properties": {
+    "ok": { "type": "boolean" }
+  }
+}
