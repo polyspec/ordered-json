@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.58: AGENTS points to the local links of kit `docs/plans/local-links.md`: while polyspec versions are 0.0.x, development checkouts link installed polyspec packages to their source, and links are never committed.
 - T1.57: the shared tools are `@polyspec/kit` 0.0.53.
 - T1.56: the shared tools are `@polyspec/kit` 0.0.52: `.php-version` declares the PHP 8.5 that every workflow sets up, and the release workflow runs `make kit-check` before any release step (kit K193).
 - T1.55: the shared tools are `@polyspec/kit` 0.0.50: knip reads the binaries that the scripts and tests run from `binaries` of `config/knip-entries.json` (kit K176), and `make dependency-policy-check` checks the root `composer.json` with its committed `composer.lock`, which locks no package, as it checks every Composer manifest of the checkout (kit K181).
