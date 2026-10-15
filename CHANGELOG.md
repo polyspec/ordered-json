@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.57: the shared tools are `@polyspec/kit` 0.0.53.
 - T1.56: the shared tools are `@polyspec/kit` 0.0.52: `.php-version` declares the PHP 8.5 that every workflow sets up, and the release workflow runs `make kit-check` before any release step (kit K193).
 - T1.55: the shared tools are `@polyspec/kit` 0.0.50: knip reads the binaries that the scripts and tests run from `binaries` of `config/knip-entries.json` (kit K176), and `make dependency-policy-check` checks the root `composer.json` with its committed `composer.lock`, which locks no package, as it checks every Composer manifest of the checkout (kit K181).
 - T1.54: the Composer locks of `packages/php` and `packages/php-ext` are current again: the version 0.0.9 of T1.50 changed the content hash of both manifests without a new lock. `config/dependency-policy.json` declares both Composer projects with PHP 8.5.0, so `make dependency-policy-check` fails on a lock that `composer validate --strict` finds stale and reviews their PHPUnit and their locks; both locks keep every package version.
