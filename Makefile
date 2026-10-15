@@ -37,10 +37,10 @@ include scripts/kit/kit-bootstrap.mk
 
 # The targets of the full suite that make check runs through the guard of full-run of @polyspec/kit and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
-CHECK_TARGETS := kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check documents-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php pie-check test-scripts typecheck lint-ts
+CHECK_TARGETS := kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check documents-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-python pie-check test-scripts typecheck lint-ts
 
 .PHONY: check test-scripts typecheck install-php install-python php-extension verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
-	benchmark benchmark-check python-parse-budget release-config-check install install-rust install-external
+	benchmark benchmark-check python-parse-budget release-config-check install install-rust install-external install-comparison
 
 # check runs the full suite once per committed tree, when no task of docs/plans/execution-checklist.md is [~]
 # (full-run of @polyspec/kit); it records its result in var/full-run.json. rerun-failed (kit.mk) reruns the targets that failed.
@@ -50,7 +50,8 @@ check:
 # install makes every download that the checks read after make install-packages: the tools of mise.lock, the Rust toolchain of
 # rust-toolchain.toml, the crates of packages/rust/Cargo.lock, the Composer projects of the PHP packages with their PHPUnit,
 # the virtual environment of the Python package, and the PIE PHAR and the supplementary suite of external-inputs.json.
-# It is the only target that downloads, besides dependency-review and release-consumer-lock.
+# It is the only target that downloads, besides dependency-review, release-consumer-lock and install-comparison, which
+# installs the PyPI ojson of the comparison report and which no check reads.
 install: install-rust install-tools cargo-downloads-fetch install-php install-python install-external
 
 install-rust:
@@ -78,6 +79,14 @@ php-extension:
 	cd packages/php-ext/src && { test -f Makefile || { phpize && ./configure --enable-ordered-json; }; } && $(MAKE)
 
 parity-check: php-extension
+
+# install-comparison makes the virtual environment .cache/comparison/ojson-venv from the Python of mise.toml (python-venv of
+# kit) and installs into it, with the uv of mise.toml, the PyPI ojson 0.1.0 of the archive .cache/comparison/ojson-0.1.0.tar.gz,
+# which scripts/compare-ojson.mts compares through the Python of that environment (docs/reports/ojson-comparison.md). A person
+# runs it before a comparison; it is no part of make install.
+install-comparison:
+	$(MAKE) --no-print-directory python-venv DIR=.cache/comparison/ojson-venv
+	$(ONLINE) $(UV) pip install --python .cache/comparison/ojson-venv/bin/python .cache/comparison/ojson-0.1.0.tar.gz
 
 # install-external installs the PIE PHAR and the supplementary suite that external-inputs.json pins (scripts/external-inputs.mts).
 install-external:

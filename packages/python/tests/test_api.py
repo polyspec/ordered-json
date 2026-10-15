@@ -203,7 +203,9 @@ class PackageCases(unittest.TestCase):
 
     def test_utf8_validation_holds_for_long_multibyte_text(self):
         text = "\ud55c\U0001f30d" * 64
-        self.assertEqual(parse_bytes(f'{{"key":"{text}"}}'.encode()).get("key").string_value(), text)
+        self.assertEqual(
+            parse_bytes(f'{{"key":"{text}"}}'.encode()).get("key").string_value(), text
+        )
         with self.assertRaises(ParseError) as caught:
             parse_bytes(b'["\xff"]')
         self.assertEqual(caught.exception.kind, "invalid_utf8")

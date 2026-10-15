@@ -1,5 +1,5 @@
 <!-- doc-id: ojson-comparison -->
-<!-- source-sha256: 4dc23f60280a38eea9d170de14b7b738d147fa699e71859c96054f18cb368a0c -->
+<!-- source-sha256: e53a063a1e5f3256516dc9fd8b4bc9e1e5a681a95c69da8acadb9ee9dd24f598 -->
 # ojson 비교
 
 [English](ojson-comparison.md)
@@ -45,13 +45,13 @@ Erlang의 구조 일치 사례는 `document-order`, `root-scalar`, `empty-and-nu
 ~~~sh
 mkdir -p .cache/comparison
 curl -L https://files.pythonhosted.org/packages/96/f0/2990e30a4b1978a104ca66fdb7aa5d0956dcf11aaf136a36e9659a699791/ojson-0.1.0.tar.gz -o .cache/comparison/ojson-0.1.0.tar.gz
-tar -xzf .cache/comparison/ojson-0.1.0.tar.gz -C .cache/comparison
+make install-comparison
 git clone https://github.com/potatosalad/erlang-ojson.git .cache/comparison/erlang-ojson
 git -C .cache/comparison/erlang-ojson checkout 5cd1de1a4a7622523c83d9464772b0f0926e654d
 node scripts/compare-ojson.mts --suite .cache/JSONTestSuite
 ~~~
 
-[PyPI](https://pypi.org/project/ojson/) 압축 파일의 SHA-256은 `94a1c628c0b4447680d9039c110dafe4efd6e3fdf77602b3ff543c2a278b7ec5`입니다. Erlang 런타임이 필요하며 `--erl /path/to/erl`로 특정 실행 파일을 지정합니다. 기록된 실행은 SHA-256이 `60e6425e089726bcae182f1856b01aa88de2782b94dedf71559e8efbc5eea0f3`인 격리된 Homebrew Erlang 29.0.6 압축 파일을 사용했습니다.
+[PyPI](https://pypi.org/project/ojson/) 압축 파일의 SHA-256은 `94a1c628c0b4447680d9039c110dafe4efd6e3fdf77602b3ff543c2a278b7ec5`입니다. `make install-comparison`은 그 압축 파일을 `mise.toml`의 Python으로 만든 가상 환경 `.cache/comparison/ojson-venv`에 설치하고, 스크립트는 그 환경의 Python으로 probe를 실행하며 `--python`으로 다른 Python을 지정할 수 있습니다. 보고서는 설치된 ojson의 version, Python release, module hash를 기록합니다. Erlang 런타임이 필요하며 `--erl /path/to/erl`로 특정 실행 파일을 지정합니다. 기록된 실행은 SHA-256이 `60e6425e089726bcae182f1856b01aa88de2782b94dedf71559e8efbc5eea0f3`인 격리된 Homebrew Erlang 29.0.6 압축 파일을 사용했습니다.
 
 스크립트는 Erlang 컴파일러 출력을 도착하는 대로 출력하고 종료 상태와 경과 시간을 출력합니다. 빌드에는 시간 한도가 없으며 종료 상태와 출력이 결과를 결정합니다. 이어서 각 프로젝트는 사례를 한 번에 하나씩 받고, 스크립트는 사례마다 결과와 경과 시간을 출력합니다. 응답마다 공통 검증기의 사례별 deadline인 60 s가 주어지며, 이를 넘긴 프로젝트는 종료되고 해당 사례 이름이 보고됩니다. 실행 전체에는 한도를 두지 않습니다.
 

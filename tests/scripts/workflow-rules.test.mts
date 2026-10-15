@@ -142,11 +142,19 @@ test('every target of the full suite runs in exactly one job', () => {
   assert.equal(run.length, new Set(run).size);
 });
 
-test('the PHP of the checkout is linted in the full suite', () => {
-  // make lint-php of kit runs phpcs and PHPStan on the tracked PHP; the full suite and so CI run it while the checkout has PHP.
-  assert.ok(trackedFiles(ROOT).some(file => file.endsWith('.php')), 'the checkout tracks PHP');
+test('the PHP and the Python of the checkout are linted in the full suite', () => {
+  // make lint-php of kit runs phpcs and PHPStan on the tracked PHP, and make lint-python runs ruff and vulture on the tracked
+  // Python and each Python package (a pyproject.toml); the full suite and so CI run each while the checkout has its language.
+  const files = trackedFiles(ROOT);
+  const lints: [string, (file: string) => boolean][] = [
+    ['lint-php', file => file.endsWith('.php')],
+    ['lint-python', file => path.posix.basename(file) === 'pyproject.toml'],
+  ];
   const suite = known(/^CHECK_TARGETS := (.*)$/m.exec(readFileSync(path.join(ROOT, 'Makefile'), 'utf8'))?.[1], 'CHECK_TARGETS of the Makefile').split(' ');
-  assert.ok(suite.includes('lint-php'), 'CHECK_TARGETS lacks lint-php');
+  for (const [target, owns] of lints) {
+    assert.ok(files.some(owns), `the checkout has the language of ${target}`);
+    assert.ok(suite.includes(target), `CHECK_TARGETS lacks ${target}`);
+  }
 });
 
 test('each report is the directory that make ci-targets writes', () => {
