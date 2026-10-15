@@ -1,5 +1,5 @@
 <!-- doc-id: rust-overview -->
-<!-- source-sha256: 3ff49379aa22975e59908073b3f4b56f52278f01c91c45bd0bb2530e80106ec1 -->
+<!-- source-sha256: 5df74f4ea3c149fc79245f88df96aeedc87f22fea090132cb3f184053ac99d4a -->
 # ordered-json for Rust
 
 [English](README.md)
@@ -30,7 +30,7 @@ let output = stringify(&value);
 <a id="verification"></a>
 ## 검증
 
-Git, make, `.node-version`의 Node.js, 해당 구현의 런타임·빌드 도구를 설치하고, `mise.toml`의 Python, Go와 다른 도구를 `mise.lock`의 digest로 `var/tools`에 설치하는 `make install-tools TOOLS=npm`, `make install-packages`, `make install`을 실행한 뒤 이 체크아웃에서 실행합니다.
+Git, make, bootstrap을 시작할 Node.js, 해당 구현의 런타임·빌드 도구를 설치하고, `mise.toml`의 Node.js, Python, Go와 다른 도구를 `mise.lock`의 digest로 `var/tools`에 설치하는 `make install-tools TOOLS=npm`, `make install-packages`, `make install`을 실행한 뒤 이 체크아웃에서 실행합니다.
 
 ~~~sh
 make check

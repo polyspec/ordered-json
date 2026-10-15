@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T1.51: the shared tools are `@polyspec/kit` 0.0.48: the checkout runs the Node.js 26.12.0 of `mise.toml` from `var/tools`, `.node-version` is gone and every `engines.node` is `>=26.12.0` (kit K171); the workflows pin each action by its SHA with its version (kit K169); the scripts and tests read JSON through schemas and check the values that they read instead of asserting them (kit K155–K158).
+
 ## 0.0.9
 
 - T1.49: the Composer manifest of `packages/php-ext` declares no `repositories` and no development requirement of `polyspec/ordered-json`; its tests load the PHP library from `../php/src` by `autoload-dev`, so the release zip of the extension carries a manifest that installs outside the repository.

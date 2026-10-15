@@ -23,11 +23,10 @@ rules:
       - "!tests/scripts"
 
   # S5: the root files of ordered-json beyond the list of kit (K145).
-  # composer.json: the root Composer package polyspec/ordered-json, whose version config/release.json checks.
   # external-inputs.json: the pinned downloads of make install-external (the PIE PHAR and the supplementary suite),
   # scripts/external-inputs.mts.
   - id: layout-root-files
-    vars: { root_files: "{composer.json,external-inputs.json}" }
+    vars: { root_files: "{external-inputs.json}" }
 
   - id: layout-infrastructure-typescript
     paths:

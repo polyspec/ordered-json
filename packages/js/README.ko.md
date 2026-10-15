@@ -1,5 +1,5 @@
 <!-- doc-id: npm-overview -->
-<!-- source-sha256: d7238fc4628272631542ebe3a7a12e9f3b75e8a65fc6d37386ceee834ed21fca -->
+<!-- source-sha256: c892709d4c6554eb953ecac63e9fe8f9b7198e8ddc389b0b342aac83e5e2485f -->
 # ordered-json for JavaScript
 
 [English](README.md)
@@ -27,7 +27,7 @@ const output = stringify(value);
 <a id="verification"></a>
 ## 검증
 
-Git, make, `.node-version`의 Node.js, 해당 구현의 런타임·빌드 도구를 설치하고, `mise.toml`의 Python, Go와 다른 도구를 `mise.lock`의 digest로 `var/tools`에 설치하는 `make install-tools TOOLS=npm`, `make install-packages`, `make install`을 실행한 뒤 이 체크아웃에서 실행합니다.
+Git, make, bootstrap을 시작할 Node.js, 해당 구현의 런타임·빌드 도구를 설치하고, `mise.toml`의 Node.js, Python, Go와 다른 도구를 `mise.lock`의 digest로 `var/tools`에 설치하는 `make install-tools TOOLS=npm`, `make install-packages`, `make install`을 실행한 뒤 이 체크아웃에서 실행합니다.
 
 ~~~sh
 make check

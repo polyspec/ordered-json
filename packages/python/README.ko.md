@@ -1,5 +1,5 @@
 <!-- doc-id: python-overview -->
-<!-- source-sha256: 83e34d7ad5c2ff1ccb91d5146a48c1275501125f184dc103d797db60b26429eb -->
+<!-- source-sha256: dde7295515aaf440b8975987976e7676516a47a4bc69faeaa7059633335281b8 -->
 # Python용 ordered-json
 
 [English](README.md)
@@ -31,7 +31,7 @@ output = stringify(value)
 <a id="verification"></a>
 ## 검증
 
-Git, make, `.node-version`의 Node.js를 설치하고, `mise.toml`의 Python, Go와 다른 도구를 `mise.lock`의 digest로 `var/tools`에 설치하는 `make install-tools TOOLS=npm`, `make install-packages`, `make install`을 실행한 뒤 이 체크아웃에서 실행합니다.
+Git, make, bootstrap을 시작할 Node.js를 설치하고, `mise.toml`의 Node.js, Python, Go와 다른 도구를 `mise.lock`의 digest로 `var/tools`에 설치하는 `make install-tools TOOLS=npm`, `make install-packages`, `make install`을 실행한 뒤 이 체크아웃에서 실행합니다.
 
 ~~~sh
 make check

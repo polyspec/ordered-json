@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 52d5e9e44704f0e67c6bf9edfdcd82490b286cd7072beb164149f79eaa55ae65 -->
+<!-- source-sha256: 6f68874289f6d43bde1f0428cf4f994c737040aa3c69e072162e9ec692a837e7 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- T1.51: 공유 도구는 `@polyspec/kit` 0.0.48입니다. checkout은 `mise.toml`의 Node.js 26.12.0을 `var/tools`에서 실행하고, `.node-version`은 없어졌으며 모든 `engines.node`는 `>=26.12.0`입니다(kit K171). workflow는 각 action을 SHA와 version으로 고정하고(kit K169), script와 test는 JSON을 schema로 읽고 읽은 값을 단언하지 않고 검사합니다(kit K155–K158).
 
 ## 0.0.9
 

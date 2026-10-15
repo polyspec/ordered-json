@@ -33,18 +33,18 @@ jobs:
   docs:
     runs-on: ubuntu-24.04
     steps:
-      # actions/checkout v6.1.0
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-      # actions/setup-node v6.5.0: the Node.js of .node-version runs the tools of @polyspec/kit. The pinned npm of var/tools
-      # installs the packages, so the cache of the packageManager of package.json, which setup-node enables by default, is off.
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+      # actions/checkout v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      # actions/setup-node v7.1.0: the Node.js of mise.toml starts the bootstrap, which installs that release into var/tools
+      # with mise; the tools of @polyspec/kit run the node of var/tools. The pinned npm of var/tools installs the packages, so the cache of the packageManager of package.json, which setup-node enables by default, is off.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         if: ${{ !cancelled() }}
         with:
-          node-version-file: .node-version
+          node-version-file: mise.toml
           package-manager-cache: false
-      # shivammathur/setup-php v2, the commit that the release workflow of @polyspec/kit pins: PHP of .php-version; Composer,
+      # shivammathur/setup-php 2.40.0, the release that the release workflow of @polyspec/kit pins: PHP of .php-version; Composer,
       # which make dependency-policy-check reads the Composer manifests with, is a tool of mise.toml.
-      - uses: shivammathur/setup-php@d52fc211a0436f8839a587b3b5b8efddab4744ea
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
         if: ${{ !cancelled() }}
         with:
           php-version-file: .php-version
@@ -74,17 +74,17 @@ jobs:
   suite:
     runs-on: ubuntu-24.04
     steps:
-      # actions/checkout v6.1.0
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-      # actions/setup-node v6.5.0
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+      # actions/checkout v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      # actions/setup-node v7.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         if: ${{ !cancelled() }}
         with:
-          node-version-file: .node-version
+          node-version-file: mise.toml
           package-manager-cache: false
-      # shivammathur/setup-php v2, the commit that the release workflow of @polyspec/kit pins: the latest patch release of
+      # shivammathur/setup-php 2.40.0, the release that the release workflow of @polyspec/kit pins: the latest patch release of
       # the minor release of .php-version, with phpize for the extension builds of the verification and PIE.
-      - uses: shivammathur/setup-php@d52fc211a0436f8839a587b3b5b8efddab4744ea
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
         if: ${{ !cancelled() }}
         with:
           php-version-file: .php-version
@@ -106,6 +106,7 @@ jobs:
         env:
           JSON_TEST_SUITE: .cache/JSONTestSuite
         run: make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go pie-check"
+      # actions/upload-artifact v7.0.1
       - name: report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -121,12 +122,12 @@ jobs:
     needs: [docs, suite]
     runs-on: ubuntu-24.04
     steps:
-      # actions/checkout v6.1.0
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-      # actions/setup-node v6.5.0
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+      # actions/checkout v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      # actions/setup-node v7.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
-          node-version-file: .node-version
+          node-version-file: mise.toml
           package-manager-cache: false
       - name: make install-tools TOOLS=npm
         run: make install-tools TOOLS=npm

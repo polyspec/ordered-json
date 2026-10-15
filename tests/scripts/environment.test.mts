@@ -1,6 +1,6 @@
 // The environment of every run: the tools are the declared releases, a check reads no network, and make install is the only
-// recipe that downloads. The releases are declared in .node-version, the packageManager of package.json, rust-toolchain.toml,
-// .php-version and mise.toml, whose Go and Python are the pins of @polyspec/kit and which the go line of the go.mod names;
+// recipe that downloads. The releases are declared in the packageManager of package.json, rust-toolchain.toml, .php-version
+// and mise.toml, whose Node.js, Go and Python are the pins of @polyspec/kit and which the go line of the go.mod names;
 // make toolchain-check compares the running tools with them, and every target that runs a tool depends on it.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
@@ -53,7 +53,7 @@ test('every check runs offline and only make install downloads', () => {
 test('make install makes every download of the checks', () => {
   const table = recipes(makefile());
   assert.deepEqual(table.get('install')!.prerequisites, ['install-rust', 'install-tools', 'cargo-downloads-fetch', 'install-php', 'install-python', 'install-external']);
-  assert.deepEqual(table.get('install-external')!.recipe, ['$(ONLINE) node scripts/external-inputs.mts']);
+  assert.deepEqual(table.get('install-external')!.recipe, ['$(ONLINE) $(NODE) scripts/external-inputs.mts']);
   assert.deepEqual(table.get('install-rust')!.recipe, ['$(ONLINE) rustup toolchain install --no-self-update']);
 });
 
@@ -70,9 +70,10 @@ test('the tools of the checkout come first on the path', () => {
 });
 
 test('the declarations name an exact release or a minor release', () => {
-  assert.match(read('.node-version'), /^\d+\.\d+\.\d+\n$/);
+  assert.equal(existsSync(path.join(ROOT, '.node-version')), false, 'mise.toml pins Node.js; .node-version is gone');
   assert.equal(existsSync(path.join(ROOT, '.python-version')), false, 'mise.toml pins Python; .python-version is gone');
   const tools = miseTools();
+  assert.match(tools.node!, /^\d+\.\d+\.\d+$/);
   assert.match(tools.go!, /^\d+\.\d+\.\d+$/);
   assert.match(tools.python!, /^\d+\.\d+\.\d+$/);
   assert.match(read('.php-version'), /^\d+\.\d+\n$/);
@@ -86,12 +87,12 @@ test('the declarations name an exact release or a minor release', () => {
 
 test('no recipe runs a pinned tool by name', () => {
   // GNU Make 3.81 looks a simple recipe command up on its own PATH, not on the exported one, so npm, go and cargo start from a
-  // script or a shim path; node, whose release .node-version pins, runs the tools of kit and the TypeScript of the checkout.
+  // script or a shim path, and node, the release of mise.toml, starts by $(NODE) of kit.mk, its path in var/tools (kit K171).
   const lines = makefile().split('\n').filter(line => line.startsWith('\t')).map(line => line.trim().replace(/^[@-]*(\$\(ONLINE\) )?/, ''));
   assert.ok(lines.length);
   for (const command of lines) {
     assert.doesNotMatch(command, /(^|[\s;&|(])(npm|npx|go|cargo|rustc)(\s|$)/, command);
-    assert.doesNotMatch(command, /^node (?!\$\(KIT\)\/|-p |scripts\/[a-z-]+\.mts|benchmarks\/run\.mts|node_modules\/typescript\/bin\/tsc )/, command);
+    assert.doesNotMatch(command, /(^|\$\$\()node\s/, command);
   }
 });
 
