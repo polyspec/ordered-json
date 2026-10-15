@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Polyspec\OrderedJson;
@@ -10,7 +11,13 @@ namespace Polyspec\OrderedJson;
  */
 final class Tape
 {
-    public const OBJECT = 1, ARRAY = 2, STRING = 3, NUMBER = 4, BOOLEAN = 5, NULL = 6, KIND = 7;
+    public const OBJECT = 1;
+    public const ARRAY = 2;
+    public const STRING = 3;
+    public const NUMBER = 4;
+    public const BOOLEAN = 5;
+    public const NULL = 6;
+    public const KIND = 7;
     public const KINDS = [self::OBJECT => 'object', self::ARRAY => 'array', self::STRING => 'string',
         self::NUMBER => 'number', self::BOOLEAN => 'boolean', self::NULL => 'null'];
     /** The value serializes to exactly its source token. */

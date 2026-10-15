@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Polyspec\OrderedJson\Tests;
@@ -13,13 +14,12 @@ use TypeError;
 use UnexpectedValueException;
 
 /**
- * The value API of both PHP backends, run by PHPUnit; each test method is a feature unit of config/parity.json. The pure
- * library and the extension must answer identically, so ValueApiTest of this package runs these tests without the
+ * The value API of both PHP backends, run by PHPUnit; each test method is a feature unit of config/parity.json. The
+ * pure library and the extension must answer identically, so ValueApiTest of this package runs these tests without the
  * extension and ValueApiTest of packages/php-ext with it.
  */
 abstract class ValueApiTestCase extends TestCase
 {
-
     /** Runs $body and requires an error of $class whose message contains $message. */
     private static function expectThrown(string $class, string $message, callable $body): void
     {
@@ -67,12 +67,36 @@ abstract class ValueApiTestCase extends TestCase
 
     public function testWrongKindAccessIsReported(): void
     {
-        self::expectThrown(LogicException::class, 'Expected object, got array', static fn() => Value::parse('[]')->members());
-        self::expectThrown(LogicException::class, 'Expected array, got object', static fn() => Value::parse('{}')->items());
-        self::expectThrown(LogicException::class, 'Expected string, got number', static fn() => Value::parse('1')->stringValue());
-        self::expectThrown(LogicException::class, 'Expected number, got string', static fn() => Value::parse('"a"')->numberLiteral());
-        self::expectThrown(LogicException::class, 'Expected boolean, got null', static fn() => Value::parse('null')->booleanValue());
-        self::expectThrown(LogicException::class, 'Expected object, got array', static fn() => Value::parse('[]')->get('a'));
+        self::expectThrown(
+            LogicException::class,
+            'Expected object, got array',
+            static fn() => Value::parse('[]')->members(),
+        );
+        self::expectThrown(
+            LogicException::class,
+            'Expected array, got object',
+            static fn() => Value::parse('{}')->items(),
+        );
+        self::expectThrown(
+            LogicException::class,
+            'Expected string, got number',
+            static fn() => Value::parse('1')->stringValue(),
+        );
+        self::expectThrown(
+            LogicException::class,
+            'Expected number, got string',
+            static fn() => Value::parse('"a"')->numberLiteral(),
+        );
+        self::expectThrown(
+            LogicException::class,
+            'Expected boolean, got null',
+            static fn() => Value::parse('null')->booleanValue(),
+        );
+        self::expectThrown(
+            LogicException::class,
+            'Expected object, got array',
+            static fn() => Value::parse('[]')->get('a'),
+        );
     }
 
     public function testUnpairedSurrogateStaysInUnits(): void
@@ -112,17 +136,33 @@ abstract class ValueApiTestCase extends TestCase
 
     public function testFactoriesValidateArguments(): void
     {
-        self::expectThrown(InvalidArgumentException::class, 'UTF-16 code units', static fn() => Value::fromUnits([65536]));
-        self::expectThrown(InvalidArgumentException::class, 'UTF-16 code units', static fn() => Value::fromUnits(['a']));
+        self::expectThrown(
+            InvalidArgumentException::class,
+            'UTF-16 code units',
+            static fn() => Value::fromUnits([65536]),
+        );
+        self::expectThrown(
+            InvalidArgumentException::class,
+            'UTF-16 code units',
+            static fn() => Value::fromUnits(['a']),
+        );
         self::expectThrown(InvalidArgumentException::class, 'without whitespace', static fn() => Value::number(' 1'));
-        self::expectThrown(InvalidArgumentException::class, 'list of values', static fn() => Value::array(['k' => Value::null()]));
+        self::expectThrown(
+            InvalidArgumentException::class,
+            'list of values',
+            static fn() => Value::array(['k' => Value::null()]),
+        );
         self::assertSame('"\ud800"', Value::fromUnits([0xd800])->compact());
         self::assertSame('{"a":1}', Value::object(['a' => Value::number('1')])->compact());
     }
 
     public function testHostSerializationBoundary(): void
     {
-        self::expectThrown(LogicException::class, 'Polyspec\\OrderedJson\\stringify', static fn() => json_encode(Value::parse('[1]')));
+        self::expectThrown(
+            LogicException::class,
+            'Polyspec\\OrderedJson\\stringify',
+            static fn() => json_encode(Value::parse('[1]')),
+        );
         self::assertSame('[1]', (string)Value::parse('[1]'));
     }
 

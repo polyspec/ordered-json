@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 // The package of the PHP implementation, which benchmarks/run.mts names by its root in config/parity.json.
 $package = getenv('OJ_PACKAGE');
 if ($package === false) {
@@ -28,31 +30,52 @@ $measure = static function (callable $fn) use ($iterations, $warmup, $warmupMs, 
     // and a warm-up counted in iterations ends in microseconds on a small
     // input, so the count is a floor and the duration decides.
     $warming = $clock();
-    do { for ($i = 0; $i < $warmup; $i++) $fn(); } while (($clock() - $warming) < $warmupMs * 1e6);
-    $values = []; $result = '';
+    do {
+        for ($i = 0; $i < $warmup; $i++) {
+            $fn();
+        }
+    } while (($clock() - $warming) < $warmupMs * 1e6);
+    $values = [];
+    $result = '';
     for ($sample = 0; $sample < $samples; $sample++) {
         $start = $clock();
-        for ($i = 0; $i < $iterations; $i++) $result = $fn();
+        for ($i = 0; $i < $iterations; $i++) {
+            $result = $fn();
+        }
         $values[] = ($clock() - $start) / $iterations;
     }
     sort($values, SORT_NUMERIC);
-    return [['median' => $values[(int)floor(count($values) / 2)], 'p95' => $percentile($values, 0.95), 'samples' => $values], $result];
+    $stats = [
+        'median' => $values[(int)floor(count($values) / 2)],
+        'p95' => $percentile($values, 0.95),
+        'samples' => $values,
+    ];
+    return [$stats, $result];
 };
 foreach ($files as $file) {
     $source = file_get_contents($file);
-    if ($source === false) throw new RuntimeException("Cannot read $file");
+    if ($source === false) {
+        throw new RuntimeException("Cannot read $file");
+    }
     $parseFn = $mode === 'native-json'
         ? static fn() => json_decode($source, false, 512, JSON_THROW_ON_ERROR)
         : static fn() => Value::parse($source, 256);
     $stringifyFn = $mode === 'native-json'
         ? static fn($value) => json_encode($value, JSON_THROW_ON_ERROR)
         : static fn($value) => $value->compact();
-    [$parseStats] = $measure(function () use ($parseFn, &$sink) { $sink = $parseFn(); return $sink; });
+    [$parseStats] = $measure(function () use ($parseFn, &$sink) {
+        $sink = $parseFn();
+        return $sink;
+    });
     $value = $parseFn();
     [$stringifyStats, $output] = $measure(fn() => $stringifyFn($value));
     [$roundtripStats] = $measure(fn() => $stringifyFn($parseFn()));
     echo implode("\t", [$file, $mode, $parseStats['median'], $stringifyStats['median'], $roundtripStats['median'],
         $parseStats['p95'], $stringifyStats['p95'], $roundtripStats['p95'],
-        json_encode(['parse'=>$parseStats['samples'], 'stringify'=>$stringifyStats['samples'], 'roundtrip'=>$roundtripStats['samples']], JSON_PRESERVE_ZERO_FRACTION),
+        json_encode([
+            'parse' => $parseStats['samples'],
+            'stringify' => $stringifyStats['samples'],
+            'roundtrip' => $roundtripStats['samples'],
+        ], JSON_PRESERVE_ZERO_FRACTION),
         $digest($output), strlen($source), strlen($output)]), "\n";
 }

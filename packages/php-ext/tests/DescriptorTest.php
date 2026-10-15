@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Polyspec\OrderedJson\Extension\Tests;
@@ -10,9 +11,9 @@ use Throwable;
 use ValueError;
 
 /**
- * The descriptor API of the extension, run by PHPUnit with the extension loaded (config/parity.json, php-extension); each
- * test method is a feature unit. The value API of both PHP backends is tested by ValueApiTest of packages/php, and the
- * hydration without the value class by ValueClassTest.
+ * The descriptor API of the extension, run by PHPUnit with the extension loaded (config/parity.json, php-extension);
+ * each test method is a feature unit. The value API of both PHP backends is tested by ValueApiTest of packages/php, and
+ * the hydration without the value class by ValueClassTest.
  */
 final class DescriptorTest extends TestCase
 {
@@ -20,7 +21,10 @@ final class DescriptorTest extends TestCase
 
     protected function setUp(): void
     {
-        self::assertTrue(extension_loaded('ordered_json'), 'these tests cover the native backend; load the ordered_json extension');
+        self::assertTrue(
+            extension_loaded('ordered_json'),
+            'these tests cover the native backend; load the ordered_json extension',
+        );
         // The extension looks the value class up without autoloading it.
         self::assertTrue(class_exists(Value::class));
     }
@@ -34,7 +38,10 @@ final class DescriptorTest extends TestCase
 
     public function testHydrateArrayItems(): void
     {
-        self::assertSame(['2', '3'], self::tokens(ordered_json_hydrate(self::SOURCE, self::tape(), self::firstRecord(self::tape(), 2))));
+        self::assertSame(
+            ['2', '3'],
+            self::tokens(ordered_json_hydrate(self::SOURCE, self::tape(), self::firstRecord(self::tape(), 2))),
+        );
     }
 
     public function testEscapedMemberNameDecodes(): void
@@ -71,13 +78,19 @@ final class DescriptorTest extends TestCase
 
     public function testCompactNodeRejectsMismatchedDescriptors(): void
     {
-        self::expectThrown(ValueError::class, static fn() => ordered_json_compact_node(self::SOURCE, array_replace(self::tape(), [2 => 9999]), 0));
+        self::expectThrown(
+            ValueError::class,
+            static fn() => ordered_json_compact_node(self::SOURCE, array_replace(self::tape(), [2 => 9999]), 0),
+        );
         self::expectThrown(ValueError::class, static fn() => ordered_json_compact_node(self::SOURCE, self::tape(), -1));
     }
 
     public function testCompactNodeCopiesACompactToken(): void
     {
-        self::assertSame('[2,3]', ordered_json_compact_node(self::SOURCE, self::tape(), self::firstRecord(self::tape(), 2)));
+        self::assertSame(
+            '[2,3]',
+            ordered_json_compact_node(self::SOURCE, self::tape(), self::firstRecord(self::tape(), 2)),
+        );
         self::assertSame(self::SOURCE, ordered_json_compact_node(self::SOURCE, self::tape(), 0));
     }
 

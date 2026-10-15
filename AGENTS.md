@@ -67,7 +67,7 @@ Run `make documents-check` and `make evidence-check` for documentation-only revi
 
 All language probes use [official.json](examples/official.json) and [scripts/verify.mts](scripts/verify.mts). Add shared cases there or under `contracts/fixtures/`. Do not create separate language-specific examples or expected results.
 
-Rust code passes `make lint-rust` (cargo clippy with `-D warnings` in each Cargo workspace) and Go code passes `make lint-go` (golangci-lint with `.golangci.yml` and deadcode), the lints of `@polyspec/kit`; both are targets of `CHECK_TARGETS`, so hosted CI runs them on every pull request and every push to `main`. Rebuild the PHP extension when native code changes. Never treat old binaries or prior results as verification of changed code.
+Rust code passes `make lint-rust` (cargo clippy with `-D warnings` in each Cargo workspace) Go code passes `make lint-go` (golangci-lint with `.golangci.yml` and deadcode) and PHP code passes `make lint-php` (phpcs with `phpcs.xml.dist` and PHPStan with `phpstan.dist.neon`), the lints of `@polyspec/kit`; all three are targets of `CHECK_TARGETS`, so hosted CI runs them on every pull request and every push to `main`. Rebuild the PHP extension when native code changes. Never treat old binaries or prior results as verification of changed code.
 
 <a id="release"></a>
 ## Release

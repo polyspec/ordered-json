@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Polyspec\OrderedJson;
@@ -14,15 +15,19 @@ final class Value implements \JsonSerializable, \Stringable
     /** Members and key tokens of an object, items of an array, or UTF-16 units of a string once read. */
     private mixed $cache = null;
 
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     public static function parse(string $source, int $maxDepth = MAX_DEPTH): self
     {
-        if ($maxDepth < 0 || $maxDepth > MAX_DEPTH)
+        if ($maxDepth < 0 || $maxDepth > MAX_DEPTH) {
             throw new \InvalidArgumentException('maxDepth must be between 0 and 256');
+        }
         if (self::$native ??= \extension_loaded('ordered_json')) {
-            try { $tape = \ordered_json_scan($source, $maxDepth); }
-            catch (NativeParseError $e) {
+            try {
+                $tape = \ordered_json_scan($source, $maxDepth);
+            } catch (NativeParseError $e) {
                 throw new ParseError($e->getMessage(), $e->offset);
             }
         } else {
@@ -54,8 +59,9 @@ final class Value implements \JsonSerializable, \Stringable
     /** @return array<string|int, Value> Members keyed by decoded name, in first insertion order. */
     private function hydrateMembers(): array
     {
-        if (self::$native ??= \extension_loaded('ordered_json'))
+        if (self::$native ??= \extension_loaded('ordered_json')) {
             return \ordered_json_hydrate($this->source, $this->tape, $this->index);
+        }
         $members = [];
         $source = $this->source;
         $tape = $this->tape;
@@ -66,7 +72,9 @@ final class Value implements \JsonSerializable, \Stringable
             if (!($meta & Tape::SKIP)) {
                 $start = $tape[$i + 1] + 1;
                 $name = substr($source, $start, $tape[$i + 2] - 1 - $start);
-                if ($meta & Tape::ESCAPED) $name = tokenText($name, true);
+                if ($meta & Tape::ESCAPED) {
+                    $name = tokenText($name, true);
+                }
                 $member = new self();
                 $member->source = $source;
                 $member->tape = $tape;
@@ -81,8 +89,9 @@ final class Value implements \JsonSerializable, \Stringable
     /** @return list<Value> */
     private function hydrateItems(): array
     {
-        if (self::$native ??= \extension_loaded('ordered_json'))
+        if (self::$native ??= \extension_loaded('ordered_json')) {
             return \ordered_json_hydrate($this->source, $this->tape, $this->index);
+        }
         $items = [];
         $source = $this->source;
         $tape = $this->tape;
@@ -98,8 +107,14 @@ final class Value implements \JsonSerializable, \Stringable
         return $items;
     }
 
-    public function kind(): string { return Tape::KINDS[$this->tape[$this->index] & Tape::KIND]; }
-    public function raw(): string { return $this->index === 0 ? $this->source : $this->token(); }
+    public function kind(): string
+    {
+        return Tape::KINDS[$this->tape[$this->index] & Tape::KIND];
+    }
+    public function raw(): string
+    {
+        return $this->index === 0 ? $this->source : $this->token();
+    }
     private function token(): string
     {
         $start = $this->tape[$this->index + 1];
@@ -112,13 +127,17 @@ final class Value implements \JsonSerializable, \Stringable
     /** @return array<string|int, Value> Key order is the first insertion order. */
     public function members(): array
     {
-        if (($this->tape[$this->index] & Tape::KIND) !== Tape::OBJECT) $this->mismatch('object');
+        if (($this->tape[$this->index] & Tape::KIND) !== Tape::OBJECT) {
+            $this->mismatch('object');
+        }
         return $this->cache ??= $this->hydrateMembers();
     }
     /** @return list<Value> */
     public function items(): array
     {
-        if (($this->tape[$this->index] & Tape::KIND) !== Tape::ARRAY) $this->mismatch('array');
+        if (($this->tape[$this->index] & Tape::KIND) !== Tape::ARRAY) {
+            $this->mismatch('array');
+        }
         return $this->cache ??= $this->hydrateItems();
     }
     /** @return list<int> UTF-16 units, including escaped unpaired surrogates. */
@@ -126,7 +145,9 @@ final class Value implements \JsonSerializable, \Stringable
     {
         $tape = $this->tape;
         $index = $this->index;
-        if (($tape[$index] & Tape::KIND) !== Tape::STRING) $this->mismatch('string');
+        if (($tape[$index] & Tape::KIND) !== Tape::STRING) {
+            $this->mismatch('string');
+        }
         $start = $tape[$index + 1] + 1;
         return $this->cache ??= tokenUnits(substr($this->source, $start, $tape[$index + 2] - 1 - $start));
     }
@@ -135,7 +156,9 @@ final class Value implements \JsonSerializable, \Stringable
         $tape = $this->tape;
         $index = $this->index;
         $meta = $tape[$index];
-        if (($meta & Tape::KIND) !== Tape::STRING) $this->mismatch('string');
+        if (($meta & Tape::KIND) !== Tape::STRING) {
+            $this->mismatch('string');
+        }
         $start = $tape[$index + 1] + 1;
         $content = substr($this->source, $start, $tape[$index + 2] - 1 - $start);
         return $meta & Tape::ESCAPED ? tokenText($content, false) : $content;
@@ -144,7 +167,9 @@ final class Value implements \JsonSerializable, \Stringable
     {
         $tape = $this->tape;
         $index = $this->index;
-        if (($tape[$index] & Tape::KIND) !== Tape::NUMBER) $this->mismatch('number');
+        if (($tape[$index] & Tape::KIND) !== Tape::NUMBER) {
+            $this->mismatch('number');
+        }
         $start = $tape[$index + 1];
         return substr($this->source, $start, $tape[$index + 2] - $start);
     }
@@ -152,12 +177,16 @@ final class Value implements \JsonSerializable, \Stringable
     {
         $tape = $this->tape;
         $index = $this->index;
-        if (($tape[$index] & Tape::KIND) !== Tape::BOOLEAN) $this->mismatch('boolean');
+        if (($tape[$index] & Tape::KIND) !== Tape::BOOLEAN) {
+            $this->mismatch('boolean');
+        }
         return $this->source[$tape[$index + 1]] === 't';
     }
     public function get(string $key): ?self
     {
-        if (($this->tape[$this->index] & Tape::KIND) !== Tape::OBJECT) $this->mismatch('object');
+        if (($this->tape[$this->index] & Tape::KIND) !== Tape::OBJECT) {
+            $this->mismatch('object');
+        }
         return ($this->cache ??= $this->hydrateMembers())[$key] ?? null;
     }
     public function getUnits(array $units): ?self
@@ -172,8 +201,9 @@ final class Value implements \JsonSerializable, \Stringable
     {
         $raw = '"';
         foreach ($units as $unit) {
-            if (!is_int($unit) || $unit < 0 || $unit > 65535)
+            if (!is_int($unit) || $unit < 0 || $unit > 65535) {
                 throw new \InvalidArgumentException('Expected UTF-16 code units');
+            }
             $raw .= sprintf('\\u%04x', $unit);
         }
         return self::parse($raw . '"');
@@ -181,15 +211,24 @@ final class Value implements \JsonSerializable, \Stringable
     public static function number(string $literal): self
     {
         $v = self::parse($literal);
-        if ($v->kind() !== 'number' || trim($literal) !== $literal)
+        if ($v->kind() !== 'number' || trim($literal) !== $literal) {
             throw new \InvalidArgumentException('Expected number literal without whitespace');
+        }
         return $v;
     }
-    public static function boolean(bool $value): self { return self::parse($value ? 'true' : 'false'); }
-    public static function null(): self { return self::parse('null'); }
+    public static function boolean(bool $value): self
+    {
+        return self::parse($value ? 'true' : 'false');
+    }
+    public static function null(): self
+    {
+        return self::parse('null');
+    }
     public static function array(array $items): self
     {
-        if (!array_is_list($items)) throw new \InvalidArgumentException('Expected a list of values');
+        if (!array_is_list($items)) {
+            throw new \InvalidArgumentException('Expected a list of values');
+        }
         return self::parse('[' . implode(',', array_map(fn(self $v) => $v->compact(), $items)) . ']');
     }
     /** @param array<string|int, Value> $members */
@@ -197,15 +236,18 @@ final class Value implements \JsonSerializable, \Stringable
     {
         $parts = [];
         foreach ($members as $key => $value) {
-            if (!$value instanceof self) throw new \InvalidArgumentException('Expected ordered_json Value');
+            if (!$value instanceof self) {
+                throw new \InvalidArgumentException('Expected ordered_json Value');
+            }
             $parts[] = quoteKey((string)$key) . ':' . $value->compact();
         }
         return self::parse('{' . implode(',', $parts) . '}');
     }
     public function compact(): string
     {
-        if (self::$native ??= \extension_loaded('ordered_json'))
+        if (self::$native ??= \extension_loaded('ordered_json')) {
             return \ordered_json_compact_node($this->source, $this->tape, $this->index);
+        }
         $meta = $this->tape[$this->index];
         return $meta & Tape::COMPACT || ($meta & Tape::KIND) > Tape::ARRAY ? $this->token() : $this->render();
     }
@@ -222,15 +264,21 @@ final class Value implements \JsonSerializable, \Stringable
             $n = 0;
             for ($i = $index + 3, $end = $tape[$index] >> Tape::LINK; $i < $end;) {
                 $valueMeta = $tape[$i + 3];
-                if (!($tape[$i] & Tape::SKIP))
-                    $parts[] = substr($source, $tape[$i + 1], $tape[$i + 2] - $tape[$i + 1]) . ':' . $values[$n++]->compact();
+                if (!($tape[$i] & Tape::SKIP)) {
+                    $parts[] = substr($source, $tape[$i + 1], $tape[$i + 2] - $tape[$i + 1])
+                        . ':' . $values[$n++]->compact();
+                }
                 $i = ($valueMeta & Tape::KIND) <= Tape::ARRAY ? $valueMeta >> Tape::LINK : $i + 6;
             }
             return '{' . implode(',', $parts) . '}';
         }
-        return '[' . implode(',', array_map(fn(self $v) => $v->compact(), $this->cache ??= $this->hydrateItems())) . ']';
+        $items = $this->cache ??= $this->hydrateItems();
+        return '[' . implode(',', array_map(fn(self $v) => $v->compact(), $items)) . ']';
     }
-    public function __toString(): string { return $this->compact(); }
+    public function __toString(): string
+    {
+        return $this->compact();
+    }
     public function jsonSerialize(): never
     {
         throw new \LogicException('Use Polyspec\\OrderedJson\\stringify($value)');

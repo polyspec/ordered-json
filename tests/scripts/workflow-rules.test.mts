@@ -13,7 +13,7 @@ import test from 'node:test';
 import { isDeepStrictEqual } from 'node:util';
 import { parse } from 'yaml';
 import { checkJson, readJsonFile } from '../../scripts/json.mts';
-import { ROOT } from '../../scripts/registry.mts';
+import { ROOT, trackedFiles } from '../../scripts/registry.mts';
 import { known } from './checkout.mts';
 
 const WORKFLOWS = path.join(ROOT, '.github/workflows');
@@ -140,6 +140,13 @@ test('every target of the full suite runs in exactly one job', () => {
   for (const target of suite) assert.equal(run.filter(item => item === target).length, 1, `${target} runs in one job`);
   assert.deepEqual(run.filter(target => !suite.includes(target)), GATE_TARGETS, 'a job runs a target that is not in CHECK_TARGETS');
   assert.equal(run.length, new Set(run).size);
+});
+
+test('the PHP of the checkout is linted in the full suite', () => {
+  // make lint-php of kit runs phpcs and PHPStan on the tracked PHP; the full suite and so CI run it while the checkout has PHP.
+  assert.ok(trackedFiles(ROOT).some(file => file.endsWith('.php')), 'the checkout tracks PHP');
+  const suite = known(/^CHECK_TARGETS := (.*)$/m.exec(readFileSync(path.join(ROOT, 'Makefile'), 'utf8'))?.[1], 'CHECK_TARGETS of the Makefile').split(' ');
+  assert.ok(suite.includes('lint-php'), 'CHECK_TARGETS lacks lint-php');
 });
 
 test('each report is the directory that make ci-targets writes', () => {
