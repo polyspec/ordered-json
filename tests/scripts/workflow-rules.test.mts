@@ -33,8 +33,9 @@ const CHECK_WORKFLOWS = ['ci.yml', 'push-gate.yml'];
 // that take an environment variable of the job by name (TAG="$TAG").
 const MAKE_STEP = /^make [^|;&`$()]*(\$\{\{[^}]*\}\}[^|;&`$()]*)*( [A-Z][A-Z_]*="\$[A-Z][A-Z_]*")*$/;
 const BOOTSTRAP_STEPS = ['make install-tools TOOLS=npm', 'make install-packages'];
-// The steps of release.yml in their order, the copy of workflows/release.yml of @polyspec/kit.
-const RELEASE_STEPS = [...BOOTSTRAP_STEPS, 'make release-prepare', 'make release-tools', 'make release-tools-path', 'make release-verify', 'make release-versions', 'make release-assets', 'make release-publish', 'make release-proof TAG="$TAG"', 'make release-undraft TAG="$TAG"'];
+// The steps of release.yml in their order, the copy of workflows/release.yml of @polyspec/kit, which checks the configuration
+// with make kit-check before any release step (kit K193).
+const RELEASE_STEPS = [...BOOTSTRAP_STEPS, 'make kit-check', 'make release-prepare', 'make release-tools', 'make release-tools-path', 'make release-verify', 'make release-versions', 'make release-assets', 'make release-publish', 'make release-proof TAG="$TAG"', 'make release-undraft TAG="$TAG"'];
 const CI_PASSED = 'ci-passed';
 const CI_PASSED_RUN = "make ci-passed RESULTS='${{ toJSON(needs) }}'";
 
@@ -104,6 +105,8 @@ export function violations(name: string, text: string): string[] {
       const tools = /^make install-tools TOOLS=(.+)$/.exec(step.run ?? '');
       if (tools && tools[1] !== 'npm') found.push(`${label} runs make install-tools TOOLS=${tools[1]}; make install-tools installs every tool of mise.lock, and TOOLS names only npm`);
       if (/^actions\/setup-(python|go)@/.test(step.uses ?? '')) found.push(`${label} installs a toolchain of mise.toml; make install-tools installs it`);
+      // .php-version is the one declaration of the PHP of the checkout, which the release workflow of kit sets up (kit K193).
+      if (step.uses?.startsWith('shivammathur/setup-php@') && (step.with?.['php-version-file'] !== '.php-version' || step.with['php-version'] !== undefined)) found.push(`${label} does not read the PHP from php-version-file: .php-version alone`);
       // setup-node caches the dependencies of the packageManager by default with the npm of the machine; the npm of var/tools installs them.
       if (step.uses?.startsWith('actions/setup-node@') && step.with?.['package-manager-cache'] !== false) found.push(`${name}: job ${job} step ${index + 1} (setup-node) lacks package-manager-cache: false; the npm of var/tools installs the packages`);
     });
@@ -292,4 +295,11 @@ test('every workflow runs on a fixed image with each action pinned to one commit
   }
   assert.ok(pins.size);
   for (const [action, commits] of pins) assert.equal(commits.size, 1, `${action} keeps one commit`);
+});
+
+test('.php-version declares the PHP minor release, and a setup-php step that names its PHP fails', () => {
+  assert.match(readFileSync(path.join(ROOT, '.php-version'), 'utf8'), /^\d+\.\d+\n$/);
+  for (const name of ['ci.yml', 'release.yml']) {
+    assert.ok(anyIncludes(violations(name, changed(read(name), 'php-version-file: .php-version', "php-version: '8.5'")), 'does not read the PHP from php-version-file: .php-version alone'), name);
+  }
 });
