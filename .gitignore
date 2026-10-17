@@ -7,3 +7,18 @@ __pycache__/
 /var/
 .venv/
 *.egg-info/
+
+# Generated files of the install, build, cache and test runs (AGENTS.md, Generated files)
+dist/
+dist.next/
+dist.old/
+*.tsbuildinfo
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.phpunit.cache/
+.phpunit.result.cache
+test-results/
+playwright-report/
+coverage/

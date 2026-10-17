@@ -27,6 +27,10 @@ Before committing the related feature, cherry-pick useful commits from a test-on
 
 `implemented` means the listed behavior exists. `partial` marks a feature whose implementation is in progress. `planned` marks a feature whose implementation has not started. `shared-suite` refers to the common JSON tests; `package-tests` refers to an implementation's own tests; `docs-tests` refers to the documentation checker tests; `benchmark` refers to the repository benchmark protocol and committed result. Each state names the record that backs it: the [records](docs/operations/validation.md#records) of the run that verifies a commit for the shared suite, the package tests and the checker tests, the [benchmark result](benchmarks/results.json) for a benchmark. The verification record contains the actual versions, case counts, date, and source hashes. A benchmark result is evidence only when it was measured from a clean checkout, with the protocol and inputs the workload declares. `source-only` identifies the confirmed distribution; registry publication is not verified. A feature row marked `published` names its release tag and asset; `make evidence-check` checks that form.
 
+## Generated files
+
+Generated files are never tracked in Git. This covers dependency installs (`node_modules/`, `vendor/`, virtual environments), build output (`dist/`, `target/`, `*.tsbuildinfo`), caches (`.cache/`, `__pycache__/`, `.pytest_cache/`), test run artifacts (`test-results/`, `playwright-report/`, PHPUnit caches) and tool downloads (`var/`). The only exceptions are files the repository deliberately needs, and only these are tracked: lock files (`package-lock.json`, `composer.lock`, `Cargo.lock`, uv locks, `mise.lock`), committed generated documents that this file names, and test fixtures. Each `.gitignore` covers these paths; a new generator adds its ignore entry in the same commit.
+
 <a id="checklist"></a>
 ## Execution checklist
 
