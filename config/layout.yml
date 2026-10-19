@@ -34,17 +34,3 @@ rules:
       - "tests/**/*.{js,mjs,cjs,py,sh,bash,zsh,rb,pl,php,go,rs,ps1,bat,cmd}"
       - "!tests/kit/fixture/**"
 
-  # K245 exception: each runtime package keeps its AGENTS, CHANGELOG and Makefile beside its code, because its registry
-  # releases that folder and its Go module tag names it. The Makefile of a package only runs the targets of the root
-  # (make -C ../.. verify-<runtime>), and its changelog and rules hold the changes of that runtime alone; the root files
-  # would merge them into one history.
-  - id: management-files-at-root
-    paths:
-      - "packages/**/AGENTS*.md"
-      - "packages/**/CHANGELOG*.md"
-      - "packages/**/Makefile"
-      - "!packages/*/AGENTS.md"
-      - "!packages/*/AGENTS.ko.md"
-      - "!packages/*/CHANGELOG.md"
-      - "!packages/*/CHANGELOG.ko.md"
-      - "!packages/*/Makefile"

@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 64f3f7ccfe92731451108543d398b3585e3bdc6f794de8863bfe97c73e8ff6ae -->
+<!-- source-sha256: cb883e4768dc78d5c23dcbe3a7d138015114394f479cd20fb4d17b0a65d36351 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,15 +7,35 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- 패키지는 AGENTS, CHANGELOG와 Makefile을 두지 않습니다 (T2.2). 각 패키지는 루트 `AGENTS.md`와 `CHANGELOG.md`에 절을 가지며, 검사와 테스트는 루트 Makefile의 target(`ordered-json-<package>-check`와 `ordered-json-<package>-test`)입니다. `config/layout.yml`의 layout 예외는 제거되었습니다. 모든 Composer manifest의 PHP platform은 8.4.1이며 Composer lock을 다시 잠갔습니다. T2.1에서 Makefile이 잃은 recipe를 되돌렸습니다 (`verify-*`, `verify-all`, `typecheck`, `evidence-check`, `release-config-check`, `pie-check`, `benchmark`, `benchmark-check`, `ordered-json-test-scripts`와 `ordered-json-install-external`). 체크리스트에는 상위 행 T1.29가 있으며, 비교 대상 제품명은 변경 기록과 체크리스트에서 더 이상 적지 않습니다.
 - 저장소는 kit 표준 0.0.54를 따릅니다 (T2.1): 실행 체크리스트를 `docs/plans/execution/`으로 옮기고, 문서와 테스트 폴더를 layout의 폴더로 옮기며 (`docs/operations/documentation-plan.md`, `docs/operations/proposals.md`, `packages/js/tests`), `install`은 kit의 bootstrap `install-kit`을 `ordered-json-install`보다 먼저 실행하고, workflow `.github/workflows/gates.yml`을 kit에서 vendor하며, 다른 프로젝트와의 비교 도구와 그 보고서를 제거합니다.
 - T1.58: AGENTS는 kit `docs/plans/local-links.md`의 local link를 가리킵니다. polyspec 버전이 0.0.x인 동안 개발 checkout은 설치된 polyspec package를 그 source에 link하며, link는 commit하지 않습니다.
 - T1.57: 공유 도구는 `@polyspec/kit` 0.0.53입니다.
 - T1.56: 공유 도구는 `@polyspec/kit` 0.0.52입니다. `.php-version`이 모든 workflow가 설정하는 PHP 8.5를 선언하며, release workflow는 모든 release 단계 앞에서 `make kit-check`를 실행합니다(kit K193).
 - T1.55: 공유 도구는 `@polyspec/kit` 0.0.50입니다. knip은 script와 테스트가 실행하는 binary를 `config/knip-entries.json`의 `binaries`에서 읽으며(kit K176), `make dependency-policy-check`는 checkout의 모든 Composer manifest를 검사하듯 루트 `composer.json`을 package를 잠그지 않는 커밋된 `composer.lock`과 함께 검사합니다(kit K181).
 - T1.54: `packages/php`와 `packages/php-ext`의 Composer lock이 다시 최신입니다. T1.50의 version 0.0.9가 새 lock 없이 두 manifest의 content hash를 바꿨습니다. `config/dependency-policy.json`은 두 Composer project를 PHP 8.5.0으로 선언하므로 `make dependency-policy-check`는 `composer validate --strict`가 오래되었다고 보는 lock에서 실패하고, 그 PHPUnit과 lock을 검토합니다. 두 lock은 모든 package version을 유지합니다.
-- T1.53: kit의 ruff와 vulture인 `make lint-python`이 전체 suite와 CI의 docs job에서 실행됩니다. `scripts/comparison`의 PyPI ojson probe는 더 이상 `sys.path`를 바꾸지 않습니다(S3). `make install-comparison`이 ojson 0.1.0을 가상 환경 `.cache/comparison/ojson-venv`에 설치하고, `scripts/compare-ojson.mts`는 그 환경의 Python으로 probe를 실행합니다(`--python`이 `--python-package`를 대신합니다).
+- T1.53: kit의 ruff와 vulture인 `make lint-python`이 전체 suite와 CI의 docs job에서 실행됩니다. `scripts/comparison`의 비교 probe는 더 이상 `sys.path`를 바꾸지 않으며(S3), 그 환경은 `mise.toml`의 uv로 package를 설치하고 그 Python(`--python`)으로 probe를 실행합니다.
 - T1.52: kit의 phpcs와 PHPStan인 `make lint-php`가 전체 suite와 CI의 suite job에서 실행됩니다. `make install-php`는 루트 package를 `vendor/`에 설치하고 PHPStan은 그 autoloader로 `benchmarks/`의 PHP를 읽으며, 패키지·테스트·benchmark의 PHP는 PSR-12를 따르고, 공통 검증기의 probe는 직렬화를 `Polyspec\OrderedJson\Tests\ProbeTree`에서 읽습니다.
 - T1.51: 공유 도구는 `@polyspec/kit` 0.0.48입니다. checkout은 `mise.toml`의 Node.js 26.12.0을 `var/tools`에서 실행하고, `.node-version`은 없어졌으며 모든 `engines.node`는 `>=26.12.0`입니다(kit K171). workflow는 각 action을 SHA와 version으로 고정하고(kit K169), script와 test는 JSON을 schema로 읽고 읽은 값을 단언하지 않고 검사합니다(kit K155–K158).
+
+### npm (packages/js)
+
+- 단독 surrogate가 있는 텍스트 입력은 문법을 읽기 전에 surrogate의 위치에서 `unescaped_lone_surrogate`로 거부됩니다. 이전에는 surrogate 다음 단위를 가리켰고, root 뒤의 surrogate는 `trailing_input`이었습니다(T1.39).
+
+### python (packages/python)
+
+- parser는 문서를 compiled `re` pattern의 한 pass로, member, item, root 값마다 match 하나로 읽고, member 이름과
+  `string_value()`를 `bytes.decode`와 `json.decoder.scanstring`으로 decode합니다 (T1.41). 평평한 객체 50,000개에서 CPU
+  시간은 순수 PHP parser의 4.44배에서 2.34-2.94배로 내려갔으며, 결과와 오류 offset은 같습니다.
+
+- `parse_bytes`는 Python으로 byte마다 검사하지 않고 `bytes.decode('utf-8')`로 UTF-8을 검증합니다 (T1.35). 거부는 이전과 같은 offset인
+  `UnicodeDecodeError`의 `start`에서의 `invalid_utf8`이며, `ParseError`는 그 error에서 발생합니다.
+
+- 패키지가 공유 JSON 계약을 구현합니다 (T1.27-2). `parse`와 `parse_bytes`가 text와 UTF-8 byte를 읽고,
+  `stringify`와 `Value.compact()`가 직렬화하며, `Value`가 접근자와 factory를 노출하고, `ParseError`가 공유
+  rejection kind를 UTF-8 byte offset으로 보고합니다. `max_depth`와 `reject_duplicates`는 JavaScript binding을
+  따릅니다. 패키지 test가 표준 사례와 자기 사례를 실행하고, 저장소의 registry, 패키지 test 표준, owner map이
+  패키지를 다룹니다.
 
 ## 0.0.9
 
@@ -24,7 +44,7 @@
 - T1.46: kit의 oxlint와 knip인 `make lint-ts`가 전체 suite와 CI의 docs job에서 실행됩니다. `config/knip-entries.json`은 공통 검증기가 실행하는 JavaScript probe `packages/js/test/probe.mjs`를 knip의 entry로 선언합니다(kit K145).
 - T1.47: 공유 도구는 `@polyspec/kit` 0.0.44입니다: `make install-tools`는 CI의 docs job에 없던 `rust-toolchain.toml`의 Rust toolchain을 설치하고, ruff는 cache를 `var/ruff`에 두며, `config/layout.yml`은 kit의 목록을 반복하는 대신 kit의 root 파일에 `composer.json`과 `external-inputs.json`을 더합니다(kit K145, K147, K150, K151).
 - T1.45: 공유 도구는 `@polyspec/kit` 0.0.43입니다. parity는 libtest-mimic의 trial과 PHPUnit test method의 data set을 읽고, `no-floating-promises`는 node:test 등록을 허용하며, API Extractor는 더 이상 `ae-missing-release-tag`를 보고하지 않고, knip은 layout에서 entry를 가져옵니다.
-- T1.42: 저장소 도구는 TypeScript입니다(S9). 공통 검증기(`scripts/verify.mts`와 그 registry, reference, records), 근거, PIE, 외부 입력, 비교 검사와 benchmark runner는 Node.js로 실행하고 `make typecheck`가 검사하며, 그 테스트는 `tests/scripts`의 node 테스트입니다(`make test-scripts`). 독립 참조는 momoa로 JSON을 읽습니다. 패키지 테스트는 검증기를 떠나 kit parity의 native runner로 옮겼고, kit의 `lint-rust`와 `lint-go`가 `scripts/lint.py`를 대신하며, CI의 job `python`은 없어졌습니다. 패키지 폴더는 `config/parity.json`에서, fixture 폴더는 registry에서 읽으며, 도구에 남은 Python은 이유와 함께 S9 예외인 `scripts/comparison`의 Python 라이브러리 ojson probe뿐입니다.
+- T1.42: 저장소 도구는 TypeScript입니다(S9). 공통 검증기(`scripts/verify.mts`와 그 registry, reference, records), 근거, PIE, 외부 입력, 비교 검사와 benchmark runner는 Node.js로 실행하고 `make typecheck`가 검사하며, 그 테스트는 `tests/scripts`의 node 테스트입니다(`make test-scripts`). 독립 참조는 momoa로 JSON을 읽습니다. 패키지 테스트는 검증기를 떠나 kit parity의 native runner로 옮겼고, kit의 `lint-rust`와 `lint-go`가 `scripts/lint.py`를 대신하며, CI의 job `python`은 없어졌습니다. 패키지 폴더는 `config/parity.json`에서, fixture 폴더는 registry에서 읽으며, 도구에 남은 Python은 이유와 함께 S9 예외인 `scripts/comparison`의 Python 라이브러리 probe뿐입니다.
 - T1.39: 모든 unit은 제외 없이 그 profile의 각 구현에서 실행합니다. `ordered_map_rejects_non_string_key`는 JavaScript에서도 실행하며, PHP 배열은 문자열이나 정수로 key를 두므로 byte 입력과 함께 profile `no-php`에 속합니다. `utf8_validation_holds_for_long_multibyte_text`(이전 `utf8_validation_survives_low_pcre_limits`)는 모든 구현에서 실행하며 PHP는 낮은 PCRE 한도에서 실행합니다. `text_input_rejects_lone_surrogates`와 새 `string_value_keeps_an_unpaired_surrogate`는 JavaScript와 Python의 profile `utf16-text`를 이룹니다. 단독 surrogate가 있는 JavaScript 텍스트 입력은 문법보다 먼저, 그 다음 단위가 아니라 surrogate의 위치에서 거부되며, root 뒤의 surrogate는 Python처럼 `trailing_input` 대신 `unescaped_lone_surrogate`입니다.
 - T1.43: `config/parity.json`은 모든 API unit을 kit의 TypeScript extractor가 `packages/js/index.d.ts`에서 읽는 JavaScript 공개 symbol에 API 계약의 표가 적는 대로 묶고(compact 출력과 UTF-16 생성 및 조회는 `stringify`, `Value.string`, `get`), JavaScript에만 있는 symbol `Kind`, `ParseOptions`, `rejectDuplicates`, `keys`, `toJSON`, `toString`을 이유와 함께 native-only로 선언합니다.
 - T1.38: 패키지 테스트는 kit parity가 실행하는 native runner로 실행하며, 각 테스트는 `config/parity.json`의 unit에 묶입니다. JavaScript는 node:test(`packages/js/test/api.test.mjs`, `official.test.mjs`), Python은 `make install-python`이 만드는 `packages/python/.venv`의 unittest(`tests/test_api.py`, `test_official.py`), PHP는 `make install-php`가 `packages/php`와 `packages/php-ext`에 설치하는 PHPUnit 13.4.2(`ValueApiTestCase`에서 나온 두 backend의 `ValueApiTest`, `DescriptorTest`, `ValueClassTest`)입니다. `make php-extension`은 `make parity-check`를 위해 확장을 제자리에서 빌드합니다. 모든 구현은 공식 예제를 예제마다 case 하나로 native로 실행합니다. JavaScript와 Python은 패키지 테스트로, Go는 `TestOfficial`로, Rust는 `tests/official.rs`의 libtest-mimic 0.8.2 trial(`official::<id>`)로, PHP는 각 backend의 `OfficialTest`가 실행하는 `OfficialTestCase`의 `testCase` data set으로 실행합니다. PHP class `Value`, `ParseError`, `Tape`, `Parser`는 각자의 파일에서 PSR-4로, 함수와 `MAX_DEPTH`는 `files`로 load하며(S2), wheel의 release smoke는 `py.typed` 표시를 요구합니다.
@@ -147,6 +167,31 @@
   anchor입니다. `test_release`는 한도를 넘는 section(`<a id>` anchor가 있는 경우와 없는 경우)과 정확히 한도인
   section을 다룹니다.
 
+### npm (packages/js)
+
+- 저장소의 0.0.3 릴리스입니다. 패키지는 0.0.2 이후 변경이 없습니다.
+
+
+### rust (packages/rust)
+
+- 저장소의 0.0.3 릴리스입니다. 패키지는 0.0.2 이후 변경이 없습니다.
+
+
+### go (packages/go)
+
+- 저장소의 0.0.3 릴리스입니다. 패키지는 0.0.2 이후 변경이 없습니다.
+
+
+### php (packages/php)
+
+- `composer.json`이 `version`을 선언하므로 릴리스 zip의 Composer artifact repository가 package를 읽습니다(T1.24).
+
+
+### php-ext (packages/php-ext)
+
+- `composer.json`이 `version`을 선언하므로 릴리스 zip의 Composer artifact repository가 package를 읽습니다(T1.24).
+
+
 <a id="0-0-2"></a>
 ## 0.0.2
 
@@ -174,6 +219,31 @@
 - 각 workflow는 trigger를 정확히 선언합니다(T1.20): `ci.yml`은 `pull_request`, `merge_group`, `workflow_dispatch`에서,
   `push-gate.yml`은 `branches-ignore: ['gh-readonly-queue/**']`를 가진 `push`, `pull_request`, `merge_group`에서
   실행됩니다. `test_workflow_rules`는 workflow의 `on:` block이 다르면 실패합니다.
+
+### npm (packages/js)
+
+- 저장소의 0.0.2 릴리스입니다. 패키지는 0.0.1 이후 변경이 없습니다.
+
+
+### rust (packages/rust)
+
+- 저장소의 0.0.2 릴리스입니다. 패키지는 0.0.1 이후 변경이 없습니다.
+
+
+### go (packages/go)
+
+- 저장소의 0.0.2 릴리스입니다. 패키지는 0.0.1 이후 변경이 없습니다.
+
+
+### php (packages/php)
+
+- 저장소의 0.0.2 릴리스입니다. 패키지는 0.0.1 이후 변경이 없습니다.
+
+
+### php-ext (packages/php-ext)
+
+- 저장소의 0.0.2 릴리스입니다. 패키지는 0.0.1 이후 변경이 없습니다.
+
 
 <a id="0-0-1"></a>
 ## 0.0.1
@@ -316,8 +386,8 @@
   `scripts/check.py`를 실행했고, 이제 `../scripts/verify.py --only js`와 `--only php`를 실행합니다. 새
   `scripts/tests/test_failure_messages.py`의 case는 각 메시지에 해당 줄, 파일, 값, 오류가 없었으므로 변경 전에 실패했고, 변경 후에는
   통과합니다.
-- `benchmarks/run.py`와 `scripts/compare_ojson.py`는 완성된 파일을 결과 위로 이름을 바꾸는 `write_record`로 결과를 게시합니다.
-  두 script는 `benchmarks/results.json`, 검토용 사본 `.cache/benchmark.current.json`, `docs/reports/ojson-comparison.json`을
+- `benchmarks/run.py`와 비교 script는 완성된 파일을 결과 위로 이름을 바꾸는 `write_record`로 결과를 게시합니다.
+  두 script는 `benchmarks/results.json`, 검토용 사본 `.cache/benchmark.current.json`, 비교 보고서를
   제자리에서 썼으므로, 파일을 연 직후 멈춘 process는 잘린 파일을 남겼고 읽는 쪽은 파일의 일부를 볼 수 있었습니다. `write_record`는
   저장소 안의 파일을 `docs/`의 기록 옆 숨은 파일 대신 Git이 무시하고 어떤 manifest도 읽지 않는 `var/`에서 준비합니다. 새
   `scripts/tests/test_atomic_publish.py`의 중단 case 두 개는 연 직후 멈추면 빈 파일이 남았으므로 변경 전에 실패했고, 변경 후에는
@@ -406,7 +476,7 @@
 - 각 검증 실행은 자신만의 임시 실행 디렉터리에서 빌드하고 끝나면 그 디렉터리를 제거합니다.
   `make check`, `scripts/verify.py`, PIE 검사, 벤치마크는 그 디렉터리에 복사한 `php-extension/`
   소스 파일로 PHP 확장을 빌드하고, Go probe는 그 디렉터리에 기록되며, PIE는 그 디렉터리에서
-  작업하고, ojson 비교는 Erlang 모듈을 그 디렉터리에서 컴파일합니다. 확장은 `php-extension/src`
+  작업하고, 비교는 Erlang 모듈을 그 디렉터리에서 컴파일합니다. 확장은 `php-extension/src`
   에서 `make distclean`, `phpize`, `configure`로 빌드되었고 Go probe, PIE 작업 디렉터리, Erlang
   모듈은 `.cache/` 아래 고정 경로를 사용했기 때문에, 한 체크아웃의 두 실행이 다른 실행이 사용
   중인 빌드 출력을 지우거나 교체했습니다. registry 키 `build_in_copy`가 복사본 빌드를 선택하며,
@@ -414,7 +484,7 @@
   산출물을 실행 디렉터리 기준 경로로 명시합니다. 이전 제자리 빌드가 남긴 무시된 출력
   (`php-extension/src`의 `phpize`, `configure`, `make` 파일과 `modules/`, `.cache/probes`,
   `.cache/pie-check`)은 어떤 명령도 읽지 않으므로 체크아웃에서 제거했습니다.
-- ojson 비교는 Erlang 컴파일 출력을 종료 상태, 경과 시간과 함께 흘려 보내고, 각 프로젝트에
+- 비교는 Erlang 컴파일 출력을 종료 상태, 경과 시간과 함께 흘려 보내고, 각 프로젝트에
   사례를 한 번에 하나씩 공통 60 s 응답 deadline으로 보내며 사례마다 경과 시간을 출력합니다.
   컴파일에는 45 s 한도, 프로젝트 실행마다 전체 사례에 60 s 한도 하나가 있어서, 느린 컴파일이나
   느린 전체 실행은 시계 때문에 실패했고 각 명령이 끝날 때까지 아무것도 출력되지 않았습니다.
@@ -525,10 +595,109 @@
 - 명세, API, 기능 상태, 운영, 예제, 개발 절차에 영어 정본과 한국어 번역을 추가했습니다.
 - `make check`와 `make docs-check`를 추가했습니다. 문서 등록, 링크, 번역 개정본, 섹션·코드 일치, 기능 상태, 현재 검증 근거를 검사합니다. 검증 기록에 실제 소스 해시, 런타임 버전, 공통 테스트 결과를 포함합니다.
 - 복사된 읽기 전용 빌드 파일이 반복 설정을 방해하여 PHP 확장을 phpize 생성 파일 정리 후 다시 빌드합니다. 도구의 종료 상태가 0이어도 빌드 오류 진단이 있으면 검증을 중단합니다.
-- 요청된 ojson 비교를 `docs/reports/`로 이동하고 컴파일 진단 경로를 소스 기준 상대 경로로 변경했습니다.
+- 요청된 비교를 `docs/reports/`로 이동하고 컴파일 진단 경로를 소스 기준 상대 경로로 변경했습니다.
 - JSON 객체를 순서 있는 연관배열로 변경했습니다. 중복 키는 최초 키 위치를 유지하면서 값을 덮어쓰므로 디코딩한 키마다 값이 하나입니다. 중복 조회와 멤버 목록 API를 제거했습니다. 기본 직렬화는 연관배열 객체를 출력하며 원문 조회는 별도로 제공합니다.
 - 엄격한 파싱, 재귀 문서 순서, 정확한 숫자 토큰, 생성 API를 제공하는 JavaScript, Rust, Go, 순수 PHP, PHP 확장 구현을 추가했습니다.
 - 공식 입력과 기대 결과를 [official.json](examples/official.json)으로 통합하고 공통 문법 사례와 선택적 추가 입력을 제공합니다.
 - 모든 구현을 공통 사례 433개로 검증했습니다. PIE 빌드 산출물도 같은 433개를 통과했으며 검사기 테스트 42개가 통과했습니다. 당시 PHP 빌드 도구의 링커 옵션 사용 중단 경고 두 건은 해당 검증 기록에 기록했습니다.
 
 현재 검증 기록은 검사한 소스와 다섯 구현 및 문서 검사기 테스트의 결과를 명시합니다. 배포 확인 결과는 별도입니다. 이 항목은 개발 변경을 기록하며 패키지 릴리스를 선언하지 않습니다.
+
+### npm (packages/js)
+
+- npm 패키지는 `@polyspec/ordered-json`으로 polyspec 관례를 따릅니다. 이전에는 `ordered-json`이었습니다.
+- 패키지 테스트 실행기는 케이스를 실행하기 전에 케이스 id를, 실행한 뒤 `ok` 또는 `FAIL`과 경과 밀리초를 동기 쓰기로 출력하므로, 검증기가 끝나지 않는 케이스의 이름을 보고할 수 있습니다. 실행 뒤에 케이스를 한 번 더 나열하던 도달할 수 없는 코드를 제거했습니다.
+- 해석된 객체 키가 한 번씩만 나와야 하는 호출자를 위해 `rejectDuplicates` 파싱 옵션을 추가합니다. 두 번째 키의 UTF-16 위치에 `duplicate_object_key` 종류의 `Duplicate object key` 오류를 보고하고, boolean만 받으며, 기본 파싱은 바뀌지 않습니다. 패키지가 커버리지 검사에 두 필드를 모두 보고하도록 `ParseOptions`의 각 필드를 한 줄씩 선언합니다.
+- `ParseError`가 자체 메시지와 함께 공통 거부 목록의 `kind`를 전합니다.
+- 타입 선언에서 `StringifyOptions`와 `stringify`의 두 번째 인자를 제거했습니다. 이 함수는 인자를 하나만 받습니다. 패키지는 공통 커버리지 검사를 위해 공개 심볼을 보고합니다.
+- 이스케이프하지 않은 제어 문자를 한 칸 뒤가 아니라 그 문자의 위치로 보고하며, 어댑터는 공통 비교를 위해 거부 위치를 보고합니다.
+- `parseBytes`가 0 대신 첫 잘못된 바이트의 바이트 위치를 보고하며, 이 오류에는 UTF-16 위치가 없으므로 메시지에 단위를 함께 적습니다.
+- 값 API의 패키지 테스트를 추가하고 구현 등록 정보에 선언했습니다. 생성 제한, 고정된 항목·키 배열, 접근할 때마다 새로 만드는 멤버 맵, 종류가 맞지 않는 접근, 키 타입 검사, 옵션 검증, `parseBytes` 입력 검사, UTF-16 파싱 위치, 짝 없는 서로게이트의 코드 단위, 팩토리 인자를 다룹니다. 공통 사례는 어댑터를 통해서만 이 패키지에 닿아 그 표면을 다루지 않습니다.
+- 파싱한 `Value`마다 `Object.freeze`를 호출하지 않도록 변경했습니다. private field로 값은 API로 변경할 수 없으며 `items`와 `keys` 배열은 계속 freeze합니다.
+- 사용하지 않는 `stringify()` options 인자를 제거했습니다.
+- 파서와 직렬화 부담을 줄였습니다. 값은 `WeakSet` 등록 대신 private field brand로 검사하고, escape가 없는 문자열은 원문에서 잘라 쓰며, 객체 키 토큰은 조회할 때 생성하고, 무의미한 공백과 중복 키가 없는 값은 원문 토큰으로 직렬화합니다. 결과, 오류, 오프셋은 바뀌지 않았습니다.
+- 패키지 자체의 개발 절차, 변경 기록, Makefile, 문서 목록을 추가했습니다.
+- 영어와 한국어 사용 방법, 개발 절차, 변경 기록을 추가했습니다.
+
+공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 저장소 루트의 [검증 기록](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.ko.md#records)에서 설명합니다. 여기서는 레지스트리 게시를 선언하지 않습니다.
+
+### rust (packages/rust)
+
+- Cargo 패키지는 `polyspec-ordered-json`, 라이브러리는 `polyspec_ordered_json`으로 polyspec 관례를 따릅니다.
+  이전에는 `ordered-json`과 `ordered_json`이었습니다.
+- JSON 원문 값이 Serde JSON 토큰 프로토콜을 사용하므로 Serde 바인딩 의존성을 검증한 버전으로
+  고정합니다.
+- 현재 JSON 테스트 의존성에 맞춰 Rust 최소 버전을 1.71로 설정합니다.
+- Serde 타입 인코딩·디코딩을 추가합니다. 구조체 필드는 선언 순서를 유지하고 wire·manifest
+  fixture가 바이트를 고정하고 포함된 `Value` 필드는 객체 순서와 숫자 토큰을 유지하며
+  잘못되거나 소비되지 않은 입력은 오류로 처리합니다.
+- 해석된 객체 키가 한 번만 나와야 하는 호출자를 위해 `parse_bytes_reject_duplicates`를
+  추가합니다. 두 번째 키의 바이트 위치를 반환하며 일반 파서는 바꾸지 않습니다.
+- `Error::kind`가 공통 식별자로 거부 이유를 알립니다.
+- 패키지 테스트가 `OrderedMap::iter`와 `stringify`를 호출하며, 패키지는 공통 커버리지 검사를 위해 공개 심볼을 보고합니다.
+- 잘못된 이스케이프를 한 바이트 뒤가 아니라 이스케이프 문자의 위치로 보고하며, 어댑터는 공통 비교를 위해 거부 위치를 보고합니다.
+- 값 API의 패키지 테스트를 추가하고 구현 등록 정보에 선언했습니다. 깊이 인자 한도, `parse_bytes`의 UTF-8 위치, `OrderedMap`의 키 검증과 반복 키, 해석한 이름으로 하는 멤버 조회, 짝 없는 서로게이트 단위, 생성자 인자, 종류가 맞지 않는 접근을 다룹니다. 공통 사례는 어댑터를 통해서만 이 패키지에 닿아 그 표면을 다루지 않습니다.
+- 루트 배열은 모든 항목을 복사하지 않고 대기 항목 스택을 그대로 사용하며, 길이의 1/4을 넘는 여유 용량은 해제합니다.
+- 파서 할당을 줄였습니다. 값마다 빈 맵, 항목 벡터, 단위 벡터를 두는 대신 종류별 payload를 저장하고, 문자열 단위는 처음 조회할 때 해석하며, 객체는 항목 목록 하나를 유지하다가 멤버가 8개를 넘으면 해시 인덱스를 만들고, 무의미한 공백과 중복 키가 없는 값은 원문 토큰을 복사하여 compact 출력을 만듭니다. 결과, 오류, 오프셋은 바뀌지 않았습니다. `Value`와 `OrderedMap`의 derive된 `Debug` 출력은 새 내부 필드를 반영합니다.
+- 패키지 자체의 개발 절차, 변경 기록, Makefile, 문서 목록을 추가했습니다.
+- 영어와 한국어 사용 방법, 개발 절차, 변경 기록을 추가했습니다.
+
+공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 저장소 루트의 [검증 기록](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.ko.md#records)에서 설명합니다. 여기서는 레지스트리 게시를 선언하지 않습니다.
+
+### go (packages/go)
+
+- `Marshal`이 nil `*Value`와 타입이 `MarshalJSON`을 구현하는 다른 nil 포인터를 `null`로 기록하고, 인터페이스는 그 안에 담긴 값으로 인코딩합니다. 이전에는 nil 포인터의 `MarshalJSON`을 호출해 `expected orderedjson Value` 오류를 반환했습니다.
+- `ParseError.Kind`가 공통 식별자로 거부 이유를 알립니다.
+- `ParseBytesBorrowed`의 패키지 테스트를 추가했습니다. 반환된 문자열은 호출자의 바이트가 바뀌어도 유지됩니다. 패키지는 공통 커버리지 검사를 위해 공개 심볼을 보고합니다.
+- 이스케이프하지 않은 제어 문자를 한 칸 뒤가 아니라 그 문자의 위치로 보고하며, 어댑터는 공통 비교를 위해 거부 위치를 보고합니다.
+- 파싱이 0 대신 첫 잘못된 UTF-8 시퀀스의 바이트 위치를 보고합니다.
+- `Marshal`이 `omitempty`와 `omitzero`를 각각의 규칙으로 적용해 host 인코더와 맞습니다. zero `time.Time`은 `omitempty`에서 유지되고 `omitzero`에서 빠집니다. 유한하지 않은 부동소수점은 파서에서 뒤늦게 실패하지 않고 해당 필드를 지목해 보고하며, `time.Time`이 자체 `MarshalJSON`을 가지므로 도달하지 않던 `time.Time` 분기를 제거했습니다. 시드 기반 무작위 테스트가 host 인코더와 해석된 구조를 비교합니다.
+- `Marshal`이 익명 구조체 필드를 버리지 않고 그 필드들을 펼쳐 넣고, 이름이 겹치는 필드는 중복 키를 만드는 대신 오류로 알리며, 파서의 중첩 한도에서 멈춰 순환 참조 값이 메모리를 소진하지 않고 오류를 반환합니다.
+- 파서 할당을 줄였습니다. 값은 문서 구분자 수로 크기를 정한 묶음 단위로 할당하고, 문자열 단위는 조회할 때 해석하며, 멤버가 8개 이하인 객체는 선형 키 조회를 사용하고, 무의미한 공백과 중복 키가 없는 값은 원문 토큰을 복사하여 compact 출력을 만듭니다. `ParseBytesBorrowed` 입력에서 `Compact`와 `StringValue`가 반환하는 텍스트는 복사합니다. 결과, 오류, 오프셋은 바뀌지 않았습니다.
+- 패키지 자체의 개발 절차, 변경 기록, Makefile, 문서 목록을 추가했습니다.
+- 영어와 한국어 사용 방법, 개발 절차, 변경 기록을 추가했습니다.
+- Go 모듈과 검사 어댑터 가져오기를 `github.com/polyspec/ordered-json/go`로 변경했습니다.
+
+공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 저장소 루트의 [검증 기록](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.ko.md#records)에서 설명합니다. 여기서는 레지스트리 게시를 선언하지 않습니다.
+
+### php (packages/php)
+
+- Composer 패키지는 `polyspec/ordered-json`, 네임스페이스는 `Polyspec\OrderedJson`으로 polyspec 관례를 따릅니다. 이전에는 `ordered-json/ordered-json`과 `OrderedJson`이었습니다. 제안하는 확장은 PIE 패키지 `polyspec/ordered-json-extension`입니다.
+- 패키지 테스트 실행기는 케이스를 실행하기 전에 케이스 id를, 실행한 뒤 `ok` 또는 `FAIL`과 경과 밀리초를 출력하므로, 검증기가 끝나지 않는 케이스의 이름을 보고할 수 있습니다. `--cases` 목록은 그 줄 없이 검사를 실행하고 케이스 id만 출력합니다.
+- 해석된 객체 키가 한 번씩만 나와야 하는 호출자를 위해 `Value::parseRejectDuplicates`를 추가합니다. 두 번째 키의 바이트 위치에 `duplicate_object_key` 종류의 `Duplicate object key` 오류를 보고하고, 두 backend 모두에서 PHP parser로 파싱하며, `Value::parse`는 바뀌지 않습니다.
+- `ParseError`가 자체 메시지와 함께 공통 거부 목록의 `kind`를 전합니다.
+- 패키지는 공통 커버리지 검사를 위해 공개 심볼을 보고하며, UTF-8 위치 헬퍼는 다른 헬퍼와 같이 내부용으로 표시했습니다.
+- 이스케이프하지 않은 제어 문자는 그 문자의 위치로, 잘못된 Unicode 이스케이프는 16진수가 아닌 첫 바이트의 위치로 보고하며, 어댑터는 공통 비교를 위해 거부 위치를 보고합니다.
+- 짝 없는 서로게이트가 다시 `UnexpectedValueException`을 발생시킵니다. 네임스페이스 안에서 수식하지 않은 이름이 존재하지 않는 `OrderedJson\UnexpectedValueException`으로 해석되어, `stringValue()`와 UTF-8 변환이 클래스를 찾을 수 없다는 오류를 냈습니다.
+- 조회 오류, UTF-16 단위, 멤버 조회, 팩토리 인자, 파싱 오류 위치, 낮은 PCRE 한도에서의 UTF-8 검증을 다루는 패키지 테스트를 추가하고 구현 등록 정보에 선언했습니다. 공통 사례는 어댑터를 통해서만 이 패키지에 닿아 그 표면을 다루지 않습니다.
+- 객체 하이드레이션이 키 토큰용 값을 따로 만들지 않습니다. 직렬화는 디스크립터에서 읽은 키 토큰과 멤버를 짝짓습니다.
+- PHP 컨테이너 직렬화를 `compact()`에서 private 메서드로 옮겨, 확장으로 직렬화할 때 호출 프레임이 작아졌습니다. 확장 직렬화 시간은 현재 조회 함수 변경 전의 0.92~0.95였습니다.
+- 확장이 로드되어 있으면 자식 값을 `ordered_json_hydrate()`로 만듭니다.
+- 조회 함수에서 디스크립터 테이프를 직접 읽고, 자식 값을 생성자 승격 없이 만들며, escape 문자열을 중간 UTF-16 단위 배열 없이 UTF-8로 해석하여 값 조회 비용을 줄였습니다.
+- `useNative` 파싱 옵션, `parseNative()`, 사용하지 않는 `stringify()` compact 인자를 제거했습니다. `parse()`는 확장이 로드돼 있으면 확장을 사용합니다.
+- PCRE backtrack 또는 recursion 한계가 매우 낮으면 올바른 입력을 거부하던 UTF-8 검증을 수정하고, 오프셋을 지역 변수로 전달하여 파서 부담을 줄였습니다.
+- 내부 디스크립터를 확장과 공유하는 정수 테이프로 변경했습니다. 파서는 공백, 숫자, 문자열 구간을 바이트 범위 함수로 검사하고, 문자열 단위는 조회할 때 해석하며, 무의미한 공백과 중복 키가 없는 값은 원문 토큰을 복사하여 직렬화합니다. 결과, 오류, 오프셋은 바뀌지 않았습니다.
+- 패키지 자체의 개발 절차, 변경 기록, Makefile, 문서 목록을 추가했습니다.
+- 영어와 한국어 사용 방법, 개발 절차, 변경 기록을 추가했습니다.
+- 네이티브 확장을 `php-extension` 패키지로 분리했으며 PHP 라이브러리는 독립적으로 사용할 수 있습니다.
+
+공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 저장소 루트의 [검증 기록](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.ko.md#records)에서 설명합니다. 여기서는 레지스트리 게시를 선언하지 않습니다.
+
+### php-ext (packages/php-ext)
+
+- PIE 패키지는 `polyspec/ordered-json-extension`, 오류 클래스는 `Polyspec\OrderedJson\NativeParseError`입니다. 이전에는 `ordered-json/ordered-json-extension`과 전역 클래스 `OrderedJsonNativeParseError`였습니다. hydration은 `Polyspec\OrderedJson\Value`를 만듭니다.
+- 패키지 테스트 실행기는 케이스를 실행하기 전에 케이스 id를, 실행한 뒤 `ok` 또는 `FAIL`과 경과 밀리초를 출력하므로, 검증기가 끝나지 않는 케이스의 이름을 보고할 수 있습니다. `--cases` 목록은 그 줄 없이 검사를 실행하고 케이스 id만 출력합니다.
+- `OrderedJsonNativeParseError`가 공통 거부 목록의 `kind`를 전합니다.
+- 패키지는 공통 커버리지 검사를 위해 함수, 상수, 오류 클래스를 보고합니다.
+- 이스케이프하지 않은 제어 문자를 한 칸 뒤가 아니라 그 문자의 위치로 보고합니다.
+- 디스크립터 API의 패키지 테스트를 추가하고 구현 등록 정보에 선언했습니다. 하이드레이션한 멤버와 항목, 반복·escape 멤버 이름, `ValueError`로 거부하는 잘못된 디스크립터, compact 토큰 복사, 지원하는 깊이 범위, 보고하는 파싱 오류 위치를 다룹니다. 공통 사례는 PHP Value API를 통해서만 확장에 닿으므로, 이 표면은 이 테스트로만 검증합니다.
+- `ordered_json_hydrate()`는 객체의 멤버만 반환하며 키 토큰용 값을 만들지 않습니다.
+- 디스크립터로 컨테이너의 자식 `OrderedJson\Value` 객체를 만들고 소스와 맞지 않는 디스크립터를 `ValueError`로 거부하는 `ordered_json_hydrate()`를 추가했습니다. 하이드레이션은 별도 파일 `hydrate.c`로 컴파일하며, 클래스 조회는 요청마다 한 번 캐시합니다.
+- `ordered_json_compact()`를 제거했습니다. PHP 라이브러리는 `ordered_json_compact_node()`로 직렬화합니다.
+- 연관배열 디스크립터를 정수 테이프로 교체하고, 별도 선검증 대신 문자열을 검사하면서 UTF-8을 검증하되 잘못된 UTF-8을 다른 오류보다 먼저 보고하며, compact 하위 트리를 한 번의 복사로 직렬화합니다. `ordered_json_compact_node`는 디스크립터 인덱스를 받고 소스와 맞지 않는 디스크립터를 `ValueError`로 거부합니다. 형식은 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.ko.md#php)에 설명합니다. 파싱 결과, 오류, 오프셋은 바뀌지 않았습니다.
+- macOS 번들 설정에서 누락된 배포 대상을 컴파일러로부터 구하고 사용하지 않는 동적 라이브러리 단일 모듈 플래그 검사를 제외합니다. 오래된 `-single_module` 및 `-undefined suppress` 링커 경고를 해결했습니다.
+- 패키지 자체의 개발 절차, 변경 기록, Makefile, 문서 목록을 추가했습니다.
+- 영어와 한국어 사용 방법, 개발 절차, 변경 기록을 추가했습니다.
+- PIE `php-ext` 메타데이터, `src` 빌드 경로, 기본 활성화된 단독 빌드를 추가했습니다.
+
+공통 JSON 동작은 유지합니다. `make check`로 검증 기록을 생성하며 통합 근거는 저장소 루트의 [검증 기록](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.ko.md#records)에서 설명합니다. 여기서는 레지스트리 게시를 선언하지 않습니다.

@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 78e3ea84e158c13199bfc0c926444648baf9d77cbb636b75b5895c9f7582b46c -->
+<!-- source-sha256: 45fe53ecce3f2a5b342f0e2c9ff51b48a40641dc8e0331eb887e03954b2e9e8b -->
 # Development procedure
 
 [English](AGENTS.md)
@@ -137,3 +137,63 @@
   Enforced by: none, 산문의 정확성은 어떤 도구도 판단할 수 없는 판단 사항입니다.
 - Git 메시지는 사실에 맞고 간결하게 쓰며, 관계없는 변경은 따로 commit합니다.
   Enforced by: `make commits-check`
+
+<a id="package-npm"></a>
+## 패키지 npm (packages/js)
+
+- 패키지 `@polyspec/ordered-json`은 `make ordered-json-js-check`로 이 패키지만 검사합니다. 이 target은 `make verify-js`(`scripts/verify.mts --only js`)를 실행해 어댑터를 공통 사례와 비교하며 기록을 쓰지 않습니다. 패키지 테스트는 `make parity-check`가 실행하는 native node:test 파일입니다.
+  Enforced by: `make parity-check`
+- 패키지는 독립 기대값을 두지 않습니다. 공식 사례와 기대 결과는 저장소 루트에 있으며, 동작을 바꿀 때는 패키지보다 먼저 공통 명세를 고칩니다.
+  Enforced by: `make verify-all`
+- 패키지의 변경은 [CHANGELOG.ko.md](CHANGELOG.ko.md)의 이 패키지 절에 적고, 문서는 다른 문서와 함께 검사합니다.
+  Enforced by: `make docs-check`
+
+<a id="package-rust"></a>
+## 패키지 rust (packages/rust)
+
+- crate는 `make ordered-json-rust-check`로 이 패키지만 검사하며, 이 target은 `make verify-rust`를 실행합니다. `make lint-rust`(`-D warnings`를 붙인 clippy)가 lint합니다. crate는 `packages/rust/Cargo.lock`에 고정된 버전이며, `make install`이 내려받고 검사는 내려받지 않습니다.
+  Enforced by: `make cargo-downloads-check`
+- 패키지 테스트는 `make parity-check`가 선언된 unit과 함께 실행하는 crate의 native 테스트입니다.
+  Enforced by: `make parity-declarations-check`
+- crate의 변경은 [CHANGELOG.ko.md](CHANGELOG.ko.md)의 이 패키지 절에 적습니다.
+  Enforced by: `make docs-check`
+
+<a id="package-go"></a>
+## 패키지 go (packages/go)
+
+- module은 `make ordered-json-go-check`로 이 패키지만 검사하며, 이 target은 `make verify-go`를 실행합니다. `make lint-go`(`.golangci.yml`을 쓰는 golangci-lint와 deadcode)가 lint합니다. `GOTOOLCHAIN`은 `local`이며, module은 `mise.toml`의 Go release를 요구합니다.
+  Enforced by: `make toolchain-check`
+- 패키지 테스트는 `make parity-check`가 선언된 unit과 함께 실행하는 코드 옆의 Go 테스트입니다.
+  Enforced by: `make parity-declarations-check`
+- module의 변경은 [CHANGELOG.ko.md](CHANGELOG.ko.md)의 이 패키지 절에 적습니다.
+  Enforced by: `make docs-check`
+
+<a id="package-php"></a>
+## 패키지 php (packages/php)
+
+- Composer 패키지는 `make ordered-json-php-check`로 이 패키지만 검사하며, 이 target은 `make verify-php`를 실행합니다. `make lint-php`(phpcs와 PHPStan)가 lint합니다. `composer.lock`은 platform `8.4.1`로 잠기고 PHP `>=8.4`를 요구하며, manifest가 바뀌면 `composer update --lock`으로 다시 잠급니다.
+  Enforced by: `make dependency-policy-check`
+- 패키지 테스트는 `packages/php/tests`의 PHPUnit 테스트이며, `make install`이 설치하고 `make parity-check`가 선언된 unit과 함께 실행합니다.
+  Enforced by: `make parity-check`
+- 패키지의 변경은 [CHANGELOG.ko.md](CHANGELOG.ko.md)의 이 패키지 절에 적습니다.
+  Enforced by: `make docs-check`
+
+<a id="package-php-ext"></a>
+## 패키지 php-ext (packages/php-ext)
+
+- extension은 `make ordered-json-php-ext-check`로 이 패키지만 검사하며, 이 target은 `make verify-php-extension`을 실행합니다. `make php-extension`이 `packages/php-ext/src/modules/ordered_json.so`를 제자리에서 빌드하고 바뀐 것만 다시 빌드하며, `make parity-check`가 이를 불러옵니다.
+  Enforced by: `make parity-check`
+- `composer.lock`은 platform `8.4.1`로 잠기고 PHP `>=8.4`를 요구합니다. PHP 패키지와 같으며, manifest가 바뀌면 `composer update --lock`으로 다시 잠급니다.
+  Enforced by: `make dependency-policy-check`
+- extension의 변경은 [CHANGELOG.ko.md](CHANGELOG.ko.md)의 이 패키지 절에 적습니다.
+  Enforced by: `make docs-check`
+
+<a id="package-python"></a>
+## 패키지 python (packages/python)
+
+- 패키지는 `make ordered-json-python-check`로 이 패키지만 검사하며, 이 target은 `make verify-python`을 실행합니다. `make lint-python`(`ruff.toml`을 쓰는 ruff와 `packages/python/vulture_whitelist.py`를 쓰는 vulture)이 lint합니다. `make install-packages`가 `packages/python/.venv`에 editable로 설치하며, 테스트가 이를 씁니다.
+  Enforced by: `make lint-python`
+- 패키지 테스트는 `packages/python/tests`의 unittest 테스트이며, `make parity-check`가 선언된 unit과 함께 실행합니다.
+  Enforced by: `make parity-declarations-check`
+- 패키지의 변경은 [CHANGELOG.ko.md](CHANGELOG.ko.md)의 이 패키지 절에 적습니다.
+  Enforced by: `make docs-check`

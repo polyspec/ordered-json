@@ -136,3 +136,63 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
   Enforced by: none, the accuracy of prose is a judgement that no tool makes.
 - Git messages are factual and concise, and unrelated changes are committed separately.
   Enforced by: `make commits-check`
+
+<a id="package-npm"></a>
+## Package npm (packages/js)
+
+- The package `@polyspec/ordered-json` is checked alone by `make ordered-json-js-check`, which runs `make verify-js` (`scripts/verify.mts --only js`) and compares its adapter with the shared cases and writes no record. Its package tests are native node:test files that `make parity-check` runs.
+  Enforced by: `make parity-check`
+- The package keeps no independent goldens: official cases and expected results belong to the repository root, and a behavior change updates the common specification before the package.
+  Enforced by: `make verify-all`
+- The changes of the package are listed in its section of [CHANGELOG.md](CHANGELOG.md), and its documents are checked with the others.
+  Enforced by: `make docs-check`
+
+<a id="package-rust"></a>
+## Package rust (packages/rust)
+
+- The crate is checked alone by `make ordered-json-rust-check`, which runs `make verify-rust`, and linted by `make lint-rust` (clippy with `-D warnings`). Its crates are the locked versions of `packages/rust/Cargo.lock`, which `make install` downloads; no check downloads them.
+  Enforced by: `make cargo-downloads-check`
+- Its package tests are the native tests of the crate that `make parity-check` runs with their declared units.
+  Enforced by: `make parity-declarations-check`
+- The changes of the crate are listed in its section of [CHANGELOG.md](CHANGELOG.md).
+  Enforced by: `make docs-check`
+
+<a id="package-go"></a>
+## Package go (packages/go)
+
+- The module is checked alone by `make ordered-json-go-check`, which runs `make verify-go`, and linted by `make lint-go` (golangci-lint with `.golangci.yml`, and deadcode). `GOTOOLCHAIN` is `local`, and the module requires the Go release of `mise.toml`.
+  Enforced by: `make toolchain-check`
+- Its package tests are the Go tests beside the code that `make parity-check` runs with their declared units.
+  Enforced by: `make parity-declarations-check`
+- The changes of the module are listed in its section of [CHANGELOG.md](CHANGELOG.md).
+  Enforced by: `make docs-check`
+
+<a id="package-php"></a>
+## Package php (packages/php)
+
+- The Composer package is checked alone by `make ordered-json-php-check`, which runs `make verify-php`, and linted by `make lint-php` (phpcs and PHPStan). Its `composer.lock` is locked to the platform `8.4.1` and requires PHP `>=8.4`, and is re-locked with `composer update --lock` when its manifest changes.
+  Enforced by: `make dependency-policy-check`
+- Its package tests are the PHPUnit tests of `packages/php/tests` that `make parity-check` runs with their declared units, installed by `make install`.
+  Enforced by: `make parity-check`
+- The changes of the package are listed in its section of [CHANGELOG.md](CHANGELOG.md).
+  Enforced by: `make docs-check`
+
+<a id="package-php-ext"></a>
+## Package php-ext (packages/php-ext)
+
+- The extension is checked alone by `make ordered-json-php-ext-check`, which runs `make verify-php-extension`. `make php-extension` builds `packages/php-ext/src/modules/ordered_json.so` in place and rebuilds what changed, and `make parity-check` loads it.
+  Enforced by: `make parity-check`
+- Its `composer.lock` is locked to the platform `8.4.1` and requires PHP `>=8.4`, the same as the PHP package, and is re-locked with `composer update --lock` when its manifest changes.
+  Enforced by: `make dependency-policy-check`
+- The changes of the extension are listed in its section of [CHANGELOG.md](CHANGELOG.md).
+  Enforced by: `make docs-check`
+
+<a id="package-python"></a>
+## Package python (packages/python)
+
+- The package is checked alone by `make ordered-json-python-check`, which runs `make verify-python`, and linted by `make lint-python` (ruff with `ruff.toml`, and vulture with `packages/python/vulture_whitelist.py`). `make install-packages` installs it editable into `packages/python/.venv`, which its tests use.
+  Enforced by: `make lint-python`
+- Its package tests are the unittest tests of `packages/python/tests` that `make parity-check` runs with their declared units.
+  Enforced by: `make parity-declarations-check`
+- The changes of the package are listed in its section of [CHANGELOG.md](CHANGELOG.md).
+  Enforced by: `make docs-check`

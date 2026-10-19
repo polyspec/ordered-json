@@ -1,5 +1,5 @@
 <!-- doc-id: php-ext-overview -->
-<!-- source-sha256: a609a2c7ed5a9cebaf83a488c9f5c56067830cd6ea04683c98705d464d0176d7 -->
+<!-- source-sha256: fe5eb6c0da7e4480e356fadb924f63977c1b8fffc2117f46dabb20882c4940d4 -->
 # ordered-json for PHP extension
 
 [English](README.md)
@@ -45,4 +45,4 @@ make check
 
 루트 검증기를 호출하여 이 패키지를 검사합니다. 루트 통합 검사는 같은 소스 리비전의 모든 패키지를 검사하고 현재 결과를 그 실행의 기록인 `var/records/verification.json`에 기록합니다.
 
-추가 사례는 `make check JSON_TEST_SUITE=/path/to/JSONTestSuite`로 검사합니다. [개발 절차](AGENTS.ko.md)와 [변경 기록](CHANGELOG.ko.md)에 필수 검사와 변경 사항이 있습니다.
+추가 사례는 `make check JSON_TEST_SUITE=/path/to/JSONTestSuite`로 검사합니다. [개발 절차](../../AGENTS.ko.md#package-php-ext)와 [변경 기록](../../CHANGELOG.ko.md)에 필수 검사와 변경 사항이 있습니다.

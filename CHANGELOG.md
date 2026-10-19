@@ -6,15 +6,37 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The packages keep no AGENTS, CHANGELOG or Makefile (T2.2): each package has a section in the root `AGENTS.md` and `CHANGELOG.md`, its check and test are targets of the root Makefile (`ordered-json-<package>-check` and `ordered-json-<package>-test`), and the layout exception of `config/layout.yml` is removed. The PHP platform of every Composer manifest is 8.4.1 and the Composer locks are locked again. The recipes that the Makefile lost in T2.1 are restored (`verify-*`, `verify-all`, `typecheck`, `evidence-check`, `release-config-check`, `pie-check`, `benchmark`, `benchmark-check`, `ordered-json-test-scripts` and `ordered-json-install-external`). The checklist has the parent row T1.29, and the comparison product is no longer named in the changelogs and the checklist.
 - The repository follows the kit standard 0.0.54 (T2.1): the execution checklist moves to `docs/plans/execution/`, the documents and the test folder move to the folders of the layout (`docs/operations/documentation-plan.md`, `docs/operations/proposals.md`, `packages/js/tests`), `install` runs the bootstrap of kit as `install-kit` before `ordered-json-install`, the workflow `.github/workflows/gates.yml` is vendored from kit, and the comparison tools with another project are removed with their report.
 - T1.58: AGENTS points to the local links of kit `docs/plans/local-links.md`: while polyspec versions are 0.0.x, development checkouts link installed polyspec packages to their source, and links are never committed.
 - T1.57: the shared tools are `@polyspec/kit` 0.0.53.
 - T1.56: the shared tools are `@polyspec/kit` 0.0.52: `.php-version` declares the PHP 8.5 that every workflow sets up, and the release workflow runs `make kit-check` before any release step (kit K193).
 - T1.55: the shared tools are `@polyspec/kit` 0.0.50: knip reads the binaries that the scripts and tests run from `binaries` of `config/knip-entries.json` (kit K176), and `make dependency-policy-check` checks the root `composer.json` with its committed `composer.lock`, which locks no package, as it checks every Composer manifest of the checkout (kit K181).
 - T1.54: the Composer locks of `packages/php` and `packages/php-ext` are current again: the version 0.0.9 of T1.50 changed the content hash of both manifests without a new lock. `config/dependency-policy.json` declares both Composer projects with PHP 8.5.0, so `make dependency-policy-check` fails on a lock that `composer validate --strict` finds stale and reviews their PHPUnit and their locks; both locks keep every package version.
-- T1.53: `make lint-python`, the ruff and vulture of kit, runs in the full suite and in the docs job of CI; the probe of PyPI ojson in `scripts/comparison` no longer changes `sys.path` (S3): `make install-comparison` installs ojson 0.1.0 into the virtual environment `.cache/comparison/ojson-venv`, whose Python `scripts/compare-ojson.mts` runs the probe with (`--python` replaces `--python-package`).
+- T1.53: `make lint-python`, the ruff and vulture of kit, runs in the full suite and in the docs job of CI; the comparison probe in `scripts/comparison` no longer changes `sys.path` (S3), and its environment installs the package with the uv of `mise.toml` and runs the probe with its Python (`--python`).
 - T1.52: `make lint-php`, the phpcs and PHPStan of kit, runs in the full suite and in the suite job of CI; `make install-php` installs the root package into `vendor/`, whose autoloader PHPStan reads for the PHP of `benchmarks/`, and the PHP of the packages, the tests and the benchmarks follows PSR-12, the probe of the shared verifier reading its serializations from `Polyspec\OrderedJson\Tests\ProbeTree`.
 - T1.51: the shared tools are `@polyspec/kit` 0.0.48: the checkout runs the Node.js 26.12.0 of `mise.toml` from `var/tools`, `.node-version` is gone and every `engines.node` is `>=26.12.0` (kit K171); the workflows pin each action by its SHA with its version (kit K169); the scripts and tests read JSON through schemas and check the values that they read instead of asserting them (kit K155–K158).
+
+### npm (packages/js)
+
+- Text input with an unpaired surrogate is rejected with `unescaped_lone_surrogate` at the offset of the surrogate, before the grammar is read; it named the unit after the surrogate, and a surrogate after the root was `trailing_input` (T1.39).
+
+### python (packages/python)
+
+- The parser reads a document in one pass of compiled `re` patterns, one match per member, item or root value,
+  and decodes member names and `string_value()` with `bytes.decode` and `json.decoder.scanstring` (T1.41). On 50,000
+  flat objects its CPU time fell from 4.44 to 2.34-2.94 times the pure PHP parser; results and error offsets are
+  unchanged.
+
+- `parse_bytes` validates UTF-8 with `bytes.decode('utf-8')` instead of a byte-by-byte check in Python (T1.35). The
+  rejection is `invalid_utf8` at the
+  `start` of the `UnicodeDecodeError`, the same offset as before, and the `ParseError` is raised from that error.
+
+- The package implements the shared JSON contract (T1.27-2): `parse` and `parse_bytes` read text and UTF-8 bytes,
+  `stringify` and `Value.compact()` serialize, `Value` exposes the accessors and factories, and `ParseError` reports
+  the shared rejection kinds at UTF-8 byte offsets, with `max_depth` and `reject_duplicates` following the JavaScript
+  binding. The package tests run the standard cases and its own cases, and the registry, the package test standard
+  and the owner map of the repository cover the package.
 
 ## 0.0.9
 
@@ -23,7 +45,7 @@
 - T1.46: `make lint-ts`, the oxlint and knip of kit, runs in the full suite and in the docs job of CI; `config/knip-entries.json` declares the JavaScript probe `packages/js/test/probe.mjs`, which the shared verifier runs, as an entry of knip (kit K145).
 - T1.47: the shared tools are `@polyspec/kit` 0.0.44: `make install-tools` installs the Rust toolchain of `rust-toolchain.toml`, which the docs job of CI lacked, ruff keeps its cache in `var/ruff`, and `config/layout.yml` adds `composer.json` and `external-inputs.json` to the root files of kit instead of repeating its list (kit K145, K147, K150, K151).
 - T1.45: the shared tools are `@polyspec/kit` 0.0.43: parity reads the trials of libtest-mimic and the data sets of a PHPUnit test method, `no-floating-promises` allows the registrations of node:test, API Extractor no longer reports `ae-missing-release-tag`, and knip takes its entries from the layout.
-- T1.42: the repository tools are TypeScript (S9): the shared verifier (`scripts/verify.mts` with its registry, reference and records), the evidence, PIE, external-input and comparison checks and the benchmark runner run with Node.js, are checked by `make typecheck`, and their tests are node tests of `tests/scripts` (`make test-scripts`). The independent reference reads JSON with momoa. The package tests left the verifier for the native runners of kit parity, kit's `lint-rust` and `lint-go` replace `scripts/lint.py`, and the job `python` of CI is gone. The package folders are read from `config/parity.json` and the fixture folder from the registry; the only Python left of the tools is the probe of the Python library ojson in `scripts/comparison`, an exception of S9 with its reason.
+- T1.42: the repository tools are TypeScript (S9): the shared verifier (`scripts/verify.mts` with its registry, reference and records), the evidence, PIE, external-input and comparison checks and the benchmark runner run with Node.js, are checked by `make typecheck`, and their tests are node tests of `tests/scripts` (`make test-scripts`). The independent reference reads JSON with momoa. The package tests left the verifier for the native runners of kit parity, kit's `lint-rust` and `lint-go` replace `scripts/lint.py`, and the job `python` of CI is gone. The package folders are read from `config/parity.json` and the fixture folder from the registry; the only Python left of the tools is the probe of a Python library in `scripts/comparison`, an exception of S9 with its reason.
 - T1.39: every unit runs in each implementation of its profile, with no exclusion. `ordered_map_rejects_non_string_key` runs in JavaScript too and shares the profile `no-php` with the byte input, since PHP arrays key by string or integer; `utf8_validation_holds_for_long_multibyte_text` (formerly `utf8_validation_survives_low_pcre_limits`) runs in every implementation, PHP under low PCRE limits; `text_input_rejects_lone_surrogates` and the new `string_value_keeps_an_unpaired_surrogate` form the profile `utf16-text` of JavaScript and Python. JavaScript text input with an unpaired surrogate is rejected before its grammar, at the offset of the surrogate instead of the unit after it, and a surrogate after the root is `unescaped_lone_surrogate` instead of `trailing_input`, as in Python.
 - T1.43: `config/parity.json` binds every API unit to the public symbol of JavaScript that the TypeScript extractor of kit reads from `packages/js/index.d.ts`, as the tables of the API contract name them (the compact output and the UTF-16 construction and lookup are `stringify`, `Value.string` and `get`), and declares the JavaScript-only symbols `Kind`, `ParseOptions`, `rejectDuplicates`, `keys`, `toJSON` and `toString` as native-only with their reasons.
 - T1.38: the package tests run with the native runners that kit parity runs, each test bound to its unit of `config/parity.json`: JavaScript with node:test (`packages/js/test/api.test.mjs`, `official.test.mjs`), Python with unittest in `packages/python/.venv`, which `make install-python` makes (`tests/test_api.py`, `test_official.py`), and PHP with PHPUnit 13.4.2, which `make install-php` installs into `packages/php` and `packages/php-ext` (`ValueApiTest` of both backends from `ValueApiTestCase`, `DescriptorTest`, `ValueClassTest`); `make php-extension` builds the extension in place for `make parity-check`. Every implementation runs the official examples natively, one case per example: JavaScript and Python by their package tests, Go by `TestOfficial`, Rust by the trials of libtest-mimic 0.8.2 in `tests/official.rs` (`official::<id>`), and PHP by the data sets of `testCase` of `OfficialTestCase`, which `OfficialTest` of each backend runs. The PHP classes `Value`, `ParseError`, `Tape` and `Parser` load by PSR-4 from a file each, the functions and `MAX_DEPTH` by `files` (S2), and the release smoke of the wheel requires its `py.typed` marker.
@@ -149,6 +171,33 @@
   of the section. `test_release` covers a section over the limit, with and without an `<a id>` anchor, and a section
   of exactly the limit.
 
+### npm (packages/js)
+
+- Release 0.0.3 of the repository; the package has no change since 0.0.2.
+
+
+### rust (packages/rust)
+
+- Release 0.0.3 of the repository; the package has no change since 0.0.2.
+
+
+### go (packages/go)
+
+- Release 0.0.3 of the repository; the package has no change since 0.0.2.
+
+
+### php (packages/php)
+
+- `composer.json` declares `version`, so a Composer artifact repository of the release zips reads the package
+  (T1.24).
+
+
+### php-ext (packages/php-ext)
+
+- `composer.json` declares `version`, so a Composer artifact repository of the release zips reads the package
+  (T1.24).
+
+
 <a id="0-0-2"></a>
 ## 0.0.2
 
@@ -178,6 +227,31 @@
 - Each workflow declares its triggers exactly (T1.20): `ci.yml` runs on `pull_request`, `merge_group` and
   `workflow_dispatch`, and `push-gate.yml` on `push` with `branches-ignore: ['gh-readonly-queue/**']`,
   `pull_request` and `merge_group`. `test_workflow_rules` fails when the `on:` block of a workflow differs.
+
+### npm (packages/js)
+
+- Release 0.0.2 of the repository; the package has no change since 0.0.1.
+
+
+### rust (packages/rust)
+
+- Release 0.0.2 of the repository; the package has no change since 0.0.1.
+
+
+### go (packages/go)
+
+- Release 0.0.2 of the repository; the package has no change since 0.0.1.
+
+
+### php (packages/php)
+
+- Release 0.0.2 of the repository; the package has no change since 0.0.1.
+
+
+### php-ext (packages/php-ext)
+
+- Release 0.0.2 of the repository; the package has no change since 0.0.1.
+
 
 <a id="0-0-1"></a>
 ## 0.0.1
@@ -353,9 +427,9 @@
   `scripts/check.py`, which does not exist; they run `../scripts/verify.py --only js` and
   `--only php`. The cases of the new `scripts/tests/test_failure_messages.py` failed before the
   change, because each message lacked the named lines, files, values or error, and pass after it.
-- `benchmarks/run.py` and `scripts/compare_ojson.py` publish their results through `write_record`,
+- `benchmarks/run.py` and the comparison script publish their results through `write_record`,
   which renames a complete file over the result. They wrote `benchmarks/results.json`, the review
-  copy `.cache/benchmark.current.json` and `docs/reports/ojson-comparison.json` in place, so a
+  copy `.cache/benchmark.current.json` and the comparison report in place, so a
   process that stopped after opening the file left it truncated, and a reader could see part of it.
   `write_record` stages a file inside the repository in `var/`, which Git ignores and no manifest
   reads, instead of a hidden file next to the record in `docs/`. The two interruption cases of the
@@ -481,7 +555,7 @@
 - Each verification run builds in its own temporary run directory and removes it at the end.
   `make check`, `scripts/verify.py`, the PIE check and the benchmark build the PHP extension
   from a copy of the `php-extension/` source files there, the Go probe is written there, PIE
-  works there, and the ojson comparison compiles its Erlang modules there. The extension was
+  works there, and the comparison compiles its Erlang modules there. The extension was
   built in `php-extension/src` with `make distclean`, `phpize` and `configure`, and the Go probe,
   the PIE work directory and the Erlang modules used fixed paths under `.cache/`, so two runs of
   one checkout cleaned or replaced each other's build output while the other run used it. The
@@ -490,7 +564,7 @@
   directory. The ignored output of the former in-place builds (the `phpize`, `configure` and
   `make` files and `modules/` in `php-extension/src`, `.cache/probes` and `.cache/pie-check`) was
   removed from the checkout, since no command reads it.
-- The ojson comparison streams the Erlang compile output with its exit status and elapsed time,
+- The comparison streams the Erlang compile output with its exit status and elapsed time,
   and sends each project one case at a time with the shared 60 s reply deadline, printing each
   case with its elapsed time. The compile had a 45 s limit and each project run one 60 s limit
   for all cases, so a slow compile or a slow whole run failed by the clock, and nothing was
@@ -606,10 +680,109 @@
 - Added English canonical documents and paired Korean translations for specifications, APIs, feature state, operations, examples, and development procedure.
 - Added `make check` and `make docs-check`. Checks validate document registration, links, translation revisions, section/code parity, feature state, and current verification evidence. Verification records now include the actual source hashes, runtime versions, and common test results.
 - Rebuild the PHP extension from clean phpize outputs because copied read-only build files prevented repeated setup. Build error diagnostics now stop verification even when the tool returns a zero exit status.
-- Moved the requested ojson comparison into `docs/reports/` and normalized compiler diagnostic paths to source-relative paths.
+- Moved the requested comparison into `docs/reports/` and normalized compiler diagnostic paths to source-relative paths.
 - Changed JSON objects to ordered associative maps. Duplicate keys now overwrite the value while retaining the first key position, so each decoded key has one value. Removed the duplicate lookup and member-list APIs. Default serialization now emits the associative object; source inspection remains available separately.
 - Added JavaScript, Rust, Go, pure PHP, and PHP extension implementations with strict parsing, recursive document order, exact number tokens, and construction APIs.
 - Centralized official inputs and expected results in [official.json](examples/official.json), with shared grammar fixtures and optional supplementary inputs.
 - Verified every implementation with 433 shared cases. The PIE-built artifact also passed all 433 cases; 42 checker tests passed. That earlier run recorded two PHP build-tool linker deprecation warnings in its verification record.
 
 The current verification record identifies the tested source and results for all five implementations and the documentation checker tests. Distribution observations are separate. This entry records development changes and does not declare a package release.
+
+### npm (packages/js)
+
+- The npm package is `@polyspec/ordered-json`, the polyspec convention; it was `ordered-json`.
+- The package test runner writes each case id before the case runs and `ok` or `FAIL` with the elapsed milliseconds after it, with synchronous writes, so the verifier can name a case that does not end. Unreachable code after the run that listed the cases a second time is removed.
+- Add the `rejectDuplicates` parse option for callers that require every decoded object key to occur once. It reports `Duplicate object key` with kind `duplicate_object_key` at the second key's UTF-16 offset, requires a boolean, and keeps the default parse unchanged. `ParseOptions` lists each field on its own line so the package reports both fields for the coverage check.
+- `ParseError` carries a `kind` from the shared rejection list beside its own message.
+- Removed the `StringifyOptions` declaration and the second `stringify` parameter from the type declaration; the function takes one argument. The package reports its public symbols for the shared coverage check.
+- An unescaped control character is reported at its own offset instead of one past it, and the adapter reports the rejection position for the shared comparison.
+- `parseBytes` reports the byte offset of the first invalid byte instead of 0, and the message names the unit because this error has no UTF-16 position.
+- Added package tests for the value API and declared them in the implementation registry: construction guards, frozen item and key arrays, a fresh member map per access, wrong-kind access, key type checking, option validation, `parseBytes` input checks, UTF-16 parse offsets, code units for unpaired surrogates, and factory arguments. Shared cases reach this package through its adapter and do not cover that surface.
+- Stopped calling `Object.freeze` on each parsed `Value`; private fields keep values unmodifiable through the API, and `items` and `keys` arrays remain frozen.
+- Removed the unused `stringify()` options argument.
+- Reduced parser and serializer overhead: values use a private-field brand check instead of a `WeakSet` registry, unescaped strings are sliced from the source, object key tokens are created on access, and values without insignificant whitespace or duplicate keys serialize as their source token. Results, errors, and offsets are unchanged.
+- Added the package's own development procedure, changelog, Makefile and documentation manifest.
+- Added English and Korean usage, development, and change records.
+
+Common JSON behavior is unchanged. Verification records are generated by `make check`; aggregate evidence is described in the [verification records](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.md#records) of the repository root. Registry publication is not declared here.
+
+### rust (packages/rust)
+
+- The Cargo package is `polyspec-ordered-json` and the library `polyspec_ordered_json`, the polyspec convention;
+  they were `ordered-json` and `ordered_json`.
+- Pin the Serde binding dependencies to the verified versions because raw JSON values use the
+  Serde JSON token protocol.
+- Set Rust minimum to 1.71 to match the current JSON test dependency.
+- Add Serde typed encoding and decoding. Struct fields retain declaration order; wire and
+  manifest fixtures fix the bytes, embedded `Value` fields retain object order and number
+  tokens, and invalid or unconsumed input fails.
+- Add `parse_bytes_reject_duplicates` for callers that require every decoded object key to
+  occur once. It returns the second key's byte offset and keeps the normal parser unchanged.
+- `Error::kind` names the rejection with the shared identifier.
+- Package tests call `OrderedMap::iter` and `stringify`, and the package reports its public symbols for the shared coverage check.
+- An invalid escape is reported at the escape character instead of one byte past it, and the adapter reports the rejection position for the shared comparison.
+- Added package tests for the value API and declared them in the implementation registry: the depth argument bound, `parse_bytes` UTF-8 offsets, `OrderedMap` key validation and repeated keys, member lookup by decoded name, unpaired surrogate units, constructor arguments, and wrong-kind access. Shared cases reach this package through its adapter and do not cover that surface.
+- Root arrays take the pending item stack instead of copying every item; spare capacity above one quarter of the length is released.
+- Reduced parser allocations: each value stores a kind-specific payload instead of an empty map, item vector, and unit vector; string units are decoded on first access; objects keep one entry list and build a hash index above eight members; values without insignificant whitespace or duplicate keys compact by copying their source token. Results, errors, and offsets are unchanged. The derived `Debug` output of `Value` and `OrderedMap` reflects the new internal fields.
+- Added the package's own development procedure, changelog, Makefile and documentation manifest.
+- Added English and Korean usage, development, and change records.
+
+Common JSON behavior is unchanged. Verification records are generated by `make check`; aggregate evidence is described in the [verification records](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.md#records) of the repository root. Registry publication is not declared here.
+
+### go (packages/go)
+
+- `Marshal` writes `null` for a nil `*Value` and for any other nil pointer whose type implements `MarshalJSON`, and encodes an interface as the value it holds. It previously called `MarshalJSON` on the nil pointer and returned `expected orderedjson Value`.
+- `ParseError.Kind` names the rejection with the shared identifier.
+- Added a package test for `ParseBytesBorrowed`: text handed back survives a change to the caller's bytes. The package reports its public symbols for the shared coverage check.
+- An unescaped control character is reported at its own offset instead of one past it, and the adapter reports the rejection position for the shared comparison.
+- Parsing reports the byte offset of the first invalid UTF-8 sequence instead of 0.
+- `Marshal` applies `omitempty` and `omitzero` as separate rules, matching the host encoder: a zero `time.Time` stays under `omitempty` and is dropped under `omitzero`. Non-finite floats report the field that holds them instead of failing later in the parser, and the unreachable `time.Time` branch is removed because `time.Time` carries its own `MarshalJSON`. A seeded randomized test compares decoded structures with the host encoder.
+- `Marshal` now contributes the fields of anonymous struct fields instead of dropping them, reports a repeated field name as an error instead of emitting a duplicate key, and stops at the parser's nesting limit so a cyclic value returns an error instead of exhausting memory.
+- Reduced parser allocations: values are allocated in chunks sized from document separators, string units are decoded on access, objects with up to eight members use linear key lookup, and values without insignificant whitespace or duplicate keys compact by copying their source token. Text returned by `Compact` and `StringValue` for `ParseBytesBorrowed` input is copied. Results, errors, and offsets are unchanged.
+- Added the package's own development procedure, changelog, Makefile and documentation manifest.
+- Added English and Korean usage, development, and change records.
+- Updated the Go module and probe import to `github.com/polyspec/ordered-json/go`.
+
+Common JSON behavior is unchanged. Verification records are generated by `make check`; aggregate evidence is described in the [verification records](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.md#records) of the repository root. Registry publication is not declared here.
+
+### php (packages/php)
+
+- The Composer package is `polyspec/ordered-json` and the namespace is `Polyspec\OrderedJson`, the polyspec convention; they were `ordered-json/ordered-json` and `OrderedJson`. The suggested extension is the PIE package `polyspec/ordered-json-extension`.
+- The package test runner writes each case id before the case runs and `ok` or `FAIL` with the elapsed milliseconds after it, so the verifier can name a case that does not end. The `--cases` listing runs the checks without those lines and prints case ids only.
+- Add `Value::parseRejectDuplicates` for callers that require every decoded object key to occur once. It reports `Duplicate object key` with kind `duplicate_object_key` at the second key's byte offset, parses with the PHP parser in both backends, and keeps `Value::parse` unchanged.
+- `ParseError` carries a `kind` from the shared rejection list beside its own message.
+- The package reports its public symbols for the shared coverage check; the UTF-8 offset helper is marked internal like the other helpers.
+- An unescaped control character is reported at its own offset, an invalid Unicode escape at the first byte that is not a hex digit, and the adapter reports the rejection position for the shared comparison.
+- An unpaired surrogate raises `UnexpectedValueException` again. Inside the namespace the unqualified name resolved to a missing `OrderedJson\UnexpectedValueException`, so `stringValue()` and UTF-8 conversion raised a class-not-found error instead.
+- Added package tests for accessor errors, UTF-16 units, member lookup, factory arguments, parse error offsets, and UTF-8 validation under low PCRE limits, and declared them in the implementation registry. Shared cases reach this package through its adapter and do not cover that surface.
+- Object hydration no longer creates a second value for each key token; serialization pairs members with key tokens read from the descriptor.
+- Moved PHP container serialization out of `compact()` into a private method, so serializing with the extension uses a smaller call frame. Extension stringify took 0.92-0.95 of the time before the current accessor changes.
+- Child values are created by `ordered_json_hydrate()` when the extension is loaded.
+- Reduced value access cost by reading the descriptor tape directly in accessors, creating child values without a promoted constructor, and decoding escaped strings to UTF-8 without an intermediate UTF-16 unit array.
+- Removed the `useNative` parse option, `parseNative()`, and the unused `stringify()` compact flag; `parse()` uses the extension when it is loaded.
+- Fixed UTF-8 validation that rejected valid input under very low PCRE backtrack or recursion limits, and reduced parser overhead by passing offsets through local variables.
+- Changed the internal descriptor to the integer tape shared with the extension. The parser scans whitespace, digits, and string runs with byte-span functions, string units are decoded on access, and values without insignificant whitespace or duplicate keys serialize by copying their source token. Results, errors, and offsets are unchanged.
+- Added the package's own development procedure, changelog, Makefile and documentation manifest.
+- Added English and Korean usage, development, and change records.
+- Moved the native extension to the `php-extension` package; the PHP library remains independently usable.
+
+Common JSON behavior is unchanged. Verification records are generated by `make check`; aggregate evidence is described in the [verification records](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.md#records) of the repository root. Registry publication is not declared here.
+
+### php-ext (packages/php-ext)
+
+- The PIE package is `polyspec/ordered-json-extension`, and the error class is `Polyspec\OrderedJson\NativeParseError`; they were `ordered-json/ordered-json-extension` and the global class `OrderedJsonNativeParseError`. Hydration creates `Polyspec\OrderedJson\Value`.
+- The package test runner writes each case id before the case runs and `ok` or `FAIL` with the elapsed milliseconds after it, so the verifier can name a case that does not end. The `--cases` listing runs the checks without those lines and prints case ids only.
+- `OrderedJsonNativeParseError` carries a `kind` from the shared rejection list.
+- The package reports its functions, constant and error class for the shared coverage check.
+- An unescaped control character is reported at its own offset instead of one past it.
+- Added package tests for the descriptor API and declared them in the implementation registry. They cover hydrated members and items, repeated and escaped member names, malformed descriptors rejected with `ValueError`, compact token copying, the supported depth range, and the reported parse error offset. Shared cases reach the extension only through the PHP Value API, so these are the only checks of that surface.
+- `ordered_json_hydrate()` returns an object's members alone; it no longer creates a value for each key token.
+- Added `ordered_json_hydrate()`, which creates the child `OrderedJson\Value` objects of a container from a descriptor and rejects a descriptor that does not match the source with `ValueError`. Hydration is compiled from a separate `hydrate.c`; the class lookup is cached for each request.
+- Removed `ordered_json_compact()`; the PHP library serializes with `ordered_json_compact_node()`.
+- Replaced associative descriptor arrays with an integer tape, validated UTF-8 while scanning strings instead of in a separate pass while still reporting invalid UTF-8 before other errors, and serialized compact subtrees with one copy. `ordered_json_compact_node` accepts a descriptor index and rejects a descriptor that does not match the source with `ValueError`. The format is described in the [API contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.md#php). Parse results, errors, and offsets are unchanged.
+- Corrected macOS bundle configuration: derive an omitted deployment target from the compiler and omit the unused dynamic-library single-module flag check. This removes the obsolete `-single_module` and `-undefined suppress` linker warnings.
+- Added the package's own development procedure, changelog, Makefile and documentation manifest.
+- Added English and Korean usage, development, and change records.
+- Added PIE `php-ext` metadata, a `src` build path, and an enabled standalone build by default.
+
+Common JSON behavior is unchanged. Verification records are generated by `make check`; aggregate evidence is described in the [verification records](https://github.com/polyspec/ordered-json/blob/main/docs/operations/validation.md#records) of the repository root. Registry publication is not declared here.

@@ -40,7 +40,9 @@ include scripts/kit/kit-bootstrap.mk
 CHECK_TARGETS := kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check docs-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-python pie-check ordered-json-test-scripts typecheck lint-ts
 
 .PHONY: check ordered-json-test-scripts typecheck ordered-json-install-php ordered-json-install-python php-extension verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
-	benchmark benchmark-check python-parse-budget release-config-check install ordered-json-install ordered-json-install-rust ordered-json-install-external
+	benchmark benchmark-check python-parse-budget release-config-check install ordered-json-install ordered-json-install-rust ordered-json-install-external \
+	ordered-json-js-check ordered-json-js-test ordered-json-go-check ordered-json-go-test ordered-json-php-check ordered-json-php-test \
+	ordered-json-php-ext-check ordered-json-php-ext-test ordered-json-python-check ordered-json-python-test ordered-json-rust-check ordered-json-rust-test
 
 # check runs the full suite once per committed tree, when no task of docs/plans/execution/checklist.md is [~]
 # (full-run of @polyspec/kit); it records its result in var/full-run.json. rerun-failed (kit.mk) reruns the targets that failed.
@@ -74,6 +76,71 @@ ordered-json-install-php:
 ordered-json-install-python:
 	$(MAKE) --no-print-directory python-venv DIR=packages/python/.venv
 	$(ONLINE) $(UV) pip install --python packages/python/.venv/bin/python --link-mode copy --no-deps -e packages/python
+
+# ordered-json-install-external installs the PIE PHAR and the supplementary suite that external-inputs.json pins (scripts/external-inputs.mts).
+ordered-json-install-external:
+	$(ONLINE) $(NODE) scripts/external-inputs.mts
+
+# ordered-json-test-scripts runs the node:test tool tests of tests/scripts, or the files of TESTS, through run-tests of @polyspec/kit,
+# which gives each test its own deadline; typecheck checks the TypeScript of scripts/, tests/scripts/ and benchmarks/ with the tsc
+# of package.json (tsconfig.json), which Node runs by type stripping and so never checks itself.
+ordered-json-test-scripts:
+	$(NODE) $(KIT)/run-tests.$(KIT_EXT) node -- $(or $(TESTS),tests/scripts/)
+
+typecheck:
+	$(NODE) node_modules/typescript/bin/tsc -p tsconfig.json
+
+# verify-all builds and verifies every implementation with the shared cases, writes var/records/verification.json and checks
+# it with the evidence check (scripts/verify.mts --record); verify-<implementation> verifies one implementation and writes no
+# record. The package tests of each implementation run in parity-check, with the native runner of its language.
+verify-all: toolchain-check cargo-downloads-check
+	$(NODE) scripts/verify.mts --record$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
+
+verify-js verify-rust verify-go verify-php verify-php-extension verify-python: toolchain-check cargo-downloads-check
+	$(NODE) scripts/verify.mts --only $(patsubst verify-%,%,$@)$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
+
+# evidence-check checks the feature rows against the evidence they name, the release assets of the published features and the
+# JSON reports of docs/ (scripts/check-evidence.mts); verify-all runs it again with the verification records of the run.
+evidence-check:
+	$(NODE) scripts/check-evidence.mts
+
+# release-config-check runs the step versions of the release (release of @polyspec/kit, config/release.json) for the tag of the
+# version of the root package.json: every manifest of config/release.json declares that version, the module path of every Go
+# module is the declared one, and CHANGELOG.md and CHANGELOG.ko.md hold its section.
+release-config-check:
+	$(NODE) $(KIT)/release.$(KIT_EXT) versions "v$$($(NODE) -p "require('./package.json').version")"
+
+# pie-check builds the extension with the PIE PHAR of external-inputs.json, verifies the module with the shared cases and writes
+# var/records/pie-verification.json (scripts/check-pie.mts).
+pie-check: toolchain-check cargo-downloads-check
+	$(NODE) scripts/check-pie.mts --pie "$(PIE)"$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
+
+benchmark: toolchain-check cargo-downloads-check
+	$(NODE) benchmarks/run.mts
+
+# benchmark-check measures the benchmark without replacing the committed result.
+benchmark-check: toolchain-check cargo-downloads-check
+	$(NODE) benchmarks/run.mts --check
+
+# The packages keep no Makefile (ruling 6 of the fourth pass): each package's check and test are targets of this Makefile,
+# named <repo>-<package>-<task>, where <package> is its folder under packages/ and the task is check or test.
+ordered-json-js-check: verify-js
+ordered-json-js-test: ordered-json-js-check
+
+ordered-json-go-check: verify-go
+ordered-json-go-test: ordered-json-go-check
+
+ordered-json-php-check: verify-php
+ordered-json-php-test: ordered-json-php-check
+
+ordered-json-php-ext-check: verify-php-extension
+ordered-json-php-ext-test: ordered-json-php-ext-check
+
+ordered-json-python-check: verify-python
+ordered-json-python-test: ordered-json-python-check
+
+ordered-json-rust-check: verify-rust
+ordered-json-rust-test: ordered-json-rust-check
 
 # php-extension builds packages/php-ext/src/modules/ordered_json.so in place, with phpize and configure when the build has
 # no Makefile yet and then make, which rebuilds what changed. config/parity.json loads it for the tests of the
