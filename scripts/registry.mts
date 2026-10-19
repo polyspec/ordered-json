@@ -31,7 +31,7 @@ export type Commands = {
 
 const PHP_EXTENSION = 'extension={php-extension}/src/modules/ordered_json.so';
 export const COMMANDS: Record<string, Commands> = {
-  js: { command: ['node', '{js}/test/probe.mjs'], runtime: { node: ['node', '--version'] } },
+  js: { command: ['node', '{js}/tests/probe.mjs'], runtime: { node: ['node', '--version'] } },
   rust: {
     env: { CARGO_TARGET_DIR: '{cache}/rust-target', RUSTUP_AUTO_INSTALL: '0' },
     prepare: [

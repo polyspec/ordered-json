@@ -224,11 +224,17 @@
   "comparators": [
     "scripts"
   ],
+  "requirements": {
+    "pattern": "RQ-[0-9]{3}"
+  },
   "units": [
     {
       "id": "official",
       "kind": "suite",
       "profile": "contract",
+      "requirements": [
+        "RQ-022"
+      ],
       "file": "examples/official.json",
       "cases": "$.cases[*].id",
       "bindings": [
@@ -266,6 +272,9 @@
       "id": "depth_argument_is_bounded",
       "kind": "feature",
       "profile": "contract",
+      "requirements": [
+        "RQ-006"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -303,6 +312,9 @@
       "id": "depth_limit_is_enforced",
       "kind": "feature",
       "profile": "contract",
+      "requirements": [
+        "RQ-006"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -340,6 +352,9 @@
       "id": "parse_errors_report_offsets",
       "kind": "feature",
       "profile": "contract",
+      "requirements": [
+        "RQ-004"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -377,6 +392,9 @@
       "id": "rejection_names_its_kind",
       "kind": "feature",
       "profile": "contract",
+      "requirements": [
+        "RQ-005"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -414,6 +432,9 @@
       "id": "wrong_kind_access_is_reported",
       "kind": "feature",
       "profile": "contract",
+      "requirements": [
+        "RQ-014"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -451,6 +472,10 @@
       "id": "member_lookup_uses_decoded_names",
       "kind": "feature",
       "profile": "contract",
+      "requirements": [
+        "RQ-002",
+        "RQ-019"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -488,6 +513,9 @@
       "id": "repeated_key_keeps_first_position_and_last_value",
       "kind": "feature",
       "profile": "contract",
+      "requirements": [
+        "RQ-001"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -525,6 +553,9 @@
       "id": "root_keeps_surrounding_text",
       "kind": "feature",
       "profile": "contract",
+      "requirements": [
+        "RQ-018"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -562,6 +593,9 @@
       "id": "unpaired_surrogate_stays_in_units",
       "kind": "feature",
       "profile": "contract",
+      "requirements": [
+        "RQ-009"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -599,6 +633,9 @@
       "id": "surrogate_pair_decodes",
       "kind": "feature",
       "profile": "contract",
+      "requirements": [
+        "RQ-009"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -636,6 +673,9 @@
       "id": "factories_validate_arguments",
       "kind": "feature",
       "profile": "contract",
+      "requirements": [
+        "RQ-015"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -673,6 +713,9 @@
       "id": "values_come_only_from_the_library",
       "kind": "feature",
       "profile": "no-rust",
+      "requirements": [
+        "RQ-012"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -705,6 +748,9 @@
       "id": "returned_collections_are_immutable",
       "kind": "feature",
       "profile": "no-rust",
+      "requirements": [
+        "RQ-013"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -737,6 +783,9 @@
       "id": "host_serialization_boundary",
       "kind": "feature",
       "profile": "no-rust",
+      "requirements": [
+        "RQ-020"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -769,6 +818,9 @@
       "id": "bytes_input_is_validated",
       "kind": "feature",
       "profile": "no-php",
+      "requirements": [
+        "RQ-007"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -796,6 +848,10 @@
       "id": "invalid_utf8_reports_the_first_bad_byte",
       "kind": "feature",
       "profile": "contract",
+      "requirements": [
+        "RQ-004",
+        "RQ-007"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -833,6 +889,9 @@
       "id": "ordered_map_rejects_non_string_key",
       "kind": "feature",
       "profile": "no-php",
+      "requirements": [
+        "RQ-016"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -860,6 +919,9 @@
       "id": "strict_parse_rejects_duplicate_keys",
       "kind": "feature",
       "profile": "duplicates",
+      "requirements": [
+        "RQ-017"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -892,6 +954,9 @@
       "id": "strict_parse_accepts_unique_keys",
       "kind": "feature",
       "profile": "duplicates",
+      "requirements": [
+        "RQ-017"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -924,6 +989,10 @@
       "id": "serde_wire_bytes_and_round_trip",
       "kind": "feature",
       "profile": "rust",
+      "requirements": [
+        "RQ-011",
+        "RQ-010"
+      ],
       "bindings": [
         {
           "implementation": "rust",
@@ -936,6 +1005,9 @@
       "id": "serde_manifest_bytes_and_round_trip",
       "kind": "feature",
       "profile": "rust",
+      "requirements": [
+        "RQ-011"
+      ],
       "bindings": [
         {
           "implementation": "rust",
@@ -948,6 +1020,10 @@
       "id": "serde_rejects_invalid_and_unconsumed_input",
       "kind": "feature",
       "profile": "rust",
+      "requirements": [
+        "RQ-004",
+        "RQ-005"
+      ],
       "bindings": [
         {
           "implementation": "rust",
@@ -960,6 +1036,9 @@
       "id": "serde_rejects_duplicate_struct_fields",
       "kind": "feature",
       "profile": "rust",
+      "requirements": [
+        "RQ-017"
+      ],
       "bindings": [
         {
           "implementation": "rust",
@@ -972,6 +1051,10 @@
       "id": "serde_embedded_values_preserve_order_and_number_tokens",
       "kind": "feature",
       "profile": "rust",
+      "requirements": [
+        "RQ-001",
+        "RQ-010"
+      ],
       "bindings": [
         {
           "implementation": "rust",
@@ -984,6 +1067,9 @@
       "id": "serde_value_respects_container_depth",
       "kind": "feature",
       "profile": "rust",
+      "requirements": [
+        "RQ-006"
+      ],
       "bindings": [
         {
           "implementation": "rust",
@@ -996,6 +1082,9 @@
       "id": "serde_value_preserves_unpaired_surrogate_token",
       "kind": "feature",
       "profile": "rust",
+      "requirements": [
+        "RQ-009"
+      ],
       "bindings": [
         {
           "implementation": "rust",
@@ -1008,6 +1097,10 @@
       "id": "marshal_preserves_typed_json_contract",
       "kind": "feature",
       "profile": "go",
+      "requirements": [
+        "RQ-011",
+        "RQ-020"
+      ],
       "bindings": [
         {
           "implementation": "go",
@@ -1020,6 +1113,9 @@
       "id": "marshal_keeps_empty_object_and_array_distinct",
       "kind": "feature",
       "profile": "go",
+      "requirements": [
+        "RQ-003"
+      ],
       "bindings": [
         {
           "implementation": "go",
@@ -1032,6 +1128,10 @@
       "id": "marshal_validates_custom_marshaler_through_ordered_parser",
       "kind": "feature",
       "profile": "go",
+      "requirements": [
+        "RQ-020",
+        "RQ-015"
+      ],
       "bindings": [
         {
           "implementation": "go",
@@ -1044,6 +1144,9 @@
       "id": "marshal_rejects_unsupported_map_key",
       "kind": "feature",
       "profile": "go",
+      "requirements": [
+        "RQ-016"
+      ],
       "bindings": [
         {
           "implementation": "go",
@@ -1056,6 +1159,9 @@
       "id": "marshal_writes_null_for_nil_value_pointer",
       "kind": "feature",
       "profile": "go",
+      "requirements": [
+        "RQ-020"
+      ],
       "bindings": [
         {
           "implementation": "go",
@@ -1068,6 +1174,9 @@
       "id": "marshal_time_and_bytes_match_typed_values",
       "kind": "feature",
       "profile": "go",
+      "requirements": [
+        "RQ-020"
+      ],
       "bindings": [
         {
           "implementation": "go",
@@ -1080,6 +1189,9 @@
       "id": "marshal_promotes_embedded_fields",
       "kind": "feature",
       "profile": "go",
+      "requirements": [
+        "RQ-020"
+      ],
       "bindings": [
         {
           "implementation": "go",
@@ -1092,6 +1204,9 @@
       "id": "marshal_rejects_repeated_field_names",
       "kind": "feature",
       "profile": "go",
+      "requirements": [
+        "RQ-017"
+      ],
       "bindings": [
         {
           "implementation": "go",
@@ -1104,6 +1219,10 @@
       "id": "marshal_rejects_cyclic_values",
       "kind": "feature",
       "profile": "go",
+      "requirements": [
+        "RQ-006",
+        "RQ-020"
+      ],
       "bindings": [
         {
           "implementation": "go",
@@ -1116,6 +1235,9 @@
       "id": "marshal_rejects_values_deeper_than_the_parser",
       "kind": "feature",
       "profile": "go",
+      "requirements": [
+        "RQ-006"
+      ],
       "bindings": [
         {
           "implementation": "go",
@@ -1128,6 +1250,9 @@
       "id": "marshal_matches_host_encoder_structures",
       "kind": "feature",
       "profile": "go",
+      "requirements": [
+        "RQ-020"
+      ],
       "bindings": [
         {
           "implementation": "go",
@@ -1140,6 +1265,9 @@
       "id": "marshal_omit_rules_follow_the_host_encoder",
       "kind": "feature",
       "profile": "go",
+      "requirements": [
+        "RQ-020"
+      ],
       "bindings": [
         {
           "implementation": "go",
@@ -1152,6 +1280,9 @@
       "id": "marshal_reports_non_finite_numbers",
       "kind": "feature",
       "profile": "go",
+      "requirements": [
+        "RQ-010"
+      ],
       "bindings": [
         {
           "implementation": "go",
@@ -1164,6 +1295,9 @@
       "id": "borrowed_input_is_copied_on_access",
       "kind": "feature",
       "profile": "go",
+      "requirements": [
+        "RQ-018"
+      ],
       "bindings": [
         {
           "implementation": "go",
@@ -1176,6 +1310,9 @@
       "id": "utf8_validation_holds_for_long_multibyte_text",
       "kind": "feature",
       "profile": "contract",
+      "requirements": [
+        "RQ-007"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -1213,6 +1350,9 @@
       "id": "hydrate_without_the_value_class",
       "kind": "feature",
       "profile": "php-extension",
+      "requirements": [
+        "RQ-021"
+      ],
       "bindings": [
         {
           "implementation": "php-extension",
@@ -1225,6 +1365,10 @@
       "id": "hydrate_object_members",
       "kind": "feature",
       "profile": "php-extension",
+      "requirements": [
+        "RQ-021",
+        "RQ-001"
+      ],
       "bindings": [
         {
           "implementation": "php-extension",
@@ -1237,6 +1381,10 @@
       "id": "hydrate_array_items",
       "kind": "feature",
       "profile": "php-extension",
+      "requirements": [
+        "RQ-021",
+        "RQ-003"
+      ],
       "bindings": [
         {
           "implementation": "php-extension",
@@ -1249,6 +1397,10 @@
       "id": "hydrate_rejects_malformed_descriptors",
       "kind": "feature",
       "profile": "php-extension",
+      "requirements": [
+        "RQ-021",
+        "RQ-015"
+      ],
       "bindings": [
         {
           "implementation": "php-extension",
@@ -1261,6 +1413,9 @@
       "id": "compact_node_rejects_mismatched_descriptors",
       "kind": "feature",
       "profile": "php-extension",
+      "requirements": [
+        "RQ-021"
+      ],
       "bindings": [
         {
           "implementation": "php-extension",
@@ -1273,6 +1428,10 @@
       "id": "compact_node_copies_a_compact_token",
       "kind": "feature",
       "profile": "php-extension",
+      "requirements": [
+        "RQ-021",
+        "RQ-011"
+      ],
       "bindings": [
         {
           "implementation": "php-extension",
@@ -1285,6 +1444,9 @@
       "id": "scan_rejects_depth_outside_the_range",
       "kind": "feature",
       "profile": "php-extension",
+      "requirements": [
+        "RQ-006"
+      ],
       "bindings": [
         {
           "implementation": "php-extension",
@@ -1297,6 +1459,9 @@
       "id": "scan_reports_the_parse_error_offset",
       "kind": "feature",
       "profile": "php-extension",
+      "requirements": [
+        "RQ-004"
+      ],
       "bindings": [
         {
           "implementation": "php-extension",
@@ -1309,6 +1474,9 @@
       "id": "escaped_member_name_decodes",
       "kind": "feature",
       "profile": "php-extension",
+      "requirements": [
+        "RQ-002"
+      ],
       "bindings": [
         {
           "implementation": "php-extension",
@@ -1321,6 +1489,9 @@
       "id": "unpaired_surrogate_member_name_keeps_wtf8_identity",
       "kind": "feature",
       "profile": "php-extension",
+      "requirements": [
+        "RQ-009"
+      ],
       "bindings": [
         {
           "implementation": "php-extension",
@@ -1333,6 +1504,9 @@
       "id": "text_input_rejects_lone_surrogates",
       "kind": "feature",
       "profile": "utf16-text",
+      "requirements": [
+        "RQ-008"
+      ],
       "bindings": [
         {
           "implementation": "js",
@@ -1350,6 +1524,9 @@
       "id": "api-parse",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-023"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1377,6 +1554,10 @@
       "id": "api-parse-bytes",
       "kind": "api",
       "profile": "no-php",
+      "requirements": [
+        "RQ-007",
+        "RQ-023"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1400,6 +1581,9 @@
       "id": "api-max-depth",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-006"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1427,6 +1611,9 @@
       "id": "api-depth-limit",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-006"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1454,6 +1641,10 @@
       "id": "api-stringify",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-011",
+        "RQ-023"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1481,6 +1672,9 @@
       "id": "api-value",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-023"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1508,6 +1702,9 @@
       "id": "api-parse-error",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-024"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1535,6 +1732,10 @@
       "id": "api-parse-error-kind",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-005",
+        "RQ-024"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1562,6 +1763,10 @@
       "id": "api-parse-error-offset",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-004",
+        "RQ-024"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1589,6 +1794,9 @@
       "id": "api-value-compact",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-011"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1616,6 +1824,9 @@
       "id": "api-value-raw",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-018"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1643,6 +1854,9 @@
       "id": "api-value-kind",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-014"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1670,6 +1884,10 @@
       "id": "api-value-members",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-013",
+        "RQ-002"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1697,6 +1915,9 @@
       "id": "api-value-get",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-019"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1724,6 +1945,10 @@
       "id": "api-value-get-units",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-019",
+        "RQ-009"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1751,6 +1976,10 @@
       "id": "api-value-items",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-013",
+        "RQ-003"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1778,6 +2007,9 @@
       "id": "api-value-string-value",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-009"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1805,6 +2037,9 @@
       "id": "api-value-string-units",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-009"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1832,6 +2067,9 @@
       "id": "api-value-number-literal",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-010"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1859,6 +2097,9 @@
       "id": "api-value-boolean-value",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-014"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1886,6 +2127,10 @@
       "id": "api-factory-object",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-015",
+        "RQ-003"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1913,6 +2158,10 @@
       "id": "api-factory-array",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-015",
+        "RQ-003"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1940,6 +2189,9 @@
       "id": "api-factory-string",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-015"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1967,6 +2219,10 @@
       "id": "api-factory-number",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-010",
+        "RQ-015"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -1994,6 +2250,9 @@
       "id": "api-factory-boolean",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-015"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -2021,6 +2280,9 @@
       "id": "api-factory-null",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-015"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -2048,6 +2310,10 @@
       "id": "api-factory-from-units",
       "kind": "api",
       "profile": "api",
+      "requirements": [
+        "RQ-009",
+        "RQ-015"
+      ],
       "symbols": [
         {
           "implementation": "js",
@@ -2075,6 +2341,9 @@
       "id": "api-ordered-map",
       "kind": "api",
       "profile": "typed",
+      "requirements": [
+        "RQ-016"
+      ],
       "symbols": [
         {
           "implementation": "rust",
@@ -2090,6 +2359,10 @@
       "id": "api-ordered-map-get",
       "kind": "api",
       "profile": "typed",
+      "requirements": [
+        "RQ-016",
+        "RQ-019"
+      ],
       "symbols": [
         {
           "implementation": "rust",
@@ -2105,6 +2378,10 @@
       "id": "api-ordered-map-get-units",
       "kind": "api",
       "profile": "typed",
+      "requirements": [
+        "RQ-016",
+        "RQ-009"
+      ],
       "symbols": [
         {
           "implementation": "rust",
@@ -2120,6 +2397,10 @@
       "id": "api-ordered-map-insert",
       "kind": "api",
       "profile": "typed",
+      "requirements": [
+        "RQ-016",
+        "RQ-001"
+      ],
       "symbols": [
         {
           "implementation": "rust",
@@ -2135,6 +2416,9 @@
       "id": "api-ordered-map-len",
       "kind": "api",
       "profile": "typed",
+      "requirements": [
+        "RQ-016"
+      ],
       "symbols": [
         {
           "implementation": "rust",
@@ -2150,6 +2434,10 @@
       "id": "api-ordered-map-keys",
       "kind": "api",
       "profile": "typed",
+      "requirements": [
+        "RQ-016",
+        "RQ-001"
+      ],
       "symbols": [
         {
           "implementation": "rust",
@@ -2165,6 +2453,9 @@
       "id": "api-kind-type",
       "kind": "api",
       "profile": "typed",
+      "requirements": [
+        "RQ-014"
+      ],
       "symbols": [
         {
           "implementation": "rust",
@@ -2180,6 +2471,9 @@
       "id": "api-kind-object",
       "kind": "api",
       "profile": "typed",
+      "requirements": [
+        "RQ-014"
+      ],
       "symbols": [
         {
           "implementation": "rust",
@@ -2195,6 +2489,9 @@
       "id": "api-kind-array",
       "kind": "api",
       "profile": "typed",
+      "requirements": [
+        "RQ-014"
+      ],
       "symbols": [
         {
           "implementation": "rust",
@@ -2210,6 +2507,9 @@
       "id": "api-kind-string",
       "kind": "api",
       "profile": "typed",
+      "requirements": [
+        "RQ-014"
+      ],
       "symbols": [
         {
           "implementation": "rust",
@@ -2225,6 +2525,9 @@
       "id": "api-kind-number",
       "kind": "api",
       "profile": "typed",
+      "requirements": [
+        "RQ-014"
+      ],
       "symbols": [
         {
           "implementation": "rust",
@@ -2240,6 +2543,9 @@
       "id": "api-kind-boolean",
       "kind": "api",
       "profile": "typed",
+      "requirements": [
+        "RQ-014"
+      ],
       "symbols": [
         {
           "implementation": "rust",
@@ -2255,6 +2561,9 @@
       "id": "api-kind-null",
       "kind": "api",
       "profile": "typed",
+      "requirements": [
+        "RQ-014"
+      ],
       "symbols": [
         {
           "implementation": "rust",
@@ -2270,6 +2579,9 @@
       "id": "api-parse-error-message",
       "kind": "api",
       "profile": "typed",
+      "requirements": [
+        "RQ-024"
+      ],
       "symbols": [
         {
           "implementation": "rust",
@@ -2285,6 +2597,9 @@
       "id": "string_value_keeps_an_unpaired_surrogate",
       "kind": "feature",
       "profile": "utf16-text",
+      "requirements": [
+        "RQ-009"
+      ],
       "bindings": [
         {
           "implementation": "js",

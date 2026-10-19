@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: cb883e4768dc78d5c23dcbe3a7d138015114394f479cd20fb4d17b0a65d36351 -->
+<!-- source-sha256: 1407a0a688ff8e51bc371e770b9c318ac38201e568ab88b97c6d3c8903bc9202 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- parity unit은 JSON 계약의 요구사항 RQ-001부터 RQ-024까지를 인용하고(kit K273), JavaScript probe는 폴더를 옮긴 뒤의 `packages/js/tests/probe.mjs`에서 실행하며, workflow 검사는 kit이 vendor하는 workflow를 제외합니다(T2.3).
 - 패키지는 AGENTS, CHANGELOG와 Makefile을 두지 않습니다 (T2.2). 각 패키지는 루트 `AGENTS.md`와 `CHANGELOG.md`에 절을 가지며, 검사와 테스트는 루트 Makefile의 target(`ordered-json-<package>-check`와 `ordered-json-<package>-test`)입니다. `config/layout.yml`의 layout 예외는 제거되었습니다. 모든 Composer manifest의 PHP platform은 8.4.1이며 Composer lock을 다시 잠갔습니다. T2.1에서 Makefile이 잃은 recipe를 되돌렸습니다 (`verify-*`, `verify-all`, `typecheck`, `evidence-check`, `release-config-check`, `pie-check`, `benchmark`, `benchmark-check`, `ordered-json-test-scripts`와 `ordered-json-install-external`). 체크리스트에는 상위 행 T1.29가 있으며, 비교 대상 제품명은 변경 기록과 체크리스트에서 더 이상 적지 않습니다.
 - 저장소는 kit 표준 0.0.54를 따릅니다 (T2.1): 실행 체크리스트를 `docs/plans/execution/`으로 옮기고, 문서와 테스트 폴더를 layout의 폴더로 옮기며 (`docs/operations/documentation-plan.md`, `docs/operations/proposals.md`, `packages/js/tests`), `install`은 kit의 bootstrap `install-kit`을 `ordered-json-install`보다 먼저 실행하고, workflow `.github/workflows/gates.yml`을 kit에서 vendor하며, 다른 프로젝트와의 비교 도구와 그 보고서를 제거합니다.
 - T1.58: AGENTS는 kit `docs/plans/local-links.md`의 local link를 가리킵니다. polyspec 버전이 0.0.x인 동안 개발 checkout은 설치된 polyspec package를 그 source에 link하며, link는 commit하지 않습니다.

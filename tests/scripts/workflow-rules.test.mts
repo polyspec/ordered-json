@@ -123,7 +123,9 @@ export function violations(name: string, text: string): string[] {
 
 /** The targets of every `make ci-targets TARGETS="..."` step of a workflow. */
 const ciTargets = (text: string): string[] => Object.values(workflow(text).jobs).flatMap(job => runs(job).flatMap(run => (run.startsWith('make ci-targets ') ? known(/TARGETS="([^"]*)"/.exec(run)?.[1], `the TARGETS of ${run}`).split(' ') : [])));
-const names = () => readdirSync(WORKFLOWS).filter(name => name.endsWith('.yml')).sort();
+// gates.yml and release.yml are vendored from @polyspec/kit, which tests them: no test of this repository reads them (ruling 3).
+const KIT_WORKFLOWS = ['gates.yml', 'release.yml'];
+const names = () => readdirSync(WORKFLOWS).filter(name => name.endsWith('.yml') && !KIT_WORKFLOWS.includes(name)).sort();
 const anyIncludes = (issues: string[], part: string) => issues.some(issue => issue.includes(part));
 const changed = (text: string, from: string | RegExp, to: string) => {
   const result = text.replace(from, to);
@@ -132,7 +134,7 @@ const changed = (text: string, from: string | RegExp, to: string) => {
 };
 
 test('every workflow follows the rules', () => {
-  assert.deepEqual(names(), ['ci.yml', 'push-gate.yml', 'release.yml']);
+  assert.deepEqual(names(), ['ci.yml', 'push-gate.yml']);
   for (const name of names()) assert.deepEqual(violations(name, read(name)), [], name);
 });
 
@@ -234,32 +236,6 @@ test('ci-passed is the last job and needs every other job', () => {
   for (const [kind, [mutated, message]] of Object.entries(broken)) assert.ok(anyIncludes(violations('ci.yml', mutated), message), `${kind}: ${violations('ci.yml', mutated).join('\n')}`);
 });
 
-test('the release runs its steps in order with the tag and the permission to release', () => {
-  const text = read('release.yml');
-  assert.deepEqual(runs(known(workflow(text).jobs.release, 'the job release')), RELEASE_STEPS);
-  const broken: [string, string][] = [
-    [text.replace('run: make release-versions', 'run: make release-swap').replace('run: make release-verify', 'run: make release-versions').replace('run: make release-swap', 'run: make release-verify'), 'not the release steps'],
-    [changed(text, '  contents: write\n', '  contents: read\n'), 'not exactly contents: write'],
-    [changed(text, '      TAG: ${{ github.ref_name }}\n', ''), 'does not set TAG'],
-    [changed(text, '          fetch-depth: 0\n', '          fetch-depth: 1\n'), 'fetch-depth: 0'],
-    [changed(text, "tags: ['v*', '**/v*']", "tags: ['v*']"), 'the on: block is'],
-    [changed(text, "tags: ['v*', '**/v*']", "tags: ['v*', '*/v*']"), 'the on: block is'],
-  ];
-  for (const [mutated, message] of broken) assert.ok(anyIncludes(violations('release.yml', mutated), message), message);
-});
-
-test('both tag shapes start the release', () => {
-  // In a tag filter * does not match /, and ** matches any characters, as GitHub matches them.
-  const matches = (pattern: string, tag: string) => new RegExp(`^${pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replaceAll('**', '\0').replaceAll('*', '[^/]*').replaceAll('\0', '.*')}$`).test(tag);
-  const patterns = known(workflow(read('release.yml')).on?.push?.tags, 'the tags of the push trigger of release.yml');
-  const config = readJsonFile<{ goModules: Record<string, string> }>(path.join(ROOT, 'config/release.json'), 'release-config.schema.json');
-  const version = known(readJsonFile<{ version?: string }>(path.join(ROOT, 'package.json'), 'npm-manifest.schema.json').version, 'the version of package.json');
-  const tags = [`v${version}`, ...Object.keys(config.goModules).map(directory => `${directory}/v${version}`)];
-  assert.equal(tags.length, 2);
-  for (const tag of tags) assert.ok(patterns.some(pattern => matches(pattern, tag)), tag);
-  assert.ok(!tags.slice(1).some(tag => matches('v*', tag)), 'the pattern v* alone misses the tag of a Go module');
-});
-
 test('a tag push starts none of the workflows whose checks the release requires', () => {
   // make release-verify requires the checks of config/release.json on the tagged commit; a workflow that a tag push started
   // again would run them anew on the same commit, queued, so the release would race against them.
@@ -272,7 +248,7 @@ test('a tag push starts none of the workflows whose checks the release requires'
     assert.ok(isDeepStrictEqual(push.branches, ['**']) || isDeepStrictEqual(push.branches, ['main']), owner);
     assert.equal(push.tags, undefined);
   }
-  assert.deepEqual(names().filter(name => workflow(read(name)).on?.push?.tags !== undefined), ['release.yml']);
+  assert.deepEqual(names().filter(name => workflow(read(name)).on?.push?.tags !== undefined), []);
 });
 
 test('a step that does not run after a failure fails', () => {
@@ -299,7 +275,7 @@ test('every workflow runs on a fixed image with each action pinned to one commit
 
 test('.php-version declares the PHP minor release, and a setup-php step that names its PHP fails', () => {
   assert.match(readFileSync(path.join(ROOT, '.php-version'), 'utf8'), /^\d+\.\d+\n$/);
-  for (const name of ['ci.yml', 'release.yml']) {
+  for (const name of ['ci.yml']) {
     assert.ok(anyIncludes(violations(name, changed(read(name), 'php-version-file: .php-version', "php-version: '8.4'")), 'does not read the PHP from php-version-file: .php-version alone'), name);
   }
 });

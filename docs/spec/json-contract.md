@@ -88,3 +88,33 @@ Every implementation receives the same official inputs and fixed expected result
 Reconstruction inserts keys in their initial order, updates their values in reverse order, serializes the result, and validates that result with an independent parser. Generated objects must contain unique decoded keys. Number token text must remain exact; generated string-key escape spelling may differ.
 
 Official examples define expected behavior. Supplementary fixtures increase coverage. A successful run establishes results for the recorded files and runtimes; it does not establish correctness for every possible input or every supported runtime.
+
+<a id="requirements"></a>
+## Requirements
+
+Each requirement is one testable statement of this contract. A unit of config/parity.json cites the identifiers that it tests.
+
+- **RQ-001** An object keeps the first occurrence position of each decoded key and the last value written for it.
+- **RQ-002** Object keys compare by decoded UTF-16 code units, so an escaped spelling and a literal spelling name the same member.
+- **RQ-003** Arrays keep their input order, and arrays and objects stay distinct, including the empty ones.
+- **RQ-004** A rejection reports the offset of the first byte that makes the document invalid.
+- **RQ-005** A rejection names one kind of the shared list of rejection kinds.
+- **RQ-006** The nesting limit is 256 by default; a caller may lower it to an integer from 0 through 256, and a limit of 0 accepts scalar roots and rejects containers.
+- **RQ-007** Byte input must be UTF-8: invalid UTF-8 is rejected, and valid multibyte text is accepted in full.
+- **RQ-008** Text input rejects a literal unpaired surrogate before its grammar is read.
+- **RQ-009** An escaped unpaired surrogate is kept as its code units and identifies its member or string by those code units.
+- **RQ-010** Number tokens are retained exactly as written, and NaN and Infinity are rejected.
+- **RQ-011** Serialization emits each object key once, and parsing its output again reproduces the same output.
+- **RQ-012** Values come only from the library: a caller cannot build a value that bypasses the parser or the constructors.
+- **RQ-013** A collection returned to the caller is immutable.
+- **RQ-014** An accessor of a kind returns that kind's value, and an access of another kind is reported as a wrong-kind access.
+- **RQ-015** Constructors validate their arguments and apply the grammar, depth and duplicate-key rules of parsing.
+- **RQ-016** Object keys are strings, and an ordered map rejects a key that is not a string.
+- **RQ-017** The strict parse rejects a duplicate key and accepts a document without one.
+- **RQ-018** The raw source span of a value is the original text, including the surrounding whitespace of the root and the overwritten keys.
+- **RQ-019** Member lookup finds a member by its decoded name.
+- **RQ-020** Host encoders refuse a value and direct the caller to the library serializer, and the typed Go encoder matches the standard encoder.
+- **RQ-021** The native PHP backend builds the same values as the PHP library from the scan descriptors and refuses a malformed descriptor.
+- **RQ-022** Every implementation gives the official examples the expected results.
+- **RQ-023** The public API exports the parse, serialization, factory and accessor functions.
+- **RQ-024** A parse error exposes its kind, its offset and its message.
