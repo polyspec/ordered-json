@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The repository follows the kit standard 0.0.54 (T2.1): the execution checklist moves to `docs/plans/execution/`, the documents and the test folder move to the folders of the layout (`docs/operations/documentation-plan.md`, `docs/operations/proposals.md`, `packages/js/tests`), `install` runs the bootstrap of kit as `install-kit` before `ordered-json-install`, the workflow `.github/workflows/gates.yml` is vendored from kit, and the comparison tools with another project are removed with their report.
 - T1.58: AGENTS points to the local links of kit `docs/plans/local-links.md`: while polyspec versions are 0.0.x, development checkouts link installed polyspec packages to their source, and links are never committed.
 - T1.57: the shared tools are `@polyspec/kit` 0.0.53.
 - T1.56: the shared tools are `@polyspec/kit` 0.0.52: `.php-version` declares the PHP 8.5 that every workflow sets up, and the release workflow runs `make kit-check` before any release step (kit K193).

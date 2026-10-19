@@ -8,7 +8,7 @@ Strict JSON with associative objects that preserve document key order recursivel
 <a id="usage"></a>
 ## Usage
 
-PHP >= 8.5 with JSON and PCRE; Composer package `polyspec/ordered-json`, whose classes Composer loads by PSR-4 and whose functions by `files`.
+PHP >= 8.4 with JSON and PCRE; Composer package `polyspec/ordered-json`, whose classes Composer loads by PSR-4 and whose functions by `files`.
 
 The usage fragment takes `source` (or `$source`) from an object case in the [common official examples](https://github.com/polyspec/ordered-json/blob/main/examples/official.json).
 

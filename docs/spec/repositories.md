@@ -34,7 +34,7 @@ Each verification run, aggregate check, selected check, PIE check, benchmark, or
 <a id="documents"></a>
 ## Documents and changes
 
-Each package has its own English documents and Korean translations. Shared contracts and aggregate feature state are referenced from implementation documents. `config/documents.json` selects the documents of the common root and of every package, and `make documents-check` checks them together.
+Each package has its own English documents and Korean translations. Shared contracts and aggregate feature state are referenced from implementation documents. `config/documents.json` selects the documents of the common root and of every package, and `make docs-check` checks them together.
 
 For a shared contract change, update the verifier, affected implementations, and conformance fixtures in one change, run package and aggregate checks, then publish the resulting repository revision. Test success and source or package publication remain separate observations.
 

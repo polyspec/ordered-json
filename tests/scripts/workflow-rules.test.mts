@@ -300,6 +300,6 @@ test('every workflow runs on a fixed image with each action pinned to one commit
 test('.php-version declares the PHP minor release, and a setup-php step that names its PHP fails', () => {
   assert.match(readFileSync(path.join(ROOT, '.php-version'), 'utf8'), /^\d+\.\d+\n$/);
   for (const name of ['ci.yml', 'release.yml']) {
-    assert.ok(anyIncludes(violations(name, changed(read(name), 'php-version-file: .php-version', "php-version: '8.5'")), 'does not read the PHP from php-version-file: .php-version alone'), name);
+    assert.ok(anyIncludes(violations(name, changed(read(name), 'php-version-file: .php-version', "php-version: '8.4'")), 'does not read the PHP from php-version-file: .php-version alone'), name);
   }
 });

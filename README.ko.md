@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: ab24f95436616b803a91fc9c4ccbfb811a2e3b5a562e2b29ad440ce0fd2e54f3 -->
+<!-- source-sha256: f24f9239ef57590905a5d838634846b10d6f0c631cc0056bd1f3bc48031de1d1 -->
 # ordered-json
 
 [English](README.md)
@@ -78,6 +78,5 @@ make check
 - [기능 상태](docs/features.ko.md)
 - [배포 상태](docs/operations/distribution.ko.md)
 - [변경 기록](CHANGELOG.ko.md)
-- [문서 관리](docs/documentation-plan.ko.md)
+- [문서 관리](docs/operations/documentation-plan.ko.md)
 - [개발 절차](AGENTS.ko.md)
-- [요청된 비교 보고서](docs/reports/ojson-comparison.ko.md)

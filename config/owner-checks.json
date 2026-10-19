@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "comment": "The checks that own each tracked path, read by owner-check of @polyspec/kit: make owner-check runs the owners of the changed paths, never the full suite, and the pre-commit hook runs make owner-validate. test-scripts runs the verifier unit tests (TESTS selects test files) and verify-<language> verifies one implementation.",
+  "comment": "The checks that own each tracked path, read by owner-check of @polyspec/kit: make owner-check runs the owners of the changed paths, never the full suite, and the pre-commit hook runs make owner-validate. ordered-json-test-scripts runs the verifier unit tests (TESTS selects test files) and verify-<language> verifies one implementation.",
   "owners": [
     {
       "paths": [
@@ -8,20 +8,20 @@
         "config/documents.json"
       ],
       "targets": [
-        "documents-check"
+        "docs-check"
       ]
     },
     {
       "paths": [
         "docs/features.md",
         "docs/features.ko.md",
-        "docs/plans/execution-checklist.md",
-        "docs/plans/execution-checklist.ko.md"
+        "docs/plans/execution/checklist.md",
+        "docs/plans/execution/checklist.ko.md"
       ],
       "targets": [
-        "test-scripts",
+        "ordered-json-test-scripts",
         "push-gate-commit",
-        "documents-check",
+        "docs-check",
         "evidence-check"
       ]
     },
@@ -30,7 +30,7 @@
         "tests/scripts/*.test.mts"
       ],
       "targets": [
-        "test-scripts"
+        "ordered-json-test-scripts"
       ],
       "variable": "TESTS"
     },
@@ -39,7 +39,7 @@
         "tests/scripts/checkout.mts"
       ],
       "targets": [
-        "test-scripts"
+        "ordered-json-test-scripts"
       ]
     },
     {
@@ -52,7 +52,7 @@
         "contracts/fixtures/**"
       ],
       "targets": [
-        "test-scripts",
+        "ordered-json-test-scripts",
         "verify-js",
         "verify-rust",
         "verify-go",
@@ -68,15 +68,13 @@
         "scripts/present.mts",
         "scripts/schema/*.schema.json",
         "scripts/check-pie.mts",
-        "scripts/compare-ojson.mts",
-        "scripts/comparison/*",
         ".gitignore",
         "Makefile",
         "scripts/external-inputs.mts",
         "tsconfig.json"
       ],
       "targets": [
-        "test-scripts",
+        "ordered-json-test-scripts",
         "typecheck"
       ]
     },
@@ -85,7 +83,7 @@
         "benchmarks/run.mts"
       ],
       "targets": [
-        "test-scripts",
+        "ordered-json-test-scripts",
         "typecheck",
         "benchmark-check"
       ]
@@ -114,7 +112,7 @@
         "packages/python/pyproject.toml"
       ],
       "targets": [
-        "test-scripts",
+        "ordered-json-test-scripts",
         "release-coverage",
         "release-config-check"
       ]
@@ -124,7 +122,7 @@
         ".github/workflows/*.yml"
       ],
       "targets": [
-        "test-scripts"
+        "ordered-json-test-scripts"
       ]
     },
     {
@@ -144,6 +142,7 @@
       "paths": [
         "scripts/kit/**",
         ".github/workflows/release.yml",
+        ".claude/settings.json",
         "PRINCIPLES.md",
         "PRINCIPLES.ko.md",
         "ruff.toml",
@@ -261,20 +260,11 @@
     {
       "paths": [
         "scripts/check-evidence.mts",
-        "docs/reports/*.json",
         "external-inputs.json"
       ],
       "targets": [
-        "test-scripts",
+        "ordered-json-test-scripts",
         "evidence-check"
-      ]
-    },
-    {
-      "paths": [
-        "config/commits.json"
-      ],
-      "targets": [
-        "commits-check"
       ]
     },
     {
@@ -289,7 +279,7 @@
         "package.json"
       ],
       "targets": [
-        "test-scripts",
+        "ordered-json-test-scripts",
         "toolchain-check"
       ]
     },

@@ -77,6 +77,5 @@ The aggregate record applies to the common revision and all package sources in t
 - [Feature state](docs/features.md)
 - [Distribution state](docs/operations/distribution.md)
 - [Changelog](CHANGELOG.md)
-- [Documentation management](docs/documentation-plan.md)
+- [Documentation management](docs/operations/documentation-plan.md)
 - [Development procedure](AGENTS.md)
-- [Requested comparison report](docs/reports/ojson-comparison.md)

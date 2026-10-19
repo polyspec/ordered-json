@@ -1,7 +1,7 @@
 <!-- doc-id: proposals -->
 # Pending proposals
 
-[한국어](README.ko.md)
+[한국어](proposals.ko.md)
 
 <a id="state"></a>
 ## Current state

@@ -39,7 +39,7 @@ class StandardCases(unittest.TestCase):
         self.assertEqual(caught.exception.offset, MAX_DEPTH)
 
     def test_parse_errors_report_offsets(self):
-        # 한 is three UTF-8 bytes, so the offset of the control character is a byte position.
+        # U+D55C (a Korean syllable) is three UTF-8 bytes, so the offset of the control character is a byte position.
         with self.assertRaises(ParseError) as caught:
             parse_bytes(b'["\xed\x95\x9c\x01"]')
         self.assertEqual((caught.exception.offset, caught.exception.unit), (5, "byte"))

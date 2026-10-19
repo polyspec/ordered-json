@@ -6,4 +6,4 @@ check:
 test: check
 
 docs-check:
-	$(MAKE) -C ../.. documents-check
+	$(MAKE) -C ../.. docs-check

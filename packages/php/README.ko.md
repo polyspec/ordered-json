@@ -1,5 +1,5 @@
 <!-- doc-id: php-overview -->
-<!-- source-sha256: 410bd0147b375597b238aa6e4903956bbc28cae33cbc3343ded0d39deb55215f -->
+<!-- source-sha256: 5052de0c103916d210e315730c7a615abe66c591b10f01215606922a9f78d342 -->
 # ordered-json for PHP
 
 [English](README.md)
@@ -9,7 +9,7 @@
 <a id="usage"></a>
 ## 사용
 
-JSON 및 PCRE를 제공하는 PHP >= 8.5를 요구하며 Composer 패키지는 `polyspec/ordered-json`입니다. Composer는 그 class를 PSR-4로, 함수를 `files`로 load합니다.
+JSON 및 PCRE를 제공하는 PHP >= 8.4를 요구하며 Composer 패키지는 `polyspec/ordered-json`입니다. Composer는 그 class를 PSR-4로, 함수를 `files`로 load합니다.
 
 사용 코드의 `source` 또는 `$source`는 [공통 공식 예제](https://github.com/polyspec/ordered-json/blob/main/examples/official.json)의 객체 사례에서 가져옵니다.
 

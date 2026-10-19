@@ -1,4 +1,4 @@
-// Installs the external inputs that external-inputs.json pins (make install-external): the PIE PHAR into .cache/pie/pie.phar
+// Installs the external inputs that external-inputs.json pins (make ordered-json-install-external): the PIE PHAR into .cache/pie/pie.phar
 // and the supplementary JSON suite into .cache/JSONTestSuite. Each is an exact release or revision with its hash: the PHAR is
 // refused unless its sha256 is the pinned one, the suite unless its case count and inputs hash are. An input that is already
 // installed with the pinned identity is not downloaded again, and a refused input leaves nothing installed. These are the only

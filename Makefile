@@ -37,12 +37,12 @@ include scripts/kit/kit-bootstrap.mk
 
 # The targets of the full suite that make check runs through the guard of full-run of @polyspec/kit and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
-CHECK_TARGETS := kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check documents-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-python pie-check test-scripts typecheck lint-ts
+CHECK_TARGETS := kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check docs-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-python pie-check ordered-json-test-scripts typecheck lint-ts
 
-.PHONY: check test-scripts typecheck install-php install-python php-extension verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
-	benchmark benchmark-check python-parse-budget release-config-check install install-rust install-external install-comparison
+.PHONY: check ordered-json-test-scripts typecheck ordered-json-install-php ordered-json-install-python php-extension verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
+	benchmark benchmark-check python-parse-budget release-config-check install ordered-json-install ordered-json-install-rust ordered-json-install-external
 
-# check runs the full suite once per committed tree, when no task of docs/plans/execution-checklist.md is [~]
+# check runs the full suite once per committed tree, when no task of docs/plans/execution/checklist.md is [~]
 # (full-run of @polyspec/kit); it records its result in var/full-run.json. rerun-failed (kit.mk) reruns the targets that failed.
 check:
 	$(NODE) $(KIT)/full-run.$(KIT_EXT) run $(CHECK_TARGETS)
@@ -50,26 +50,28 @@ check:
 # install makes every download that the checks read after make install-packages: the tools of mise.lock, the Rust toolchain of
 # rust-toolchain.toml, the crates of packages/rust/Cargo.lock, the Composer projects of the PHP packages with their PHPUnit,
 # the virtual environment of the Python package, and the PIE PHAR and the supplementary suite of external-inputs.json.
-# It is the only target that downloads, besides dependency-review, release-consumer-lock and install-comparison, which
-# installs the PyPI ojson of the comparison report and which no check reads.
-install: install-rust install-tools cargo-downloads-fetch install-php install-python install-external
+# It is the only target that downloads, besides dependency-review and release-consumer-lock.
+# install runs the bootstrap of kit as the prerequisite install-kit of ordered-json-install (K246-2).
+install: ordered-json-install
 
-install-rust:
+ordered-json-install: install-kit ordered-json-install-rust cargo-downloads-fetch ordered-json-install-php ordered-json-install-python ordered-json-install-external
+
+ordered-json-install-rust:
 	$(ONLINE) rustup toolchain install --no-self-update
 
-# install-php installs the locked Composer packages of packages/php and packages/php-ext, PHPUnit among them, into their
+# ordered-json-install-php installs the locked Composer packages of packages/php and packages/php-ext, PHPUnit among them, into their
 # vendor/, from which kit parity runs their tests (config/parity.json), and the root package, the published composer.json,
 # into vendor/, whose autoloader PHPStan of make lint-php reads for the PHP of benchmarks/. The root package requires only
 # the platform, so its install downloads nothing; its composer.lock, which composerPlatforms of config/dependency-policy.json
 # checks as every Composer manifest of the checkout (kit K181), locks no package.
-install-php:
+ordered-json-install-php:
 	$(ONLINE) $(COMPOSER) install --no-interaction --no-progress
 	$(ONLINE) $(COMPOSER) install --no-interaction --no-progress --working-dir=packages/php
 	$(ONLINE) $(COMPOSER) install --no-interaction --no-progress --working-dir=packages/php-ext
 
-# install-python makes packages/python/.venv from the Python of mise.toml (python-venv of kit) and installs the package into
+# ordered-json-install-python makes packages/python/.venv from the Python of mise.toml (python-venv of kit) and installs the package into
 # it, editable, with the uv of mise.toml; config/parity.json runs the Python tests with its interpreter.
-install-python:
+ordered-json-install-python:
 	$(MAKE) --no-print-directory python-venv DIR=packages/python/.venv
 	$(ONLINE) $(UV) pip install --python packages/python/.venv/bin/python --link-mode copy --no-deps -e packages/python
 
@@ -80,59 +82,6 @@ php-extension:
 	cd packages/php-ext/src && { test -f Makefile || { phpize && ./configure --enable-ordered-json; }; } && $(MAKE)
 
 parity-check: php-extension
-
-# install-comparison makes the virtual environment .cache/comparison/ojson-venv from the Python of mise.toml (python-venv of
-# kit) and installs into it, with the uv of mise.toml, the PyPI ojson 0.1.0 of the archive .cache/comparison/ojson-0.1.0.tar.gz,
-# which scripts/compare-ojson.mts compares through the Python of that environment (docs/reports/ojson-comparison.md). A person
-# runs it before a comparison; it is no part of make install.
-install-comparison:
-	$(MAKE) --no-print-directory python-venv DIR=.cache/comparison/ojson-venv
-	$(ONLINE) $(UV) pip install --python .cache/comparison/ojson-venv/bin/python .cache/comparison/ojson-0.1.0.tar.gz
-
-# install-external installs the PIE PHAR and the supplementary suite that external-inputs.json pins (scripts/external-inputs.mts).
-install-external:
-	$(ONLINE) $(NODE) scripts/external-inputs.mts
-
-# test-scripts runs the node:test tool tests of tests/scripts, or the files of TESTS, through run-tests of @polyspec/kit, which
-# gives each test its own deadline; typecheck checks the TypeScript of scripts/, tests/scripts/ and benchmarks/ with the tsc
-# of package.json (tsconfig.json), which Node runs by type stripping and so never checks itself.
-test-scripts:
-	$(NODE) $(KIT)/run-tests.$(KIT_EXT) node -- $(or $(TESTS),tests/scripts/)
-
-typecheck:
-	$(NODE) node_modules/typescript/bin/tsc -p tsconfig.json
-
-# verify-all builds and verifies every implementation with the shared cases, writes var/records/verification.json and checks
-# it with the evidence check (scripts/verify.mts --record); verify-<implementation> verifies one implementation and writes no
-# record. The package tests of each implementation run in parity-check, with the native runner of its language.
-verify-all: toolchain-check cargo-downloads-check
-	$(NODE) scripts/verify.mts --record$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
-
-verify-js verify-rust verify-go verify-php verify-php-extension verify-python: toolchain-check cargo-downloads-check
-	$(NODE) scripts/verify.mts --only $(patsubst verify-%,%,$@)$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
-
-# evidence-check checks the feature rows against the evidence they name, the release assets of the published features and the
-# JSON reports of docs/ (scripts/check-evidence.mts); verify-all runs it again with the verification records of the run.
-evidence-check:
-	$(NODE) scripts/check-evidence.mts
-
-# release-config-check runs the step versions of the release (release of @polyspec/kit, config/release.json) for the tag of the
-# version of the root package.json, the version manifest of config/release.json: every manifest of config/release.json declares
-# that version, the module path of every Go module is the declared one, and CHANGELOG.md and CHANGELOG.ko.md hold its section.
-release-config-check:
-	$(NODE) $(KIT)/release.$(KIT_EXT) versions "v$$($(NODE) -p "require('./package.json').version")"
-
-# pie-check builds the extension with the PIE PHAR of external-inputs.json, verifies the module with the shared cases and writes
-# var/records/pie-verification.json (scripts/check-pie.mts).
-pie-check: toolchain-check cargo-downloads-check
-	$(NODE) scripts/check-pie.mts --pie "$(PIE)"$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
-
-benchmark: toolchain-check cargo-downloads-check
-	$(NODE) benchmarks/run.mts
-
-# benchmark-check measures the benchmark without replacing the committed result.
-benchmark-check: toolchain-check cargo-downloads-check
-	$(NODE) benchmarks/run.mts --check
 
 # python-parse-budget compares the CPU time of the Python parse with the pure PHP parse on one generated document and fails
 # when the Python median exceeds three times the PHP median (benchmarks/python-parse/run.py). A person runs it after a

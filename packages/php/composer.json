@@ -5,7 +5,7 @@
   "type": "library",
   "license": "MIT",
   "require": {
-    "php": ">=8.5",
+    "php": ">=8.4",
     "ext-json": "*",
     "ext-pcre": "*"
   },
@@ -30,7 +30,7 @@
   },
   "config": {
     "platform": {
-      "php": "8.5.0"
+      "php": "8.4.0"
     }
   }
 }

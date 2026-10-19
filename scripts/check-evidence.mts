@@ -1,7 +1,7 @@
 // Checks the evidence that the feature record names: the feature rows of docs/features.md and its translation, the release
 // assets of the published features, the benchmark result and the JSON reports of docs/; with --records also the verification
 // records of the checkout against the current sources. The documents themselves (translation pairs, links, anchors,
-// checklists) are checked by check-documents of @polyspec/kit (make documents-check). The Markdown is read with mdast.
+// checklists) are checked by check-documents of @polyspec/kit (make docs-check). The Markdown is read with mdast.
 //
 //   node scripts/check-evidence.mts [--records] [--root <directory>]
 import { existsSync, readFileSync } from 'node:fs';

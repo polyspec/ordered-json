@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 84f96d48b8aef41a2ace125a1a55ef9810ec82bc358a8e4e35e2962e1a07d1e1 -->
+<!-- source-sha256: 64f3f7ccfe92731451108543d398b3585e3bdc6f794de8863bfe97c73e8ff6ae -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- 저장소는 kit 표준 0.0.54를 따릅니다 (T2.1): 실행 체크리스트를 `docs/plans/execution/`으로 옮기고, 문서와 테스트 폴더를 layout의 폴더로 옮기며 (`docs/operations/documentation-plan.md`, `docs/operations/proposals.md`, `packages/js/tests`), `install`은 kit의 bootstrap `install-kit`을 `ordered-json-install`보다 먼저 실행하고, workflow `.github/workflows/gates.yml`을 kit에서 vendor하며, 다른 프로젝트와의 비교 도구와 그 보고서를 제거합니다.
 - T1.58: AGENTS는 kit `docs/plans/local-links.md`의 local link를 가리킵니다. polyspec 버전이 0.0.x인 동안 개발 checkout은 설치된 polyspec package를 그 source에 link하며, link는 commit하지 않습니다.
 - T1.57: 공유 도구는 `@polyspec/kit` 0.0.53입니다.
 - T1.56: 공유 도구는 `@polyspec/kit` 0.0.52입니다. `.php-version`이 모든 workflow가 설정하는 PHP 8.5를 선언하며, release workflow는 모든 release 단계 앞에서 `make kit-check`를 실행합니다(kit K193).

@@ -67,7 +67,7 @@ export const COMMANDS: Record<string, Commands> = {
     artifacts: ['{php-extension}/src/modules/ordered_json.so'],
   },
   python: {
-    // The virtual environment of make install-python, into which the package is installed.
+    // The virtual environment of make ordered-json-install-python, into which the package is installed.
     command: ['{python}/.venv/bin/python', '{python}/tests/probe.py'],
     runtime: { python: ['{python}/.venv/bin/python', '-c', 'import platform; print(platform.python_version())'] },
   },

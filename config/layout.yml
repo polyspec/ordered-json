@@ -19,11 +19,11 @@ rules:
       - "tests/*"
       # The consumer projects in which make release-consumer installs the release archives (config/release.json).
       - "!tests/release-consumer"
-      # The node:test tests of the tools of scripts/ and benchmarks/run.mts (make test-scripts).
+      # The node:test tests of the tools of scripts/ and benchmarks/run.mts (make ordered-json-test-scripts).
       - "!tests/scripts"
 
   # S5: the root files of ordered-json beyond the list of kit (K145).
-  # external-inputs.json: the pinned downloads of make install-external (the PIE PHAR and the supplementary suite),
+  # external-inputs.json: the pinned downloads of make ordered-json-install-external (the PIE PHAR and the supplementary suite),
   # scripts/external-inputs.mts.
   - id: layout-root-files
     vars: { root_files: "{external-inputs.json}" }
@@ -33,7 +33,18 @@ rules:
       - "scripts/**/*.{js,mjs,cjs,py,sh,bash,zsh,rb,pl,php,go,rs,ps1,bat,cmd}"
       - "tests/**/*.{js,mjs,cjs,py,sh,bash,zsh,rb,pl,php,go,rs,ps1,bat,cmd}"
       - "!tests/kit/fixture/**"
-      # S9 exception (a), a harness that drives one language: the probe of the ojson comparison (scripts/compare-ojson.mts)
-      # imports PyPI ojson 0.1.0, a Python library outside this repository, into the Python interpreter that runs it and
-      # answers each document with its decoded tree and its output; only Python can call that library.
-      - "!scripts/comparison/python_ojson_probe.py"
+
+  # K245 exception: each runtime package keeps its AGENTS, CHANGELOG and Makefile beside its code, because its registry
+  # releases that folder and its Go module tag names it. The Makefile of a package only runs the targets of the root
+  # (make -C ../.. verify-<runtime>), and its changelog and rules hold the changes of that runtime alone; the root files
+  # would merge them into one history.
+  - id: management-files-at-root
+    paths:
+      - "packages/**/AGENTS*.md"
+      - "packages/**/CHANGELOG*.md"
+      - "packages/**/Makefile"
+      - "!packages/*/AGENTS.md"
+      - "!packages/*/AGENTS.ko.md"
+      - "!packages/*/CHANGELOG.md"
+      - "!packages/*/CHANGELOG.ko.md"
+      - "!packages/*/Makefile"

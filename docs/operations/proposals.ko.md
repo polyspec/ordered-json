@@ -1,8 +1,8 @@
 <!-- doc-id: proposals -->
-<!-- source-sha256: 3d6c069868451481dddc37e21e3d531aa3b8021028636d1e2bfbe968fb23c0b1 -->
+<!-- source-sha256: ddb0cb1d4df2b69c26e09a23b30f646c42ad6e5bf0d8ed33c7850489019fdc64 -->
 # 승인 대기 제안
 
-[English](README.md)
+[English](proposals.md)
 
 <a id="state"></a>
 ## 현재 상태

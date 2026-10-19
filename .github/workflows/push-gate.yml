@@ -1,9 +1,9 @@
 # The push gate in CI. The pre-push hook .githooks/pre-push refuses a push while a task of
-# docs/plans/execution-checklist.md is [~], but a push from a checkout without the hook does not run it. This job runs
+# docs/plans/execution/checklist.md is [~], but a push from a checkout without the hook does not run it. This job runs
 # the same gate, make push-gate-commit (push-gate of @polyspec/kit), on the pushed commit of every branch and on the head
 # commit of every pull request: it fails while a task of the checklist is [~], naming each one, and when the commit does
 # not track .githooks/pre-push and .githooks/pre-commit with mode 100755. The release workflow requires this job on the
-# tagged commit, so it also runs the document check, make documents-check (check-documents of @polyspec/kit), the evidence
+# tagged commit, so it also runs the document check, make docs-check (check-documents of @polyspec/kit), the evidence
 # check, make evidence-check (scripts/check-evidence.mts), and the check of the commit message, make commits-check: a
 # commit whose documents, checklist, feature record or message fail their own checks does not reach a release. The
 # targets run through make ci-targets, which runs each after a failed one and writes the report. A step runs a make target, never a
@@ -48,7 +48,7 @@ jobs:
         run: make install-tools
       - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci-targets TARGETS="push-gate-commit documents-check evidence-check commits-check"
+        run: make ci-targets TARGETS="push-gate-commit docs-check evidence-check commits-check"
       # actions/upload-artifact v7.0.1
       - name: report
         if: ${{ !cancelled() }}

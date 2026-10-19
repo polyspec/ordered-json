@@ -54,20 +54,20 @@ test('no command installs or selects another toolchain', () => {
   assert.equal(commandsOf('rust').env?.RUSTUP_AUTO_INSTALL, '0');
 });
 
-// install-comparison downloads the build of PyPI ojson for scripts/compare-ojson.mts, which no check runs.
 test('every check runs offline and only make install downloads', () => {
   const text = makefile();
   for (const [name, value] of Object.entries(OFFLINE)) assert.match(text, new RegExp(`^export ${name} := ${value}$`, 'm'));
   assert.match(text, new RegExp(`^ONLINE := env${Object.keys(OFFLINE).map(name => ` -u ${name}`).join('')}$`, 'm'));
   const downloading = [...recipes(text)].filter(([, rule]) => rule.recipe.some(line => line.includes('$(ONLINE)'))).map(([target]) => target).sort();
-  assert.deepEqual(downloading, ['install-comparison', 'install-external', 'install-php', 'install-python', 'install-rust']);
+  assert.deepEqual(downloading, ['ordered-json-install-external', 'ordered-json-install-php', 'ordered-json-install-python', 'ordered-json-install-rust']);
 });
 
 test('make install makes every download of the checks', () => {
   const table = recipes(makefile());
-  assert.deepEqual(known(table.get('install'), 'the target install').prerequisites, ['install-rust', 'install-tools', 'cargo-downloads-fetch', 'install-php', 'install-python', 'install-external']);
-  assert.deepEqual(known(table.get('install-external'), 'the target install-external').recipe, ['$(ONLINE) $(NODE) scripts/external-inputs.mts']);
-  assert.deepEqual(known(table.get('install-rust'), 'the target install-rust').recipe, ['$(ONLINE) rustup toolchain install --no-self-update']);
+  assert.deepEqual(known(table.get('install'), 'the target install').prerequisites, ['ordered-json-install']);
+  assert.deepEqual(known(table.get('ordered-json-install'), 'the target ordered-json-install').prerequisites, ['install-kit', 'ordered-json-install-rust', 'cargo-downloads-fetch', 'ordered-json-install-php', 'ordered-json-install-python', 'ordered-json-install-external']);
+  assert.deepEqual(known(table.get('ordered-json-install-external'), 'the target ordered-json-install-external').recipe, ['$(ONLINE) $(NODE) scripts/external-inputs.mts']);
+  assert.deepEqual(known(table.get('ordered-json-install-rust'), 'the target ordered-json-install-rust').recipe, ['$(ONLINE) rustup toolchain install --no-self-update']);
 });
 
 test('a target that runs a tool depends on the toolchain and download checks', () => {

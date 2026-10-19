@@ -1,5 +1,5 @@
 <!-- doc-id: repositories -->
-<!-- source-sha256: cbda374e3ea9bd5f129675f73ece12d72b71d191d6fa49d9bc51ea04e2219ac0 -->
+<!-- source-sha256: 15499b7d2e5ba5d47bbd9220bf1d15bae80d019184d4c1912c4438584370239b -->
 # 저장소 계약
 
 [English](repositories.md)
@@ -35,7 +35,7 @@
 <a id="documents"></a>
 ## 문서와 변경
 
-각 패키지는 자체 영어 문서와 한국어 번역을 가집니다. 구현 문서는 공통 계약과 통합 기능 상태를 참조합니다. `config/documents.json`이 공통 루트와 모든 패키지의 문서를 선택하며 `make documents-check`가 함께 검사합니다.
+각 패키지는 자체 영어 문서와 한국어 번역을 가집니다. 구현 문서는 공통 계약과 통합 기능 상태를 참조합니다. `config/documents.json`이 공통 루트와 모든 패키지의 문서를 선택하며 `make docs-check`가 함께 검사합니다.
 
 공통 계약을 변경할 때 검증기, 관련 구현과 적합성 fixture를 하나의 변경으로 갱신하고 패키지 및 통합 검사를 실행한 다음 결과 저장소 리비전을 게시합니다. 테스트 성공과 소스 또는 패키지 게시는 별도로 확인합니다.
 
