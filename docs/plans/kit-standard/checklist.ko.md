@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: c189fbd8dbe5d0aa35b4c4739d09306a18b10fa795f7a6922b2798ad3296b36e -->
+<!-- source-sha256: 16096ac1f28cceec7e9974d5c46ba6421a258181cd11c08b6f44c4b47560ba5a -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -32,3 +32,4 @@
 | T2.22 | packages/php의 OfficialTest와 ValueApiTest는 확장이 로드되지 않았음을 단정하지 않고, 확장이 있든 없든 성립하는 동작을 단정합니다 (S10 ruling 8: 같은 파일이 두 구현을 test합니다) | `packages/php/tests/OfficialTest.php`, `packages/php/tests/ValueApiTest.php`, `packages/php-ext/tests/`, `CHANGELOG.md`(.ko) | `make test-php CASES=Official` and `make test-php-ext CASES=Official` | [ ] |
 | T2.23 | 각 언어 생태계의 JSON이 contract를 만족하는 곳에서는 그것 위에 만듭니다: 표준 JSON reader와 writer가 RQ id를 만족하면 손으로 쓴 parser나 serializer를 대체하고, 손으로 쓴 것은 실패하는 case를 적은 rebuild 기록과 함께만 남깁니다 | `docs/rebuild/`, `packages/*/`, `config/rebuild.json`, `CHANGELOG.md`(.ko) | `make rebuild-check` | [o] |
 | T2.24 | kit 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), the copies of `kit.copies`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
+| T2.25 | Python test는 package입니다: packages/python/tests에 __init__.py가 있어 make test-python이 case를 고릅니다 (kit K298) | `packages/python/tests/__init__.py`, `CHANGELOG.md`(.ko) | `make test-python CASES=depth_limit` | [!] 원인: tests/__init__.py를 추가해 make test-python이 case를 찾지만 ModuleNotFoundError: No module named polyspec으로 실패합니다: kit의 scripts/kit/runtime-targets.mts 91행이 --venv 없이 mise python을 실행하며(run-tests.mts는 --venv를 받습니다), 그래서 test가 import하는 package(S3: 설치되며 경로에 두지 않음)를 import할 수 없습니다; 재시도: test-python이 packages/python/.venv의 interpreter를 실행한 뒤 |
