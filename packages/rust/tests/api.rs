@@ -179,3 +179,43 @@ fn root_keeps_surrounding_text() {
     assert_eq!(stringify(&value), value.compact());
     assert_eq!(value.items().unwrap()[0].raw(), "1");
 }
+
+#[test]
+fn public_api_exports_the_entry_points() {
+    // RQ-023: the parse, serialization, factory and accessor functions are exported.
+    let built = Value::object(&{
+        let mut members = OrderedMap::new();
+        members
+            .insert(
+                Value::string("a"),
+                Value::array(&[
+                    Value::string("x"),
+                    Value::number("1").unwrap(),
+                    Value::boolean(true),
+                    Value::null(),
+                ])
+                .unwrap(),
+            )
+            .unwrap();
+        members
+    })
+    .unwrap();
+    assert_eq!(stringify(&built), "{\"a\":[\"x\",1,true,null]}");
+    let parsed = parse(&stringify(&built)).unwrap();
+    let items = parsed.members().unwrap().get("a").unwrap().items().unwrap();
+    let kinds: Vec<Kind> = items.iter().map(Value::kind).collect();
+    assert_eq!(kinds, [Kind::String, Kind::Number, Kind::Boolean, Kind::Null]);
+    assert_eq!(items[0].string_value().unwrap(), "x");
+    assert_eq!(items[1].number_literal(), Some("1"));
+    assert_eq!(items[2].boolean_value(), Some(true));
+    assert_eq!(parse_bytes(b"[]").unwrap().compact(), "[]");
+}
+
+#[test]
+fn parse_error_exposes_kind_offset_and_message() {
+    // RQ-024: a parse error exposes its kind, its offset and its message.
+    let error = parse("[1,]").unwrap_err();
+    assert_eq!(error.kind(), "expected_value");
+    assert_eq!(error.offset, 3);
+    assert_eq!(error.message, "expected JSON value");
+}

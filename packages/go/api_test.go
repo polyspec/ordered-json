@@ -357,3 +357,70 @@ func second[T any](_ T, err error) error { return err }
 func secondString(_ string, err error) error { return err }
 
 func secondBool(_ bool, err error) error { return err }
+
+func TestPublicApiExportsTheEntryPoints(t *testing.T) {
+	// RQ-023: the parse, serialization, factory and accessor functions are exported.
+	text, err := String("x")
+	if err != nil {
+		t.Fatal(err)
+	}
+	number, err := Number("1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	list, err := Array([]*Value{text, number, Boolean(true), Null()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var members OrderedMap
+	if err := members.Set(mustParse(t, `"a"`), list); err != nil {
+		t.Fatal(err)
+	}
+	built, err := Object(&members)
+	if err != nil {
+		t.Fatal(err)
+	}
+	compact, err := Stringify(built)
+	if err != nil || compact != `{"a":["x",1,true,null]}` {
+		t.Fatalf("Stringify = %q, %v", compact, err)
+	}
+	parsed := mustParse(t, compact)
+	object, err := parsed.Members()
+	if err != nil {
+		t.Fatal(err)
+	}
+	items, err := object.Get("a").Items()
+	if err != nil {
+		t.Fatal(err)
+	}
+	kinds := []Kind{StringKind, NumberKind, BooleanKind, NullKind}
+	for index, item := range items {
+		if item.Kind() != kinds[index] {
+			t.Fatalf("item %d kind = %s", index, item.Kind())
+		}
+	}
+	if value, _ := items[0].StringValue(); value != "x" {
+		t.Fatalf("StringValue = %q", value)
+	}
+	if literal, _ := items[1].NumberLiteral(); literal != "1" {
+		t.Fatalf("NumberLiteral = %q", literal)
+	}
+	if flag, _ := items[2].BooleanValue(); !flag {
+		t.Fatal("BooleanValue = false")
+	}
+	if _, err := ParseBytes([]byte("[]")); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestParseErrorExposesKindOffsetAndMessage(t *testing.T) {
+	// RQ-024: a parse error exposes its kind, its offset and its message.
+	var failure *ParseError
+	_, err := Parse("[1,]")
+	if !errors.As(err, &failure) {
+		t.Fatalf("Parse error = %v", err)
+	}
+	if failure.Kind() != "expected_value" || failure.Offset != 3 || failure.Message != "expected JSON value" {
+		t.Fatalf("kind = %q, offset = %d, message = %q", failure.Kind(), failure.Offset, failure.Message)
+	}
+}

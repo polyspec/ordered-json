@@ -2391,6 +2391,84 @@
           "id": "test_string_value_keeps_an_unpaired_surrogate"
         }
       ]
+    },
+    {
+      "id": "public_api_exports_the_entry_points",
+      "kind": "feature",
+      "requirements": [
+        "RQ-023"
+      ],
+      "bindings": [
+        {
+          "implementation": "js",
+          "test": "packages/js/tests/api.test.mjs",
+          "id": "public_api_exports_the_entry_points"
+        },
+        {
+          "implementation": "rust",
+          "test": "packages/rust/tests/api.rs",
+          "id": "public_api_exports_the_entry_points"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/go/api_test.go",
+          "id": "TestPublicApiExportsTheEntryPoints"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testPublicApiExportsTheEntryPoints"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testPublicApiExportsTheEntryPoints"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_public_api_exports_the_entry_points"
+        }
+      ]
+    },
+    {
+      "id": "parse_error_exposes_kind_offset_and_message",
+      "kind": "feature",
+      "requirements": [
+        "RQ-024"
+      ],
+      "bindings": [
+        {
+          "implementation": "js",
+          "test": "packages/js/tests/api.test.mjs",
+          "id": "parse_error_exposes_kind_offset_and_message"
+        },
+        {
+          "implementation": "rust",
+          "test": "packages/rust/tests/api.rs",
+          "id": "parse_error_exposes_kind_offset_and_message"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/go/api_test.go",
+          "id": "TestParseErrorExposesKindOffsetAndMessage"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testParseErrorExposesKindOffsetAndMessage"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testParseErrorExposesKindOffsetAndMessage"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_parse_error_exposes_kind_offset_and_message"
+        }
+      ]
     }
   ],
   "tools": [

@@ -216,3 +216,24 @@ class PackageCases(unittest.TestCase):
             parse('["한"]\ud800')
         self.assertEqual(caught.exception.kind, "unescaped_lone_surrogate")
         self.assertEqual(caught.exception.offset, len('["한"]'.encode("utf-8")))
+
+    def test_public_api_exports_the_entry_points(self):
+        # RQ-023: the parse, serialization, factory and accessor functions are exported.
+        for name in ("parse", "parse_bytes", "stringify", "Value"):
+            self.assertTrue(callable(getattr(ordered_json, name)), name)
+        built = Value.object([("a", Value.array([Value.string("x"), Value.number("1"), Value.boolean(True), Value.null()]))])
+        self.assertEqual(stringify(built), '{"a":["x",1,true,null]}')
+        items = parse(stringify(built)).get("a").items()
+        self.assertEqual([item.kind for item in items], ["string", "number", "boolean", "null"])
+        self.assertEqual(items[0].string_value(), "x")
+        self.assertEqual(items[1].number_literal(), "1")
+        self.assertIs(items[2].boolean_value(), True)
+        self.assertEqual(len(built.members()), 1)
+
+    def test_parse_error_exposes_kind_offset_and_message(self):
+        # RQ-024: a parse error exposes its kind, its offset and its message.
+        with self.assertRaises(ParseError) as caught:
+            parse("[1,]")
+        self.assertEqual(caught.exception.kind, "expected_value")
+        self.assertEqual(caught.exception.offset, 3)
+        self.assertTrue(str(caught.exception))

@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 6348cbd773ababa1b97a93f338282863c5fb73f8074591e9a158697533c4412c -->
+<!-- source-sha256: 646b0e29b020e242c36533b3d69748e389de269f6053a6bb15c8eb32acd9335c -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- RQ-023과 RQ-024처럼 어느 unit도 인용하지 않던 requirement를 두 feature unit이 test합니다 (T2.4-3): `public_api_exports_the_entry_points`(RQ-023: parse, serialization, factory, accessor 함수)와 `parse_error_exposes_kind_offset_and_message`(RQ-024)이며, js, rust, go, php, python과 php-extension binding(상속한 PHP test case 실행)에 각각 test가 있습니다. Red: `make parity-declarations-check` R13 untraced-requirement 2건(RQ-023, RQ-024); green: R13 0건. Test: node:test 2 passed, cargo test 2 passed, go test 2 passed, PHPUnit 2 passed, unittest 2 passed; 확장 실행은 T2.8을 기다립니다.
 - PRINCIPLES 사본은 설치된 kit 0.0.54의 것과 같습니다 (T2.17). `make kit-sync`가 씁니다. Red: `make kit-check` exit 2, 101건 중 `PRINCIPLES.md`와 `PRINCIPLES.ko.md`가 다르다는 2건; green: 99건, PRINCIPLES에 관한 것은 없음(남은 것은 parity와 rebuild 설정이며 T2.4와 T2.18 항목).
 - `config/duplication.json`은 `packages/*/tests/**`를 제외합니다 (T2.14). 이유는 kit이 자신의 test에 쓴 것과 같습니다: test는 case를 온전히 적습니다. Red: `make duplication-check` exit 2, package test에만 3건; green: exit 0, `no piece of code exists twice`.
 - `config/dependency-policy.json`의 Composer platform은 PHP 8.4.1입니다 (T2.13). 세 manifest와 lock의 값이며 PHPUnit 13.4.2가 필요로 합니다(kit K259). Red: `make dependency-policy-check` exit 2, 10건 중 규칙 `platform` 6건; green: 4건, `platform`은 없음; 남은 4건은 2026-10-15 review 뒤에 바뀐 lock이며 kit K283 뒤에 `make dependency-review RECORD=1`로 기록합니다.

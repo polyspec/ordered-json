@@ -13,6 +13,9 @@ use Throwable;
 use TypeError;
 use UnexpectedValueException;
 
+use function Polyspec\OrderedJson\parse;
+use function Polyspec\OrderedJson\stringify;
+
 /**
  * The value API of both PHP backends, run by PHPUnit; each test method is a feature unit of config/parity.json. The
  * pure library and the extension must answer identically, so ValueApiTest of this package runs these tests without the
@@ -271,6 +274,38 @@ abstract class ValueApiTestCase extends TestCase
         } finally {
             ini_set('pcre.backtrack_limit', (string)$backtrack);
             ini_set('pcre.recursion_limit', (string)$recursion);
+        }
+    }
+
+    public function testPublicApiExportsTheEntryPoints(): void
+    {
+        // RQ-023: the parse, serialization, factory and accessor functions are exported.
+        $built = Value::object(['a' => Value::array([
+            Value::string('x'),
+            Value::number('1'),
+            Value::boolean(true),
+            Value::null(),
+        ])]);
+        self::assertSame('{"a":["x",1,true,null]}', stringify($built));
+        $items = parse(stringify($built))->get('a')?->items();
+        self::assertNotNull($items);
+        self::assertSame(['string', 'number', 'boolean', 'null'], array_map(static fn(Value $item) => $item->kind(), $items));
+        self::assertSame('x', $items[0]->stringValue());
+        self::assertSame('1', $items[1]->numberLiteral());
+        self::assertTrue($items[2]->booleanValue());
+        self::assertCount(1, $built->members());
+    }
+
+    public function testParseErrorExposesKindOffsetAndMessage(): void
+    {
+        // RQ-024: a parse error exposes its kind, its offset and its message.
+        try {
+            parse('[1,]');
+            self::fail('expected ParseError');
+        } catch (ParseError $error) {
+            self::assertSame('expected_value', $error->kind);
+            self::assertSame(3, $error->offset);
+            self::assertNotSame('', $error->getMessage());
         }
     }
 }

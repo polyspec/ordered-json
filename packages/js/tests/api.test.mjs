@@ -190,3 +190,28 @@ test('strict_parse_accepts_unique_keys', () => {
       {name: 'TypeError', message: 'rejectDuplicates must be a boolean'});
   }
 });
+
+test('public_api_exports_the_entry_points', () => {
+  // RQ-023: the parse, serialization, factory and accessor functions are exported.
+  for (const entry of [parse, parseBytes, stringify, Value.string, Value.number, Value.boolean, Value.null, Value.array, Value.object]) {
+    assert.equal(typeof entry, 'function');
+  }
+  const built = Value.object([['a', Value.array([Value.string('x'), Value.number('1'), Value.boolean(true), Value.null()])]]);
+  assert.equal(stringify(built), '{"a":["x",1,true,null]}');
+  const items = parse(stringify(built)).get('a').items;
+  assert.deepEqual(items.map(item => item.kind), ['string', 'number', 'boolean', 'null']);
+  assert.equal(items[0].stringValue(), 'x');
+  assert.equal(items[1].numberLiteral(), '1');
+  assert.equal(items[2].booleanValue(), true);
+  assert.equal(built.members.size, 1);
+});
+
+test('parse_error_exposes_kind_offset_and_message', () => {
+  // RQ-024: a parse error exposes its kind, its offset and its message.
+  const error = (() => { try { parse('[1,]'); } catch (failure) { return failure; } })();
+  assert.ok(error instanceof ParseError);
+  assert.equal(error.kind, 'expected_value');
+  assert.equal(error.offset, 3);
+  assert.equal(typeof error.message, 'string');
+  assert.ok(error.message.length > 0);
+});
