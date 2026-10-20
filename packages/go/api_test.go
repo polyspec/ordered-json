@@ -93,7 +93,7 @@ func TestBytesInputIsValidated(t *testing.T) {
 	if parseErr != nil {
 		t.Fatal(parseErr)
 	}
-	if compact, _ := value.Compact(); compact != `["한"]` {
+	if compact := must(value.Compact()); compact != `["한"]` {
 		t.Fatalf("Compact() = %s", compact)
 	}
 }
@@ -162,7 +162,7 @@ func TestRepeatedKeyKeepsFirstPositionAndLastValue(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if compact, _ := object.Compact(); compact != `{"a":3,"b":2}` {
+	if compact := must(object.Compact()); compact != `{"a":3,"b":2}` {
 		t.Fatalf("Compact() = %s", compact)
 	}
 	if members.Len() != 2 {
@@ -175,7 +175,7 @@ func TestMemberLookupUsesDecodedNames(t *testing.T) {
 	value := mustParse(t, `{"a\u00e9":1,"b":2}`)
 	if child := value.Get("aé"); child == nil {
 		t.Fatal(`Get("aé") returned nothing`)
-	} else if literal, _ := child.NumberLiteral(); literal != "1" {
+	} else if literal := must(child.NumberLiteral()); literal != "1" {
 		t.Fatalf("NumberLiteral() = %q", literal)
 	}
 	if value.Get("missing") != nil {
@@ -199,7 +199,7 @@ func TestUnpairedSurrogateStaysInUnits(t *testing.T) {
 	if len(units) != 2 || units[0] != 'a' || units[1] != 0xd800 {
 		t.Fatalf("StringUnits() = %v", units)
 	}
-	if compact, _ := StringFromUnits([]uint16{0xd800}).Compact(); compact != `"\ud800"` {
+	if compact := must(StringFromUnits([]uint16{0xd800}).Compact()); compact != `"\ud800"` {
 		t.Fatalf("StringFromUnits Compact() = %s", compact)
 	}
 }
@@ -214,7 +214,7 @@ func TestSurrogatePairDecodes(t *testing.T) {
 	if len(units) != 2 || units[0] != 0xd83c || units[1] != 0xdf0d {
 		t.Fatalf("StringUnits() = %v", units)
 	}
-	if text, _ := pair.StringValue(); text != "🌍" {
+	if text := must(pair.StringValue()); text != "🌍" {
 		t.Fatalf("StringValue() = %q", text)
 	}
 }
@@ -253,10 +253,10 @@ func TestFactoriesValidateArguments(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if compact, _ := text.Compact(); compact != `"\"q\""` {
+	if compact := must(text.Compact()); compact != `"\"q\""` {
 		t.Fatalf("String Compact() = %s", compact)
 	}
-	if compact, _ := Boolean(true).Compact(); compact != "true" {
+	if compact := must(Boolean(true).Compact()); compact != "true" {
 		t.Fatalf("Boolean(true) Compact() = %s", compact)
 	}
 }
@@ -283,7 +283,7 @@ func TestReturnedCollectionsAreImmutable(t *testing.T) {
 		t.Fatal(err)
 	}
 	items[0] = nil
-	again, _ := array.Items()
+	again := must(array.Items())
 	if again[0] == nil {
 		t.Fatal("Items() handed out the parsed slice")
 	}
@@ -292,11 +292,11 @@ func TestReturnedCollectionsAreImmutable(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	key, _ := String("c")
+	key := must(String("c"))
 	if err := members.Set(key, Null()); err != nil {
 		t.Fatal(err)
 	}
-	fresh, _ := object.Members()
+	fresh := must(object.Members())
 	if fresh.Len() != 2 {
 		t.Fatalf("Members() shares state: Len() = %d", fresh.Len())
 	}
@@ -308,7 +308,7 @@ func TestRootKeepsSurroundingText(t *testing.T) {
 	if value.Raw() != "  [1] \n" {
 		t.Fatalf("Raw() = %q", value.Raw())
 	}
-	if compact, _ := value.Compact(); compact != "[1]" {
+	if compact := must(value.Compact()); compact != "[1]" {
 		t.Fatalf("Compact() = %s", compact)
 	}
 	items, err := value.Items()
@@ -357,7 +357,7 @@ func TestHostDeserializationEmbedsValues(t *testing.T) {
 	if err := json.Unmarshal([]byte(`{"call":"view","props":{"z":1.50,"a":[{"b":2,"a":3}]}}`), &got); err != nil {
 		t.Fatal(err)
 	}
-	if compact, _ := got.Props.Compact(); compact != `{"z":1.50,"a":[{"b":2,"a":3}]}` {
+	if compact := must(got.Props.Compact()); compact != `{"z":1.50,"a":[{"b":2,"a":3}]}` {
 		t.Fatalf("Compact() = %s", compact)
 	}
 	// A document that the library parser rejects, here one nested deeper than its limit, is an error of the decoder.
@@ -373,6 +373,14 @@ func mustParse(t *testing.T, source string) *Value {
 	value, err := Parse(source)
 	if err != nil {
 		t.Fatalf("Parse(%q) error = %v", source, err)
+	}
+	return value
+}
+
+// must returns the value of a call that the test expects to succeed; its error panics, which fails the test.
+func must[T any](value T, err error) T {
+	if err != nil {
+		panic(err)
 	}
 	return value
 }
@@ -424,13 +432,13 @@ func TestPublicApiExportsTheEntryPoints(t *testing.T) {
 			t.Fatalf("item %d kind = %s", index, item.Kind())
 		}
 	}
-	if value, _ := items[0].StringValue(); value != "x" {
+	if value := must(items[0].StringValue()); value != "x" {
 		t.Fatalf("StringValue = %q", value)
 	}
-	if literal, _ := items[1].NumberLiteral(); literal != "1" {
+	if literal := must(items[1].NumberLiteral()); literal != "1" {
 		t.Fatalf("NumberLiteral = %q", literal)
 	}
-	if flag, _ := items[2].BooleanValue(); !flag {
+	if flag := must(items[2].BooleanValue()); !flag {
 		t.Fatal("BooleanValue = false")
 	}
 	if _, err := ParseBytes([]byte("[]")); err != nil {
@@ -480,7 +488,7 @@ func TestStrictParseAcceptsUniqueKeys(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if compact, _ := parsed.Compact(); compact != source {
+	if compact := must(parsed.Compact()); compact != source {
 		t.Fatalf("Compact() = %s", compact)
 	}
 	var failure *ParseError
@@ -519,7 +527,7 @@ func TestArraysAndObjectsStayDistinct(t *testing.T) {
 		t.Fatal(err)
 	}
 	for index, want := range []string{"3", "1", "2"} {
-		if literal, _ := items[index].NumberLiteral(); literal != want {
+		if literal := must(items[index].NumberLiteral()); literal != want {
 			t.Fatalf("item %d = %s, want %s", index, literal, want)
 		}
 	}
@@ -527,7 +535,7 @@ func TestArraysAndObjectsStayDistinct(t *testing.T) {
 		t.Fatal("[] and {} are not an array and an object")
 	}
 	text := `{"a":[],"b":{},"c":[{}]}`
-	if compact, _ := Stringify(mustParse(t, text)); compact != text {
+	if compact := must(Stringify(mustParse(t, text))); compact != text {
 		t.Fatalf("Stringify() = %s", compact)
 	}
 }
@@ -540,7 +548,7 @@ func TestNumberTokensAreKeptExactly(t *testing.T) {
 		t.Fatal(err)
 	}
 	for index, want := range tokens {
-		if literal, _ := items[index].NumberLiteral(); literal != want {
+		if literal := must(items[index].NumberLiteral()); literal != want {
 			t.Fatalf("item %d = %s, want %s", index, literal, want)
 		}
 	}
@@ -554,11 +562,11 @@ func TestNumberTokensAreKeptExactly(t *testing.T) {
 
 // Requirements: RQ-011
 func TestSerializationIsIdempotent(t *testing.T) {
-	once, _ := Stringify(mustParse(t, ` { "b" : 1 , "a" : 2 , "b" : 3 } `))
+	once := must(Stringify(mustParse(t, ` { "b" : 1 , "a" : 2 , "b" : 3 } `)))
 	if once != `{"b":3,"a":2}` {
 		t.Fatalf("Stringify() = %s", once)
 	}
-	if again, _ := Stringify(mustParse(t, once)); again != once {
+	if again := must(Stringify(mustParse(t, once))); again != once {
 		t.Fatalf("Stringify(Parse(%s)) = %s", once, again)
 	}
 }

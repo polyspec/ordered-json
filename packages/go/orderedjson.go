@@ -287,7 +287,15 @@ func (v *Value) name() string {
 	}
 	return unitsName(decodeUnits(content))
 }
-func (v *Value) String() string { out, _ := v.Compact(); return out }
+// String implements fmt.Stringer. A Value that does not serialize has no text, so String panics with the error rather
+// than return an empty string that looks like a value (P8).
+func (v *Value) String() string {
+	out, err := v.Compact()
+	if err != nil {
+		panic(err)
+	}
+	return out
+}
 func (v *Value) Members() (*OrderedMap, error) {
 	if v.Kind() != ObjectKind {
 		return nil, fmt.Errorf("expected object")
@@ -361,8 +369,7 @@ func StringFromUnits(units []uint16) *Value {
 		}
 	}
 	out.WriteByte('"')
-	v, _ := Parse(out.String())
-	return v
+	return mustBuild(out.String())
 }
 func Number(literal string) (*Value, error) {
 	v, err := Parse(literal)
@@ -374,22 +381,33 @@ func Number(literal string) (*Value, error) {
 	}
 	return v, nil
 }
-func Boolean(value bool) *Value {
-	if value {
-		v, _ := Parse("true")
-		return v
+// mustBuild parses a literal that this package builds itself. Such a literal always parses, so a failure is a defect of
+// the package and panics with the literal instead of returning a Value that is nil.
+func mustBuild(literal string) *Value {
+	v, err := Parse(literal)
+	if err != nil {
+		panic(fmt.Sprintf("orderedjson: built literal %q does not parse: %v", literal, err))
 	}
-	v, _ := Parse("false")
 	return v
 }
-func Null() *Value { v, _ := Parse("null"); return v }
+func Boolean(value bool) *Value {
+	if value {
+		return mustBuild("true")
+	}
+	return mustBuild("false")
+}
+func Null() *Value { return mustBuild("null") }
 func Array(items []*Value) (*Value, error) {
 	parts := make([]string, len(items))
 	for i, v := range items {
 		if !v.valid() {
 			return nil, fmt.Errorf("expected orderedjson Value")
 		}
-		parts[i], _ = v.Compact()
+		part, err := v.Compact()
+		if err != nil {
+			return nil, err
+		}
+		parts[i] = part
 	}
 	return Parse("[" + strings.Join(parts, ",") + "]")
 }
@@ -399,7 +417,10 @@ func Object(members *OrderedMap) (*Value, error) {
 	}
 	parts := make([]string, members.Len())
 	for i, key := range members.orderedKeys() {
-		child, _ := members.state.values[i].Compact()
+		child, err := members.state.values[i].Compact()
+		if err != nil {
+			return nil, err
+		}
 		parts[i] = strings.TrimSpace(key.Raw()) + ":" + child
 	}
 	return Parse("{" + strings.Join(parts, ",") + "}")

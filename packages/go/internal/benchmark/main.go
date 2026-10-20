@@ -15,17 +15,18 @@ import (
 )
 
 func digest(value []byte) string { sum := sha256.Sum256(value); return hex.EncodeToString(sum[:]) }
-func iterations() int {
-	n, _ := strconv.Atoi(os.Getenv("OJ_BENCH_ITERATIONS"))
-	if n < 1 {
-		return 1000
-	}
-	return n
-}
+func iterations() int { return setting("OJ_BENCH_ITERATIONS", 1000) }
+
+// setting returns the fallback when the variable is unset. A value that is not a positive integer stops the run: a silent
+// default would measure a different workload than the one asked for (P8).
 func setting(name string, fallback int) int {
-	n, _ := strconv.Atoi(os.Getenv(name))
-	if n < 1 {
+	text, set := os.LookupEnv(name)
+	if !set {
 		return fallback
+	}
+	n, err := strconv.Atoi(text)
+	if err != nil || n < 1 {
+		panic(fmt.Sprintf("%s must be a positive integer, got %q", name, text))
 	}
 	return n
 }
@@ -131,7 +132,10 @@ func main() {
 			return out
 		}, n, warmup, warmupMs, samples)
 		statsJSON := func(p, s, r stats) string {
-			b, _ := json.Marshal(map[string]any{"parse": p.Samples, "stringify": s.Samples, "roundtrip": r.Samples})
+			b, err := json.Marshal(map[string]any{"parse": p.Samples, "stringify": s.Samples, "roundtrip": r.Samples})
+			if err != nil {
+				panic(err)
+			}
 			return string(b)
 		}
 		fmt.Printf("%s\tordered-json\t%f\t%f\t%f\t%f\t%f\t%f\t%s\t%s\t%d\t%d\n", file, parseStats.Median, stringifyStats.Median, roundtripStats.Median, parseStats.P95, stringifyStats.P95, roundtripStats.P95, statsJSON(parseStats, stringifyStats, roundtripStats), digest(output), len(source), len(output))

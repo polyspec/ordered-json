@@ -34,7 +34,10 @@ func tree(v *orderedjson.Value) string {
 		}
 		parts := []string{}
 		for _, key := range members.Keys() {
-			units, _ := key.StringUnits()
+			units, err := key.StringUnits()
+			if err != nil {
+				panic(err)
+			}
 			parts = append(parts, "["+text(key)+","+tree(members.GetUnits(units))+"]")
 		}
 		return `["object",[` + strings.Join(parts, ",") + `]]`
@@ -82,7 +85,10 @@ func rebuild(v *orderedjson.Value) *orderedjson.Value {
 		}
 		for i := len(keys) - 1; i >= 0; i-- {
 			key := keys[i]
-			units, _ := key.StringUnits()
+			units, err := key.StringUnits()
+			if err != nil {
+				panic(err)
+			}
 			if err := outMembers.Set(key, rebuild(v.GetUnits(units))); err != nil {
 				panic(err)
 			}
