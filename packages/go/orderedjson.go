@@ -365,27 +365,13 @@ func StringFromUnits(units []uint16) *Value {
 	var out strings.Builder
 	out.WriteByte('"')
 	for _, u := range units {
-		switch u {
-		case '"':
-			out.WriteString(`\"`)
-		case '\\':
-			out.WriteString(`\\`)
-		case '\b':
-			out.WriteString(`\b`)
-		case '\f':
-			out.WriteString(`\f`)
-		case '\n':
-			out.WriteString(`\n`)
-		case '\r':
-			out.WriteString(`\r`)
-		case '\t':
-			out.WriteString(`\t`)
-		default:
-			if u >= 0x20 && u <= 0x7e {
-				out.WriteByte(byte(u))
-			} else {
-				fmt.Fprintf(&out, "\\u%04x", u)
-			}
+		if writeShortEscape(&out, rune(u)) {
+			continue
+		}
+		if u >= 0x20 && u <= 0x7e {
+			out.WriteByte(byte(u))
+		} else {
+			fmt.Fprintf(&out, "\\u%04x", u)
 		}
 	}
 	out.WriteByte('"')

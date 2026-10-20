@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 8a18eb2cdb0178e86cbb598f0521ff0bcf7fc44c6a82047b7352facbf375daf8 -->
+<!-- source-sha256: 340eeb0499402bbc8756750fabc69a186e6f8f869892a4a3730b9794b45c8f4e -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -12,3 +12,4 @@
 | T2.7 | 고정된 외부 입력(PIE PHAR와 JSONTestSuite revision)은 composer.phar와 같이 url과 sha256을 받는 mise의 http backend가 설치하고, scripts/external-inputs.mts는 제거합니다 | `mise.toml`, `mise.lock`, `external-inputs.json`, `scripts/external-inputs.mts`, `scripts/check-pie.mts`, `scripts/records.mts`, `Makefile` | `make rebuild-check` | [ ] |
 | T2.6 | config/rebuild.json은 scripts/의 각 tool의 class를 선언합니다 (S1) | `config/rebuild.json`, `config/owner-checks.json`, `CHANGELOG.md`(.ko) | `make rebuild-check` | [o] |
 | T2.8 | PHP 확장은 S10을 따릅니다: polyspec/ordered-json-php-ext와 polyspec_ordered_json이라는 이름, 추적되는 arginfo header가 있는 stub 하나, build-php-ext가 var/php-ext에 빌드 | `packages/php-ext/`, `Makefile`, `scripts/registry.mts`, `scripts/check-pie.mts`, `config/parity.json`, `AGENTS.md`(.ko) | `make lint-php-ext` and `node node_modules/@polyspec/kit/dist/run-tests.mjs node -- tests/scripts/registry.test.mts` | [!] 원인: 이름 변경은 끝났고 php-extension의 공유 case로 검증했지만, make lint-php-ext는 아직 arginfo header가 없다고 보고하며, make php-ext-arginfo는 kit에서 실패합니다: php-extension.mts의 arginfo(167-171행)는 복사본에서 phpize 뒤에 make <header>를 실행하는데, ./configure 전에는 Makefile이 없습니다; 재시도: kit이 arginfo의 복사본에서 ./configure를 실행한 뒤; 그 다음 make php-ext-arginfo로 packages/php-ext/src/polyspec_ordered_json_arginfo.h를 쓰고, 직접 쓴 arginfo와 function table 대신 ordered_json.c에 include하며, build-php-ext로 빌드합니다 |
+| T2.9 | Go 패키지는 각 코드 조각을 한 번만 적습니다: slice와 array의 list marshalling, JSON string의 짧은 escape는 각각 하나의 함수입니다 | `packages/go/marshal.go`, `packages/go/orderedjson.go`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-go` | [o] |

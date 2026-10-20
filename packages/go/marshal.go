@@ -112,27 +112,9 @@ func marshalReflect(out *strings.Builder, value reflect.Value, path string, omit
 		if value.Type().Elem().Kind() == reflect.Uint8 {
 			return writeString(out, base64.StdEncoding.EncodeToString(value.Bytes()))
 		}
-		out.WriteByte('[')
-		for i := 0; i < value.Len(); i++ {
-			if i > 0 {
-				out.WriteByte(',')
-			}
-			if err := marshalReflect(out, value.Index(i), fmt.Sprintf("%s[%d]", path, i), false, depth+1); err != nil {
-				return err
-			}
-		}
-		out.WriteByte(']')
+		return marshalList(out, value, path, depth)
 	case reflect.Array:
-		out.WriteByte('[')
-		for i := 0; i < value.Len(); i++ {
-			if i > 0 {
-				out.WriteByte(',')
-			}
-			if err := marshalReflect(out, value.Index(i), fmt.Sprintf("%s[%d]", path, i), false, depth+1); err != nil {
-				return err
-			}
-		}
-		out.WriteByte(']')
+		return marshalList(out, value, path, depth)
 	case reflect.Map:
 		if value.Type().Key().Kind() != reflect.String {
 			return fmt.Errorf("%s: map keys must be strings", path)
@@ -289,30 +271,55 @@ func writeString(out *strings.Builder, value string) error {
 	}
 	out.WriteByte('"')
 	for _, r := range value {
-		switch r {
-		case '"':
-			out.WriteString(`\"`)
-		case '\\':
-			out.WriteString(`\\`)
-		case '\b':
-			out.WriteString(`\b`)
-		case '\f':
-			out.WriteString(`\f`)
-		case '\n':
-			out.WriteString(`\n`)
-		case '\r':
-			out.WriteString(`\r`)
-		case '\t':
-			out.WriteString(`\t`)
-		default:
-			if r < 0x20 {
-				out.WriteString(`\u00`)
-				fmt.Fprintf(out, "%02x", r)
-			} else {
-				out.WriteRune(r)
-			}
+		if writeShortEscape(out, r) {
+			continue
+		}
+		if r < 0x20 {
+			out.WriteString(`\u00`)
+			fmt.Fprintf(out, "%02x", r)
+		} else {
+			out.WriteRune(r)
 		}
 	}
 	out.WriteByte('"')
+	return nil
+}
+
+// writeShortEscape writes the two-character escape of c that JSON defines (quote, backslash and the control characters
+// with a letter), and reports whether c had one.
+func writeShortEscape(out *strings.Builder, c rune) bool {
+	switch c {
+	case '"':
+		out.WriteString(`\"`)
+	case '\\':
+		out.WriteString(`\\`)
+	case '\b':
+		out.WriteString(`\b`)
+	case '\f':
+		out.WriteString(`\f`)
+	case '\n':
+		out.WriteString(`\n`)
+	case '\r':
+		out.WriteString(`\r`)
+	case '\t':
+		out.WriteString(`\t`)
+	default:
+		return false
+	}
+	return true
+}
+
+// marshalList writes the elements of a slice or an array as a JSON array.
+func marshalList(out *strings.Builder, value reflect.Value, path string, depth int) error {
+	out.WriteByte('[')
+	for i := 0; i < value.Len(); i++ {
+		if i > 0 {
+			out.WriteByte(',')
+		}
+		if err := marshalReflect(out, value.Index(i), fmt.Sprintf("%s[%d]", path, i), false, depth+1); err != nil {
+			return err
+		}
+	}
+	out.WriteByte(']')
 	return nil
 }
