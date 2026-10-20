@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: b59c962e0015c7e3cd42779aa7746b0248e41f7b5204c4536be5fc937e97e9c1 -->
+<!-- source-sha256: 3756dafea97fea01d9ffabca41434b87727b67adcd92cbbb78206bb22f1b9a6d -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -31,7 +31,7 @@
 | T2.18 | config/rebuild.json은 paths를 두지 않고, kit이 layout으로 찾은 모든 tool을 분류합니다 | `config/rebuild.json`, `CHANGELOG.md`(.ko) | `make rebuild-check` | [o] |
 | T2.19 | 확장의 test는 확장을 올리고 실행하는 packages/php의 PHPUnit 파일입니다: packages/php-ext는 그 사본도 packages/php로 향하는 상대 경로도 두지 않습니다 (kit K285) | `packages/php-ext/tests/`, `packages/php-ext/composer.json`, `packages/php-ext/phpunit.xml`, `packages/php/tests/`, `CHANGELOG.md`(.ko) | `make test-php-ext CASES=OfficialTest` | [o] |
 | T2.20 | 의존성 review 기록은 commit된 manifest와 lock에 일치합니다 | `config/dependency-review.json`, `CHANGELOG.md`(.ko) | `make dependency-policy-check` | [o] |
-| T2.21 | CHECK_TARGETS와 CI job은 kit-gates의 모든 gate를 실행합니다: rules-check, rebuild-check, language-check, test-markers-check, duplication-check, lint-php-ext, test-php-ext | `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make kit-check` and `node node_modules/@polyspec/kit/dist/run-tests.mjs node -- tests/scripts/workflow-rules.test.mts` | [!] 원인: CHECK_TARGETS의 7건은 고쳤고(make kit-check 105건에서 98건; tests/scripts/workflow-rules.test.mts 17 passed), 남은 98건은 T2.4가 맡은 config/parity.json의 schema 결과(profile, profiles, nativeOnly, exclusions)입니다; 재시도: T2.4 뒤 |
+| T2.21 | CHECK_TARGETS와 CI job은 kit-gates의 모든 gate를 실행합니다: rules-check, rebuild-check, language-check, test-markers-check, duplication-check, lint-php-ext, test-php-ext | `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make kit-check` and `node node_modules/@polyspec/kit/dist/run-tests.mjs node -- tests/scripts/workflow-rules.test.mts` | [o] |
 | T2.22 | packages/php의 OfficialTest와 ValueApiTest는 확장이 로드되지 않았음을 단정하지 않고, 확장이 있든 없든 성립하는 동작을 단정합니다 (S10 ruling 8: 같은 파일이 두 구현을 test합니다) | `packages/php/tests/OfficialTest.php`, `packages/php/tests/ValueApiTest.php`, `packages/php-ext/tests/`, `CHANGELOG.md`(.ko) | `make test-php CASES=Official` and `make test-php-ext CASES=Official` | [o] |
 | T2.23 | 각 언어 생태계의 JSON이 contract를 만족하는 곳에서는 그것 위에 만듭니다: 표준 JSON reader와 writer가 RQ id를 만족하면 손으로 쓴 parser나 serializer를 대체하고, 손으로 쓴 것은 실패하는 case를 적은 rebuild 기록과 함께만 남깁니다 | `docs/rebuild/`, `packages/*/`, `config/rebuild.json`, `CHANGELOG.md`(.ko) | `make rebuild-check` | [o] |
 | T2.24 | kit 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), the copies of `kit.copies`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
