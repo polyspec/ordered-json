@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: d383e8c02d71ecb52d89f79703faac8478a66e29ffcebc7eaeb2fdf1fab9bc9e -->
+<!-- source-sha256: 1c32ecc1b3f6c11ec71d4ea13f06624e8cfdf9fe2e29d34f8352e70b6a4dd7ad -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- `config/parity.json`의 모든 unit은 모든 구현에서 성립하고 test가 이름으로 적은 requirement를 인용합니다 (T2.4): profile, `nativeOnly`, `exclusions`는 없어졌고(S6), 하위 항목 T2.4-1부터 T2.4-4가 R1, R2, R13, R15 결과를 닫았으며, 여섯 구현의 extractor는 어느 unit도 선언하지 않은 공개 symbol을 나열하지 않습니다. Red: `make parity-declarations-check` exit 2, schema 결과 98건에 이어 R1, R2, R13, R15 결과 432건; green: exit 0, `every declaration holds`.
 - 모든 unit의 모든 feature는 모든 구현에 binding이 있습니다 (T2.4-2): R2 결과(missing binding 172건: php 35, python 31, js 31, rust 29, php-extension 25, go 21)는 기존 동작의 binding(T2.26, T2.27, T2.28), 라이브러리를 따르는 PHP와 확장 test(T2.15-3, T2.22), 중립 host 직렬화 unit(T2.37), 없앤 unit만 인용하던 requirement(RQ-003, RQ-010, RQ-011)의 unit으로 닫았습니다. Red: `make parity-declarations-check` R2 172건; green: `every declaration holds`.
 - 모든 API unit은 모든 구현의 symbol을 선언합니다 (T2.4-1): R1 결과(missing implementation 84건: php-extension 41, php 15, python 14, js 14)는 확장의 구현(T2.15-3), `Kind` 열거형(T2.35), 중립 object entry, byte 입력, 오류, host 인터페이스 unit(T2.34, T2.37), Go zero-copy 파싱 제거(T2.33)로 닫았습니다. Red: `make parity-declarations-check` R1 84건; green: `every declaration holds`이며 여섯 구현의 extractor가 선언 없는 공개 symbol을 나열하지 않음.
 - 모든 언어의 host JSON 인터페이스를 중립 unit으로 binding합니다 (T2.37): `host_serialization_boundary`(host 인코더를 거친 값: Rust `serde_json::to_string`, Go `json.Marshal`, JavaScript, PHP, Python의 거부)와 새 `host_serialization_embeds_values`(값을 담은 native 구조). typed 형태의 unit 20개(`serde_*`, `marshal_*`)는 이들로 대체하고 그 test는 package test로 남깁니다(`packages/go/marshal_test.go`와 fuzz test는 `api_test.go`로 들어감). Python에 `ordered_json.JSONEncoder`를 두어 `default`가 `Value`를 거부하고 `stringify`를 가리키게 하며, Go는 자체 `Marshaler` 대신 표준 라이브러리의 `json.Marshaler`를 쓰고, Rust `serde::Error`는 variant를 숨깁니다. API unit 11개가 typed 형태와 남은 accessor를 각 언어의 symbol과 짝짓고, unit `arrays_and_objects_stay_distinct`(RQ-003), `number_tokens_are_kept_exactly`(RQ-010), `serialization_is_idempotent`(RQ-011)는 없앤 unit만 인용하던 requirement를 test합니다. Red: `make parity-declarations-check` R2 99건(5개 언어에서 host unit 20개 없음)과 extractor가 읽은 선언 없는 공개 symbol 38개; green: `every declaration holds`, 여섯 구현 모두 R1과 R11 없음; 모든 test passed, 여섯 구현의 `scripts/verify.mts` passed, lint passed.
