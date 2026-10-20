@@ -443,3 +443,42 @@ func TestParseErrorExposesKindOffsetAndMessage(t *testing.T) {
 		t.Fatalf("kind = %q, offset = %d, message = %q", failure.Kind(), failure.Offset, failure.Message)
 	}
 }
+
+// Requirements: RQ-017
+func TestStrictParseRejectsDuplicateKeys(t *testing.T) {
+	for _, source := range []string{
+		`{"a":1,"a":2}`,
+		`{"a":1,"a":2}`,
+		`{"nested":{"a":1,"a":2}}`,
+		`[{"a":1,"a":2}]`,
+		`{"\ud800":1,"\ud800":2}`,
+	} {
+		if _, err := Parse(source); err != nil {
+			t.Fatalf("Parse(%s) error = %v", source, err)
+		}
+		var failure *ParseError
+		_, err := ParseRejectDuplicates(source)
+		if !errors.As(err, &failure) {
+			t.Fatalf("ParseRejectDuplicates(%s) error = %v", source, err)
+		}
+		if failure.Message != "duplicate object key" || failure.Kind() != "duplicate_object_key" || failure.Offset != strings.LastIndex(source, `,"`)+1 {
+			t.Fatalf("ParseRejectDuplicates(%s) = %q %q at %d", source, failure.Message, failure.Kind(), failure.Offset)
+		}
+	}
+}
+
+// Requirements: RQ-017
+func TestStrictParseAcceptsUniqueKeys(t *testing.T) {
+	source := `{"a":1,"nested":[{"b":2}],"state":null}`
+	parsed, err := ParseRejectDuplicates(source)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if compact, _ := parsed.Compact(); compact != source {
+		t.Fatalf("Compact() = %s", compact)
+	}
+	var failure *ParseError
+	if _, err := ParseRejectDuplicates("\xff"); !errors.As(err, &failure) || failure.Message != "invalid UTF-8" || failure.Offset != 0 {
+		t.Fatalf("invalid UTF-8 error = %v", err)
+	}
+}

@@ -799,6 +799,11 @@
           "id": "strict_parse_rejects_duplicate_keys"
         },
         {
+          "implementation": "go",
+          "test": "packages/go/api_test.go",
+          "id": "TestStrictParseRejectsDuplicateKeys"
+        },
+        {
           "implementation": "php",
           "test": "packages/php/tests/ValueApiTest.php",
           "id": "testStrictParseRejectsDuplicateKeys"
@@ -831,6 +836,11 @@
           "implementation": "rust",
           "test": "packages/rust/tests/duplicate_keys.rs",
           "id": "strict_parse_accepts_unique_keys"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/go/api_test.go",
+          "id": "TestStrictParseAcceptsUniqueKeys"
         },
         {
           "implementation": "php",
@@ -2477,6 +2487,35 @@
           "implementation": "python",
           "test": "packages/python/tests/test_api.py",
           "id": "test_parse_error_exposes_kind_offset_and_message"
+        }
+      ]
+    },
+    {
+      "id": "api-parse-reject-duplicates",
+      "kind": "api",
+      "requirements": [
+        "RQ-017"
+      ],
+      "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!ParseOptions#rejectDuplicates:member"
+        },
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::parse_bytes_reject_duplicates"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/go.ParseRejectDuplicates"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::parseRejectDuplicates"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.ParseOptions"
         }
       ]
     }

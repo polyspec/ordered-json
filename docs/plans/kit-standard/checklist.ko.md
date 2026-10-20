@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 2020f79fe62415a5df53618a0ffbe9b99328aeb6045b1bd9152eb6568461a19f -->
+<!-- source-sha256: 0ed34c0304369aa8da3375556922b73aa0301c166de53b3f7d3ac58a0b81bb58 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -34,3 +34,4 @@
 | T2.24 | kit 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), the copies of `kit.copies`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.25 | Python test는 package입니다: packages/python/tests에 __init__.py가 있어 make test-python이 case를 고릅니다 (kit K298) | `packages/python/tests/__init__.py`, `CHANGELOG.md`(.ko) | `make test-python CASES=depth_limit` | [!] 원인: tests/__init__.py를 추가해 make test-python이 case를 찾지만 ModuleNotFoundError: No module named polyspec으로 실패합니다: kit의 scripts/kit/runtime-targets.mts 91행이 --venv 없이 mise python을 실행하며(run-tests.mts는 --venv를 받습니다), 그래서 test가 import하는 package(S3: 설치되며 경로에 두지 않음)를 import할 수 없습니다; 재시도: test-python이 packages/python/.venv의 interpreter를 실행한 뒤 |
 | T2.26 | Rust API는 type이 본질적으로 보장하는 contract 동작의 binding을 가집니다: 값은 library에서만 나오고(RQ-012) 반환된 collection은 변경할 수 없습니다(RQ-013) | `packages/rust/tests/api.rs`, `CHANGELOG.md`(.ko) | `make test-rust CASES=come_only` | [o] |
+| T2.27 | Go package는 요청 시 반복된 decode된 object key를 거부합니다 (RQ-017): ParseRejectDuplicates이며 kind는 duplicate_object_key, 위치는 두 번째 key의 첫 byte입니다 | `packages/go/orderedjson.go`, `packages/go/api_test.go`, `config/parity.json`, `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make test-go CASES=StrictParse` | [o] |

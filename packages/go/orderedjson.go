@@ -44,6 +44,8 @@ const (
 	flagRoot
 	// flagBorrowed marks a source that aliases caller memory, so derived text is copied.
 	flagBorrowed
+	// flagRejectDuplicates is a parser flag only: a repeated decoded key is an error, not an overwrite.
+	flagRejectDuplicates
 	// flagEscaped marks a string token that contains escape sequences.
 	flagEscaped
 )
@@ -74,6 +76,7 @@ var rejectionKinds = map[string]string{
 	"invalid UTF-8":                       "invalid_utf8",
 	"maximum nesting depth exceeded":      "maximum_depth_exceeded",
 	"unexpected trailing input":           "trailing_input",
+	"duplicate object key":                "duplicate_object_key",
 }
 
 // Kind reports why the document was rejected.
@@ -491,6 +494,12 @@ func ParseWithMaxDepth(source string, maxDepth int) (*Value, error) {
 	return parse(source, maxDepth, 0)
 }
 
+// ParseRejectDuplicates parses source with the normal grammar and the default depth limit, but rejects a repeated decoded
+// object key at any depth with the message "duplicate object key" at the first byte of the second key.
+func ParseRejectDuplicates(source string) (*Value, error) {
+	return parse(source, MaxDepth, flagRejectDuplicates)
+}
+
 // utf8.ValidString reports only that an invalid sequence exists, so the error
 // position comes from the first one.
 func firstInvalidByte(source string) int {
@@ -554,7 +563,7 @@ func (p *parser) newValue(kind uint8, start int, flags uint8) *Value {
 	}
 	p.slab = p.slab[:len(p.slab)+1]
 	v := &p.slab[len(p.slab)-1]
-	v.source, v.start, v.end, v.kind, v.flags = p.source, start, p.pos, kind, flags|p.flags
+	v.source, v.start, v.end, v.kind, v.flags = p.source, start, p.pos, kind, flags|p.flags&^flagRejectDuplicates
 	return v
 }
 
@@ -738,7 +747,11 @@ func (p *parser) container(depth, start int, object bool) (*Value, error) {
 				if err != nil {
 					return nil, err
 				}
+				duplicates := p.duplicates
 				index = p.addMember(base, index, key, child)
+				if p.flags&flagRejectDuplicates != 0 && p.duplicates != duplicates {
+					return nil, &ParseError{keyStart, "duplicate object key"}
+				}
 			} else {
 				child, err := p.value(depth + 1)
 				if err != nil {

@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 23c7a950696ef7bbf46e07c748b91f88f4d72003a48ed6f74ce02ac02ca431b2 -->
+<!-- source-sha256: c24fc3698ff156bb470c119637b60b7d6017da8dfb070a587dba5e6297d409a8 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Go package는 요청 시 반복된 decode된 object key를 거부합니다 (T2.27): `ParseRejectDuplicates(source)`는 어느 깊이든 두 번째 key token의 첫 byte에 `duplicate object key`(kind `duplicate_object_key`)를 보고하며 이스케이프로 쓴 같은 key도 포함합니다. `Parse`는 공통 동작을 유지합니다. Go binding은 `docs/spec/api.md`(.ko)에 명세하고, unit `strict_parse_rejects_duplicate_keys`와 `strict_parse_accepts_unique_keys`가 `TestStrictParse*`를 binding하며, API unit `api-parse-reject-duplicates`가 모든 구현의 symbol을 선언합니다. Red: `make test-go CASES=StrictParse` build error `undefined: ParseRejectDuplicates`, parity R2 172건(go 2건); green: 2 passed, `scripts/verify.mts --only go` passed, `make lint-go` passed, R2 168건(R1 85건: 새 unit에 php-extension symbol이 없음, T2.15 항목).
 - Rust API는 type이 본질적으로 보장하는 contract 동작을 test합니다 (T2.26): `values_come_only_from_the_library`(RQ-012: parser와 factory만이 생성자이며 각각 검증함)와 `returned_collections_are_immutable`(RQ-013: members와 items는 공유 참조이고 바꾼 사본은 원래 값을 그대로 둠)이며 둘 다 `packages/rust/tests/api.rs`에 binding합니다. Red: `make parity-declarations-check` R2 missing-binding 172건 중 이 unit의 rust 2건; green: R2 170건. `cargo test --test api` 2 passed, `make lint-rust` passed.
 - 각 test는 parity unit이 인용한 requirement를 이름으로 적습니다 (T2.4-4): 모든 binding(js, rust, go, python, php, php-extension case)의 test 위에 `Requirements: RQ-nnn` 주석을 두고, 하위 class가 상속한 case를 실행하는 곳에는 class 문서를 둡니다. Red: `make parity-declarations-check` R15 unnamed-requirement 178건; green: R15 0건(R1 84건과 R2 172건은 T2.4-1과 T2.4-2 항목에 남음). T2.4-3 test의 서식도 함께 고쳤습니다: `make lint-php`, `make lint-python`, `cargo fmt --check` 통과.
 - 확장은 자기 package의 version을 보고합니다 (T2.16): `config.m4`가 `../composer.json`(package, PIE build, kit의 build 모두에서 `src/` 옆에 있음, K295)에서 `PHP_POLYSPEC_ORDERED_JSON_VERSION`을 정의하고, `ordered_json.c`가 이를 쓰며, 상수 `ORDERED_JSON_VERSION = 0.0.1`은 없앴고, verifier의 `extension_version` runtime 검사는 같은 C 파일의 상수가 아니라 `composer.json`의 version과 `phpversion('polyspec_ordered_json')`을 비교합니다. Red: `runtimeVersions(['php-extension'])`가 `phpversion('polyspec_ordered_json') '0.0.1' differs from the version 0.0.9 of composer.json`으로 실패; green: `{ php: '8.4.26', extension_version: '0.0.9' }`, `scripts/verify.mts --only php-extension` passed, registry test 7 passed, `make release-versions TAG=v0.0.9` passed.
