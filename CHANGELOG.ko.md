@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 50fb2551aa1af23c61a54581db6f5bed1004dede0186c029d3a8b3be59c4720d -->
+<!-- source-sha256: 5bdd92c7ccae18cb11afc1b4103a41ecb910af1a04a72eba24d7c360a0621b65 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Rust에는 `Value`의 Serde trait 구현만 있습니다 (T2.42): 자체 serializer, `to_string`, `from_str`, `from_slice`, `Error`를 가진 `serde` 모듈(`serde_json`의 사본, S1)을 test, fixture 2개, 의존성 `serde_ignored`와 함께 없앱니다. `serde_json`이 값을 담은 모든 구조를 contract bytes로 인코딩하고 디코딩하며 `Deserialize`는 Go `UnmarshalJSON`처럼 일반 문법으로 파싱합니다. Red: 명세(T2.40)와 Go 쪽에는 typed codec이 없는데 Rust는 여전히 내보냄(`serde` 아래 공개 symbol 13개, 456줄); green: cargo test 24 + 2 + 17 + 3 passed, `scripts/verify.mts --only rust`, `make lint-rust`, `make parity-declarations-check`, `make dependency-policy-check` exit 0.
 - Go `Value`는 `json.Marshaler`와 함께 `json.Unmarshaler`를 구현하고 (T2.41), `encoding/json`의 사본인 package의 typed `Marshal`(S1)은 test 13개, fuzz test, interface `Marshaler`와 함께 없앱니다. `encoding/json`이 값을 담은 모든 구조를 contract bytes로 인코딩하고 디코딩합니다. API unit `api-host-typed-*`와 `api-host-error`는 `api-host-deserialization`으로 대체하고 `api-host-serialization`은 Rust에 `Value::compact`를 선언합니다. Red: `make test-go CASES=HostDeserialization` 실패(`UnmarshalJSON` 없음); green: `Host`, `Parse`, `Stringify` go test 7개 passed, `scripts/verify.mts --only go` passed, `make lint-go` passed, `make parity-declarations-check` exit 0.
 - 명세는 native JSON 통합만 말합니다 (T2.40): Go `Value`는 `json.Marshaler`와 `json.Unmarshaler`를, Rust `Value`는 Serde `Serialize`와 `Deserialize`를 구현하며, `encoding/json`과 `serde_json`을 중복하던 Go의 typed `Marshal`과 Rust의 `serde` 모듈은 명세에서 뺍니다(S1). 코드는 T2.41과 T2.42에서 따릅니다. Red: 명세가 두 typed 인코더를 설명했음; green: `make docs-check` passed.
 - Rust의 `string_value()`는 문자열의 WTF-8 바이트(`Vec<u8>`)를 반환하므로 (T2.39) 이스케이프된 짝 없는 surrogate는 거부되지 않고 Go, PHP, JavaScript, Python처럼 유지됩니다. Red: `b"a\xed\xa0\x80"`를 기대하는 test가 `String`에 대해 compile되지 않음; green: cargo test api 24개와 official 17개 passed, `scripts/verify.mts --only rust` passed, `make lint-rust` passed.

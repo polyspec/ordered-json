@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 4ed9b914d65ef584d61900c118dd82190871bd1d3b41b98a3de2fb226d6ba722 -->
+<!-- source-sha256: 8afe241dbea2a7a818b5a6f408583bf26730b121711ddada9a045b7719f29d4c -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -52,3 +52,4 @@
 | T2.39 | Rust의 string_value는 문자열의 WTF-8 바이트를 반환하므로 짝 없는 surrogate가 다른 모든 구현처럼 유지됩니다 (RQ-009) | `packages/rust/src/lib.rs`, `packages/rust/tests/`, `CHANGELOG.md`(.ko) | `make test-rust CASES=surrogate` | [o] |
 | T2.40 | 명세는 Go와 Rust의 native 통합(Marshaler와 Unmarshaler method, Serde trait 구현)만 말하며 encoding/json이나 serde_json과 중복되는 라이브러리의 typed 인코더는 말하지 않습니다 (S1) | `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make docs-check` | [o] |
 | T2.41 | Go Value는 json.Marshaler와 함께 json.Unmarshaler를 구현하고, encoding/json의 사본인 package의 typed Marshal은 test와 함께 없앱니다 (S1) | `packages/go/orderedjson.go`, `packages/go/marshal.go`, `packages/go/api_test.go`, `config/parity.json`, `CHANGELOG.md`(.ko) | `make test-go CASES=HostSerialization` and `make lint-go` | [o] |
+| T2.42 | Rust에는 Value의 Serde trait 구현만 있습니다: 자체 serializer, to_string, from_str, from_slice, Error를 가진 serde 모듈(serde_json의 사본)은 test, fixture와 함께 없앱니다 (S1) | `packages/rust/src/serde.rs`, `packages/rust/src/lib.rs`, `packages/rust/Cargo.toml`, `packages/rust/Cargo.lock`, `packages/rust/tests/`, `config/dependency-review.json`, `CHANGELOG.md`(.ko) | `make test-rust CASES=serde` and `make lint-rust` | [o] |

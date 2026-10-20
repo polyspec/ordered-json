@@ -8,7 +8,7 @@ use std::{
 
 pub const MAX_DEPTH: usize = 256;
 
-pub mod serde;
+mod serde;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Error {
