@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: ffa44e4768be83d5b64a819e793ae70b4b23363ff6fd5339848f0df8907e7867 -->
+<!-- source-sha256: f62adc09cb4927565ec8db512157b266e91e0f78cf651c3522a03b048ea88596 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -44,3 +44,4 @@
 | T2.31 | kit 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.32 | CHECK_TARGETS와 CI job은 link-state-check를 실행합니다 | `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.33 | Go에는 zero-copy ParseBytesBorrowed가 없습니다: contract 밖이므로(S6: native 전용 symbol 없음) symbol, flag, test, unit을 없애고 benchmark는 ParseBytes로 파싱합니다 | `packages/go/orderedjson.go`, `packages/go/api_test.go`, `packages/go/internal/benchmark/main.go`, `config/parity.json`, `docs/spec/api.md`(.ko), `benchmarks/README.md`(.ko), `CHANGELOG.md`(.ko) | `make test-go CASES=Parse` and `make lint-go` | [o] |
+| T2.34 | object entry, byte 입력, 오류 message는 언어별 표현에 binding한 중립 API unit입니다: JavaScript, PHP, Python은 Value의 members, get, object, PHP의 byte 입력은 parse, message는 ParseError class이며 PHP의 key test는 문자열이 아닌 key가 없음을 보입니다 | `config/parity.json`, `packages/php/tests/ValueApiTest.php`, `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make parity-declarations-check` and `make test-php CASES=NonStringKey` | [o] |

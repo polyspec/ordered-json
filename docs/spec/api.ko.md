@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 6563f97c8a29a1b1b5cbf2aaaec2e0e3dc98a7852a98aa9a3d93b623a4f50cd3 -->
+<!-- source-sha256: 85516a3aad3a8f20bd5fce2eb0f9f2e7c261a608b5c8186e2108ad44fdf48813 -->
 # API 계약
 
 [English](api.md)
@@ -60,9 +60,9 @@ JavaScript는 복사된 `Map<string, Value>`를 반환하며 TypeScript에는 `R
 
 Rust는 불변 `OrderedMap` 참조를 반환합니다. `OrderedMap::insert(key, value)`는 문자열 `Value` 키를 받고 교체된 값이 있으면 반환합니다. `iter()`는 등록 순서대로 키와 값의 참조를 반환합니다.
 
-Go는 독립적인 `OrderedMap` 복사본을 반환합니다. `Set(key, value)`는 문자열 `Value` 키를 받으며 `Keys()`는 등록 순서대로 키 값을 반환합니다. `Get`과 `GetUnits`는 값 포인터 또는 nil을 반환합니다. `ParseBytes`는 입력을 복사합니다. `ParseBytesBorrowed`는 명시적인 zero-copy API이며 반환된 값이 살아 있는 동안 호출자는 바이트 슬라이스를 변경하면 안 됩니다.
+Go는 독립적인 `OrderedMap` 복사본을 반환합니다. `Set(key, value)`는 문자열 `Value` 키를 받으며 `Keys()`는 등록 순서대로 키 값을 반환합니다. `Get`과 `GetUnits`는 값 포인터 또는 nil을 반환합니다. `ParseBytes`는 입력을 복사합니다.
 
-PHP는 `Value` 객체의 연관배열을 반환합니다. 객체 생성자는 해당 연관배열을 받습니다. Python은 읽기 전용 mapping 복사본을 반환하며, 객체 생성자는 문자열 또는 문자열 `Value` 키를 가진 mapping이나 쌍의 iterable을 받습니다. 키가 없으면 PHP는 null, JavaScript는 undefined, Rust와 Python은 `None`, Go는 nil을 반환합니다.
+PHP는 `Value` 객체의 연관배열을 반환합니다. 객체 생성자는 해당 연관배열을 받습니다. PHP 배열의 키는 문자열 또는 정수이므로 다른 종류의 키는 객체에 닿을 수 없으며 정수 키는 그 십진 숫자 문자열이 객체 키가 됩니다. Python은 읽기 전용 mapping 복사본을 반환하며, 객체 생성자는 문자열 또는 문자열 `Value` 키를 가진 mapping이나 쌍의 iterable을 받습니다. 키가 없으면 PHP는 null, JavaScript는 undefined, Rust와 Python은 `None`, Go는 nil을 반환합니다.
 
 <a id="scalars"></a>
 ## 배열과 스칼라

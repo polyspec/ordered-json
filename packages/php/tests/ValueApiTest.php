@@ -22,7 +22,7 @@ use function Polyspec\OrderedJson\stringify;
  * extension and `make test-php-ext` with it.
  *
  * Requirements: RQ-001, RQ-002, RQ-004, RQ-005, RQ-006, RQ-007, RQ-008, RQ-009, RQ-012, RQ-013, RQ-014, RQ-015,
- * RQ-017, RQ-018, RQ-019, RQ-020, RQ-023, RQ-024.
+ * RQ-016, RQ-017, RQ-018, RQ-019, RQ-020, RQ-023, RQ-024.
  */
 final class ValueApiTest extends TestCase
 {
@@ -348,5 +348,19 @@ final class ValueApiTest extends TestCase
             self::assertSame(2, $error->offset);
         }
         self::assertSame('{"a":"한"}', Value::parse('{"a":"한"}')->compact());
+    }
+
+    // Requirements: RQ-016
+    public function testOrderedMapRejectsNonStringKey(): void
+    {
+        // A PHP array key is a string or an integer, and no other type exists: an integer key is the object key of its
+        // decimal digits, and a value that is no Value is rejected.
+        $object = Value::object([7 => Value::null(), 'a' => Value::boolean(true)]);
+        self::assertSame('{"7":null,"a":true}', $object->compact());
+        self::expectThrown(
+            InvalidArgumentException::class,
+            'Expected ordered_json Value',
+            static fn() => Value::object(['a' => 1]),
+        );
     }
 }

@@ -788,6 +788,16 @@
           "implementation": "python",
           "test": "packages/python/tests/test_api.py",
           "id": "test_ordered_map_rejects_non_string_key"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testOrderedMapRejectsNonStringKey"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testOrderedMapRejectsNonStringKey"
         }
       ]
     },
@@ -1289,6 +1299,14 @@
         {
           "implementation": "python",
           "symbol": "ordered_json.parse_bytes"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\parse"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\parse"
         }
       ]
     },
@@ -2141,6 +2159,22 @@
         {
           "implementation": "go",
           "symbol": "github.com/polyspec/ordered-json/packages/go.OrderedMap"
+        },
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#members:member"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::members"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::members"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.members"
         }
       ]
     },
@@ -2159,6 +2193,22 @@
         {
           "implementation": "go",
           "symbol": "github.com/polyspec/ordered-json/packages/go.OrderedMap.Get"
+        },
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#get:member(1)"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::get"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::get"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.get"
         }
       ]
     },
@@ -2177,6 +2227,22 @@
         {
           "implementation": "go",
           "symbol": "github.com/polyspec/ordered-json/packages/go.OrderedMap.GetUnits"
+        },
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#get:member(1)"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::getUnits"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::getUnits"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.get_units"
         }
       ]
     },
@@ -2195,6 +2261,22 @@
         {
           "implementation": "go",
           "symbol": "github.com/polyspec/ordered-json/packages/go.OrderedMap.Set"
+        },
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value.object:member(1)"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::object"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::object"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.object"
         }
       ]
     },
@@ -2212,6 +2294,22 @@
         {
           "implementation": "go",
           "symbol": "github.com/polyspec/ordered-json/packages/go.OrderedMap.Len"
+        },
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#members:member"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::members"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::members"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.members"
         }
       ]
     },
@@ -2230,6 +2328,22 @@
         {
           "implementation": "go",
           "symbol": "github.com/polyspec/ordered-json/packages/go.OrderedMap.Keys"
+        },
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#keys:member"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::members"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::members"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.members"
         }
       ]
     },
@@ -2366,6 +2480,22 @@
         {
           "implementation": "go",
           "symbol": "github.com/polyspec/ordered-json/packages/go.ParseError.Message"
+        },
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!ParseError:class"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\ParseError"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\ParseError"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.ParseError"
         }
       ]
     },
