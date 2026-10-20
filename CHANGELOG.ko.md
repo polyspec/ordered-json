@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 9dd2176d9bcd00bf2ae98f57b108a641e06d3c34efd177a660623fdb1c2ef51d -->
+<!-- source-sha256: 0d57b747ba2a44ca6716da9007b97665184a59e2e5dbad5e0ffa3d51693b5d42 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- 의존성 review 기록은 manifest 및 lock과 일치하고 모든 registry 의존성이 최신 stable release입니다 (T2.20): PHPUnit 13.4.3, ruff 0.17.1, setuptools 84.2.0(kit K296 뒤 `make dependency-review UPDATE=1`이 pin). Red: `make dependency-policy-check` exit 2, 4건(2026-10-15 review 뒤의 lock), 이어서 1건(setuptools); green: exit 0.
 - PRINCIPLES 사본은 K282부터 K297의 반영 뒤 `make kit-sync`가 다시 쓴 설치된 kit의 것과 같습니다 (T2.24). Red: `make kit-check` exit 2, 2건(PRINCIPLES.md와 PRINCIPLES.ko.md가 다름); green: exit 0.
 - `config/rebuild.json`은 `paths`를 두지 않고, kit이 layout으로 찾은 모든 tool이 class를 가집니다 (T2.18): benchmark tool 6개는 이유와 함께 `policy`이고, kit(K294)은 vendor된 사본을 더 이상 보고하지 않습니다. Red: `make rebuild-check` exit 2(`paths`, 이어서 미분류 사본 9건); green: exit 0, `every tool that config/rebuild.json selects has its class`.
 - 언어마다 손으로 쓴 parser는 남기고, 그 생태계 reader가 실패하는 contract case를 적은 rebuild 기록을 둡니다 (T2.23): `docs/rebuild/json-js.md`(JSON.parse: 115개 중 106, RQ-001 정수 모양 key 순서), `json-go.md`(encoding/json Token: 102, RQ-009와 RQ-007), `json-python.md`(json.loads: 114, RQ-004와 RQ-006), `json-php.md`(json_decode: 99, RQ-010과 RQ-009), `json-rust.md`(serde_json: 105, RQ-010과 RQ-009)이며 각각 `config/rebuild.json`에서 `record`로 분류합니다. Red: case를 적은 기록이 없었음; green: `make rebuild-check` exit 0, `make docs-check` 문서 쌍 30개 passed.

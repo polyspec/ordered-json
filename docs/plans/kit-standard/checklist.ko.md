@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 18ab6606e0f189dd240ca0a4f6fdc8d8ba1bc8d83476fd8d99db3c5c3f241f8c -->
+<!-- source-sha256: 366259fc1e6966ac4e22bb30fc3fd23b346c7fe177522daeb532651f0c9eafaa -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -27,7 +27,7 @@
 | T2.17 | PRINCIPLES 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`, `PRINCIPLES.ko.md`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.18 | config/rebuild.json은 paths를 두지 않고, kit이 layout으로 찾은 모든 tool을 분류합니다 | `config/rebuild.json`, `CHANGELOG.md`(.ko) | `make rebuild-check` | [o] |
 | T2.19 | 확장의 test는 확장을 올리고 실행하는 packages/php의 PHPUnit 파일입니다: packages/php-ext는 그 사본도 packages/php로 향하는 상대 경로도 두지 않습니다 (kit K285) | `packages/php-ext/tests/`, `packages/php-ext/composer.json`, `packages/php-ext/phpunit.xml`, `packages/php/tests/`, `CHANGELOG.md`(.ko) | `make test-php-ext CASES=OfficialTest` | [!] 원인: 변경을 소유한 검사인 make test-php-ext를 실행할 수 없습니다: make build-php-ext가 없는 arginfo header에서 멈춥니다(T2.8, kit php-extension.mts 167-171행); packages/php의 test도 확장이 로드되지 않았음을 단정합니다(packages/php/tests/OfficialTest.php, ValueApiTest.php). 이는 T2.15가 확장에서 라이브러리 API를 등록할 때까지 유지됩니다; 재시도: T2.8과 T2.15 뒤 |
-| T2.20 | 의존성 review 기록은 commit된 manifest와 lock에 일치합니다 | `config/dependency-review.json`, `CHANGELOG.md`(.ko) | `make dependency-policy-check` | [!] 원인: phpunit 13.4.3, ruff 0.17.1과 review 기록은 반영했고 dependency-policy-check의 1건이 남았습니다: packages/python/pyproject.toml의 build-system requires에 있는 setuptools 84.0.0 < 84.2.0을 make dependency-review UPDATE=1이 pin할 수 없습니다: kit의 scripts/kit/pyproject-dependencies.mts 30-43행(dependencyArrays)이 build-system.requires를 빼서 pin-python-dependency.mts 47행이 "no exact pin of setuptools in the dependency arrays"로 실패합니다; 재시도: kit이 dependencyArrays에서 build-system의 requirements를 pin한 뒤 |
+| T2.20 | 의존성 review 기록은 commit된 manifest와 lock에 일치합니다 | `config/dependency-review.json`, `CHANGELOG.md`(.ko) | `make dependency-policy-check` | [o] |
 | T2.21 | CHECK_TARGETS와 CI job은 kit-gates의 모든 gate를 실행합니다: rules-check, rebuild-check, language-check, test-markers-check, duplication-check, lint-php-ext, test-php-ext | `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make kit-check` and `node node_modules/@polyspec/kit/dist/run-tests.mjs node -- tests/scripts/workflow-rules.test.mts` | [!] 원인: CHECK_TARGETS의 7건은 고쳤고(make kit-check 105건에서 98건; tests/scripts/workflow-rules.test.mts 17 passed), 남은 98건은 T2.4가 맡은 config/parity.json의 schema 결과(profile, profiles, nativeOnly, exclusions)입니다; 재시도: T2.4 뒤 |
 | T2.22 | packages/php의 OfficialTest와 ValueApiTest는 확장이 로드되지 않았음을 단정하지 않고, 확장이 있든 없든 성립하는 동작을 단정합니다 (S10 ruling 8: 같은 파일이 두 구현을 test합니다) | `packages/php/tests/OfficialTest.php`, `packages/php/tests/ValueApiTest.php`, `packages/php-ext/tests/`, `CHANGELOG.md`(.ko) | `make test-php CASES=Official` and `make test-php-ext CASES=Official` | [ ] |
 | T2.23 | 각 언어 생태계의 JSON이 contract를 만족하는 곳에서는 그것 위에 만듭니다: 표준 JSON reader와 writer가 RQ id를 만족하면 손으로 쓴 parser나 serializer를 대체하고, 손으로 쓴 것은 실패하는 case를 적은 rebuild 기록과 함께만 남깁니다 | `docs/rebuild/`, `packages/*/`, `config/rebuild.json`, `CHANGELOG.md`(.ko) | `make rebuild-check` | [o] |

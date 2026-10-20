@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "comment": "Written by make dependency-review RECORD=1 (scripts/kit/dependency-review.mts) from the registries; make dependency-policy-check compares the checkout with it without a network.",
-  "reviewed": "2026-10-20T04:41:47.279Z",
+  "reviewed": "2026-10-20T05:01:51.536Z",
   "locks": [
     {
       "lock": "package-lock.json",
@@ -139,7 +139,7 @@
       "ecosystem": "pypi",
       "manifest": "packages/python/pyproject.toml",
       "package": "setuptools",
-      "version": "84.0.0",
+      "version": "84.2.0",
       "latest": "84.2.0"
     },
     {
