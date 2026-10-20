@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 5bdd92c7ccae18cb11afc1b4103a41ecb910af1a04a72eba24d7c360a0621b65 -->
+<!-- source-sha256: e5c642c1dbe9e36df11c21a3b5d4ed45e4f115ac1a3a3af17c1e3bf61e349263 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- php-lint 사본은 `make kit-sync`가 쓴 설치된 kit의 것과 같습니다 (T2.43). Red: `make kit-check` exit 2, 2건(`config/php-lint/composer.json`과 `composer.lock`이 다름); green: exit 0.
 - Rust에는 `Value`의 Serde trait 구현만 있습니다 (T2.42): 자체 serializer, `to_string`, `from_str`, `from_slice`, `Error`를 가진 `serde` 모듈(`serde_json`의 사본, S1)을 test, fixture 2개, 의존성 `serde_ignored`와 함께 없앱니다. `serde_json`이 값을 담은 모든 구조를 contract bytes로 인코딩하고 디코딩하며 `Deserialize`는 Go `UnmarshalJSON`처럼 일반 문법으로 파싱합니다. Red: 명세(T2.40)와 Go 쪽에는 typed codec이 없는데 Rust는 여전히 내보냄(`serde` 아래 공개 symbol 13개, 456줄); green: cargo test 24 + 2 + 17 + 3 passed, `scripts/verify.mts --only rust`, `make lint-rust`, `make parity-declarations-check`, `make dependency-policy-check` exit 0.
 - Go `Value`는 `json.Marshaler`와 함께 `json.Unmarshaler`를 구현하고 (T2.41), `encoding/json`의 사본인 package의 typed `Marshal`(S1)은 test 13개, fuzz test, interface `Marshaler`와 함께 없앱니다. `encoding/json`이 값을 담은 모든 구조를 contract bytes로 인코딩하고 디코딩합니다. API unit `api-host-typed-*`와 `api-host-error`는 `api-host-deserialization`으로 대체하고 `api-host-serialization`은 Rust에 `Value::compact`를 선언합니다. Red: `make test-go CASES=HostDeserialization` 실패(`UnmarshalJSON` 없음); green: `Host`, `Parse`, `Stringify` go test 7개 passed, `scripts/verify.mts --only go` passed, `make lint-go` passed, `make parity-declarations-check` exit 0.
 - 명세는 native JSON 통합만 말합니다 (T2.40): Go `Value`는 `json.Marshaler`와 `json.Unmarshaler`를, Rust `Value`는 Serde `Serialize`와 `Deserialize`를 구현하며, `encoding/json`과 `serde_json`을 중복하던 Go의 typed `Marshal`과 Rust의 `serde` 모듈은 명세에서 뺍니다(S1). 코드는 T2.41과 T2.42에서 따릅니다. Red: 명세가 두 typed 인코더를 설명했음; green: `make docs-check` passed.

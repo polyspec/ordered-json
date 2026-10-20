@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 8afe241dbea2a7a818b5a6f408583bf26730b121711ddada9a045b7719f29d4c -->
+<!-- source-sha256: bab6838a628419982e6c313c414deeec2f6c5e4a2604aeb9dcba16eb4d7a01d8 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -53,3 +53,4 @@
 | T2.40 | 명세는 Go와 Rust의 native 통합(Marshaler와 Unmarshaler method, Serde trait 구현)만 말하며 encoding/json이나 serde_json과 중복되는 라이브러리의 typed 인코더는 말하지 않습니다 (S1) | `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make docs-check` | [o] |
 | T2.41 | Go Value는 json.Marshaler와 함께 json.Unmarshaler를 구현하고, encoding/json의 사본인 package의 typed Marshal은 test와 함께 없앱니다 (S1) | `packages/go/orderedjson.go`, `packages/go/marshal.go`, `packages/go/api_test.go`, `config/parity.json`, `CHANGELOG.md`(.ko) | `make test-go CASES=HostSerialization` and `make lint-go` | [o] |
 | T2.42 | Rust에는 Value의 Serde trait 구현만 있습니다: 자체 serializer, to_string, from_str, from_slice, Error를 가진 serde 모듈(serde_json의 사본)은 test, fixture와 함께 없앱니다 (S1) | `packages/rust/src/serde.rs`, `packages/rust/src/lib.rs`, `packages/rust/Cargo.toml`, `packages/rust/Cargo.lock`, `packages/rust/tests/`, `config/dependency-review.json`, `CHANGELOG.md`(.ko) | `make test-rust CASES=serde` and `make lint-rust` | [o] |
+| T2.43 | kit 사본은 설치된 kit의 것과 같습니다 | `config/php-lint/`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
