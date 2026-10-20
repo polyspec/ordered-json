@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: fae59c1974d4b4eaa48bc031d2ea7c3d8452189fba24f188556efaecc620d621 -->
+<!-- source-sha256: 8088ae1c8c2f6aa9040d4a132769e78176a1367336b181e19dcf39a5d34e6536 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -60,3 +60,4 @@
 | T2.47 | benchmark는 make build-php-ext가 게시한 확장을 올리며, Go zero-copy 파싱과 PHP 확장이 바뀐 뒤 commit된 결과를 다시 측정합니다 | `benchmarks/run.mts`, `scripts/registry.mts`, `benchmarks/results.json`, `CHANGELOG.md`(.ko) | `make benchmark-check` | [o] |
 | T2.48 | commit된 benchmark 결과는 유휴 machine에서 측정합니다: make benchmark-check가 허용 오차 안에서 그것과 일치합니다 | `benchmarks/results.json`, `CHANGELOG.md`(.ko) | `make benchmark-check` | [!] 원인: T2.47의 결과는 machine의 load average가 25에서 40이던 때(다른 session이 build와 검사를 실행) 측정했고, 바로 뒤의 make benchmark-check는 그것과 1.2에서 13배의 비율로 어긋납니다(js parse 2.27, go roundtrip 3.78, rust parse 2.26). 그래서 어느 측정도 코드의 증거가 아닙니다; 재시도: machine이 유휴일 때(load average 2 미만): make benchmark를 실행해 결과를 commit한 뒤 make benchmark-check가 통과 |
 | T2.49 | PRINCIPLES 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
+| T2.50 | PRINCIPLES 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
