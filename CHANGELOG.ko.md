@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 19569c81b9a37d5c66f63814ab02d0e83043c2596bc566b2c3fff0bd0f08b243 -->
+<!-- source-sha256: 4df205995a98abb7af1211cff1c91573301c16c1fd1787fe409431161f73edbc -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- `AGENTS.md`의 모든 규칙은 `Own:`으로 시작합니다 (T2.30, kit K300): 62개 규칙은 이 저장소 자신의 용어를 말하며, 외부 생태계의 표준 도구에 관한 원칙(P14)을 되풀이하던 규칙은 한국어 쌍과 함께 제거했습니다. Red: `make rules-check` exit 2, 91건(그중 62건이 `begins with neither Own: nor Refines`); green: exit 0, `every rule names its check; 13 rules are enforced by no tool`.
 - PRINCIPLES 사본은 K299부터 K303 뒤 `make kit-sync`가 쓴 설치된 kit의 것과 다시 같습니다 (T2.29)(원칙은 P1…, S1… id를 가짐). Red: `make kit-check` exit 2, 2건; green: exit 0.
 - Rust, Go, PHP는 UTF-8과 surrogate unit을 binding합니다 (T2.28): PHP의 `bytes_input_is_validated`(string이 byte 입력), Rust, Go, PHP의 `text_input_rejects_lone_surrogates`(text의 짝 없는 surrogate 원문의 WTF-8 byte는 문법 전에 surrogate 위치에서 invalid UTF-8로 거부), Rust, Go, PHP의 `string_value_keeps_an_unpaired_surrogate`. 이스케이프된 짝 없는 surrogate의 string value는 거부하지 않고 library 형태로 유지합니다: Go(`StringValue`)와 PHP(`stringValue`, `tokenText`는 flag를 잃음)는 WTF-8이고, String이 담을 수 없는 Rust는 `string_units`를 가리키며 여전히 거부합니다. `docs/spec/api.md`(.ko)에 규칙을 명세했습니다. Red: Go `StringValue() = "", unpaired surrogate; use StringUnits`, PHP `UnexpectedValueException: Unpaired surrogate`; parity R2 172건; green: go test 4 passed, PHPUnit 5 passed, cargo test 4 passed, `scripts/verify.mts --only go,php` passed, lint-go, lint-php, lint-rust passed, R2 158건.
 - Go package는 요청 시 반복된 decode된 object key를 거부합니다 (T2.27): `ParseRejectDuplicates(source)`는 어느 깊이든 두 번째 key token의 첫 byte에 `duplicate object key`(kind `duplicate_object_key`)를 보고하며 이스케이프로 쓴 같은 key도 포함합니다. `Parse`는 공통 동작을 유지합니다. Go binding은 `docs/spec/api.md`(.ko)에 명세하고, unit `strict_parse_rejects_duplicate_keys`와 `strict_parse_accepts_unique_keys`가 `TestStrictParse*`를 binding하며, API unit `api-parse-reject-duplicates`가 모든 구현의 symbol을 선언합니다. Red: `make test-go CASES=StrictParse` build error `undefined: ParseRejectDuplicates`, parity R2 172건(go 2건); green: 2 passed, `scripts/verify.mts --only go` passed, `make lint-go` passed, R2 168건(R1 85건: 새 unit에 php-extension symbol이 없음, T2.15 항목).
