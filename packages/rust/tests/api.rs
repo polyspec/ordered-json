@@ -302,3 +302,56 @@ fn text_input_rejects_lone_surrogates() {
         assert_eq!(error.offset, 2, "{source:?}");
     }
 }
+
+// Requirements: RQ-003
+#[test]
+fn arrays_and_objects_stay_distinct() {
+    let array = parse("[3,1,2]").unwrap();
+    let numbers: Vec<&str> = array
+        .items()
+        .unwrap()
+        .iter()
+        .map(|item| item.number_literal().unwrap())
+        .collect();
+    assert_eq!(numbers, ["3", "1", "2"]);
+    assert_eq!(parse("[]").unwrap().kind(), Kind::Array);
+    assert_eq!(parse("{}").unwrap().kind(), Kind::Object);
+    let text = r#"{"a":[],"b":{},"c":[{}]}"#;
+    assert_eq!(stringify(&parse(text).unwrap()), text);
+}
+
+// Requirements: RQ-010
+#[test]
+fn number_tokens_are_kept_exactly() {
+    let tokens = [
+        "1.0e+2",
+        "-0",
+        "0.10",
+        "123456789012345678901234567890",
+        "1E400",
+    ];
+    let value = parse(&format!("[{}]", tokens.join(","))).unwrap();
+    let kept: Vec<&str> = value
+        .items()
+        .unwrap()
+        .iter()
+        .map(|item| item.number_literal().unwrap())
+        .collect();
+    assert_eq!(kept, tokens);
+    for (source, kind) in [
+        ("NaN", "expected_value"),
+        ("Infinity", "expected_value"),
+        ("-Infinity", "expected_digit"),
+        ("[NaN]", "expected_value"),
+    ] {
+        assert_eq!(parse(source).unwrap_err().kind(), kind, "{source}");
+    }
+}
+
+// Requirements: RQ-011
+#[test]
+fn serialization_is_idempotent() {
+    let once = stringify(&parse(" { \"b\" : 1 , \"a\" : 2 , \"b\" : 3 } ").unwrap());
+    assert_eq!(once, r#"{"b":3,"a":2}"#);
+    assert_eq!(stringify(&parse(&once).unwrap()), once);
+}

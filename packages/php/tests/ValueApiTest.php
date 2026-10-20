@@ -21,8 +21,8 @@ use function Polyspec\OrderedJson\stringify;
  * the extension that registers the same API answer identically, so `make test-php` runs these tests without the
  * extension and `make test-php-ext` with it.
  *
- * Requirements: RQ-001, RQ-002, RQ-004, RQ-005, RQ-006, RQ-007, RQ-008, RQ-009, RQ-012, RQ-013, RQ-014, RQ-015,
- * RQ-016, RQ-017, RQ-018, RQ-019, RQ-020, RQ-023, RQ-024.
+ * Requirements: RQ-001, RQ-002, RQ-003, RQ-004, RQ-005, RQ-006, RQ-007, RQ-008, RQ-009, RQ-010, RQ-011, RQ-012,
+ * RQ-013, RQ-014, RQ-015, RQ-016, RQ-017, RQ-018, RQ-019, RQ-020, RQ-023, RQ-024.
  */
 final class ValueApiTest extends TestCase
 {
@@ -362,5 +362,56 @@ final class ValueApiTest extends TestCase
             'Expected ordered_json Value',
             static fn() => Value::object(['a' => 1]),
         );
+    }
+
+    // Requirements: RQ-020
+    public function testHostSerializationEmbedsValues(): void
+    {
+        // A native structure that holds a value is refused by the host encoder, which points to the library serializer.
+        $value = Value::parse('{"b":1.50,"a":[2]}');
+        self::expectThrown(
+            LogicException::class,
+            'Polyspec\\OrderedJson\\stringify',
+            static fn() => json_encode(['props' => $value]),
+        );
+        self::assertSame('{"b":1.50,"a":[2]}', stringify($value));
+    }
+
+    // Requirements: RQ-003
+    public function testArraysAndObjectsStayDistinct(): void
+    {
+        $numbers = array_map(static fn(Value $item) => $item->numberLiteral(), Value::parse('[3,1,2]')->items());
+        self::assertSame(['3', '1', '2'], $numbers);
+        self::assertSame('array', Value::parse('[]')->kind());
+        self::assertSame('object', Value::parse('{}')->kind());
+        $text = '{"a":[],"b":{},"c":[{}]}';
+        self::assertSame($text, stringify(Value::parse($text)));
+    }
+
+    // Requirements: RQ-010
+    public function testNumberTokensAreKeptExactly(): void
+    {
+        $tokens = ['1.0e+2', '-0', '0.10', '123456789012345678901234567890', '1E400'];
+        $items = Value::parse('[' . implode(',', $tokens) . ']')->items();
+        $kept = array_map(static fn(Value $item) => $item->numberLiteral(), $items);
+        self::assertSame($tokens, $kept);
+        $rejected = ['NaN' => 'expected_value', 'Infinity' => 'expected_value', '-Infinity' => 'expected_digit'];
+        $rejected['[NaN]'] = 'expected_value';
+        foreach ($rejected as $source => $kind) {
+            try {
+                Value::parse((string)$source);
+                self::fail("expected ParseError for $source");
+            } catch (ParseError $error) {
+                self::assertSame($kind, $error->kind);
+            }
+        }
+    }
+
+    // Requirements: RQ-011
+    public function testSerializationIsIdempotent(): void
+    {
+        $once = stringify(Value::parse(' { "b" : 1 , "a" : 2 , "b" : 3 } '));
+        self::assertSame('{"b":3,"a":2}', $once);
+        self::assertSame($once, stringify(Value::parse($once)));
     }
 }

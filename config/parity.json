@@ -680,6 +680,11 @@
           "implementation": "python",
           "test": "packages/python/tests/test_api.py",
           "id": "test_host_serialization_boundary"
+        },
+        {
+          "implementation": "rust",
+          "test": "packages/rust/tests/serde_binding.rs",
+          "id": "host_serialization_boundary"
         }
       ]
     },
@@ -876,292 +881,6 @@
           "implementation": "python",
           "test": "packages/python/tests/test_api.py",
           "id": "test_strict_parse_accepts_unique_keys"
-        }
-      ]
-    },
-    {
-      "id": "serde_wire_bytes_and_round_trip",
-      "kind": "feature",
-      "requirements": [
-        "RQ-011",
-        "RQ-010"
-      ],
-      "bindings": [
-        {
-          "implementation": "rust",
-          "test": "packages/rust/tests/serde_binding.rs",
-          "id": "serde_wire_bytes_and_round_trip"
-        }
-      ]
-    },
-    {
-      "id": "serde_manifest_bytes_and_round_trip",
-      "kind": "feature",
-      "requirements": [
-        "RQ-011"
-      ],
-      "bindings": [
-        {
-          "implementation": "rust",
-          "test": "packages/rust/tests/serde_binding.rs",
-          "id": "serde_manifest_bytes_and_round_trip"
-        }
-      ]
-    },
-    {
-      "id": "serde_rejects_invalid_and_unconsumed_input",
-      "kind": "feature",
-      "requirements": [
-        "RQ-004",
-        "RQ-005"
-      ],
-      "bindings": [
-        {
-          "implementation": "rust",
-          "test": "packages/rust/tests/serde_binding.rs",
-          "id": "serde_rejects_invalid_and_unconsumed_input"
-        }
-      ]
-    },
-    {
-      "id": "serde_rejects_duplicate_struct_fields",
-      "kind": "feature",
-      "requirements": [
-        "RQ-017"
-      ],
-      "bindings": [
-        {
-          "implementation": "rust",
-          "test": "packages/rust/tests/serde_binding.rs",
-          "id": "serde_rejects_duplicate_struct_fields"
-        }
-      ]
-    },
-    {
-      "id": "serde_embedded_values_preserve_order_and_number_tokens",
-      "kind": "feature",
-      "requirements": [
-        "RQ-001",
-        "RQ-010"
-      ],
-      "bindings": [
-        {
-          "implementation": "rust",
-          "test": "packages/rust/tests/serde_binding.rs",
-          "id": "serde_embedded_values_preserve_order_and_number_tokens"
-        }
-      ]
-    },
-    {
-      "id": "serde_value_respects_container_depth",
-      "kind": "feature",
-      "requirements": [
-        "RQ-006"
-      ],
-      "bindings": [
-        {
-          "implementation": "rust",
-          "test": "packages/rust/tests/serde_binding.rs",
-          "id": "serde_value_respects_container_depth"
-        }
-      ]
-    },
-    {
-      "id": "serde_value_preserves_unpaired_surrogate_token",
-      "kind": "feature",
-      "requirements": [
-        "RQ-009"
-      ],
-      "bindings": [
-        {
-          "implementation": "rust",
-          "test": "packages/rust/tests/serde_binding.rs",
-          "id": "serde_value_preserves_unpaired_surrogate_token"
-        }
-      ]
-    },
-    {
-      "id": "marshal_preserves_typed_json_contract",
-      "kind": "feature",
-      "requirements": [
-        "RQ-011",
-        "RQ-020"
-      ],
-      "bindings": [
-        {
-          "implementation": "go",
-          "test": "packages/go/marshal_test.go",
-          "id": "TestMarshalPreservesTypedJSONContract"
-        }
-      ]
-    },
-    {
-      "id": "marshal_keeps_empty_object_and_array_distinct",
-      "kind": "feature",
-      "requirements": [
-        "RQ-003"
-      ],
-      "bindings": [
-        {
-          "implementation": "go",
-          "test": "packages/go/marshal_test.go",
-          "id": "TestMarshalKeepsEmptyObjectAndArrayDistinct"
-        }
-      ]
-    },
-    {
-      "id": "marshal_validates_custom_marshaler_through_ordered_parser",
-      "kind": "feature",
-      "requirements": [
-        "RQ-020",
-        "RQ-015"
-      ],
-      "bindings": [
-        {
-          "implementation": "go",
-          "test": "packages/go/marshal_test.go",
-          "id": "TestMarshalValidatesCustomMarshalerThroughOrderedParser"
-        }
-      ]
-    },
-    {
-      "id": "marshal_rejects_unsupported_map_key",
-      "kind": "feature",
-      "requirements": [
-        "RQ-016"
-      ],
-      "bindings": [
-        {
-          "implementation": "go",
-          "test": "packages/go/marshal_test.go",
-          "id": "TestMarshalRejectsUnsupportedMapKey"
-        }
-      ]
-    },
-    {
-      "id": "marshal_writes_null_for_nil_value_pointer",
-      "kind": "feature",
-      "requirements": [
-        "RQ-020"
-      ],
-      "bindings": [
-        {
-          "implementation": "go",
-          "test": "packages/go/marshal_test.go",
-          "id": "TestMarshalWritesNullForNilValuePointer"
-        }
-      ]
-    },
-    {
-      "id": "marshal_time_and_bytes_match_typed_values",
-      "kind": "feature",
-      "requirements": [
-        "RQ-020"
-      ],
-      "bindings": [
-        {
-          "implementation": "go",
-          "test": "packages/go/marshal_test.go",
-          "id": "TestMarshalTimeAndBytesMatchTypedValues"
-        }
-      ]
-    },
-    {
-      "id": "marshal_promotes_embedded_fields",
-      "kind": "feature",
-      "requirements": [
-        "RQ-020"
-      ],
-      "bindings": [
-        {
-          "implementation": "go",
-          "test": "packages/go/marshal_test.go",
-          "id": "TestMarshalPromotesEmbeddedFields"
-        }
-      ]
-    },
-    {
-      "id": "marshal_rejects_repeated_field_names",
-      "kind": "feature",
-      "requirements": [
-        "RQ-017"
-      ],
-      "bindings": [
-        {
-          "implementation": "go",
-          "test": "packages/go/marshal_test.go",
-          "id": "TestMarshalRejectsRepeatedFieldNames"
-        }
-      ]
-    },
-    {
-      "id": "marshal_rejects_cyclic_values",
-      "kind": "feature",
-      "requirements": [
-        "RQ-006",
-        "RQ-020"
-      ],
-      "bindings": [
-        {
-          "implementation": "go",
-          "test": "packages/go/marshal_test.go",
-          "id": "TestMarshalRejectsCyclicValues"
-        }
-      ]
-    },
-    {
-      "id": "marshal_rejects_values_deeper_than_the_parser",
-      "kind": "feature",
-      "requirements": [
-        "RQ-006"
-      ],
-      "bindings": [
-        {
-          "implementation": "go",
-          "test": "packages/go/marshal_test.go",
-          "id": "TestMarshalRejectsValuesDeeperThanTheParser"
-        }
-      ]
-    },
-    {
-      "id": "marshal_matches_host_encoder_structures",
-      "kind": "feature",
-      "requirements": [
-        "RQ-020"
-      ],
-      "bindings": [
-        {
-          "implementation": "go",
-          "test": "packages/go/marshal_fuzz_test.go",
-          "id": "TestMarshalMatchesHostEncoderStructures"
-        }
-      ]
-    },
-    {
-      "id": "marshal_omit_rules_follow_the_host_encoder",
-      "kind": "feature",
-      "requirements": [
-        "RQ-020"
-      ],
-      "bindings": [
-        {
-          "implementation": "go",
-          "test": "packages/go/marshal_fuzz_test.go",
-          "id": "TestMarshalOmitRulesFollowTheHostEncoder"
-        }
-      ]
-    },
-    {
-      "id": "marshal_reports_non_finite_numbers",
-      "kind": "feature",
-      "requirements": [
-        "RQ-010"
-      ],
-      "bindings": [
-        {
-          "implementation": "go",
-          "test": "packages/go/marshal_fuzz_test.go",
-          "id": "TestMarshalReportsNonFiniteNumbers"
         }
       ]
     },
@@ -2758,6 +2477,526 @@
         {
           "implementation": "python",
           "symbol": "ordered_json.ParseOptions"
+        }
+      ]
+    },
+    {
+      "id": "host_serialization_embeds_values",
+      "kind": "feature",
+      "requirements": [
+        "RQ-020"
+      ],
+      "bindings": [
+        {
+          "implementation": "js",
+          "test": "packages/js/tests/api.test.mjs",
+          "id": "host_serialization_embeds_values"
+        },
+        {
+          "implementation": "rust",
+          "test": "packages/rust/tests/serde_binding.rs",
+          "id": "serde_embedded_values_preserve_order_and_number_tokens"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/go/api_test.go",
+          "id": "TestHostSerializationEmbedsValues"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testHostSerializationEmbedsValues"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testHostSerializationEmbedsValues"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_host_serialization_embeds_values"
+        }
+      ]
+    },
+    {
+      "id": "api-host-serialization",
+      "kind": "api",
+      "requirements": [
+        "RQ-020"
+      ],
+      "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#toJSON:member(1)"
+        },
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::serde"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Value.MarshalJSON"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::jsonSerialize"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::jsonSerialize"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.JSONEncoder.default"
+        }
+      ]
+    },
+    {
+      "id": "api-host-typed-encode",
+      "kind": "api",
+      "requirements": [
+        "RQ-020"
+      ],
+      "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#toJSON:member(1)"
+        },
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::serde::to_string"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Marshal"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::jsonSerialize"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::jsonSerialize"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.JSONEncoder"
+        }
+      ]
+    },
+    {
+      "id": "api-host-typed-decode",
+      "kind": "api",
+      "requirements": [
+        "RQ-020"
+      ],
+      "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!parse:function(1)"
+        },
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::serde::from_str"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Parse"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\parse"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\parse"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.parse"
+        }
+      ]
+    },
+    {
+      "id": "api-host-typed-decode-bytes",
+      "kind": "api",
+      "requirements": [
+        "RQ-020",
+        "RQ-007"
+      ],
+      "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!parseBytes:function(1)"
+        },
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::serde::from_slice"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/go.ParseBytes"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\parse"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\parse"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.parse_bytes"
+        }
+      ]
+    },
+    {
+      "id": "api-host-error",
+      "kind": "api",
+      "requirements": [
+        "RQ-024"
+      ],
+      "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!ParseError:class"
+        },
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::serde::Error"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/go.ParseError"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\ParseError"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\ParseError"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.ParseError"
+        }
+      ]
+    },
+    {
+      "id": "api-to-string",
+      "kind": "api",
+      "requirements": [
+        "RQ-011"
+      ],
+      "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#toString:member(1)"
+        },
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Value::compact"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Value.String"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::__toString"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::__toString"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.compact"
+        }
+      ]
+    },
+    {
+      "id": "api-parse-options",
+      "kind": "api",
+      "requirements": [
+        "RQ-006"
+      ],
+      "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!ParseOptions:interface"
+        },
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::parse_with_max_depth"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/go.ParseWithMaxDepth"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::parse"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::parse"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.ParseOptions"
+        }
+      ]
+    },
+    {
+      "id": "api-parse-error-constructor",
+      "kind": "api",
+      "requirements": [
+        "RQ-024"
+      ],
+      "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!ParseError:class"
+        },
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Error"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/go.ParseError"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\ParseError::__construct"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\ParseError::__construct"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.ParseError"
+        }
+      ]
+    },
+    {
+      "id": "api-parse-error-text",
+      "kind": "api",
+      "requirements": [
+        "RQ-024"
+      ],
+      "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!ParseError:class"
+        },
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::Error::message"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/go.ParseError.Error"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\ParseError"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\ParseError"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.ParseError"
+        }
+      ]
+    },
+    {
+      "id": "api-ordered-map-new",
+      "kind": "api",
+      "requirements": [
+        "RQ-016"
+      ],
+      "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value.object:member(1)"
+        },
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::OrderedMap::new"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/go.OrderedMap"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::object"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::object"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.object"
+        }
+      ]
+    },
+    {
+      "id": "api-ordered-map-is-empty",
+      "kind": "api",
+      "requirements": [
+        "RQ-016"
+      ],
+      "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Value#members:member"
+        },
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::OrderedMap::is_empty"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/go.OrderedMap.Len"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::members"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::members"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Value.members"
+        }
+      ]
+    },
+    {
+      "id": "arrays_and_objects_stay_distinct",
+      "kind": "feature",
+      "requirements": [
+        "RQ-003"
+      ],
+      "bindings": [
+        {
+          "implementation": "js",
+          "test": "packages/js/tests/api.test.mjs",
+          "id": "arrays_and_objects_stay_distinct"
+        },
+        {
+          "implementation": "rust",
+          "test": "packages/rust/tests/api.rs",
+          "id": "arrays_and_objects_stay_distinct"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/go/api_test.go",
+          "id": "TestArraysAndObjectsStayDistinct"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testArraysAndObjectsStayDistinct"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testArraysAndObjectsStayDistinct"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_arrays_and_objects_stay_distinct"
+        }
+      ]
+    },
+    {
+      "id": "number_tokens_are_kept_exactly",
+      "kind": "feature",
+      "requirements": [
+        "RQ-010"
+      ],
+      "bindings": [
+        {
+          "implementation": "js",
+          "test": "packages/js/tests/api.test.mjs",
+          "id": "number_tokens_are_kept_exactly"
+        },
+        {
+          "implementation": "rust",
+          "test": "packages/rust/tests/api.rs",
+          "id": "number_tokens_are_kept_exactly"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/go/api_test.go",
+          "id": "TestNumberTokensAreKeptExactly"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testNumberTokensAreKeptExactly"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testNumberTokensAreKeptExactly"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_number_tokens_are_kept_exactly"
+        }
+      ]
+    },
+    {
+      "id": "serialization_is_idempotent",
+      "kind": "feature",
+      "requirements": [
+        "RQ-011"
+      ],
+      "bindings": [
+        {
+          "implementation": "js",
+          "test": "packages/js/tests/api.test.mjs",
+          "id": "serialization_is_idempotent"
+        },
+        {
+          "implementation": "rust",
+          "test": "packages/rust/tests/api.rs",
+          "id": "serialization_is_idempotent"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/go/api_test.go",
+          "id": "TestSerializationIsIdempotent"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testSerializationIsIdempotent"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testSerializationIsIdempotent"
+        },
+        {
+          "implementation": "python",
+          "test": "packages/python/tests/test_api.py",
+          "id": "test_serialization_is_idempotent"
         }
       ]
     }

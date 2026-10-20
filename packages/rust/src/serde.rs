@@ -11,33 +11,47 @@ use serde_json::value::RawValue;
 const RAW_TOKEN: &str = "$serde_json::private::RawValue";
 use std::{collections::HashSet, fmt};
 
+/// Why a Serde conversion failed; the variants are private, the message and the source say it.
 #[derive(Debug)]
-pub enum Error {
+pub struct Error(Cause);
+#[derive(Debug)]
+enum Cause {
     Json(super::Error),
     Typed(serde_json::Error),
     Encode(String),
 }
+impl Error {
+    fn json(error: super::Error) -> Self {
+        Self(Cause::Json(error))
+    }
+    fn typed(error: serde_json::Error) -> Self {
+        Self(Cause::Typed(error))
+    }
+    fn encode(message: String) -> Self {
+        Self(Cause::Encode(message))
+    }
+}
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Json(e) => e.fmt(f),
-            Self::Typed(e) => e.fmt(f),
-            Self::Encode(e) => f.write_str(e),
+        match &self.0 {
+            Cause::Json(e) => e.fmt(f),
+            Cause::Typed(e) => e.fmt(f),
+            Cause::Encode(e) => f.write_str(e),
         }
     }
 }
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            Self::Json(e) => Some(e),
-            Self::Typed(e) => Some(e),
-            Self::Encode(_) => None,
+        match &self.0 {
+            Cause::Json(e) => Some(e),
+            Cause::Typed(e) => Some(e),
+            Cause::Encode(_) => None,
         }
     }
 }
 impl ser::Error for Error {
     fn custom<T: fmt::Display>(v: T) -> Self {
-        Self::Encode(v.to_string())
+        Self::encode(v.to_string())
     }
 }
 
@@ -47,10 +61,10 @@ pub fn to_string<T: Serialize + ?Sized>(value: &T) -> Result<String, Error> {
         depth: 0,
     };
     value.serialize(&mut w)?;
-    Ok(super::parse(&w.text).map_err(Error::Json)?.compact())
+    Ok(super::parse(&w.text).map_err(Error::json)?.compact())
 }
 pub fn from_slice<T: DeserializeOwned>(bytes: &[u8]) -> Result<T, Error> {
-    let value = super::parse_bytes_reject_duplicates(bytes).map_err(Error::Json)?;
+    let value = super::parse_bytes_reject_duplicates(bytes).map_err(Error::json)?;
     let text = value.compact();
     let mut decoder = serde_json::Deserializer::from_str(&text);
     decoder.disable_recursion_limit();
@@ -60,10 +74,10 @@ pub fn from_slice<T: DeserializeOwned>(bytes: &[u8]) -> Result<T, Error> {
             ignored = Some(path.to_string());
         }
     })
-    .map_err(Error::Typed)?;
-    decoder.end().map_err(Error::Typed)?;
+    .map_err(Error::typed)?;
+    decoder.end().map_err(Error::typed)?;
     if let Some(path) = ignored {
-        return Err(Error::Encode(format!("unknown field: {path}")));
+        return Err(Error::encode(format!("unknown field: {path}")));
     }
     Ok(result)
 }
@@ -96,10 +110,10 @@ struct Writer {
 impl Writer {
     fn float<T: Serialize>(&mut self, v: T, finite: bool) -> Result<(), Error> {
         if !finite {
-            return Err(Error::Encode("non-finite number".into()));
+            return Err(Error::encode("non-finite number".into()));
         }
         self.text
-            .push_str(&serde_json::to_string(&v).map_err(Error::Typed)?);
+            .push_str(&serde_json::to_string(&v).map_err(Error::typed)?);
         Ok(())
     }
     /// Opens the object of an enum variant that holds a tuple or a struct: `{"name":` and the opening bracket.
@@ -111,12 +125,12 @@ impl Writer {
     }
     fn quoted(&mut self, v: &str) -> Result<(), Error> {
         self.text
-            .push_str(&serde_json::to_string(v).map_err(Error::Typed)?);
+            .push_str(&serde_json::to_string(v).map_err(Error::typed)?);
         Ok(())
     }
     fn begin(&mut self, c: char) -> Result<(), Error> {
         if self.depth >= super::MAX_DEPTH {
-            return Err(Error::Encode("maximum nesting depth exceeded".into()));
+            return Err(Error::encode("maximum nesting depth exceeded".into()));
         }
         self.depth += 1;
         self.text.push(c);
@@ -139,15 +153,15 @@ struct Compound<'a> {
 impl Compound<'_> {
     fn raw_field<T: Serialize + ?Sized>(&mut self, k: &str, v: &T) -> Result<(), Error> {
         if k != RAW_TOKEN || !self.first {
-            return Err(Error::Encode("invalid raw JSON field".into()));
+            return Err(Error::encode("invalid raw JSON field".into()));
         }
-        let value = serde_json::to_value(v).map_err(Error::Typed)?;
+        let value = serde_json::to_value(v).map_err(Error::typed)?;
         let text = value
             .as_str()
-            .ok_or_else(|| Error::Encode("raw JSON must be text".into()))?;
+            .ok_or_else(|| Error::encode("raw JSON must be text".into()))?;
         self.w
             .text
-            .push_str(&super::parse(text).map_err(Error::Json)?.compact());
+            .push_str(&super::parse(text).map_err(Error::json)?.compact());
         self.first = false;
         Ok(())
     }
@@ -159,15 +173,15 @@ impl Compound<'_> {
     }
     fn key(&mut self, k: &str) -> Result<(), Error> {
         if self.pending {
-            return Err(Error::Encode("map value is missing".into()));
+            return Err(Error::encode("map value is missing".into()));
         }
         if !self
             .keys
             .as_mut()
-            .ok_or_else(|| Error::Encode("object key is invalid".into()))?
+            .ok_or_else(|| Error::encode("object key is invalid".into()))?
             .insert(k.into())
         {
-            return Err(Error::Encode(format!("duplicate object key: {k}")));
+            return Err(Error::encode(format!("duplicate object key: {k}")));
         }
         self.comma();
         self.w.quoted(k)?;
@@ -186,13 +200,13 @@ impl Compound<'_> {
     fn finish(self) -> Result<(), Error> {
         if self.raw {
             return if self.first {
-                Err(Error::Encode("raw JSON value is missing".into()))
+                Err(Error::encode("raw JSON value is missing".into()))
             } else {
                 Ok(())
             };
         }
         if self.pending {
-            return Err(Error::Encode("map value is missing".into()));
+            return Err(Error::encode("map value is missing".into()));
         }
         self.w.end(self.close);
         if self.variant {
@@ -412,15 +426,15 @@ impl SerializeMap for Compound<'_> {
     type Ok = ();
     type Error = Error;
     fn serialize_key<T: Serialize + ?Sized>(&mut self, k: &T) -> Result<(), Error> {
-        let v = serde_json::to_value(k).map_err(Error::Typed)?;
+        let v = serde_json::to_value(k).map_err(Error::typed)?;
         self.key(
             v.as_str()
-                .ok_or_else(|| Error::Encode("object key must be a string".into()))?,
+                .ok_or_else(|| Error::encode("object key must be a string".into()))?,
         )
     }
     fn serialize_value<T: Serialize + ?Sized>(&mut self, v: &T) -> Result<(), Error> {
         if !self.pending {
-            return Err(Error::Encode("map key is missing".into()));
+            return Err(Error::encode("map key is missing".into()));
         }
         self.value(v)
     }

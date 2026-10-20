@@ -2,6 +2,7 @@ package orderedjson
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"math"
 	"reflect"
@@ -12,17 +13,11 @@ import (
 	"unicode/utf8"
 )
 
-// Marshaler is the JSON marshaler boundary understood by Marshal. A custom
-// marshaler's result is parsed by ordered-json before it is returned.
-type Marshaler interface {
-	MarshalJSON() ([]byte, error)
-}
-
 var timeType = reflect.TypeOf(time.Time{})
 
-// Marshal encodes a Go value through the ordered-json value model. Struct
-// fields follow declaration order; map keys are sorted because Go maps have no
-// defined iteration order. The returned bytes are compact JSON.
+// Marshal encodes a Go value through the ordered-json value model. A type that implements json.Marshaler is encoded by
+// it, and its result is parsed by ordered-json before it is returned. Struct fields follow declaration order; map keys are
+// sorted because Go maps have no defined iteration order. The returned bytes are compact JSON.
 func Marshal(value any) ([]byte, error) {
 	if value == nil {
 		return []byte("null"), nil
@@ -66,7 +61,7 @@ func marshalReflect(out *strings.Builder, value reflect.Value, path string, omit
 		return marshalReflect(out, value.Elem(), path, false, depth+1)
 	}
 	if value.CanInterface() {
-		if marshaler, ok := value.Interface().(Marshaler); ok {
+		if marshaler, ok := value.Interface().(json.Marshaler); ok {
 			body, err := marshaler.MarshalJSON()
 			if err != nil {
 				return fmt.Errorf("%s: %w", path, err)

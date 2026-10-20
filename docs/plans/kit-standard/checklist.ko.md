@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 5ec0abd699a021c8d65695e61b5552f962f4e732ffe730bd2d99153c6032b70e -->
+<!-- source-sha256: 3fc239c0d7ba4266e76cd1a3e6b832acaa9499ec4fde8d28fe9cbe718f9f7332 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -47,3 +47,4 @@
 | T2.34 | object entry, byte 입력, 오류 message는 언어별 표현에 binding한 중립 API unit입니다: JavaScript, PHP, Python은 Value의 members, get, object, PHP의 byte 입력은 parse, message는 ParseError class이며 PHP의 key test는 문자열이 아닌 key가 없음을 보입니다 | `config/parity.json`, `packages/php/tests/ValueApiTest.php`, `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make parity-declarations-check` and `make test-php CASES=NonStringKey` | [o] |
 | T2.35 | kind 이름은 모든 구현의 상수입니다 (S6): Rust, Go처럼 JavaScript(TypeScript 선언), Python, PHP에서도 Kind는 enum입니다 | `packages/js/index.js`, `packages/js/index.d.ts`, `packages/python/src/polyspec/ordered_json/__init__.py`, `packages/php/src/Kind.php`, `packages/php-ext/src/`, `config/parity.json`, `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make parity-declarations-check` | [o] |
 | T2.36 | 명세는 RQ-020을 모든 언어의 native JSON 인터페이스에 대한 하나의 규칙으로 말하고 Rust와 Go의 typed 형태를 그 확장으로 둡니다 | `docs/spec/json-contract.md`(.ko), `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make docs-check` | [o] |
+| T2.37 | 모든 언어의 host JSON 인터페이스는 중립 unit 둘(경계와 포함된 값)로, 그 typed 형태는 중립 API unit로 binding합니다: Rust serde와 Go Marshal은 test를 package test로 두고, Go는 encoding/json의 Marshaler를 쓰며, Python은 Value를 거부하는 JSONEncoder를 가집니다 | `packages/go/`, `packages/rust/`, `packages/python/`, `packages/js/tests`, `packages/php/tests`, `config/parity.json`, `CHANGELOG.md`(.ko) | `make parity-declarations-check` | [o] |

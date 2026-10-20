@@ -11,6 +11,7 @@ import unittest
 from polyspec import ordered_json
 from polyspec.ordered_json import (
     MAX_DEPTH,
+    JSONEncoder,
     ParseError,
     ParseOptions,
     Value,
@@ -150,9 +151,21 @@ class StandardCases(unittest.TestCase):
 
     # Requirements: RQ-020
     def test_host_serialization_boundary(self):
-        # The host encoder has no ordered knowledge and refuses the value.
+        # The host encoder has no ordered knowledge and refuses the value; the encoder of the library points to stringify.
         with self.assertRaises(TypeError):
             json.dumps(parse('{"a":1}'))
+        with self.assertRaisesRegex(TypeError, "stringify"):
+            json.dumps(parse('{"a":1}'), cls=JSONEncoder)
+
+    # Requirements: RQ-020
+    def test_host_serialization_embeds_values(self):
+        # A native structure that holds a value is refused by the host encoder, which points to the library serializer.
+        value = parse('{"b":1.50,"a":[2]}')
+        with self.assertRaises(TypeError):
+            json.dumps({"props": value})
+        with self.assertRaisesRegex(TypeError, "stringify"):
+            json.dumps({"props": value}, cls=JSONEncoder)
+        self.assertEqual(stringify(value), '{"b":1.50,"a":[2]}')
 
     # Requirements: RQ-007
     def test_bytes_input_is_validated(self):
@@ -267,3 +280,36 @@ class PackageCases(unittest.TestCase):
         self.assertEqual(caught.exception.kind, "expected_value")
         self.assertEqual(caught.exception.offset, 3)
         self.assertTrue(str(caught.exception))
+
+    # Requirements: RQ-003
+    def test_arrays_and_objects_stay_distinct(self):
+        numbers = [item.number_literal() for item in parse("[3,1,2]").items()]
+        self.assertEqual(numbers, ["3", "1", "2"])
+        self.assertEqual(parse("[]").kind, "array")
+        self.assertEqual(parse("{}").kind, "object")
+        text = '{"a":[],"b":{},"c":[{}]}'
+        self.assertEqual(stringify(parse(text)), text)
+
+    # Requirements: RQ-010
+    def test_number_tokens_are_kept_exactly(self):
+        tokens = ["1.0e+2", "-0", "0.10", "123456789012345678901234567890", "1E400"]
+        kept = [
+            item.number_literal() for item in parse(f"[{','.join(tokens)}]").items()
+        ]
+        self.assertEqual(kept, tokens)
+        for source, kind in (
+            ("NaN", "expected_value"),
+            ("Infinity", "expected_value"),
+            ("-Infinity", "expected_digit"),
+            ("[NaN]", "expected_value"),
+        ):
+            with self.subTest(source=source):
+                with self.assertRaises(ParseError) as caught:
+                    parse(source)
+                self.assertEqual(caught.exception.kind, kind)
+
+    # Requirements: RQ-011
+    def test_serialization_is_idempotent(self):
+        once = stringify(parse(' { "b" : 1 , "a" : 2 , "b" : 3 } '))
+        self.assertEqual(once, '{"b":3,"a":2}')
+        self.assertEqual(stringify(parse(once)), once)

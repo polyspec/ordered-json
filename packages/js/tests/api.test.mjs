@@ -237,3 +237,36 @@ test('parse_error_exposes_kind_offset_and_message', () => {
   assert.equal(typeof error.message, 'string');
   assert.ok(error.message.length > 0);
 });
+
+// Requirements: RQ-020
+test('host_serialization_embeds_values', () => {
+  // A native structure that holds a value is refused by the host encoder, which points to the library serializer.
+  const value = parse('{"b":1.50,"a":[2]}');
+  assert.throws(() => JSON.stringify({props: value}), {name: 'TypeError', message: 'Use stringify(value) from ordered-json'});
+  assert.throws(() => JSON.stringify([value]), {name: 'TypeError'});
+  assert.equal(stringify(value), '{"b":1.50,"a":[2]}');
+});
+
+// Requirements: RQ-003
+test('arrays_and_objects_stay_distinct', () => {
+  assert.deepEqual(parse('[3,1,2]').items.map(item => item.numberLiteral()), ['3', '1', '2']);
+  assert.equal(parse('[]').kind, 'array');
+  assert.equal(parse('{}').kind, 'object');
+  assert.equal(stringify(parse('{"a":[],"b":{},"c":[{}]}')), '{"a":[],"b":{},"c":[{}]}');
+});
+
+// Requirements: RQ-010
+test('number_tokens_are_kept_exactly', () => {
+  const tokens = ['1.0e+2', '-0', '0.10', '123456789012345678901234567890', '1E400'];
+  assert.deepEqual(parse(`[${tokens}]`).items.map(item => item.numberLiteral()), tokens);
+  for (const [source, kind] of [['NaN', 'expected_value'], ['Infinity', 'expected_value'], ['-Infinity', 'expected_digit'], ['[NaN]', 'expected_value']]) {
+    assert.throws(() => parse(source), {name: 'ParseError', kind}, source);
+  }
+});
+
+// Requirements: RQ-011
+test('serialization_is_idempotent', () => {
+  const once = stringify(parse(' { "b" : 1 , "a" : 2 , "b" : 3 } '));
+  assert.equal(once, '{"b":3,"a":2}');
+  assert.equal(stringify(parse(once)), once);
+});

@@ -163,3 +163,15 @@ fn serde_value_preserves_unpaired_surrogate_token() {
         Some(&[0xd800][..])
     );
 }
+
+// Requirements: RQ-020
+#[test]
+fn host_serialization_boundary() {
+    // The Serde traits are the host interface: a value is written with its contract bytes, in order and with its tokens.
+    let value = parse(r#"{"b":1.50,"a":[2,{"d":3,"c":4}]}"#).unwrap();
+    assert_eq!(
+        serde_json::to_string(&value).unwrap(),
+        r#"{"b":1.50,"a":[2,{"d":3,"c":4}]}"#
+    );
+    assert_eq!(to_string(&value).unwrap(), value.compact());
+}

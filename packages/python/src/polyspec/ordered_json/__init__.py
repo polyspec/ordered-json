@@ -8,12 +8,14 @@ implementation shares.
 
 from collections.abc import Iterable, Mapping
 from enum import StrEnum
+import json
 from json.decoder import scanstring as _scanstring
 import re
 from types import MappingProxyType
 
 __all__ = [
     "MAX_DEPTH",
+    "JSONEncoder",
     "Kind",
     "ParseError",
     "ParseOptions",
@@ -162,6 +164,16 @@ class ParseError(ValueError):
         self.kind = kind
         self.offset = offset
         self.unit = "byte"
+
+
+class JSONEncoder(json.JSONEncoder):
+    """The encoder of json.dumps(cls=JSONEncoder) that refuses a Value and points to stringify, as the host encoder cannot
+    write the ordered document."""
+
+    def default(self, o):
+        if isinstance(o, Value):
+            raise TypeError("Use ordered_json.stringify(value)")
+        return super().default(o)
 
 
 class ParseOptions:
