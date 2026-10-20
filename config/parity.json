@@ -584,6 +584,11 @@
           "id": "values_come_only_from_the_library"
         },
         {
+          "implementation": "rust",
+          "test": "packages/rust/tests/api.rs",
+          "id": "values_come_only_from_the_library"
+        },
+        {
           "implementation": "go",
           "test": "packages/go/api_test.go",
           "id": "TestValuesComeOnlyFromTheLibrary"
@@ -615,6 +620,11 @@
         {
           "implementation": "js",
           "test": "packages/js/tests/api.test.mjs",
+          "id": "returned_collections_are_immutable"
+        },
+        {
+          "implementation": "rust",
+          "test": "packages/rust/tests/api.rs",
           "id": "returned_collections_are_immutable"
         },
         {

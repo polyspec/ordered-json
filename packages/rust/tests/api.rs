@@ -237,3 +237,34 @@ fn parse_error_exposes_kind_offset_and_message() {
     assert_eq!(error.offset, 3);
     assert_eq!(error.message, "expected JSON value");
 }
+
+// Requirements: RQ-012
+#[test]
+fn values_come_only_from_the_library() {
+    // A Value has private fields and no public constructor besides the parser and the factories, and each of them validates,
+    // so a rejected input yields an error and never a Value.
+    assert!(parse("[1,]").is_err());
+    assert!(parse_bytes(b"\xff").is_err());
+    assert!(Value::number("x").is_err());
+    assert!(Value::number(" 1").is_err());
+    assert_eq!(Value::null().compact(), "null");
+    assert_eq!(Value::string("a").compact(), "\"a\"");
+    assert_eq!(Value::boolean(false).compact(), "false");
+    assert_eq!(Value::from_units(&[0x61]).compact(), "\"a\"");
+    assert_eq!(parse("[1]").unwrap().compact(), "[1]");
+}
+
+// Requirements: RQ-013
+#[test]
+fn returned_collections_are_immutable() {
+    // members() and items() return shared references, which allow no change; a changed copy leaves the value as it was.
+    let value = parse("{\"a\":[1,2]}").unwrap();
+    let members: &OrderedMap = value.members().unwrap();
+    let mut copy = members.clone();
+    copy.insert(Value::string("b"), Value::null()).unwrap();
+    assert_eq!(copy.len(), 2);
+    assert_eq!(value.members().unwrap().len(), 1);
+    let items: &[Value] = value.members().unwrap().get("a").unwrap().items().unwrap();
+    assert_eq!(items.len(), 2);
+    assert_eq!(stringify(&value), "{\"a\":[1,2]}");
+}

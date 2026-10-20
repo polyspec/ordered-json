@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 2737764d0b0715d03b9ae66cbbdb601fc083dbae7cf7aa904f16e2d1db72f906 -->
+<!-- source-sha256: 23c7a950696ef7bbf46e07c748b91f88f4d72003a48ed6f74ce02ac02ca431b2 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Rust API는 type이 본질적으로 보장하는 contract 동작을 test합니다 (T2.26): `values_come_only_from_the_library`(RQ-012: parser와 factory만이 생성자이며 각각 검증함)와 `returned_collections_are_immutable`(RQ-013: members와 items는 공유 참조이고 바꾼 사본은 원래 값을 그대로 둠)이며 둘 다 `packages/rust/tests/api.rs`에 binding합니다. Red: `make parity-declarations-check` R2 missing-binding 172건 중 이 unit의 rust 2건; green: R2 170건. `cargo test --test api` 2 passed, `make lint-rust` passed.
 - 각 test는 parity unit이 인용한 requirement를 이름으로 적습니다 (T2.4-4): 모든 binding(js, rust, go, python, php, php-extension case)의 test 위에 `Requirements: RQ-nnn` 주석을 두고, 하위 class가 상속한 case를 실행하는 곳에는 class 문서를 둡니다. Red: `make parity-declarations-check` R15 unnamed-requirement 178건; green: R15 0건(R1 84건과 R2 172건은 T2.4-1과 T2.4-2 항목에 남음). T2.4-3 test의 서식도 함께 고쳤습니다: `make lint-php`, `make lint-python`, `cargo fmt --check` 통과.
 - 확장은 자기 package의 version을 보고합니다 (T2.16): `config.m4`가 `../composer.json`(package, PIE build, kit의 build 모두에서 `src/` 옆에 있음, K295)에서 `PHP_POLYSPEC_ORDERED_JSON_VERSION`을 정의하고, `ordered_json.c`가 이를 쓰며, 상수 `ORDERED_JSON_VERSION = 0.0.1`은 없앴고, verifier의 `extension_version` runtime 검사는 같은 C 파일의 상수가 아니라 `composer.json`의 version과 `phpversion('polyspec_ordered_json')`을 비교합니다. Red: `runtimeVersions(['php-extension'])`가 `phpversion('polyspec_ordered_json') '0.0.1' differs from the version 0.0.9 of composer.json`으로 실패; green: `{ php: '8.4.26', extension_version: '0.0.9' }`, `scripts/verify.mts --only php-extension` passed, registry test 7 passed, `make release-versions TAG=v0.0.9` passed.
 - PHP 확장은 S10을 따릅니다 (T2.8): 이름 `polyspec/ordered-json-php-ext`와 `polyspec_ordered_json`, `@generate-function-entries`를 가진 stub 하나, `make php-ext-arginfo`가 쓰고 손으로 쓴 arginfo와 function table 대신 `ordered_json.c`가 include하는 추적되는 arginfo header, 그리고 `var/php-ext/polyspec_ordered_json.so`를 빌드하는 `make build-php-ext`이며, verifier(`scripts/registry.mts`), PIE 검사, `config/parity.json`, `make parity-check`가 이를 불러옵니다. 제자리 빌드인 `make php-extension`은 없앴습니다. Red: `make lint-php-ext` exit 2(arginfo header 없음, K290 전에는 `make php-ext-arginfo`가 kit에서 실패); green: `make lint-php-ext` exit 0, `make build-php-ext`가 library를 빌드, `scripts/verify.mts --only php-extension` 공식 예제 17 + 공유 case 98 passed, registry test 7 passed.
