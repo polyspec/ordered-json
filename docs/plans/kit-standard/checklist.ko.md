@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: c73a7e2356050e8cdd307d99234dac3ab46f787b5f3d6471c01815a4320290d2 -->
+<!-- source-sha256: 73abee999deb2ea73508284cf06a7b1fd0ee88b7611c61623799beb7f533c62e -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -16,3 +16,4 @@
 | T2.10 | PHP 패키지는 code point의 UTF-8 인코딩을 하나의 함수로 적습니다 | `packages/php/src/OrderedJson.php`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-php` | [o] |
 | T2.11 | Python parser는 member와 item의 scalar value를 하나의 method로 만듭니다 | `packages/python/src/polyspec/ordered_json/__init__.py`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-python` | [o] |
 | T2.12 | Rust serializer는 각 코드 조각을 한 번만 적습니다: float 검사, variant 열기, compound serializer의 element method는 각각 하나의 정의입니다 | `packages/rust/src/serde.rs`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-rust` | [o] |
+| T2.13 | config/dependency-policy.json의 Composer platform은 manifest와 lock의 값인 PHP 8.4.1입니다 (PHPUnit 13, kit K259) | `config/dependency-policy.json`, `CHANGELOG.md`(.ko) | `make dependency-policy-check` | [o] |

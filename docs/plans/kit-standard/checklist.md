@@ -15,3 +15,4 @@
 | T2.10 | The PHP package encodes a code point as UTF-8 in one function | `packages/php/src/OrderedJson.php`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-php` | [o] |
 | T2.11 | The Python parser builds the scalar value of a member or an item in one method | `packages/python/src/polyspec/ordered_json/__init__.py`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-python` | [o] |
 | T2.12 | The Rust serializer states each piece of code once: the float check, the variant opening and the element methods of its compound serializers are one definition each | `packages/rust/src/serde.rs`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-rust` | [o] |
+| T2.13 | The Composer platform of config/dependency-policy.json is PHP 8.4.1, the value of the manifests and locks (PHPUnit 13, kit K259) | `config/dependency-policy.json`, `CHANGELOG.md`(.ko) | `make dependency-policy-check` | [o] |
