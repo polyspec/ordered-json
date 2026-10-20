@@ -68,3 +68,4 @@
 | T2.55 | rust benchmark example은 각 ok 호출의 Result를 처리한다 (P8, K334) | packages/rust/examples/benchmark.rs, CHANGELOG.md(.ko) | `make lint-rust` and `make test-rust CASES=api` | [o] |
 | T2.56 | Go package는 orderedjson.go의 각 오류를 버리지 않고 처리한다 (P8, K334) | packages/go/orderedjson.go, CHANGELOG.md(.ko) | `make lint-go` and `make test-go CASES=Official` | [-] 원인: T2.57로 합쳐짐: lint-go는 package의 gate 하나다 |
 | T2.57 | Go package는 lint-go에 errcheck finding이 없다: orderedjson.go, api_test.go, 내부 probe와 benchmark의 모든 오류를 처리하거나 반환한다 (P8, K334) | packages/go/orderedjson.go, packages/go/api_test.go, packages/go/internal/benchmark/main.go, packages/go/internal/probe/main.go, CHANGELOG.md(.ko) | `make lint-go` | [o] |
+| T2.58 | 영문 CHANGELOG.md와 kit-standard 체크리스트의 한국어 쌍이 원문과 다시 일치한다. 원인: 67cd062 이후 영문 문서가 바뀌었으나 한국어 쌍은 ad81bad의 source-sha256을 유지하여 make docs-check가 실패한다 | CHANGELOG.ko.md, docs/plans/kit-standard/checklist.ko.md | `make docs-check` | [ ] |
