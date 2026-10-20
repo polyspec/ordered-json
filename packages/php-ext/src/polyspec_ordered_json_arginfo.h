@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 1371866e42bf58128d603a3a43c42b13fd3843a6 */
+ * Stub hash: de6e4eadd5108a9e4bfa5aa3be830abd9bfabc3d */
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_Polyspec_OrderedJson_parse, 0, 1, Polyspec\\OrderedJson\\Value, 0)
 	ZEND_ARG_TYPE_INFO(0, source, IS_STRING, 0)
@@ -153,6 +153,43 @@ static const zend_function_entry class_Polyspec_OrderedJson_Value_methods[] = {
 static void register_polyspec_ordered_json_symbols(int module_number)
 {
 	REGISTER_LONG_CONSTANT("Polyspec\\OrderedJson\\MAX_DEPTH", 256, CONST_PERSISTENT);
+}
+
+static zend_class_entry *register_class_Polyspec_OrderedJson_Kind(void)
+{
+	zend_class_entry *class_entry = zend_register_internal_enum("Polyspec\\OrderedJson\\Kind", IS_STRING, NULL);
+
+	zval enum_case_Object_value;
+	zend_string *enum_case_Object_value_str = zend_string_init("object", strlen("object"), 1);
+	ZVAL_STR(&enum_case_Object_value, enum_case_Object_value_str);
+	zend_enum_add_case_cstr(class_entry, "Object", &enum_case_Object_value);
+
+	zval enum_case_Array_value;
+	zend_string *enum_case_Array_value_str = zend_string_init("array", strlen("array"), 1);
+	ZVAL_STR(&enum_case_Array_value, enum_case_Array_value_str);
+	zend_enum_add_case_cstr(class_entry, "Array", &enum_case_Array_value);
+
+	zval enum_case_String_value;
+	zend_string *enum_case_String_value_str = zend_string_init("string", strlen("string"), 1);
+	ZVAL_STR(&enum_case_String_value, enum_case_String_value_str);
+	zend_enum_add_case_cstr(class_entry, "String", &enum_case_String_value);
+
+	zval enum_case_Number_value;
+	zend_string *enum_case_Number_value_str = zend_string_init("number", strlen("number"), 1);
+	ZVAL_STR(&enum_case_Number_value, enum_case_Number_value_str);
+	zend_enum_add_case_cstr(class_entry, "Number", &enum_case_Number_value);
+
+	zval enum_case_Boolean_value;
+	zend_string *enum_case_Boolean_value_str = zend_string_init("boolean", strlen("boolean"), 1);
+	ZVAL_STR(&enum_case_Boolean_value, enum_case_Boolean_value_str);
+	zend_enum_add_case_cstr(class_entry, "Boolean", &enum_case_Boolean_value);
+
+	zval enum_case_Null_value;
+	zend_string *enum_case_Null_value_str = zend_string_init("null", strlen("null"), 1);
+	ZVAL_STR(&enum_case_Null_value, enum_case_Null_value_str);
+	zend_enum_add_case_cstr(class_entry, "Null", &enum_case_Null_value);
+
+	return class_entry;
 }
 
 static zend_class_entry *register_class_Polyspec_OrderedJson_ParseError(zend_class_entry *class_entry_InvalidArgumentException)

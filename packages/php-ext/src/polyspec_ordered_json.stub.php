@@ -7,6 +7,16 @@ namespace Polyspec\OrderedJson;
 /** @var int */
 const MAX_DEPTH = 256;
 
+enum Kind: string
+{
+    case Object = 'object';
+    case Array = 'array';
+    case String = 'string';
+    case Number = 'number';
+    case Boolean = 'boolean';
+    case Null = 'null';
+}
+
 final class ParseError extends \InvalidArgumentException
 {
     public readonly string $kind;

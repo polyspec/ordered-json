@@ -1,4 +1,11 @@
-export type Kind = 'object' | 'array' | 'string' | 'number' | 'boolean' | 'null';
+export declare enum Kind {
+  Object = 'object',
+  Array = 'array',
+  String = 'string',
+  Number = 'number',
+  Boolean = 'boolean',
+  Null = 'null',
+}
 export interface ParseOptions {
   maxDepth?: number;
   rejectDuplicates?: boolean;

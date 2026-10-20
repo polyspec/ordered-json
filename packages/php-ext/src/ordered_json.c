@@ -1,5 +1,6 @@
 #include "ordered_json_internal.h"
 #include "Zend/zend_exceptions.h"
+#include "Zend/zend_enum.h"
 #include "Zend/zend_interfaces.h"
 #include "ext/standard/info.h"
 #include "ext/json/php_json.h"
@@ -428,6 +429,8 @@ zend_class_entry *oj_value_ce, *oj_error_ce;
 
 PHP_MINIT_FUNCTION(polyspec_ordered_json) {
     register_polyspec_ordered_json_symbols(module_number);
+    /* Reflection reports a userland enum as final, as an enum is; the registration of an internal enum does not set it. */
+    register_class_Polyspec_OrderedJson_Kind()->ce_flags |= ZEND_ACC_FINAL;
     oj_error_ce = register_class_Polyspec_OrderedJson_ParseError(spl_ce_InvalidArgumentException);
     oj_value_ce = register_class_Polyspec_OrderedJson_Value(php_json_serializable_ce, zend_ce_stringable);
     oj_init_value_class();

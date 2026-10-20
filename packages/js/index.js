@@ -67,6 +67,16 @@ const KINDS = {
   'Duplicate object key': 'duplicate_object_key',
 };
 
+/** The names of the kinds of a value, which Value.kind returns. */
+export const Kind = Object.freeze({
+  Object: 'object',
+  Array: 'array',
+  String: 'string',
+  Number: 'number',
+  Boolean: 'boolean',
+  Null: 'null',
+});
+
 export class ParseError extends SyntaxError {
   constructor(message, offset, unit = 'UTF-16 offset') {
     super(`${message} at ${unit} ${offset}`);

@@ -2361,6 +2361,22 @@
         {
           "implementation": "go",
           "symbol": "github.com/polyspec/ordered-json/packages/go.Kind"
+        },
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Kind:enum"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Kind"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Kind"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Kind"
         }
       ]
     },
@@ -2378,6 +2394,22 @@
         {
           "implementation": "go",
           "symbol": "github.com/polyspec/ordered-json/packages/go.ObjectKind"
+        },
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Kind.Object:member"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Kind::Object"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Kind::Object"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Kind"
         }
       ]
     },
@@ -2395,6 +2427,22 @@
         {
           "implementation": "go",
           "symbol": "github.com/polyspec/ordered-json/packages/go.ArrayKind"
+        },
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Kind.Array:member"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Kind::Array"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Kind::Array"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Kind"
         }
       ]
     },
@@ -2412,6 +2460,22 @@
         {
           "implementation": "go",
           "symbol": "github.com/polyspec/ordered-json/packages/go.StringKind"
+        },
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Kind.String:member"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Kind::String"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Kind::String"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Kind"
         }
       ]
     },
@@ -2429,6 +2493,22 @@
         {
           "implementation": "go",
           "symbol": "github.com/polyspec/ordered-json/packages/go.NumberKind"
+        },
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Kind.Number:member"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Kind::Number"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Kind::Number"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Kind"
         }
       ]
     },
@@ -2446,6 +2526,22 @@
         {
           "implementation": "go",
           "symbol": "github.com/polyspec/ordered-json/packages/go.BooleanKind"
+        },
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Kind.Boolean:member"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Kind::Boolean"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Kind::Boolean"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Kind"
         }
       ]
     },
@@ -2463,6 +2559,22 @@
         {
           "implementation": "go",
           "symbol": "github.com/polyspec/ordered-json/packages/go.NullKind"
+        },
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!Kind.Null:member"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Kind::Null"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Kind::Null"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.Kind"
         }
       ]
     },

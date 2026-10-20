@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 0f1a26dabcf0b25c1a2806baee14f90d9eb42d3f18207391d0944ed87a78d8ec -->
+<!-- source-sha256: 44ace3d0b3f5d207dc64b3b4a8ed1f6f28e28f8090adf88e54a331008d774436 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- 종류 이름은 모든 구현의 열거형 `Kind`입니다 (T2.35, S6): `packages/js/index.d.ts`의 TypeScript enum과 `index.js`의 frozen 객체 `Kind`, Python의 `StrEnum` `Kind`(`Value.kind`는 문자열과 같은 그 멤버를 반환), PHP의 backed enum `Polyspec\\OrderedJson\\Kind`(확장도 stub에서 등록하며 Reflection이 userland enum을 final로 보고하므로 final로 표시); `docs/spec/api.md`(.ko)가 열거형을 명세하고 `api-kind-*` unit 7개가 각 구현의 symbol을 선언합니다. Red: `make parity-declarations-check` R1 28건(js, php, php-extension, python의 kind unit); green: R1 0건. 확장 유무의 PHPUnit test 41개 assertion 188개 passed, unittest passed, `scripts/verify.mts` probe 4개 passed, `make lint-ts`, `lint-php`, `lint-python`, `lint-php-ext`, `typecheck` passed.
 - object entry, byte 입력, 오류 message는 중립 API unit입니다 (T2.34): `api-ordered-map*`는 Rust와 Go의 `OrderedMap`과 함께 JavaScript, PHP, Python, php-extension의 `Value` members, get, object를 선언하고, `api-parse-bytes`는 PHP의 byte 입력으로 `parse`를, `api-parse-error-message`는 표준 예외 message를 가진 `ParseError` class를 선언하며, `ordered_map_rejects_non_string_key`는 PHP와 확장에 `testOrderedMapRejectsNonStringKey`를 binding합니다(PHP 배열 키는 문자열 또는 정수이므로 다른 키는 객체에 닿지 않음). `docs/spec/api.md`(.ko)의 Go 문장은 더 이상 `ParseBytesBorrowed`를 말하지 않습니다. Red: `make parity-declarations-check` R1 58건, R2 101건; green: R1 28건(Kind unit), R2 99건. PHPUnit `NonStringKey`는 확장 유무와 관계없이 통과합니다.
 - Go에는 zero-copy 파싱이 없습니다 (T2.33): `ParseBytesBorrowed`, 그 `flagBorrowed` 처리, test, unit `borrowed_input_is_copied_on_access`는 contract 밖이므로(S6은 native 전용 symbol을 허용하지 않음) 없애며 Go benchmark는 `ParseBytes`로 파싱합니다. benchmark README와 API 표도 더 이상 이를 적지 않습니다. Red: `make parity-declarations-check` R2 missing-binding이 `borrowed_input_is_copied_on_access`에서 5개 구현; green: 그 5건이 없어짐; go test 6 passed, `scripts/verify.mts --only go` passed, `make lint-go` passed. commit된 Go benchmark 결과는 이 변경보다 앞서므로 다른 것과 함께 다시 측정합니다.
 - `CHECK_TARGETS`와 CI job은 kit-gates의 모든 gate를 실행합니다 (T2.21): parity 선언이 profile을 잃은 뒤(T2.4) schema 결과 98건이 없어졌습니다. Green: `make kit-check` exit 0, `tests/scripts/workflow-rules.test.mts` 17 passed.

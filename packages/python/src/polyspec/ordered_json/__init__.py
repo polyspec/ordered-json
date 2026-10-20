@@ -7,12 +7,14 @@ implementation shares.
 """
 
 from collections.abc import Iterable, Mapping
+from enum import StrEnum
 from json.decoder import scanstring as _scanstring
 import re
 from types import MappingProxyType
 
 __all__ = [
     "MAX_DEPTH",
+    "Kind",
     "ParseError",
     "ParseOptions",
     "Value",
@@ -22,6 +24,18 @@ __all__ = [
 ]
 
 MAX_DEPTH = 256
+
+
+class Kind(StrEnum):
+    """The names of the kinds of a value, which Value.kind returns."""
+
+    Object = "object"
+    Array = "array"
+    String = "string"
+    Number = "number"
+    Boolean = "boolean"
+    Null = "null"
+
 
 _MESSAGES = {
     "expected_value": "Expected JSON value",
@@ -301,9 +315,9 @@ class Value:
             raise TypeError("Use parse(), parse_bytes() or the Value factories")
 
     @property
-    def kind(self) -> str:
-        """'object', 'array', 'string', 'number', 'boolean' or 'null'."""
-        return self._kind
+    def kind(self) -> Kind:
+        """The kind of the value: Kind.Object, Kind.Array, Kind.String, Kind.Number, Kind.Boolean or Kind.Null."""
+        return Kind(self._kind)
 
     @property
     def raw(self) -> str:

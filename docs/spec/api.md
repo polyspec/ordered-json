@@ -80,6 +80,8 @@ PHP returns an associative array of `Value` objects. Object construction accepts
 | Boolean access | `booleanValue()` | `boolean_value()` | `BooleanValue()` | `booleanValue()` | `boolean_value()` |
 | Null construction | `Value.null()` | `Value::null()` | `Null()` | `Value::null()` | `Value.null()` |
 
+The kind names are the enumeration `Kind` of every implementation: `Object`, `Array`, `String`, `Number`, `Boolean` and `Null`, with the values `object`, `array`, `string`, `number`, `boolean` and `null`. Rust has the enum `Kind`, Go the constants `ObjectKind` to `NullKind` of `Kind`, JavaScript the enum `Kind`, Python the `StrEnum` `Kind` and PHP the backed enum `Kind`. `value.kind` is a `Kind` in Rust and Go, its string value in JavaScript, a member of `Kind` (which is its string) in Python, and `$value->kind()` is the string, which `Kind::from()` turns into the enum.
+
 JavaScript can construct a string from existing UTF-16 text. Rust and Go expose UTF-16 units as slices; PHP and Python take an iterable of integer code units, and Python returns the units as a list. Array access returns immutable data or independent copies.
 
 <a id="php"></a>
