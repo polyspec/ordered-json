@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: c6208522f88253af5b63af5f6b819d3629688744507fd09978c6f5e2b5e74725 -->
+<!-- source-sha256: 7258ace38d0d69abf06f7d3a76c819412fa24cade63e5934df9d0cd65beccc34 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -18,7 +18,7 @@
 | T2.12 | Rust serializer는 각 코드 조각을 한 번만 적습니다: float 검사, variant 열기, compound serializer의 element method는 각각 하나의 정의입니다 | `packages/rust/src/serde.rs`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-rust` | [o] |
 | T2.13 | config/dependency-policy.json의 Composer platform은 manifest와 lock의 값인 PHP 8.4.1입니다 (PHPUnit 13, kit K259) | `config/dependency-policy.json`, `CHANGELOG.md`(.ko) | `make dependency-policy-check` | [o] |
 | T2.14 | config/duplication.json은 kit이 자신의 test를 제외하듯 패키지의 test를 제외합니다: test는 case를 온전히 적습니다 | `config/duplication.json`, `config/owner-checks.json`, `CHANGELOG.md`(.ko) | `make duplication-check` | [o] |
-| T2.16 | 각 패키지는 version의 원천이 하나입니다: 확장은 ordered_json.c의 상수 0.0.1이 아니라 composer.json의 version을 보고하며, 설치 문서는 두 번째 version을 적지 않습니다 | `packages/php-ext/src/ordered_json.c`, `scripts/registry.mts`, `docs/operations/installation.md`(.ko) | `make release-versions` | [ ] |
+| T2.16 | 각 패키지는 version의 원천이 하나입니다: 확장은 ordered_json.c의 상수 0.0.1이 아니라 composer.json의 version을 보고하며, 설치 문서는 두 번째 version을 적지 않습니다 | `packages/php-ext/src/ordered_json.c`, `scripts/registry.mts`, `docs/operations/installation.md`(.ko) | `make release-versions` | [!] 원인: version의 원천이 build에 닿을 수 없습니다: kit의 scripts/kit/php-extension.mts 130행이 packages/php-ext/src만 build 디렉터리로 복사하므로 그 옆의 config.m4가 ../composer.json을 읽을 수 없고(build-path가 src인 패키지에서 실행되는 PIE build는 읽을 수 있습니다), 145행은 configure에 --enable-<extension>만 넘깁니다; manifest와 맞추는 두 번째 상수는 원천이 둘로 남고 make release-versions는 C 상수를 읽지 않습니다; 재시도: kit이 composer.json을 src 옆에 둔 복사본(PIE가 build하는 구조)에서 build한 뒤, config.m4가 ../composer.json에서 version을 정의합니다 |
 | T2.15 | PHP 확장은 내부 scan, hydrate, compact_node 함수가 아니라 PHP 라이브러리의 class와 함수를 같은 이름과 signature로 등록합니다 (S10). kit K1이 고쳐진 뒤 측정합니다 | `packages/php-ext/src/`, `packages/php/src/`, `docs/spec/api.md`(.ko) | `make lint-php-ext` | [!] 원인: 확장은 stub의 arginfo header로 API를 등록하는데 header를 쓸 수 없습니다: kit의 scripts/kit/php-extension.mts 167-171행(arginfo)이 복사본에서 ./configure 없이 phpize와 make <header>를 실행하므로 make php-ext-arginfo가 "No rule to make target"으로 실패합니다; 그래서 make lint-php-ext, build-php-ext, test-php-ext(packages/php와의 Reflection 비교)를 실행할 수 없고, 도구 밖에서 쓴 header는 결함을 우회하는 것입니다; 재시도: kit이 arginfo의 복사본에서 ./configure를 실행한 뒤(T2.8 참고) |
 | T2.17 | PRINCIPLES 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`, `PRINCIPLES.ko.md`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.18 | config/rebuild.json은 paths를 두지 않고, kit이 layout으로 찾은 모든 tool을 분류합니다 | `config/rebuild.json`, `CHANGELOG.md`(.ko) | `make rebuild-check` | [!] 원인: paths를 제거하고 benchmark tool 6개를 분류했지만 rebuild-check는 vendor된 scripts/kit 사본 9개를 아직 미분류로 보고합니다: kit의 scripts/kit/rebuild-check.mts 38행이 사본을 설치된 kit이 아니라(kit-check.mts 78행) kit.copies가 없는 저장소의 package.json(copiesOf(manifest))에서 가져옵니다; 재시도: kit이 toolSources에서 설치된 @polyspec/kit의 사본을 읽은 뒤 |
