@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 89d9aba3f88ecb757c787872db463cc7624aa48b145ac6d62ec7984b9089bd9e -->
+<!-- source-sha256: bc5ea1cc6fad08d47327ec1025a92292749b8583ee08fb969dcf7bce505400d0 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- 모든 API unit은 모든 구현의 symbol을 선언합니다 (T2.4-1): R1 결과(missing implementation 84건: php-extension 41, php 15, python 14, js 14)는 확장의 구현(T2.15-3), `Kind` 열거형(T2.35), 중립 object entry, byte 입력, 오류, host 인터페이스 unit(T2.34, T2.37), Go zero-copy 파싱 제거(T2.33)로 닫았습니다. Red: `make parity-declarations-check` R1 84건; green: `every declaration holds`이며 여섯 구현의 extractor가 선언 없는 공개 symbol을 나열하지 않음.
 - 모든 언어의 host JSON 인터페이스를 중립 unit으로 binding합니다 (T2.37): `host_serialization_boundary`(host 인코더를 거친 값: Rust `serde_json::to_string`, Go `json.Marshal`, JavaScript, PHP, Python의 거부)와 새 `host_serialization_embeds_values`(값을 담은 native 구조). typed 형태의 unit 20개(`serde_*`, `marshal_*`)는 이들로 대체하고 그 test는 package test로 남깁니다(`packages/go/marshal_test.go`와 fuzz test는 `api_test.go`로 들어감). Python에 `ordered_json.JSONEncoder`를 두어 `default`가 `Value`를 거부하고 `stringify`를 가리키게 하며, Go는 자체 `Marshaler` 대신 표준 라이브러리의 `json.Marshaler`를 쓰고, Rust `serde::Error`는 variant를 숨깁니다. API unit 11개가 typed 형태와 남은 accessor를 각 언어의 symbol과 짝짓고, unit `arrays_and_objects_stay_distinct`(RQ-003), `number_tokens_are_kept_exactly`(RQ-010), `serialization_is_idempotent`(RQ-011)는 없앤 unit만 인용하던 requirement를 test합니다. Red: `make parity-declarations-check` R2 99건(5개 언어에서 host unit 20개 없음)과 extractor가 읽은 선언 없는 공개 symbol 38개; green: `every declaration holds`, 여섯 구현 모두 R1과 R11 없음; 모든 test passed, 여섯 구현의 `scripts/verify.mts` passed, lint passed.
 - 명세는 RQ-020을 하나의 규칙으로 말합니다 (T2.36): 모든 언어는 값을 표준 JSON 직렬화 인터페이스와 통합하며, 그 인터페이스는 contract bytes를 쓰거나(Go `encoding/json`, Rust serde, native 구조 안에서도) 거부하며 라이브러리 직렬화기를 가리킵니다(JavaScript, PHP, Python). `docs/spec/api.md`(.ko)는 각 언어의 인터페이스를 이름 붙이고 Go의 typed `Marshal`과 Rust의 `serde::to_string`을 그 규칙을 native 구조 전체로 넓힌 확장으로 제시합니다. Red: RQ-020은 호스트 인코더가 거부하고 typed Go 인코더가 표준과 일치한다고 말해 Rust와 다른 언어가 binding할 수 없었음; green: `make docs-check` 문서 쌍 30개 passed.
 - 종류 이름은 모든 구현의 열거형 `Kind`입니다 (T2.35): `packages/js/index.d.ts`의 TypeScript enum과 `index.js`의 frozen 객체 `Kind`, Python의 `StrEnum` `Kind`(`Value.kind`는 문자열과 같은 그 멤버를 반환), PHP의 backed enum `Polyspec\\OrderedJson\\Kind`(확장도 stub에서 등록하며 Reflection이 userland enum을 final로 보고하므로 final로 표시); `docs/spec/api.md`(.ko)가 열거형을 명세하고 `api-kind-*` unit 7개가 각 구현의 symbol을 선언합니다. Red: `make parity-declarations-check` R1 28건(js, php, php-extension, python의 kind unit); green: R1 0건. 확장 유무의 PHPUnit test 41개 assertion 188개 passed, unittest passed, `scripts/verify.mts` probe 4개 passed, `make lint-ts`, `lint-php`, `lint-python`, `lint-php-ext`, `typecheck` passed.
