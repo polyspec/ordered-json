@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: d6ec99a4e40daad254129fccfdf567f2feb50fbb6dcc647e64734fbf1948c3c1 -->
+<!-- source-sha256: b94fc18a3352a8a13a8f4e9e86199842d0818cc6c40d4522d272ff1204a2b78e -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- 명세는 확장이 PHP 라이브러리를 구현한다고 말합니다 (T2.15-1): scan descriptor에 관한 RQ-021을 `docs/spec/json-contract.md`(.ko)에서 없애고, `docs/spec/api.md`(.ko)는 PHP 라이브러리의 공개 symbol(`Value`, `ParseError`, `parse`, `stringify`, `MAX_DEPTH`)을 나열하며 확장이 이를 같은 이름과 signature로 등록하고(S10) 자기 package의 version을 보고한다고 말하고, `docs/operations/installation.md`(.ko)는 `make build-php-ext`로 빌드하며 더 이상 package의 version을 적지 않습니다. Red: 명세가 `ordered_json_scan`, `ordered_json_hydrate`, `ordered_json_compact_node`를 설명했고 표가 0.0.9인 package에 0.0.3을 적었음; green: `make docs-check` 문서 쌍 30개 passed.
 - `AGENTS.md`의 모든 규칙은 `Own:`으로 시작합니다 (T2.30): 62개 규칙은 이 저장소 자신의 용어를 말하며, 외부 생태계의 표준 도구에 관한 원칙(P14)을 되풀이하던 규칙은 한국어 쌍과 함께 제거했습니다. Red: `make rules-check` exit 2, 91건(그중 62건이 `begins with neither Own: nor Refines`); green: exit 0, `every rule names its check; 13 rules are enforced by no tool`.
 - PRINCIPLES 사본은 K299부터 K303 뒤 `make kit-sync`가 쓴 설치된 kit의 것과 다시 같습니다 (T2.29)(원칙은 P1…, S1… id를 가짐). Red: `make kit-check` exit 2, 2건; green: exit 0.
 - Rust, Go, PHP는 UTF-8과 surrogate unit을 binding합니다 (T2.28): PHP의 `bytes_input_is_validated`(string이 byte 입력), Rust, Go, PHP의 `text_input_rejects_lone_surrogates`(text의 짝 없는 surrogate 원문의 WTF-8 byte는 문법 전에 surrogate 위치에서 invalid UTF-8로 거부), Rust, Go, PHP의 `string_value_keeps_an_unpaired_surrogate`. 이스케이프된 짝 없는 surrogate의 string value는 거부하지 않고 library 형태로 유지합니다: Go(`StringValue`)와 PHP(`stringValue`, `tokenText`는 flag를 잃음)는 WTF-8이고, String이 담을 수 없는 Rust는 `string_units`를 가리키며 여전히 거부합니다. `docs/spec/api.md`(.ko)에 규칙을 명세했습니다. Red: Go `StringValue() = "", unpaired surrogate; use StringUnits`, PHP `UnexpectedValueException: Unpaired surrogate`; parity R2 172건; green: go test 4 passed, PHPUnit 5 passed, cargo test 4 passed, `scripts/verify.mts --only go,php` passed, lint-go, lint-php, lint-rust passed, R2 158건.

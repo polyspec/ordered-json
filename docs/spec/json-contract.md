@@ -114,7 +114,6 @@ Each requirement is one testable statement of this contract. A unit of config/pa
 - **RQ-018** The raw source span of a value is the original text, including the surrounding whitespace of the root and the overwritten keys.
 - **RQ-019** Member lookup finds a member by its decoded name.
 - **RQ-020** Host encoders refuse a value and direct the caller to the library serializer, and the typed Go encoder matches the standard encoder.
-- **RQ-021** The native PHP backend builds the same values as the PHP library from the scan descriptors and refuses a malformed descriptor.
 - **RQ-022** Every implementation gives the official examples the expected results.
 - **RQ-023** The public API exports the parse, serialization, factory and accessor functions.
 - **RQ-024** A parse error exposes its kind, its offset and its message.

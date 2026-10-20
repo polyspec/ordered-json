@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 4229abe173eb37ba1c659d1f786aed630631963a9689c3fb408d297d5dd0ae85 -->
+<!-- source-sha256: 0b1f048982145205e2b41aa0caf10abafd52378532c14be8c1e66c087a51ca0d -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -24,7 +24,7 @@
 | T2.14 | config/duplication.json은 kit이 자신의 test를 제외하듯 패키지의 test를 제외합니다: test는 case를 온전히 적습니다 | `config/duplication.json`, `config/owner-checks.json`, `CHANGELOG.md`(.ko) | `make duplication-check` | [o] |
 | T2.16 | 각 패키지는 version의 원천이 하나입니다: 확장은 ordered_json.c의 상수 0.0.1이 아니라 composer.json의 version을 보고하며, 설치 문서는 두 번째 version을 적지 않습니다 | `packages/php-ext/src/ordered_json.c`, `scripts/registry.mts`, `docs/operations/installation.md`(.ko) | `make release-versions` | [o] |
 | T2.15 | PHP 확장은 내부 scan, hydrate, compact_node 함수가 아니라 PHP 라이브러리의 class와 함수를 같은 이름과 signature로 등록합니다 (S10). kit K1이 고쳐진 뒤 측정합니다 | `packages/php-ext/src/`, `packages/php/src/`, `docs/spec/api.md`(.ko) | `make lint-php-ext` | [~] |
-| T2.15-1 | 명세는 확장이 PHP 라이브러리 API를 등록한다고 말하며(S10) descriptor에 관한 RQ-021은 없앱니다 | `docs/spec/json-contract.md`(.ko), `docs/spec/api.md`(.ko), `docs/operations/installation.md`(.ko), `CHANGELOG.md`(.ko) | `make docs-check` | [ ] |
+| T2.15-1 | 명세는 확장이 PHP 라이브러리 API를 등록한다고 말하며(S10) descriptor에 관한 RQ-021은 없앱니다 | `docs/spec/json-contract.md`(.ko), `docs/spec/api.md`(.ko), `docs/operations/installation.md`(.ko), `CHANGELOG.md`(.ko) | `make docs-check` | [o] |
 | T2.15-2 | PHP 라이브러리는 내부를 공개하지 않습니다: 공개 symbol은 Value, ParseError, parse, stringify, MAX_DEPTH뿐이며 확장이 로드되면 그 어느 것도 선언하지 않습니다 | `packages/php/src/`, `packages/php/composer.json`, `CHANGELOG.md`(.ko) | `make test-php CASES=Value` and `make lint-php` | [ ] |
 | T2.15-3 | 확장은 PHP 라이브러리를 C로 구현합니다: Value, ParseError, parse, stringify, MAX_DEPTH를 같은 이름과 signature로 등록하며 descriptor 함수와 그 test는 없앱니다 | `packages/php-ext/src/`, `packages/php-ext/tests/`, `packages/php-ext/composer.json`, `packages/php-ext/phpunit.xml`, `config/parity.json`, `CHANGELOG.md`(.ko) | `make lint-php-ext` and `make test-php-ext CASES=Value` | [ ] |
 | T2.17 | PRINCIPLES 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`, `PRINCIPLES.ko.md`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |

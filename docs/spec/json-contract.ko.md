@@ -1,5 +1,5 @@
 <!-- doc-id: json-contract -->
-<!-- source-sha256: 0409effc3ae042b48645741c6f4824c80f2ba7b635a24556bb94983080c8c02c -->
+<!-- source-sha256: 673455ba4567ce5834dc93ce50242eaa1f731a440ae7010b48d28da8d5dfed8a -->
 # JSON 계약
 
 [English](json-contract.md)
@@ -115,7 +115,6 @@ JavaScript의 `compact` 옵션과 PHP의 `compact` 인자는 호환성을 위해
 - **RQ-018** 값의 원문 span은 원래 텍스트이며, 루트의 앞뒤 공백과 덮어쓰인 키를 포함합니다.
 - **RQ-019** member 조회는 디코딩된 이름으로 member를 찾습니다.
 - **RQ-020** 호스트 인코더는 값을 거부하고 호출자를 라이브러리 직렬화기로 안내하며, 타입이 있는 Go 인코더는 표준 인코더와 일치합니다.
-- **RQ-021** 네이티브 PHP 백엔드는 스캔 descriptor로 PHP 라이브러리와 같은 값을 만들고, 잘못된 descriptor를 거부합니다.
 - **RQ-022** 모든 구현은 공식 예제에 기대 결과를 냅니다.
 - **RQ-023** 공개 API는 파싱, 직렬화, 생성과 접근자 함수를 내보냅니다.
 - **RQ-024** 파싱 오류는 종류, 위치와 메시지를 노출합니다.

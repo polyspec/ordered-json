@@ -8,12 +8,12 @@
 
 | Component | Declared requirement | Current identifier | Metadata |
 | --- | --- | --- | --- |
-| JavaScript | Node.js >= 20, ESM | `@polyspec/ordered-json`, 0.0.3 | [package.json](https://github.com/polyspec/ordered-json/blob/main/packages/js/package.json) |
-| Rust | Rust >= 1.71, edition 2021 | `polyspec-ordered-json`, 0.0.3 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/packages/rust/Cargo.toml) |
+| JavaScript | Node.js >= 20, ESM | `@polyspec/ordered-json` | [package.json](https://github.com/polyspec/ordered-json/blob/main/packages/js/package.json) |
+| Rust | Rust >= 1.71, edition 2021 | `polyspec-ordered-json` | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/packages/rust/Cargo.toml) |
 | Go | Go >= 1.22 | `github.com/polyspec/ordered-json/packages/go` module, `orderedjson` package | [go.mod](https://github.com/polyspec/ordered-json/blob/main/packages/go/go.mod) |
 | PHP | PHP >= 8.2, JSON and PCRE extensions | `polyspec/ordered-json`, `Polyspec\OrderedJson` namespace | [composer.json](https://github.com/polyspec/ordered-json/blob/main/packages/php/composer.json) |
-| Python | Python >= 3.14 | `polyspec-ordered-json`, `polyspec.ordered_json` import, 0.0.3 | [pyproject.toml](https://github.com/polyspec/ordered-json/blob/main/packages/python/pyproject.toml) |
-| Native PHP | Matching PHP development headers, C compiler, phpize, make | `polyspec_ordered_json` extension, 0.0.3 | [extension source](https://github.com/polyspec/ordered-json/blob/main/packages/php-ext/src/ordered_json.c) |
+| Python | Python >= 3.14 | `polyspec-ordered-json`, `polyspec.ordered_json` import | [pyproject.toml](https://github.com/polyspec/ordered-json/blob/main/packages/python/pyproject.toml) |
+| Native PHP | Matching PHP development headers, C compiler, phpize, make | `polyspec_ordered_json` extension | [extension source](https://github.com/polyspec/ordered-json/blob/main/packages/php-ext/src/ordered_json.c) |
 | Repository checks | The pinned Python, Node.js, Rust, Go and npm releases, Git, make, PHP above | `make install`, `make check` | [verification](validation.md) |
 
 The repository checks run with the exact releases that tracked files pin: Rust in `rust-toolchain.toml`, Node.js, Go and Python at the pins of `@polyspec/kit` in `mise.toml`, with Composer, uv and the tools of the lints and the dependency review, each locked by its digests in `mise.lock` (the `go` line of `packages/go/go.mod` names the same Go exactly), PHP by its minor release in `.php-version`, and npm with the SHA-512 of its registry tarball in the `packageManager` field of `package.json`. A new checkout first runs `make install-tools TOOLS=npm`, which installs mise, the Node.js of `mise.toml` and that npm into `var/tools`, and `make install-packages`, which installs `package-lock.json` with it, the package `@polyspec/kit` of the shared tools included. `make install` then installs that Rust toolchain with rustup, and the tools of `mise.lock` with `mise install --locked` into `var/tools/mise` of the checkout (`make install-tools` of `@polyspec/kit`), which Git ignores and whose shims the Makefile puts first on `PATH`; no tool of the machine is used or changed. `make toolchain-check` compares every tool with its declaration, every target that runs a tool depends on it, and it fails with the expected and the actual version of each tool that differs. `GOTOOLCHAIN=local` and `RUSTUP_AUTO_INSTALL=0` keep go and rustup from downloading or installing another toolchain during a run, and every cargo command uses `--locked`.
@@ -76,21 +76,16 @@ The packages of this repository depend on no other package, so the repository ha
 <a id="native-php"></a>
 ## Native PHP
 
-Build against the PHP runtime that will load the extension:
+Build against the PHP runtime that will load the extension, from the repository root:
 
 ~~~sh
-cd packages/php-ext/src
-if test -f Makefile; then make distclean; fi
-phpize --clean
-phpize
-./configure --enable-ordered-json
-make -j2
+make build-php-ext
 ~~~
 
-The current Unix build produces `packages/php-ext/src/modules/polyspec_ordered_json.so`. From the repository root:
+`make build-php-ext` of kit builds the extension in a copy of `packages/php-ext` with phpize, after checking that the arginfo header, which `make php-ext-arginfo` writes from the stub, is that of the stub, and publishes `var/php-ext/polyspec_ordered_json.so`. A consumer builds and installs it with PIE (`polyspec/ordered-json-php-ext`). To load the module:
 
 ~~~sh
-php -n -d extension="$PWD/packages/php-ext/src/modules/polyspec_ordered_json.so" script.php
+php -n -d extension="$PWD/var/php-ext/polyspec_ordered_json.so" script.php
 ~~~
 
 `script.php` is any PHP script that uses the extension. `php -n` ignores php.ini; required built-in JSON and PCRE support must still be available. The source includes `config.w32`, but Windows and ZTS builds have not been verified. PIE requires its build tools, including `pkg-config`; on macOS the Homebrew package is `pkgconf`. See the [PIE artifact check](validation.md#pie) for the reproducible PIE build and shared verification procedure.

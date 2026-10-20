@@ -1,5 +1,5 @@
 <!-- doc-id: installation -->
-<!-- source-sha256: 7ac44823bcd1285afd364bd8a9d270f25fcc8b126bb0b3b6a0e921a07b007e81 -->
+<!-- source-sha256: 5e44ca2689592e7c2dc4f42c8957d429fbdf50cc37c1f4ac8d4ebc42aa3c6bb0 -->
 # 설치와 실행
 
 [English](installation.md)
@@ -9,12 +9,12 @@
 
 | 구성 요소 | 선언된 요구사항 | 현재 식별자 | 메타데이터 |
 | --- | --- | --- | --- |
-| JavaScript | Node.js >= 20, ESM | `@polyspec/ordered-json`, 0.0.3 | [package.json](https://github.com/polyspec/ordered-json/blob/main/packages/js/package.json) |
-| Rust | Rust >= 1.71, edition 2021 | `polyspec-ordered-json`, 0.0.3 | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/packages/rust/Cargo.toml) |
+| JavaScript | Node.js >= 20, ESM | `@polyspec/ordered-json` | [package.json](https://github.com/polyspec/ordered-json/blob/main/packages/js/package.json) |
+| Rust | Rust >= 1.71, edition 2021 | `polyspec-ordered-json` | [Cargo.toml](https://github.com/polyspec/ordered-json/blob/main/packages/rust/Cargo.toml) |
 | Go | Go >= 1.22 | `github.com/polyspec/ordered-json/packages/go` 모듈, `orderedjson` 패키지 | [go.mod](https://github.com/polyspec/ordered-json/blob/main/packages/go/go.mod) |
 | PHP | PHP >= 8.2, JSON 및 PCRE 확장 | `polyspec/ordered-json`, `Polyspec\OrderedJson` 네임스페이스 | [composer.json](https://github.com/polyspec/ordered-json/blob/main/packages/php/composer.json) |
-| Python | Python >= 3.14 | `polyspec-ordered-json`, `polyspec.ordered_json` import, 0.0.3 | [pyproject.toml](https://github.com/polyspec/ordered-json/blob/main/packages/python/pyproject.toml) |
-| 네이티브 PHP | 일치하는 PHP 개발 헤더, C 컴파일러, phpize, make | `polyspec_ordered_json` 확장, 0.0.3 | [확장 소스](https://github.com/polyspec/ordered-json/blob/main/packages/php-ext/src/ordered_json.c) |
+| Python | Python >= 3.14 | `polyspec-ordered-json`, `polyspec.ordered_json` import | [pyproject.toml](https://github.com/polyspec/ordered-json/blob/main/packages/python/pyproject.toml) |
+| 네이티브 PHP | 일치하는 PHP 개발 헤더, C 컴파일러, phpize, make | `polyspec_ordered_json` 확장 | [확장 소스](https://github.com/polyspec/ordered-json/blob/main/packages/php-ext/src/ordered_json.c) |
 | 저장소 검사 | 고정된 Python, Node.js, Rust, Go, npm release, Git, make, 위 PHP | `make install`, `make check` | [검증](validation.ko.md) |
 
 저장소 검사는 추적 파일이 고정한 정확한 release로 실행합니다. Rust는 `rust-toolchain.toml`, Node.js, Go와 Python은 `mise.toml`에 `@polyspec/kit`의 pin으로(`packages/go/go.mod`의 `go` 줄도 같은 Go를 정확히 가리킵니다) Composer, uv, lint와 dependency review의 도구와 함께 고정하고 `mise.lock`이 각 digest로 잠그며, PHP는 `.php-version`에 minor release로, npm은 `package.json`의 `packageManager` 필드에 registry tarball의 SHA-512와 함께 고정합니다. 새 checkout은 먼저 mise, `mise.toml`의 Node.js와 그 npm을 `var/tools`에 설치하는 `make install-tools TOOLS=npm`과, 그 npm으로 공유 도구의 package `@polyspec/kit`을 포함한 `package-lock.json`을 설치하는 `make install-packages`를 실행합니다. 그다음 `make install`은 그 Rust toolchain을 rustup으로 설치하고, `mise.lock`의 도구를 `mise install --locked`로 Git이 무시하고 Makefile이 그 shim을 `PATH` 앞에 두는 checkout의 `var/tools/mise`에 설치합니다(`@polyspec/kit`의 `make install-tools`). 기계의 도구는 사용하지도 바꾸지도 않습니다. `make toolchain-check`는 모든 도구를 선언과 비교하고, 도구를 실행하는 모든 target이 이에 의존하며, 다른 도구마다 기대 버전과 실제 버전을 밝히며 실패합니다. `GOTOOLCHAIN=local`과 `RUSTUP_AUTO_INSTALL=0`은 실행 중에 go와 rustup이 다른 toolchain을 내려받거나 설치하지 못하게 하고, 모든 cargo 명령은 `--locked`를 사용합니다.
@@ -77,21 +77,16 @@ Composer는 두 zip을 모두 읽습니다. type이 `php-ext`인 package `polysp
 <a id="native-php"></a>
 ## 네이티브 PHP
 
-확장을 로드할 PHP 런타임에 맞춰 빌드합니다.
+확장을 로드할 PHP 런타임에 맞춰 저장소 루트에서 빌드합니다.
 
 ~~~sh
-cd packages/php-ext/src
-if test -f Makefile; then make distclean; fi
-phpize --clean
-phpize
-./configure --enable-ordered-json
-make -j2
+make build-php-ext
 ~~~
 
-현재 Unix 빌드는 `packages/php-ext/src/modules/polyspec_ordered_json.so`를 생성합니다. 저장소 루트에서는 다음과 같이 실행합니다.
+kit의 `make build-php-ext`는 stub에서 `make php-ext-arginfo`가 쓴 arginfo header가 그 stub의 것임을 확인한 뒤 `packages/php-ext`의 복사본에서 phpize로 확장을 빌드하고 `var/php-ext/polyspec_ordered_json.so`를 게시합니다. 사용자는 PIE(`polyspec/ordered-json-php-ext`)로 빌드하고 설치합니다. 모듈을 로드하려면 다음과 같이 실행합니다.
 
 ~~~sh
-php -n -d extension="$PWD/packages/php-ext/src/modules/polyspec_ordered_json.so" script.php
+php -n -d extension="$PWD/var/php-ext/polyspec_ordered_json.so" script.php
 ~~~
 
 `script.php`는 확장을 사용하는 임의의 PHP 스크립트입니다. `php -n`은 php.ini를 무시하며 필수 내장 JSON 및 PCRE 지원은 사용할 수 있어야 합니다. 소스에는 `config.w32`가 포함돼 있지만 Windows와 ZTS 빌드는 검증되지 않았습니다. PIE에는 `pkg-config`를 포함한 빌드 도구가 필요하며 macOS의 Homebrew 패키지는 `pkgconf`입니다. 재현 가능한 PIE 빌드와 공통 검증 절차는 [PIE 산출물 검사](validation.ko.md#pie)를 참조합니다.
