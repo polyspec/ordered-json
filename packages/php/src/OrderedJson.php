@@ -183,10 +183,9 @@ function textUnits(string $text): array
 }
 
 /**
- * @internal UTF-8 text of validated string token contents. A lone surrogate becomes WTF-8
- * when $allowUnpaired is true; otherwise it is rejected like unitsToUtf8().
+ * @internal UTF-8 text of validated string token contents. A lone surrogate becomes WTF-8.
  */
-function tokenText(string $content, bool $allowUnpaired): string
+function tokenText(string $content): string
 {
     $slash = strpos($content, '\\');
     if ($slash === false) {
@@ -211,9 +210,6 @@ function tokenText(string $content, bool $allowUnpaired): string
                     $point = 0x10000 + (($point - 0xd800) << 10) + $low - 0xdc00;
                     $offset += 6;
                 }
-            }
-            if ($point >= 0xd800 && $point <= 0xdfff && !$allowUnpaired) {
-                throw new \UnexpectedValueException('Unpaired surrogate; use stringUnits()');
             }
             $out .= codePointToUtf8($point);
         }

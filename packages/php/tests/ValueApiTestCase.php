@@ -106,7 +106,6 @@ abstract class ValueApiTestCase extends TestCase
     {
         $lone = Value::parse('"a\ud800"');
         self::assertSame([0x61, 0xd800], $lone->stringUnits());
-        self::expectThrown(UnexpectedValueException::class, 'stringUnits', static fn() => $lone->stringValue());
     }
 
     public function testSurrogatePairDecodes(): void
@@ -308,5 +307,43 @@ abstract class ValueApiTestCase extends TestCase
             self::assertSame(3, $error->offset);
             self::assertNotSame('', $error->getMessage());
         }
+    }
+
+    // Requirements: RQ-009
+    public function testStringValueKeepsAnUnpairedSurrogate(): void
+    {
+        // The string value is the library form: UTF-8 with an unpaired surrogate as WTF-8, never replaced by U+FFFD.
+        self::assertSame("a\xed\xa0\x80", Value::parse('"a\ud800"')->stringValue());
+        self::assertSame("\u{1f30d}", Value::parse('"\ud83c\udf0d"')->stringValue());
+    }
+
+    // Requirements: RQ-008
+    public function testTextInputRejectsLoneSurrogates(): void
+    {
+        // A literal unpaired surrogate has only its WTF-8 encoding in a PHP string, which is no UTF-8: it is rejected
+        // before the grammar is read, at the byte of the surrogate.
+        foreach (["[\"\xed\xa0\x80\"]", "[\"\xed\xb0\x80\"]", "{\"\xed\xa0\x80\":1}", "[\"\xed\xa0\x80"] as $source) {
+            try {
+                Value::parse($source);
+                self::fail('expected ParseError for ' . bin2hex($source));
+            } catch (ParseError $error) {
+                self::assertSame('invalid_utf8', $error->kind);
+                self::assertSame(2, $error->offset);
+            }
+        }
+    }
+
+    // Requirements: RQ-007
+    public function testBytesInputIsValidated(): void
+    {
+        // A PHP string is the byte input: invalid UTF-8 is rejected at its first bad byte; multibyte text is kept.
+        try {
+            Value::parse("[\"\xff\"]");
+            self::fail('expected ParseError for invalid UTF-8');
+        } catch (ParseError $error) {
+            self::assertSame('invalid_utf8', $error->kind);
+            self::assertSame(2, $error->offset);
+        }
+        self::assertSame('{"a":"한"}', Value::parse('{"a":"한"}')->compact());
     }
 }

@@ -226,9 +226,6 @@ func TestUnpairedSurrogateStaysInUnits(t *testing.T) {
 	if len(units) != 2 || units[0] != 'a' || units[1] != 0xd800 {
 		t.Fatalf("StringUnits() = %v", units)
 	}
-	if _, err := lone.StringValue(); err == nil || err.Error() != "unpaired surrogate; use StringUnits" {
-		t.Fatalf("StringValue() error = %v", err)
-	}
 	if compact, _ := StringFromUnits([]uint16{0xd800}).Compact(); compact != `"\ud800"` {
 		t.Fatalf("StringFromUnits Compact() = %s", compact)
 	}
@@ -480,5 +477,28 @@ func TestStrictParseAcceptsUniqueKeys(t *testing.T) {
 	var failure *ParseError
 	if _, err := ParseRejectDuplicates("\xff"); !errors.As(err, &failure) || failure.Message != "invalid UTF-8" || failure.Offset != 0 {
 		t.Fatalf("invalid UTF-8 error = %v", err)
+	}
+}
+
+// Requirements: RQ-009
+func TestStringValueKeepsAnUnpairedSurrogate(t *testing.T) {
+	// The string value is the library form: UTF-8 with an unpaired surrogate as WTF-8, never replaced by U+FFFD.
+	if value, err := mustParse(t, `"a\ud800"`).StringValue(); err != nil || value != "a\xed\xa0\x80" {
+		t.Fatalf("StringValue() = %q, %v", value, err)
+	}
+	if value, err := mustParse(t, `"\ud83c\udf0d"`).StringValue(); err != nil || value != "\U0001f30d" {
+		t.Fatalf("StringValue() of a pair = %q, %v", value, err)
+	}
+}
+
+// Requirements: RQ-008
+func TestTextInputRejectsLoneSurrogates(t *testing.T) {
+	// A literal unpaired surrogate has only its WTF-8 encoding in a Go string, which is no UTF-8: it is rejected before the
+	// grammar is read, at the byte of the surrogate.
+	for source, offset := range map[string]int{"[\"\xed\xa0\x80\"]": 2, "[\"\xed\xb0\x80\"]": 2, "{\"\xed\xa0\x80\":1}": 2, "[\"\xed\xa0\x80": 2} {
+		var failure *ParseError
+		if _, err := Parse(source); !errors.As(err, &failure) || failure.Message != "invalid UTF-8" || failure.Offset != offset {
+			t.Fatalf("Parse(%q) error = %v", source, err)
+		}
 	}
 }

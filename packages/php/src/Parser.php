@@ -177,7 +177,7 @@ final class Parser
                     $this->tape[] = $pos;
                     $name = substr($s, $keyStart + 1, $pos - $keyStart - 2);
                     if ($result & 1) {
-                        $name = tokenText($name, true);
+                        $name = tokenText($name);
                     }
                     if ($this->rejectDuplicates && isset($names[$name])) {
                         $this->fail('Duplicate object key', $keyStart);

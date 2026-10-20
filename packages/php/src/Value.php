@@ -73,7 +73,7 @@ final class Value implements \JsonSerializable, \Stringable
                 $start = $tape[$i + 1] + 1;
                 $name = substr($source, $start, $tape[$i + 2] - 1 - $start);
                 if ($meta & Tape::ESCAPED) {
-                    $name = tokenText($name, true);
+                    $name = tokenText($name);
                 }
                 $member = new self();
                 $member->source = $source;
@@ -161,7 +161,7 @@ final class Value implements \JsonSerializable, \Stringable
         }
         $start = $tape[$index + 1] + 1;
         $content = substr($this->source, $start, $tape[$index + 2] - 1 - $start);
-        return $meta & Tape::ESCAPED ? tokenText($content, false) : $content;
+        return $meta & Tape::ESCAPED ? tokenText($content) : $content;
     }
     public function numberLiteral(): string
     {

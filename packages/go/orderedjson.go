@@ -320,19 +320,8 @@ func (v *Value) StringValue() (string, error) {
 		}
 		return content, nil
 	}
-	units := decodeUnits(content)
-	for i := 0; i < len(units); i++ {
-		u := units[i]
-		if u >= 0xd800 && u <= 0xdbff {
-			if i+1 >= len(units) || units[i+1] < 0xdc00 || units[i+1] > 0xdfff {
-				return "", fmt.Errorf("unpaired surrogate; use StringUnits")
-			}
-			i++
-		} else if u >= 0xdc00 && u <= 0xdfff {
-			return "", fmt.Errorf("unpaired surrogate; use StringUnits")
-		}
-	}
-	return string(utf16.Decode(units)), nil
+	// An unpaired surrogate has no UTF-8 encoding; the string value keeps it as WTF-8, the form of the keys (unitsName).
+	return unitsName(decodeUnits(content)), nil
 }
 func (v *Value) NumberLiteral() (string, error) {
 	if v.Kind() != NumberKind {

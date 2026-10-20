@@ -268,3 +268,37 @@ fn returned_collections_are_immutable() {
     assert_eq!(items.len(), 2);
     assert_eq!(stringify(&value), "{\"a\":[1,2]}");
 }
+
+// Requirements: RQ-009
+#[test]
+fn string_value_keeps_an_unpaired_surrogate() {
+    // A Rust String holds no unpaired surrogate, so the string value is refused and points to the code units, which keep it;
+    // it is never replaced by U+FFFD.
+    let lone = parse("\"a\\ud800\"").unwrap();
+    assert_eq!(
+        lone.string_value().unwrap_err().message,
+        "unpaired surrogate; use string_units"
+    );
+    assert_eq!(lone.string_units(), Some(&[0x61u16, 0xd800][..]));
+    assert_eq!(
+        parse("\"\\ud83c\\udf0d\"").unwrap().string_value().unwrap(),
+        "\u{1f30d}"
+    );
+}
+
+// Requirements: RQ-008
+#[test]
+fn text_input_rejects_lone_surrogates() {
+    // A literal unpaired surrogate has only its WTF-8 encoding in UTF-8 text, which is no UTF-8: it is rejected before the
+    // grammar is read, at the byte of the surrogate.
+    for source in [
+        &b"[\"\xed\xa0\x80\"]"[..],
+        b"[\"\xed\xb0\x80\"]",
+        b"{\"\xed\xa0\x80\":1}",
+        b"[\"\xed\xa0\x80",
+    ] {
+        let error = parse_bytes(source).unwrap_err();
+        assert_eq!(error.message, "invalid UTF-8", "{source:?}");
+        assert_eq!(error.offset, 2, "{source:?}");
+    }
+}

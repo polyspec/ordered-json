@@ -709,6 +709,16 @@
           "implementation": "python",
           "test": "packages/python/tests/test_api.py",
           "id": "test_bytes_input_is_validated"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testBytesInputIsValidated"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testBytesInputIsValidated"
         }
       ]
     },
@@ -1358,6 +1368,26 @@
           "implementation": "python",
           "test": "packages/python/tests/test_api.py",
           "id": "test_text_input_rejects_lone_surrogates"
+        },
+        {
+          "implementation": "rust",
+          "test": "packages/rust/tests/api.rs",
+          "id": "text_input_rejects_lone_surrogates"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/go/api_test.go",
+          "id": "TestTextInputRejectsLoneSurrogates"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testTextInputRejectsLoneSurrogates"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testTextInputRejectsLoneSurrogates"
         }
       ]
     },
@@ -2409,6 +2439,26 @@
           "implementation": "python",
           "test": "packages/python/tests/test_api.py",
           "id": "test_string_value_keeps_an_unpaired_surrogate"
+        },
+        {
+          "implementation": "rust",
+          "test": "packages/rust/tests/api.rs",
+          "id": "string_value_keeps_an_unpaired_surrogate"
+        },
+        {
+          "implementation": "go",
+          "test": "packages/go/api_test.go",
+          "id": "TestStringValueKeepsAnUnpairedSurrogate"
+        },
+        {
+          "implementation": "php",
+          "test": "packages/php/tests/ValueApiTest.php",
+          "id": "testStringValueKeepsAnUnpairedSurrogate"
+        },
+        {
+          "implementation": "php-extension",
+          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "id": "testStringValueKeepsAnUnpairedSurrogate"
         }
       ]
     },
