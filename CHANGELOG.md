@@ -5,6 +5,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.60: ordered-json takes the copies of kit at 8813c04a (K354 K394 K386 K348-1 K360-2 K349-2 K392-1 K393), written by make kit-sync and make hooks; red: make kit-check exit 2 with scripts/kit/kit-bootstrap.mk and scripts/kit/bootstrap/install-mise.mts differing from @polyspec/kit 0.0.54 and config/commit-identity.json missing, green: make kit-check and make link-check exit 0. (T2.60)
 
 - T2.59: ordered-json takes the copies of kit at f9eb43dd: make kit-sync writes scripts/kit/kit-bootstrap.mk and config/layout.kit.yml, and make hooks writes .githooks/commit-msg; red: make kit-check exit 2 with two copies that differ from the installed kit, green: make kit-check exit 0. (T2.59)
 - T2.58: the Korean twins of CHANGELOG.md and of the kit-standard checklist carry the source-sha256 of their English files again; red: make docs-check reported both stamps stale since 67cd062, green: it passes. (T2.58)

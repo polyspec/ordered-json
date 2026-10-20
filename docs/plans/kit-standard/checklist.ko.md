@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: d175e6f3bcd3e5b88d7dd371bbdc011fe1aa6db48503e7a2b5238c25d7dc1550 -->
+<!-- source-sha256: 1d7436f07f97984ee7464e91276ca01e29fbe9bd4e6a3a4ce9d11d58df98b1a9 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -70,3 +70,4 @@
 | T2.57 | Go package는 lint-go에 errcheck finding이 없다: orderedjson.go, api_test.go, 내부 probe와 benchmark의 모든 오류를 처리하거나 반환한다 (P8, K334) | packages/go/orderedjson.go, packages/go/api_test.go, packages/go/internal/benchmark/main.go, packages/go/internal/probe/main.go, CHANGELOG.md(.ko) | `make lint-go` | [o] |
 | T2.58 | 영문 CHANGELOG.md와 kit-standard 체크리스트의 한국어 쌍이 원문과 다시 일치한다. 원인: 67cd062 이후 영문 문서가 바뀌었으나 한국어 쌍은 ad81bad의 source-sha256을 유지하여 make docs-check가 실패한다 | CHANGELOG.ko.md, docs/plans/kit-standard/checklist.ko.md | `make docs-check` | [o] |
 | T2.59 | ordered-json은 kit f9eb43dd의 복사본(K348 K385 K384 K360-1 K383 K380 K382 K375)을 make kit-sync, make hooks, make link-check로 받는다 | scripts/kit, config, .githooks, PRINCIPLES.md, PRINCIPLES.ko.md, .claude/settings.json | `make kit-check` | [o] |
+| T2.60 | ordered-json은 8813c04a의 kit 사본을 받으며(K354 K394 K386 K348-1 K360-2 K349-2 K392-1 K393), make kit-sync와 make hooks가 쓴다 | the copies of kit, .githooks | `make kit-check` | [o] |
