@@ -49,7 +49,7 @@ final class Value implements \JsonSerializable, \Stringable
     {
     }
 
-    public static function parse(string $source, int $maxDepth = MAX_DEPTH): self
+    public static function parse(string $source, int $maxDepth = MAX_DEPTH): Value
     {
         if ($maxDepth < 0 || $maxDepth > MAX_DEPTH) {
             throw new \InvalidArgumentException('maxDepth must be between 0 and 256');
@@ -61,7 +61,7 @@ final class Value implements \JsonSerializable, \Stringable
      * Parses like parse() with the default depth limit and rejects a repeated decoded object key
      * at the first byte of the second key token.
      */
-    public static function parseRejectDuplicates(string $source): self
+    public static function parseRejectDuplicates(string $source): Value
     {
         return self::root($source, self::scan($source, MAX_DEPTH, true));
     }
@@ -196,22 +196,22 @@ final class Value implements \JsonSerializable, \Stringable
         }
         return $this->source[$tape[$index + 1]] === 't';
     }
-    public function get(string $key): ?self
+    public function get(string $key): ?Value
     {
         if (($this->tape[$this->index] & self::KIND) !== self::OBJECT) {
             $this->mismatch('object');
         }
         return ($this->cache ??= $this->hydrateMembers())[$key] ?? null;
     }
-    public function getUnits(array $units): ?self
+    public function getUnits(array $units): ?Value
     {
         return $this->get(self::unitsToUtf8($units));
     }
-    public static function string(string $text): self
+    public static function string(string $text): Value
     {
         return self::parse(self::quoteUnits(self::utf8Units($text)));
     }
-    public static function fromUnits(array $units): self
+    public static function fromUnits(array $units): Value
     {
         $raw = '"';
         foreach ($units as $unit) {
@@ -222,7 +222,7 @@ final class Value implements \JsonSerializable, \Stringable
         }
         return self::parse($raw . '"');
     }
-    public static function number(string $literal): self
+    public static function number(string $literal): Value
     {
         $v = self::parse($literal);
         if ($v->kind() !== 'number' || trim($literal) !== $literal) {
@@ -230,15 +230,15 @@ final class Value implements \JsonSerializable, \Stringable
         }
         return $v;
     }
-    public static function boolean(bool $value): self
+    public static function boolean(bool $value): Value
     {
         return self::parse($value ? 'true' : 'false');
     }
-    public static function null(): self
+    public static function null(): Value
     {
         return self::parse('null');
     }
-    public static function array(array $items): self
+    public static function array(array $items): Value
     {
         if (!array_is_list($items)) {
             throw new \InvalidArgumentException('Expected a list of values');
@@ -246,7 +246,7 @@ final class Value implements \JsonSerializable, \Stringable
         return self::parse('[' . implode(',', array_map(fn(self $v) => $v->compact(), $items)) . ']');
     }
     /** @param array<string|int, Value> $members */
-    public static function object(array $members): self
+    public static function object(array $members): Value
     {
         $parts = [];
         foreach ($members as $key => $value) {

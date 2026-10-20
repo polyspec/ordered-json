@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 8f3c154c3e987cce7b79fc357365396d877efa54605cad39f98f2ae7f6b7764a -->
+<!-- source-sha256: 7938555226fe8d3da939807d7f8ae0652848bee45c17cfebfec5705bcfb58882 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -26,7 +26,7 @@
 | T2.15 | PHP 확장은 내부 scan, hydrate, compact_node 함수가 아니라 PHP 라이브러리의 class와 함수를 같은 이름과 signature로 등록합니다 (S10). kit K1이 고쳐진 뒤 측정합니다 | `packages/php-ext/src/`, `packages/php/src/`, `docs/spec/api.md`(.ko) | `make lint-php-ext` | [~] |
 | T2.15-1 | 명세는 확장이 PHP 라이브러리 API를 등록한다고 말하며(S10) descriptor에 관한 RQ-021은 없앱니다 | `docs/spec/json-contract.md`(.ko), `docs/spec/api.md`(.ko), `docs/operations/installation.md`(.ko), `CHANGELOG.md`(.ko) | `make docs-check` | [o] |
 | T2.15-2 | PHP 라이브러리는 내부를 공개하지 않습니다: 공개 symbol은 Value, ParseError, parse, stringify, MAX_DEPTH뿐이며 확장이 로드되면 그 어느 것도 선언하지 않습니다 | `packages/php/src/`, `packages/php/composer.json`, `CHANGELOG.md`(.ko) | `make test-php CASES=Value` and `make lint-php` | [o] |
-| T2.15-3 | 확장은 PHP 라이브러리를 C로 구현합니다: Value, ParseError, parse, stringify, MAX_DEPTH를 같은 이름과 signature로 등록하며 descriptor 함수와 그 test는 없앱니다 | `packages/php-ext/src/`, `packages/php-ext/tests/`, `packages/php-ext/composer.json`, `packages/php-ext/phpunit.xml`, `config/parity.json`, `CHANGELOG.md`(.ko) | `make lint-php-ext` and `make test-php-ext CASES=Value` | [~] |
+| T2.15-3 | 확장은 PHP 라이브러리를 C로 구현합니다: Value, ParseError, parse, stringify, MAX_DEPTH를 같은 이름과 signature로 등록하며 descriptor 함수와 그 test는 없앱니다 | `packages/php-ext/src/`, `packages/php-ext/tests/`, `packages/php-ext/composer.json`, `packages/php-ext/phpunit.xml`, `config/parity.json`, `CHANGELOG.md`(.ko) | `make lint-php-ext` and `make test-php-ext CASES=Value` | [o] |
 | T2.17 | PRINCIPLES 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`, `PRINCIPLES.ko.md`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.18 | config/rebuild.json은 paths를 두지 않고, kit이 layout으로 찾은 모든 tool을 분류합니다 | `config/rebuild.json`, `CHANGELOG.md`(.ko) | `make rebuild-check` | [o] |
 | T2.19 | 확장의 test는 확장을 올리고 실행하는 packages/php의 PHPUnit 파일입니다: packages/php-ext는 그 사본도 packages/php로 향하는 상대 경로도 두지 않습니다 (kit K285) | `packages/php-ext/tests/`, `packages/php-ext/composer.json`, `packages/php-ext/phpunit.xml`, `packages/php/tests/`, `CHANGELOG.md`(.ko) | `make test-php-ext CASES=OfficialTest` | [!] 원인: 변경을 소유한 검사인 make test-php-ext를 실행할 수 없습니다: make build-php-ext가 없는 arginfo header에서 멈춥니다(T2.8, kit php-extension.mts 167-171행); packages/php의 test도 확장이 로드되지 않았음을 단정합니다(packages/php/tests/OfficialTest.php, ValueApiTest.php). 이는 T2.15가 확장에서 라이브러리 API를 등록할 때까지 유지됩니다; 재시도: T2.8과 T2.15 뒤 |
