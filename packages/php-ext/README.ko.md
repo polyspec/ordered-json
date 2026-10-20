@@ -1,5 +1,5 @@
 <!-- doc-id: php-ext-overview -->
-<!-- source-sha256: 267effbf10f064a98830eda0150ebb58cab2084ae22e4002220fa016a7a660ed -->
+<!-- source-sha256: fb0c27a7cac6514c451030ebb2d14df87b4576b85bb6cef522ff4dddb0b49c33 -->
 # ordered-json for PHP extension
 
 [English](README.md)
@@ -11,14 +11,7 @@
 
 PHP >= 8.2와 일치하는 개발 헤더를 요구하며 PIE 패키지는 `polyspec/ordered-json-php-ext`, 확장은 `polyspec_ordered_json`입니다.
 
-소스 빌드는 `src/modules/polyspec_ordered_json.so`를 생성합니다. PHP의 `-d extension=/absolute/path/to/polyspec_ordered_json.so`로 로드합니다. [PHP 라이브러리](https://github.com/polyspec/ordered-json/tree/main/packages/php)는 공통 Value API를 제공합니다.
-
-~~~sh
-cd src
-phpize
-./configure
-make -j2
-~~~
+모노레포의 `make build-php-ext`가 `var/php-ext/polyspec_ordered_json.so`를 생성합니다. PHP의 `-d extension=/absolute/path/to/polyspec_ordered_json.so`로 로드합니다. 확장은 [PHP 라이브러리](https://github.com/polyspec/ordered-json/tree/main/packages/php)를 구현하며 그 `Value`, `ParseError`, `parse`, `stringify`, `MAX_DEPTH`를 같은 이름과 signature로 등록합니다.
 
 
 macOS의 configure는 지정된 `MACOSX_DEPLOYMENT_TARGET`을 유지합니다. 값이 없으면 대상 플래그를 포함한 현재 컴파일러 설정에서 구합니다. 최신 macOS 대상의 번들에는 동적 심볼 조회를 사용합니다. Libtool의 `LT_MULTI_MODULE` 옵션으로 불필요한 동적 라이브러리 단일 모듈 플래그 검사를 제외합니다.

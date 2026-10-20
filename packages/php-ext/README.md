@@ -10,14 +10,7 @@ Strict JSON with associative objects that preserve document key order recursivel
 
 PHP >= 8.2 and matching development headers; PIE package `polyspec/ordered-json-php-ext`, extension `polyspec_ordered_json`.
 
-The source build produces `src/modules/polyspec_ordered_json.so`. Load it with PHP using `-d extension=/absolute/path/to/polyspec_ordered_json.so`. The [PHP library](https://github.com/polyspec/ordered-json/tree/main/packages/php) provides the common Value API.
-
-~~~sh
-cd src
-phpize
-./configure
-make -j2
-~~~
+`make build-php-ext` of the monorepo produces `var/php-ext/polyspec_ordered_json.so`. Load it with PHP using `-d extension=/absolute/path/to/polyspec_ordered_json.so`. The extension implements the [PHP library](https://github.com/polyspec/ordered-json/tree/main/packages/php) and registers its `Value`, `ParseError`, `parse`, `stringify` and `MAX_DEPTH` under the same names and signatures.
 
 
 On macOS, configure preserves `MACOSX_DEPLOYMENT_TARGET` when supplied. Otherwise, it derives the value from the active compiler, including its target flags. The bundle uses dynamic symbol lookup for modern macOS targets. Libtool's `LT_MULTI_MODULE` option omits the unnecessary dynamic-library single-module flag check.

@@ -1,7 +1,69 @@
 <?php
 
-/** @generate-function-entries */
-/** Native descriptors are tapes of three integers per value: meta, start and end. */
-function ordered_json_scan(string $source, int $maxDepth = 256): array {}
-function ordered_json_hydrate(string $source, array $node, int $index): array {}
-function ordered_json_compact_node(string $source, array $node, int $index = 0): string {}
+/** @generate-class-entries */
+
+namespace Polyspec\OrderedJson;
+
+/** @var int */
+const MAX_DEPTH = 256;
+
+final class ParseError extends \InvalidArgumentException
+{
+    public readonly string $kind;
+    public readonly int $offset;
+
+    public function __construct(string $message, int $offset) {}
+}
+
+final class Value implements \JsonSerializable, \Stringable
+{
+    private function __construct() {}
+
+    public static function parse(string $source, int $maxDepth = \Polyspec\OrderedJson\MAX_DEPTH): Value {}
+
+    public static function parseRejectDuplicates(string $source): Value {}
+
+    public function kind(): string {}
+
+    public function raw(): string {}
+
+    public function members(): array {}
+
+    public function items(): array {}
+
+    public function stringUnits(): array {}
+
+    public function stringValue(): string {}
+
+    public function numberLiteral(): string {}
+
+    public function booleanValue(): bool {}
+
+    public function get(string $key): ?Value {}
+
+    public function getUnits(array $units): ?Value {}
+
+    public static function string(string $text): Value {}
+
+    public static function fromUnits(array $units): Value {}
+
+    public static function number(string $literal): Value {}
+
+    public static function boolean(bool $value): Value {}
+
+    public static function null(): Value {}
+
+    public static function array(array $items): Value {}
+
+    public static function object(array $members): Value {}
+
+    public function compact(): string {}
+
+    public function __toString(): string {}
+
+    public function jsonSerialize(): never {}
+}
+
+function parse(string $source, int $maxDepth = \Polyspec\OrderedJson\MAX_DEPTH): Value {}
+
+function stringify(Value $value): string {}

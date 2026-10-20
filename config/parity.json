@@ -132,8 +132,8 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/OfficialTest.php",
-          "symbol": "Polyspec\\OrderedJson\\Extension\\Tests\\OfficialTest::testCase"
+          "test": "packages/php/tests/OfficialTest.php",
+          "symbol": "Polyspec\\OrderedJson\\Tests\\OfficialTest::testCase"
         },
         {
           "implementation": "python",
@@ -170,7 +170,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testDepthArgumentIsBounded"
         },
         {
@@ -209,7 +209,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testDepthLimitIsEnforced"
         },
         {
@@ -248,7 +248,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testParseErrorsReportOffsets"
         },
         {
@@ -287,7 +287,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testRejectionNamesItsKind"
         },
         {
@@ -326,7 +326,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testWrongKindAccessIsReported"
         },
         {
@@ -366,7 +366,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testMemberLookupUsesDecodedNames"
         },
         {
@@ -405,7 +405,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testRepeatedKeyKeepsFirstPositionAndLastValue"
         },
         {
@@ -444,7 +444,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testRootKeepsSurroundingText"
         },
         {
@@ -483,7 +483,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testUnpairedSurrogateStaysInUnits"
         },
         {
@@ -522,7 +522,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testSurrogatePairDecodes"
         },
         {
@@ -561,7 +561,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testFactoriesValidateArguments"
         },
         {
@@ -600,7 +600,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testValuesComeOnlyFromTheLibrary"
         },
         {
@@ -639,7 +639,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testReturnedCollectionsAreImmutable"
         },
         {
@@ -673,7 +673,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testHostSerializationBoundary"
         },
         {
@@ -717,7 +717,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testBytesInputIsValidated"
         }
       ]
@@ -752,7 +752,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testInvalidUtf8ReportsTheFirstBadByte"
         },
         {
@@ -820,7 +820,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testStrictParseRejectsDuplicateKeys"
         },
         {
@@ -859,7 +859,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testStrictParseAcceptsUniqueKeys"
         },
         {
@@ -1198,157 +1198,13 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testUtf8ValidationHoldsForLongMultibyteText"
         },
         {
           "implementation": "python",
           "test": "packages/python/tests/test_api.py",
           "id": "test_utf8_validation_holds_for_long_multibyte_text"
-        }
-      ]
-    },
-    {
-      "id": "hydrate_without_the_value_class",
-      "kind": "feature",
-      "requirements": [
-        "RQ-021"
-      ],
-      "bindings": [
-        {
-          "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueClassTest.php",
-          "id": "testHydrateWithoutTheValueClass"
-        }
-      ]
-    },
-    {
-      "id": "hydrate_object_members",
-      "kind": "feature",
-      "requirements": [
-        "RQ-021",
-        "RQ-001"
-      ],
-      "bindings": [
-        {
-          "implementation": "php-extension",
-          "test": "packages/php-ext/tests/DescriptorTest.php",
-          "id": "testHydrateObjectMembers"
-        }
-      ]
-    },
-    {
-      "id": "hydrate_array_items",
-      "kind": "feature",
-      "requirements": [
-        "RQ-021",
-        "RQ-003"
-      ],
-      "bindings": [
-        {
-          "implementation": "php-extension",
-          "test": "packages/php-ext/tests/DescriptorTest.php",
-          "id": "testHydrateArrayItems"
-        }
-      ]
-    },
-    {
-      "id": "hydrate_rejects_malformed_descriptors",
-      "kind": "feature",
-      "requirements": [
-        "RQ-021",
-        "RQ-015"
-      ],
-      "bindings": [
-        {
-          "implementation": "php-extension",
-          "test": "packages/php-ext/tests/DescriptorTest.php",
-          "id": "testHydrateRejectsMalformedDescriptors"
-        }
-      ]
-    },
-    {
-      "id": "compact_node_rejects_mismatched_descriptors",
-      "kind": "feature",
-      "requirements": [
-        "RQ-021"
-      ],
-      "bindings": [
-        {
-          "implementation": "php-extension",
-          "test": "packages/php-ext/tests/DescriptorTest.php",
-          "id": "testCompactNodeRejectsMismatchedDescriptors"
-        }
-      ]
-    },
-    {
-      "id": "compact_node_copies_a_compact_token",
-      "kind": "feature",
-      "requirements": [
-        "RQ-021",
-        "RQ-011"
-      ],
-      "bindings": [
-        {
-          "implementation": "php-extension",
-          "test": "packages/php-ext/tests/DescriptorTest.php",
-          "id": "testCompactNodeCopiesACompactToken"
-        }
-      ]
-    },
-    {
-      "id": "scan_rejects_depth_outside_the_range",
-      "kind": "feature",
-      "requirements": [
-        "RQ-006"
-      ],
-      "bindings": [
-        {
-          "implementation": "php-extension",
-          "test": "packages/php-ext/tests/DescriptorTest.php",
-          "id": "testScanRejectsDepthOutsideTheRange"
-        }
-      ]
-    },
-    {
-      "id": "scan_reports_the_parse_error_offset",
-      "kind": "feature",
-      "requirements": [
-        "RQ-004"
-      ],
-      "bindings": [
-        {
-          "implementation": "php-extension",
-          "test": "packages/php-ext/tests/DescriptorTest.php",
-          "id": "testScanReportsTheParseErrorOffset"
-        }
-      ]
-    },
-    {
-      "id": "escaped_member_name_decodes",
-      "kind": "feature",
-      "requirements": [
-        "RQ-002"
-      ],
-      "bindings": [
-        {
-          "implementation": "php-extension",
-          "test": "packages/php-ext/tests/DescriptorTest.php",
-          "id": "testEscapedMemberNameDecodes"
-        }
-      ]
-    },
-    {
-      "id": "unpaired_surrogate_member_name_keeps_wtf8_identity",
-      "kind": "feature",
-      "requirements": [
-        "RQ-009"
-      ],
-      "bindings": [
-        {
-          "implementation": "php-extension",
-          "test": "packages/php-ext/tests/DescriptorTest.php",
-          "id": "testUnpairedSurrogateMemberNameKeepsWtf8Identity"
         }
       ]
     },
@@ -1386,7 +1242,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testTextInputRejectsLoneSurrogates"
         }
       ]
@@ -1412,6 +1268,10 @@
         },
         {
           "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\parse"
+        },
+        {
+          "implementation": "php-extension",
           "symbol": "Polyspec\\OrderedJson\\parse"
         },
         {
@@ -1470,6 +1330,10 @@
           "symbol": "Polyspec\\OrderedJson\\MAX_DEPTH"
         },
         {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\MAX_DEPTH"
+        },
+        {
           "implementation": "python",
           "symbol": "ordered_json.MAX_DEPTH"
         }
@@ -1496,6 +1360,10 @@
         },
         {
           "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\parse"
+        },
+        {
+          "implementation": "php-extension",
           "symbol": "Polyspec\\OrderedJson\\parse"
         },
         {
@@ -1529,6 +1397,10 @@
           "symbol": "Polyspec\\OrderedJson\\stringify"
         },
         {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\stringify"
+        },
+        {
           "implementation": "python",
           "symbol": "ordered_json.stringify"
         }
@@ -1558,6 +1430,10 @@
           "symbol": "Polyspec\\OrderedJson\\Value"
         },
         {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value"
+        },
+        {
           "implementation": "python",
           "symbol": "ordered_json.Value"
         }
@@ -1584,6 +1460,10 @@
         },
         {
           "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\ParseError"
+        },
+        {
+          "implementation": "php-extension",
           "symbol": "Polyspec\\OrderedJson\\ParseError"
         },
         {
@@ -1617,6 +1497,10 @@
           "symbol": "Polyspec\\OrderedJson\\ParseError::$kind"
         },
         {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\ParseError::$kind"
+        },
+        {
           "implementation": "python",
           "symbol": "ordered_json.ParseError"
         }
@@ -1644,6 +1528,10 @@
         },
         {
           "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\ParseError::$offset"
+        },
+        {
+          "implementation": "php-extension",
           "symbol": "Polyspec\\OrderedJson\\ParseError::$offset"
         },
         {
@@ -1676,6 +1564,10 @@
           "symbol": "Polyspec\\OrderedJson\\Value::compact"
         },
         {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::compact"
+        },
+        {
           "implementation": "python",
           "symbol": "ordered_json.Value.compact"
         }
@@ -1705,6 +1597,10 @@
           "symbol": "Polyspec\\OrderedJson\\Value::raw"
         },
         {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::raw"
+        },
+        {
           "implementation": "python",
           "symbol": "ordered_json.Value.raw"
         }
@@ -1731,6 +1627,10 @@
         },
         {
           "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::kind"
+        },
+        {
+          "implementation": "php-extension",
           "symbol": "Polyspec\\OrderedJson\\Value::kind"
         },
         {
@@ -1764,6 +1664,10 @@
           "symbol": "Polyspec\\OrderedJson\\Value::members"
         },
         {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::members"
+        },
+        {
           "implementation": "python",
           "symbol": "ordered_json.Value.members"
         }
@@ -1790,6 +1694,10 @@
         },
         {
           "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::get"
+        },
+        {
+          "implementation": "php-extension",
           "symbol": "Polyspec\\OrderedJson\\Value::get"
         },
         {
@@ -1823,6 +1731,10 @@
           "symbol": "Polyspec\\OrderedJson\\Value::getUnits"
         },
         {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::getUnits"
+        },
+        {
           "implementation": "python",
           "symbol": "ordered_json.Value.get_units"
         }
@@ -1850,6 +1762,10 @@
         },
         {
           "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::items"
+        },
+        {
+          "implementation": "php-extension",
           "symbol": "Polyspec\\OrderedJson\\Value::items"
         },
         {
@@ -1882,6 +1798,10 @@
           "symbol": "Polyspec\\OrderedJson\\Value::stringValue"
         },
         {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::stringValue"
+        },
+        {
           "implementation": "python",
           "symbol": "ordered_json.Value.string_value"
         }
@@ -1908,6 +1828,10 @@
         },
         {
           "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::stringUnits"
+        },
+        {
+          "implementation": "php-extension",
           "symbol": "Polyspec\\OrderedJson\\Value::stringUnits"
         },
         {
@@ -1940,6 +1864,10 @@
           "symbol": "Polyspec\\OrderedJson\\Value::numberLiteral"
         },
         {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::numberLiteral"
+        },
+        {
           "implementation": "python",
           "symbol": "ordered_json.Value.number_literal"
         }
@@ -1966,6 +1894,10 @@
         },
         {
           "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::booleanValue"
+        },
+        {
+          "implementation": "php-extension",
           "symbol": "Polyspec\\OrderedJson\\Value::booleanValue"
         },
         {
@@ -1999,6 +1931,10 @@
           "symbol": "Polyspec\\OrderedJson\\Value::object"
         },
         {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::object"
+        },
+        {
           "implementation": "python",
           "symbol": "ordered_json.Value.object"
         }
@@ -2029,6 +1965,10 @@
           "symbol": "Polyspec\\OrderedJson\\Value::array"
         },
         {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::array"
+        },
+        {
           "implementation": "python",
           "symbol": "ordered_json.Value.array"
         }
@@ -2055,6 +1995,10 @@
         },
         {
           "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::string"
+        },
+        {
+          "implementation": "php-extension",
           "symbol": "Polyspec\\OrderedJson\\Value::string"
         },
         {
@@ -2088,6 +2032,10 @@
           "symbol": "Polyspec\\OrderedJson\\Value::number"
         },
         {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::number"
+        },
+        {
           "implementation": "python",
           "symbol": "ordered_json.Value.number"
         }
@@ -2114,6 +2062,10 @@
         },
         {
           "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::boolean"
+        },
+        {
+          "implementation": "php-extension",
           "symbol": "Polyspec\\OrderedJson\\Value::boolean"
         },
         {
@@ -2146,6 +2098,10 @@
           "symbol": "Polyspec\\OrderedJson\\Value::null"
         },
         {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\Value::null"
+        },
+        {
           "implementation": "python",
           "symbol": "ordered_json.Value.null"
         }
@@ -2173,6 +2129,10 @@
         },
         {
           "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::fromUnits"
+        },
+        {
+          "implementation": "php-extension",
           "symbol": "Polyspec\\OrderedJson\\Value::fromUnits"
         },
         {
@@ -2457,7 +2417,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testStringValueKeepsAnUnpairedSurrogate"
         }
       ]
@@ -2491,7 +2451,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testPublicApiExportsTheEntryPoints"
         },
         {
@@ -2530,7 +2490,7 @@
         },
         {
           "implementation": "php-extension",
-          "test": "packages/php-ext/tests/ValueApiTest.php",
+          "test": "packages/php/tests/ValueApiTest.php",
           "id": "testParseErrorExposesKindOffsetAndMessage"
         },
         {
@@ -2561,6 +2521,10 @@
         },
         {
           "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\Value::parseRejectDuplicates"
+        },
+        {
+          "implementation": "php-extension",
           "symbol": "Polyspec\\OrderedJson\\Value::parseRejectDuplicates"
         },
         {

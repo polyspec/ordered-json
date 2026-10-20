@@ -7,19 +7,6 @@
   "require": {
     "php": ">=8.4"
   },
-  "require-dev": {
-    "phpunit/phpunit": "13.4.3"
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Polyspec\\OrderedJson\\": "../php/src/",
-      "Polyspec\\OrderedJson\\Extension\\Tests\\": "tests/",
-      "Polyspec\\OrderedJson\\Tests\\": "../php/tests/"
-    },
-    "files": [
-      "../php/src/OrderedJson.php"
-    ]
-  },
   "php-ext": {
     "extension-name": "polyspec_ordered_json",
     "build-path": "src"

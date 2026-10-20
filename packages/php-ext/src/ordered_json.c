@@ -1,6 +1,9 @@
 #include "ordered_json_internal.h"
 #include "Zend/zend_exceptions.h"
+#include "Zend/zend_interfaces.h"
 #include "ext/standard/info.h"
+#include "ext/json/php_json.h"
+#include "ext/spl/spl_exceptions.h"
 #include "polyspec_ordered_json_arginfo.h"
 
 #define ORDERED_JSON_MAX_DEPTH 256
@@ -16,6 +19,7 @@ typedef struct {
     zend_long *tape;
     size_t count, capacity;
     size_t whitespace, duplicates;
+    bool reject_duplicates;
 } oj_parser;
 
 typedef struct {
@@ -31,10 +35,9 @@ typedef struct {
     HashTable *names;
 } oj_members;
 
-static zend_class_entry *oj_error_ce;
 
 /* Why the document was rejected, named the same way by every implementation. */
-static const char *oj_kind(const char *message) {
+const char *oj_kind(const char *message) {
     static const char *const pairs[][2] = {
         {"Expected JSON value", "expected_value"},
         {"Expected digit", "expected_digit"},
@@ -49,6 +52,7 @@ static const char *oj_kind(const char *message) {
         {"Invalid UTF-8", "invalid_utf8"},
         {"Maximum nesting depth exceeded", "maximum_depth_exceeded"},
         {"Unexpected trailing input", "trailing_input"},
+        {"Duplicate object key", "duplicate_object_key"},
     };
     for (size_t i = 0; i < sizeof(pairs) / sizeof(pairs[0]); i++)
         if (strcmp(pairs[i][0], message) == 0) return pairs[i][1];
@@ -167,7 +171,7 @@ static void oj_members_free(oj_members *m) {
     }
 }
 /* Record the member whose key record is at `key`; a repeated name keeps the first key. */
-static void oj_add_member(oj_parser *p, oj_members *m, size_t key) {
+static bool oj_add_member(oj_parser *p, oj_members *m, size_t key) {
     size_t start = (size_t)p->tape[key + 1] + 1, end = (size_t)p->tape[key + 2] - 1;
     oj_member member = {(const char *)p->source + start, end - start, key, false};
     if (p->tape[key] & OJ_ESCAPED) {
@@ -189,12 +193,18 @@ static void oj_add_member(oj_parser *p, oj_members *m, size_t key) {
         }
     }
     if (first != SIZE_MAX) {
+        if (p->reject_duplicates) {
+            if (member.owned) efree((char *)member.name);
+            p->message = "Duplicate object key";
+            p->error_offset = (size_t)p->tape[key + 1];
+            return false;
+        }
         size_t first_key = m->items[first].key;
         p->tape[first_key] = (p->tape[first_key] & ((1 << OJ_LINK_SHIFT) - 1)) | ((zend_long)(key + 3) << OJ_LINK_SHIFT);
         p->tape[key] |= OJ_SKIP;
         p->duplicates++;
         if (member.owned) efree((char *)member.name);
-        return;
+        return true;
     }
     if (m->count == m->capacity) {
         oj_member *items = safe_emalloc(m->capacity, 2 * sizeof(oj_member), 0);
@@ -217,6 +227,7 @@ static void oj_add_member(oj_parser *p, oj_members *m, size_t key) {
             zend_hash_str_add_new(m->names, m->items[i].name, m->items[i].length, &position);
         }
     }
+    return true;
 }
 
 static bool oj_value(oj_parser *p, zend_long depth);
@@ -244,7 +255,7 @@ static bool oj_container(oj_parser *p, zend_long depth, size_t start, bool objec
                 oj_ws(p);
                 if (!oj_expect(p, ':', "Expected colon")) goto done;
                 if (!oj_value(p, depth + 1)) goto done;
-                oj_add_member(p, &members, key);
+                if (!oj_add_member(p, &members, key)) goto done;
             } else if (!oj_value(p, depth + 1)) goto done;
             oj_ws(p);
             if (oj_peek(p) == close) break;
@@ -298,12 +309,13 @@ static bool oj_value(oj_parser *p, zend_long depth) {
     return oj_fail(p, "Expected JSON value");
 }
 
-/* Parse into p->tape. On failure the tape is released and Polyspec\OrderedJson\NativeParseError is thrown. */
-static bool oj_parse(zend_string *source, zend_long max_depth, oj_parser *p) {
+/* Parse into p->tape. On failure the tape is released and Polyspec\OrderedJson\ParseError is thrown. */
+static bool oj_parse(zend_string *source, zend_long max_depth, bool reject_duplicates, oj_parser *p) {
     memset(p, 0, sizeof(*p));
     p->source = (const unsigned char *)ZSTR_VAL(source);
     p->length = ZSTR_LEN(source);
     p->max_depth = max_depth;
+    p->reject_duplicates = reject_duplicates;
     p->capacity = 3 * MIN(p->length / 2 + 2, 4096);
     p->tape = safe_emalloc(p->capacity, sizeof(zend_long), 0);
     if (!oj_value(p, 0)) goto fail;
@@ -332,10 +344,15 @@ fail:;
     }
     if (p->tape) efree(p->tape);
     p->tape = NULL;
-    zend_object *exception = zend_throw_exception(oj_error_ce, p->message, 0);
-    zend_update_property_long(oj_error_ce, exception, "offset", sizeof("offset") - 1, (zend_long)p->error_offset);
-    zend_update_property_string(oj_error_ce, exception, "kind", sizeof("kind") - 1, oj_kind(p->message));
+    oj_throw_parse_error(p->message, p->error_offset);
     return false;
+}
+
+zend_long *oj_scan(zend_string *source, zend_long max_depth, bool reject_duplicates, size_t *count) {
+    oj_parser p;
+    if (!oj_parse(source, max_depth, reject_duplicates, &p)) return NULL;
+    *count = p.count;
+    return p.tape;
 }
 
 typedef struct {
@@ -389,7 +406,7 @@ static bool oj_render(const oj_tape *t, oj_writer *w, size_t index, int depth) {
     }
     return oj_write_byte(w, object ? '}' : ']');
 }
-static zend_string *oj_compact(zend_string *source, const oj_tape *t, size_t index) {
+zend_string *oj_compact(zend_string *source, const oj_tape *t, size_t index) {
     zend_long meta, start, end;
     if (oj_slot(t, index, &meta) && (meta & OJ_COMPACT) && oj_slot(t, index + 1, &start) && oj_slot(t, index + 2, &end)
         && start >= 0 && end > start && (zend_ulong)end <= ZSTR_LEN(source)) {
@@ -407,55 +424,13 @@ static zend_string *oj_compact(zend_string *source, const oj_tape *t, size_t ind
     return out;
 }
 
-PHP_FUNCTION(ordered_json_scan) {
-    zend_string *source;
-    zend_long max_depth = ORDERED_JSON_MAX_DEPTH;
-    ZEND_PARSE_PARAMETERS_START(1, 2)
-        Z_PARAM_STR(source)
-        Z_PARAM_OPTIONAL
-        Z_PARAM_LONG(max_depth)
-    ZEND_PARSE_PARAMETERS_END();
-    if (max_depth < 0 || max_depth > ORDERED_JSON_MAX_DEPTH) {
-        zend_argument_value_error(2, "must be between 0 and 256"); RETURN_THROWS();
-    }
-    oj_parser p;
-    if (!oj_parse(source, max_depth, &p)) RETURN_THROWS();
-    array_init_size(return_value, (uint32_t)p.count);
-    zend_hash_real_init_packed(Z_ARRVAL_P(return_value));
-    ZEND_HASH_FILL_PACKED(Z_ARRVAL_P(return_value)) {
-        for (size_t i = 0; i < p.count; i++) {
-            ZEND_HASH_FILL_SET_LONG(p.tape[i]);
-            ZEND_HASH_FILL_NEXT();
-        }
-    } ZEND_HASH_FILL_END();
-    efree(p.tape);
-}
-
-PHP_FUNCTION(ordered_json_compact_node) {
-    zend_string *source;
-    HashTable *node;
-    zend_long index = 0;
-    ZEND_PARSE_PARAMETERS_START(2, 3)
-        Z_PARAM_STR(source)
-        Z_PARAM_ARRAY_HT(node)
-        Z_PARAM_OPTIONAL
-        Z_PARAM_LONG(index)
-    ZEND_PARSE_PARAMETERS_END();
-    oj_tape t = {NULL, node, zend_hash_num_elements(node)};
-    zend_string *out = index < 0 ? NULL : oj_compact(source, &t, (size_t)index);
-    if (!out) {
-        zend_argument_value_error(2, "must be a descriptor from ordered_json_scan() for argument #1 ($source)");
-        RETURN_THROWS();
-    }
-    RETURN_STR(out);
-}
+zend_class_entry *oj_value_ce, *oj_error_ce;
 
 PHP_MINIT_FUNCTION(polyspec_ordered_json) {
-    zend_class_entry ce;
-    INIT_CLASS_ENTRY(ce, "Polyspec\\OrderedJson\\NativeParseError", NULL);
-    oj_error_ce = zend_register_internal_class_ex(&ce, zend_ce_exception);
-    zend_declare_property_long(oj_error_ce, "offset", sizeof("offset") - 1, 0, ZEND_ACC_PUBLIC);
-    zend_declare_property_string(oj_error_ce, "kind", sizeof("kind") - 1, "", ZEND_ACC_PUBLIC);
+    register_polyspec_ordered_json_symbols(module_number);
+    oj_error_ce = register_class_Polyspec_OrderedJson_ParseError(spl_ce_InvalidArgumentException);
+    oj_value_ce = register_class_Polyspec_OrderedJson_Value(php_json_serializable_ce, zend_ce_stringable);
+    oj_init_value_class();
     return SUCCESS;
 }
 PHP_MINFO_FUNCTION(polyspec_ordered_json) {
@@ -464,16 +439,17 @@ PHP_MINFO_FUNCTION(polyspec_ordered_json) {
     php_info_print_table_row(2, "version", PHP_POLYSPEC_ORDERED_JSON_VERSION);
     php_info_print_table_end();
 }
+static const zend_module_dep oj_deps[] = {
+    ZEND_MOD_REQUIRED("json")
+    ZEND_MOD_REQUIRED("spl")
+    ZEND_MOD_END
+};
 zend_module_entry polyspec_ordered_json_module_entry = {
-    STANDARD_MODULE_HEADER,
+    STANDARD_MODULE_HEADER_EX, NULL, oj_deps,
     "polyspec_ordered_json", ext_functions,
-    PHP_MINIT(polyspec_ordered_json), NULL, NULL, PHP_RSHUTDOWN(polyspec_ordered_json), PHP_MINFO(polyspec_ordered_json),
-    PHP_POLYSPEC_ORDERED_JSON_VERSION, PHP_MODULE_GLOBALS(polyspec_ordered_json), PHP_GINIT(polyspec_ordered_json), NULL, NULL,
-    STANDARD_MODULE_PROPERTIES_EX
+    PHP_MINIT(polyspec_ordered_json), NULL, NULL, NULL, PHP_MINFO(polyspec_ordered_json),
+    PHP_POLYSPEC_ORDERED_JSON_VERSION, STANDARD_MODULE_PROPERTIES
 };
 #ifdef COMPILE_DL_POLYSPEC_ORDERED_JSON
-#ifdef ZTS
-ZEND_TSRMLS_CACHE_DEFINE()
-#endif
 ZEND_GET_MODULE(polyspec_ordered_json)
 #endif

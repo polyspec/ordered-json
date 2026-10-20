@@ -1,4 +1,4 @@
-/* Definitions shared by the parser (ordered_json.c) and child value hydration (hydrate.c). */
+/* Definitions shared by the scanner (ordered_json.c) and the classes (value.c). */
 #ifndef ORDERED_JSON_INTERNAL_H
 #define ORDERED_JSON_INTERNAL_H
 
@@ -28,22 +28,15 @@
 #define OJ_SKIP 32
 #define OJ_LINK_SHIFT 8
 
-/* A read-only view of a tape held either in C memory or in a PHP array. */
+/* A read-only view of the tape of a document. */
 typedef struct {
     const zend_long *slots;
-    HashTable *array;
     size_t count;
 } oj_tape;
 
 static inline bool oj_slot(const oj_tape *t, size_t index, zend_long *value) {
     if (index >= t->count) return false;
-    if (t->slots) {
-        *value = t->slots[index];
-        return true;
-    }
-    zval *slot = zend_hash_index_find(t->array, index);
-    if (!slot || Z_TYPE_P(slot) != IS_LONG) return false;
-    *value = Z_LVAL_P(slot);
+    *value = t->slots[index];
     return true;
 }
 static inline int oj_hex(int ch) {
@@ -118,24 +111,18 @@ static inline size_t oj_decode_name(const unsigned char *s, size_t i, size_t end
     return n;
 }
 
-/* Property slots of Polyspec\OrderedJson\Value, which ordered_json_hydrate() fills directly. */
-typedef struct {
-    zend_class_entry *ce;
-    uint32_t source, tape, index;
-} oj_value_class;
+extern zend_class_entry *oj_value_ce, *oj_error_ce;
 
-/* The class lookup is cached for the request; user classes are freed when it ends. */
-ZEND_BEGIN_MODULE_GLOBALS(polyspec_ordered_json)
-    oj_value_class value_class;
-ZEND_END_MODULE_GLOBALS(polyspec_ordered_json)
-ZEND_EXTERN_MODULE_GLOBALS(polyspec_ordered_json)
-#define OJ_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(polyspec_ordered_json, v)
-#if defined(ZTS) && defined(COMPILE_DL_POLYSPEC_ORDERED_JSON)
-ZEND_TSRMLS_CACHE_EXTERN()
-#endif
-
-PHP_GINIT_FUNCTION(polyspec_ordered_json);
-PHP_RSHUTDOWN_FUNCTION(polyspec_ordered_json);
-PHP_FUNCTION(ordered_json_hydrate);
+/* Why a document was rejected, named the same way by every implementation; "" for an unknown message. */
+const char *oj_kind(const char *message);
+/* Throws Polyspec\OrderedJson\ParseError for the message at the byte offset. */
+void oj_throw_parse_error(const char *message, size_t offset);
+/* Scans source into a tape of `count` slots (emalloc), or throws ParseError and returns NULL. A repeated key is an error
+ * at the first byte of its second token when reject_duplicates. */
+zend_long *oj_scan(zend_string *source, zend_long max_depth, bool reject_duplicates, size_t *count);
+/* The compact serialization of the value at index, or NULL for a tape that does not match the source. */
+zend_string *oj_compact(zend_string *source, const oj_tape *t, size_t index);
+/* Registers the object handlers of Polyspec\OrderedJson\Value. */
+void oj_init_value_class(void);
 
 #endif
