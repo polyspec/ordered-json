@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: d95c825601dec53e1e31bb06408c998c892060481744fc645e949b84f8ca7ef4 -->
+<!-- source-sha256: 7da5634fc2c1ca572428e2f596ba64a33fb5f4b207f1ed8482a0958dba6c02a7 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -9,3 +9,4 @@
 | T2.3 | parity unit은 JSON 계약의 요구사항을 인용하고, JavaScript probe는 옮긴 폴더에서 실행하며, workflow 검사는 kit이 vendor하는 workflow를 제외합니다 | `config/parity.json`, `docs/spec/json-contract.md`(.ko), `scripts/registry.mts`, `tests/scripts/workflow-rules.test.mts`, `CHANGELOG.md`(.ko), `docs/plans/kit-standard/checklist.md`(.ko) | `make parity-declarations-check` and `node node_modules/@polyspec/kit/dist/run-tests.mjs node -- tests/scripts/workflow-rules.test.mts` | [o] |
 | T2.4 | config/parity.json의 모든 unit은 모든 구현에서 성립하고, test가 이름으로 적은 spec requirement를 인용한다 (kit K273, K275, K276) | config/parity.json, docs/spec, the tests of every implementation | `make parity-declarations-check` | [!] 원인: 선언이 아직 profile, native 전용 symbol이나 exclusion, 또는 명명된 requirement가 없는 unit을 담고 있다; 각 구현의 누락된 feature와 test는 red-first로 작성되어야 한다; 재시도: kit 0.0.55를 make kit-sync로 설치한 후 |
 | T2.5 | kit-standard 체크리스트의 한국어 문서는 영어 원본의 revision을 담습니다 | `docs/plans/kit-standard/checklist.ko.md` | `make docs-check` | [o] |
+| T2.7 | 고정된 외부 입력(PIE PHAR와 JSONTestSuite revision)은 composer.phar와 같이 url과 sha256을 받는 mise의 http backend가 설치하고, scripts/external-inputs.mts는 제거합니다 | `mise.toml`, `mise.lock`, `external-inputs.json`, `scripts/external-inputs.mts`, `scripts/check-pie.mts`, `scripts/records.mts`, `Makefile` | `make rebuild-check` | [ ] |
