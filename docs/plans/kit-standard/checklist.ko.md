@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 92792c3bd3b34525fe9d8e512ce46bd72929875fbd28897f2b0d28c6d2de7f5d -->
+<!-- source-sha256: f521bdc1d539dfc54574a6e81470425c4f05a3b3f40a029080c050faec40c018 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -21,3 +21,4 @@
 | T2.16 | 각 패키지는 version의 원천이 하나입니다: 확장은 ordered_json.c의 상수 0.0.1이 아니라 composer.json의 version을 보고하며, 설치 문서는 두 번째 version을 적지 않습니다 | `packages/php-ext/src/ordered_json.c`, `scripts/registry.mts`, `docs/operations/installation.md`(.ko) | `make release-versions` | [ ] |
 | T2.15 | PHP 확장은 내부 scan, hydrate, compact_node 함수가 아니라 PHP 라이브러리의 class와 함수를 같은 이름과 signature로 등록합니다 (S10). kit K1이 고쳐진 뒤 측정합니다 | `packages/php-ext/src/`, `packages/php/src/`, `docs/spec/api.md`(.ko) | `make lint-php-ext` | [ ] |
 | T2.17 | PRINCIPLES 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`, `PRINCIPLES.ko.md`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
+| T2.18 | config/rebuild.json은 paths를 두지 않고, kit이 layout으로 찾은 모든 tool을 분류합니다 | `config/rebuild.json`, `CHANGELOG.md`(.ko) | `make rebuild-check` | [!] 원인: paths를 제거하고 benchmark tool 6개를 분류했지만 rebuild-check는 vendor된 scripts/kit 사본 9개를 아직 미분류로 보고합니다: kit의 scripts/kit/rebuild-check.mts 38행이 사본을 설치된 kit이 아니라(kit-check.mts 78행) kit.copies가 없는 저장소의 package.json(copiesOf(manifest))에서 가져옵니다; 재시도: kit이 toolSources에서 설치된 @polyspec/kit의 사본을 읽은 뒤 |

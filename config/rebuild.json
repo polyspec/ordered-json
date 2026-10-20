@@ -1,16 +1,66 @@
 {
   "schema": 1,
   "comment": "The class of each tool of ordered-json that make rebuild-check checks (S1). The copies of kit under scripts/kit are not listed: kit classifies them.",
-  "paths": ["scripts/*.mts"],
   "tools": {
-    "scripts/check-evidence.mts": { "kind": "ecosystem", "tool": "mdast-util-from-markdown" },
-    "scripts/check-pie.mts": { "kind": "ecosystem", "tool": "PIE" },
-    "scripts/external-inputs.mts": { "kind": "replaced", "reason": "mise installs a pinned url with a sha256 through its http backend, as mise.toml does for composer.phar; item T2.7 moves the PIE PHAR and the JSONTestSuite revision to it and removes this installer" },
-    "scripts/json.mts": { "kind": "ecosystem", "tool": "ajv" },
-    "scripts/present.mts": { "kind": "policy", "reason": "present of kit (K156) is not exported by @polyspec/kit, and no ecosystem library asserts a defined value and returns it typed; reported to the conductor as a missing export of kit" },
-    "scripts/records.mts": { "kind": "policy", "reason": "the verification records of polyspec name the sources that a run checked with their sha256, a rule of this repository with no ecosystem equivalent; node:crypto hashes" },
-    "scripts/reference.mts": { "kind": "ecosystem", "tool": "@humanwhocodes/momoa" },
-    "scripts/registry.mts": { "kind": "policy", "reason": "the commands of the shared verifier for the implementations of config/parity.json, the product of this repository; no ecosystem tool builds and probes four languages" },
-    "scripts/verify.mts": { "kind": "policy", "reason": "the shared verifier compares every implementation with the golden results of the JSON contract, the product of this repository; node:util parseArgs reads its arguments" }
+    "benchmarks/js.mjs": {
+      "kind": "policy",
+      "reason": "the JavaScript harness of the benchmark protocol of benchmarks/run.mts, which times with node:perf_hooks and prints the row that the protocol compares across implementations; the protocol has no ecosystem equivalent"
+    },
+    "benchmarks/php.php": {
+      "kind": "policy",
+      "reason": "the PHP harness of the benchmark protocol of benchmarks/run.mts, which times with hrtime and prints the row that the protocol compares across implementations; the protocol has no ecosystem equivalent"
+    },
+    "benchmarks/python-parse/parse.php": {
+      "kind": "policy",
+      "reason": "the PHP side of the parse-ratio budget of benchmarks/python-parse/run.py: one parse of the generated document, printing its CPU seconds; a rule of this repository that bounds the Python parser against the pure PHP parser"
+    },
+    "benchmarks/python-parse/parse.py": {
+      "kind": "policy",
+      "reason": "the Python side of the parse-ratio budget of benchmarks/python-parse/run.py: one parse of the generated document, printing its CPU seconds; a rule of this repository that bounds the Python parser against the pure PHP parser"
+    },
+    "benchmarks/python-parse/run.py": {
+      "kind": "policy",
+      "reason": "the parse-ratio budget of the Python parser against the pure PHP parser (make python-parse-budget), a performance rule of this repository that no ecosystem benchmark tool states; it runs both parsers in their own processes"
+    },
+    "benchmarks/run.mts": {
+      "kind": "policy",
+      "reason": "the equal-workload benchmark protocol of benchmarks/workload.json: the same inputs, warm-up, samples and tolerances in every implementation, with the output sha256 of each row compared across them, a rule of this repository; no ecosystem benchmark tool runs one protocol in four languages and compares their outputs; it runs each harness and writes benchmarks/results.json"
+    },
+    "scripts/check-evidence.mts": {
+      "kind": "ecosystem",
+      "tool": "mdast-util-from-markdown"
+    },
+    "scripts/check-pie.mts": {
+      "kind": "ecosystem",
+      "tool": "PIE"
+    },
+    "scripts/external-inputs.mts": {
+      "kind": "replaced",
+      "reason": "mise installs a pinned url with a sha256 through its http backend, as mise.toml does for composer.phar; item T2.7 moves the PIE PHAR and the JSONTestSuite revision to it and removes this installer"
+    },
+    "scripts/json.mts": {
+      "kind": "ecosystem",
+      "tool": "ajv"
+    },
+    "scripts/present.mts": {
+      "kind": "policy",
+      "reason": "present of kit (K156) is not exported by @polyspec/kit, and no ecosystem library asserts a defined value and returns it typed; reported to the conductor as a missing export of kit"
+    },
+    "scripts/records.mts": {
+      "kind": "policy",
+      "reason": "the verification records of polyspec name the sources that a run checked with their sha256, a rule of this repository with no ecosystem equivalent; node:crypto hashes"
+    },
+    "scripts/reference.mts": {
+      "kind": "ecosystem",
+      "tool": "@humanwhocodes/momoa"
+    },
+    "scripts/registry.mts": {
+      "kind": "policy",
+      "reason": "the commands of the shared verifier for the implementations of config/parity.json, the product of this repository; no ecosystem tool builds and probes four languages"
+    },
+    "scripts/verify.mts": {
+      "kind": "policy",
+      "reason": "the shared verifier compares every implementation with the golden results of the JSON contract, the product of this repository; node:util parseArgs reads its arguments"
+    }
   }
 }
