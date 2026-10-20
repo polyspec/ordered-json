@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: f3b85f5c3c8a57895daabeb3adbe509a9e850f347fecf077157a3052889133e8 -->
+<!-- source-sha256: c7e1fb2786cba572d67bd3b07b8267a63689f53bf1ba0ffe761741aa255e3781 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- 명세는 native JSON 통합만 말합니다 (T2.40): Go `Value`는 `json.Marshaler`와 `json.Unmarshaler`를, Rust `Value`는 Serde `Serialize`와 `Deserialize`를 구현하며, `encoding/json`과 `serde_json`을 중복하던 Go의 typed `Marshal`과 Rust의 `serde` 모듈은 명세에서 뺍니다(S1). 코드는 T2.41과 T2.42에서 따릅니다. Red: 명세가 두 typed 인코더를 설명했음; green: `make docs-check` passed.
 - Rust의 `string_value()`는 문자열의 WTF-8 바이트(`Vec<u8>`)를 반환하므로 (T2.39) 이스케이프된 짝 없는 surrogate는 거부되지 않고 Go, PHP, JavaScript, Python처럼 유지됩니다. Red: `b"a\xed\xa0\x80"`를 기대하는 test가 `String`에 대해 compile되지 않음; green: cargo test api 24개와 official 17개 passed, `scripts/verify.mts --only rust` passed, `make lint-rust` passed.
 - 명세는 RQ-009를 모든 구현에서 성립시킵니다 (T2.38): `docs/spec/api.md`(.ko)는 더 이상 Rust가 짝 없는 surrogate의 `string_value()`를 거부하게 두지 않으며 Go, PHP, Rust는 그 WTF-8 바이트를 반환합니다(Rust는 `Vec<u8>`). Red: 명세가 Rust의 예외를 적었음; green: `make docs-check` passed; 코드는 T2.39에서 따릅니다.
 - `config/parity.json`의 모든 unit은 모든 구현에서 성립하고 test가 이름으로 적은 requirement를 인용합니다 (T2.4): profile, `nativeOnly`, `exclusions`는 없어졌고(S6), 하위 항목 T2.4-1부터 T2.4-4가 R1, R2, R13, R15 결과를 닫았으며, 여섯 구현의 extractor는 어느 unit도 선언하지 않은 공개 symbol을 나열하지 않습니다. Red: `make parity-declarations-check` exit 2, schema 결과 98건에 이어 R1, R2, R13, R15 결과 432건; green: exit 0, `every declaration holds`.

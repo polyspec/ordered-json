@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 436f80ca05b8c07c5c448b961686a5a7187dfba61a65ad3efe1eeae2c2c67f03 -->
+<!-- source-sha256: f6369ed818cd6730f3e2c33540d719c13af861c4c59f564dc215b3f477be098d -->
 # API 계약
 
 [English](api.md)
@@ -42,11 +42,9 @@ Python 바인딩은 `parse(source, options)`와 `parse_bytes(data, options)`의 
 
 문자열 접근은 surrogate pair를 한 문자로 반환합니다. 이스케이프된 짝 없는 surrogate는 대체되지 않습니다: 문자열 값은 라이브러리의 형태로 이를 유지하며, JavaScript와 Python에서는 host 문자열의 단독 surrogate로, Go, PHP, Rust에서는 WTF-8 바이트로 유지하며, Rust의 `String`이 이를 담을 수 없으므로 Rust의 `string_value()`가 그 바이트(`Vec<u8>`, 짝 없는 surrogate가 없으면 유효한 UTF-8)를 반환합니다. 텍스트 입력의 짝 없는 surrogate 원문은 UTF-8 인코딩이 없으므로 Rust, Go, PHP는 그 WTF-8 바이트를 문법을 읽기 전에 `invalid UTF-8`로 거부하고 JavaScript와 Python은 `unescaped_lone_surrogate`로 거부합니다.
 
-각 언어의 표준 JSON 인터페이스는 JavaScript의 `Value.toJSON`, PHP의 `Value::jsonSerialize`, Python의 `ordered_json.JSONEncoder`, Go의 `Value.MarshalJSON`, Rust의 Serde trait입니다. JavaScript, PHP, Python은 native 구조가 값을 담고 있어도 값을 거부하며 `stringify`를 가리키는 메시지를 냅니다. Python은 호출자가 `json.dumps`의 `cls`로 넘기는 `JSONEncoder.default`로 거부하고, 그것 없이 `json.dumps`는 자체 `TypeError`로 거부합니다. Go와 Rust는 native 구조 안에서도 값의 compact contract bytes를 씁니다. 아래의 typed 형태는 그 규칙을 native 구조 전체로 넓힙니다.
+각 언어의 표준 JSON 인터페이스는 JavaScript의 `Value.toJSON`, PHP의 `Value::jsonSerialize`, Python의 `ordered_json.JSONEncoder`, Go의 `Value.MarshalJSON`, Rust의 Serde trait입니다. JavaScript, PHP, Python은 native 구조가 값을 담고 있어도 값을 거부하며 `stringify`를 가리키는 메시지를 냅니다. Python은 호출자가 `json.dumps`의 `cls`로 넘기는 `JSONEncoder.default`로 거부하고, 그것 없이 `json.dumps`는 자체 `TypeError`로 거부합니다. Go와 Rust는 native 구조 안에서도 값의 compact contract bytes를 씁니다.
 
-Rust `serde` 모듈은 Serde `Serialize`와 소유한 `Deserialize` 타입에 `to_string(&value)`, `from_str(text)`, `from_slice(bytes)`를 제공합니다. 인코딩은 구조체 필드를 선언 순서로 기록하고 Serde 필드 이름과 생략 속성을 적용하며 compact JSON을 기록합니다. `Value`는 두 Serde trait을 구현하여 포함된 JSON의 객체 순서와 숫자 토큰을 유지합니다. map 키는 문자열로 직렬화되어야 하며 반복 키, 유한하지 않은 숫자, 256개보다 깊은 컨테이너는 오류로 처리합니다. 디코딩은 라이브러리 파서로 UTF-8과 JSON을 검사하고 해석된 반복 키를 거부한 뒤 대상 Serde 타입을 적용합니다. 알 수 없는 필드와 뒤따르는 입력은 버리지 않고 오류로 처리합니다. 타입 오류도 오류로 유지합니다. wire와 manifest 패키지 fixture가 정확한 출력 바이트를 정합니다.
-
-Go 바인딩은 `Marshal(value)`을 제공합니다. 내보낸 구조체 필드를 선언 순서로 인코딩하고, `json` 이름이 없는 익명 필드는 그 필드들을 펼쳐 넣으며, 이름이 겹치는 필드와 파서 한도보다 깊은 값은 오류로 거부하고, `json` 필드 이름과 생략 옵션을 적용하며 바이트 슬라이스를 base64 문자열로 인코딩합니다. nil `*Value`와 타입이 `MarshalJSON`을 구현하는 다른 nil 포인터를 포함해 nil 포인터와 nil 인터페이스는 `null`로 기록하고, 인터페이스는 그 안에 담긴 값으로 인코딩합니다. `MarshalJSON() ([]byte, error)` 경계를 구현한 타입을 허용하고 사용자 정의 결과를 ordered-json parser로 검증합니다. 네이티브 map 순서가 정의되지 않았으므로 Go map 키는 정렬합니다. 결과는 compact JSON이며 typed 인코딩을 host JSON 인코더에 위임하지 않습니다.
+통합은 생태계의 표준 인터페이스이며 라이브러리의 인코더가 아닙니다: Go `Value`는 `json.Marshaler`(`MarshalJSON`이 값의 compact 텍스트를 씀)와 `json.Unmarshaler`(`UnmarshalJSON`이 라이브러리 parser로 문서를 파싱해 순서, 숫자 token, 짝 없는 surrogate를 유지하고 잘못된 JSON을 거부함)를 구현하고, Rust `Value`는 Serde `Serialize`와 `Deserialize`를 구현하므로 `encoding/json`과 `serde_json`이 값을 담은 모든 native 구조를 contract bytes로 인코딩하고 디코딩합니다. 그 밖의 native 구조는 host 라이브러리가 자체 규칙으로 인코딩합니다.
 
 <a id="objects"></a>
 ## 연관 객체
