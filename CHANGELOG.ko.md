@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: bab94f3145d263f5f68a4a1436f3dadebd3f2110737d2239cf43697625c536c4 -->
+<!-- source-sha256: 7e35fc2028ee65c49081f0ab403f70fb20db13a88d3542c6d26e43adb3c39e04 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.58: 영문 CHANGELOG.md와 kit-standard 체크리스트의 한국어 쌍이 영문 원문의 source-sha256을 다시 기록한다. red: make docs-check가 67cd062 이후 두 marker가 낡았다고 보고했고, green: 통과한다. (T2.58)
 
 - T2.57: Go package는 errcheck gate가 찾은 모든 오류를 처리한다(P8). `orderedjson.go`는 `Compact`의 오류를 panic하거나(`String`) 반환하고(`Array`, `Object`), literal은 `mustBuild`로 만들며, 이 함수는 내부 literal이 parse되지 않을 때만 panic한다. `api_test.go`는 test helper `must`로 각 호출을 확인한다. `internal/benchmark/main.go`는 Rust benchmark와 같은 방식으로 설정을 읽고(변수가 없으면 기본값, 양의 정수가 아니면 실행을 멈춤), `strconv`와 `json.Marshal`의 오류를 확인한다. `internal/probe/main.go`는 `StringUnits`의 오류를 확인한다. red: `make lint-go`가 exit 2, errcheck finding 33개(orderedjson.go 7, api_test.go 21, benchmark 3, probe 2)를 보고했고, green: `make lint-go`가 exit 0, issue 0개, deadcode passed, `make test-go CASES=Official` 18 passed, api test 29 passed. T2.56은 이 row로 합쳐졌다. (T2.57)
 - T2.55: Rust 벤치마크 예제는 설정을 명시된 규칙으로 읽는다. 변수가 없으면 기본값을 쓰고, 양의 정수가 아닌 값이면 기본값으로 바꾸지 않고 실행을 멈춘다(P8, 삼킨 parse 오류 없음). red: `make lint-rust`가 exit 2, `examples/benchmark.rs`에서 `Result::ok` finding 4개를 보고했고, green: `make lint-rust`가 exit 0, `make test-rust CASES=api`가 1 passed. (T2.55)
