@@ -13,7 +13,7 @@
     "phpunit/phpunit": "13.4.2"
   },
   "suggest": {
-    "ext-ordered_json": "Native backend from the polyspec/ordered-json-extension PIE package"
+    "ext-polyspec_ordered_json": "Native backend from the polyspec/ordered-json-php-ext PIE package"
   },
   "autoload": {
     "psr-4": {

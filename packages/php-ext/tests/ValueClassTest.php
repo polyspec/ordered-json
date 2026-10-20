@@ -17,8 +17,8 @@ final class ValueClassTest extends TestCase
     public function testHydrateWithoutTheValueClass(): void
     {
         self::assertTrue(
-            extension_loaded('ordered_json'),
-            'this test covers the native backend; load the ordered_json extension',
+            extension_loaded('polyspec_ordered_json'),
+            'this test covers the native backend; load the polyspec_ordered_json extension',
         );
         self::assertFalse(
             class_exists('Polyspec\OrderedJson\Value', false),

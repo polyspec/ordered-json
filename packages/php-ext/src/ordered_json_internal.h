@@ -125,17 +125,17 @@ typedef struct {
 } oj_value_class;
 
 /* The class lookup is cached for the request; user classes are freed when it ends. */
-ZEND_BEGIN_MODULE_GLOBALS(ordered_json)
+ZEND_BEGIN_MODULE_GLOBALS(polyspec_ordered_json)
     oj_value_class value_class;
-ZEND_END_MODULE_GLOBALS(ordered_json)
-ZEND_EXTERN_MODULE_GLOBALS(ordered_json)
-#define OJ_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(ordered_json, v)
-#if defined(ZTS) && defined(COMPILE_DL_ORDERED_JSON)
+ZEND_END_MODULE_GLOBALS(polyspec_ordered_json)
+ZEND_EXTERN_MODULE_GLOBALS(polyspec_ordered_json)
+#define OJ_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(polyspec_ordered_json, v)
+#if defined(ZTS) && defined(COMPILE_DL_POLYSPEC_ORDERED_JSON)
 ZEND_TSRMLS_CACHE_EXTERN()
 #endif
 
-PHP_GINIT_FUNCTION(ordered_json);
-PHP_RSHUTDOWN_FUNCTION(ordered_json);
+PHP_GINIT_FUNCTION(polyspec_ordered_json);
+PHP_RSHUTDOWN_FUNCTION(polyspec_ordered_json);
 PHP_FUNCTION(ordered_json_hydrate);
 
 #endif

@@ -12,7 +12,7 @@ use function Polyspec\OrderedJson\parse;
 use function Polyspec\OrderedJson\stringify;
 
 $expectNative = in_array('--native', $argv, true);
-if ($expectNative !== extension_loaded('ordered_json')) {
+if ($expectNative !== extension_loaded('polyspec_ordered_json')) {
     throw new RuntimeException('Unexpected PHP parser backend');
 }
 

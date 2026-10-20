@@ -471,7 +471,7 @@ static const zend_function_entry ordered_json_functions[] = {
     PHP_FE(ordered_json_compact_node, arginfo_ordered_json_compact_node)
     PHP_FE_END
 };
-PHP_MINIT_FUNCTION(ordered_json) {
+PHP_MINIT_FUNCTION(polyspec_ordered_json) {
     zend_class_entry ce;
     INIT_CLASS_ENTRY(ce, "Polyspec\\OrderedJson\\NativeParseError", NULL);
     oj_error_ce = zend_register_internal_class_ex(&ce, zend_ce_exception);
@@ -480,22 +480,22 @@ PHP_MINIT_FUNCTION(ordered_json) {
     REGISTER_STRING_CONSTANT("ORDERED_JSON_VERSION", ORDERED_JSON_VERSION, CONST_CS | CONST_PERSISTENT);
     return SUCCESS;
 }
-PHP_MINFO_FUNCTION(ordered_json) {
+PHP_MINFO_FUNCTION(polyspec_ordered_json) {
     php_info_print_table_start();
-    php_info_print_table_row(2, "ordered_json support", "enabled");
+    php_info_print_table_row(2, "polyspec_ordered_json support", "enabled");
     php_info_print_table_row(2, "version", ORDERED_JSON_VERSION);
     php_info_print_table_end();
 }
-zend_module_entry ordered_json_module_entry = {
+zend_module_entry polyspec_ordered_json_module_entry = {
     STANDARD_MODULE_HEADER,
-    "ordered_json", ordered_json_functions,
-    PHP_MINIT(ordered_json), NULL, NULL, PHP_RSHUTDOWN(ordered_json), PHP_MINFO(ordered_json),
-    ORDERED_JSON_VERSION, PHP_MODULE_GLOBALS(ordered_json), PHP_GINIT(ordered_json), NULL, NULL,
+    "polyspec_ordered_json", ordered_json_functions,
+    PHP_MINIT(polyspec_ordered_json), NULL, NULL, PHP_RSHUTDOWN(polyspec_ordered_json), PHP_MINFO(polyspec_ordered_json),
+    ORDERED_JSON_VERSION, PHP_MODULE_GLOBALS(polyspec_ordered_json), PHP_GINIT(polyspec_ordered_json), NULL, NULL,
     STANDARD_MODULE_PROPERTIES_EX
 };
-#ifdef COMPILE_DL_ORDERED_JSON
+#ifdef COMPILE_DL_POLYSPEC_ORDERED_JSON
 #ifdef ZTS
 ZEND_TSRMLS_CACHE_DEFINE()
 #endif
-ZEND_GET_MODULE(ordered_json)
+ZEND_GET_MODULE(polyspec_ordered_json)
 #endif

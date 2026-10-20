@@ -12,7 +12,7 @@ import { PIE_RECORD, externalPins, inputIssues, manifestDifferences, packageRevi
 import { ROOT, artifactPaths, pathOf, probeCommands, runStreamed, runtimeVersions, withRun, type Run } from './registry.mts';
 import { SUITE_FIX, verifyProbes } from './verify.mts';
 
-const PACKAGE = 'polyspec/ordered-json-extension:*@dev';
+const PACKAGE = 'polyspec/ordered-json-php-ext:*@dev';
 
 /** Runs PIE with `args` in the extension of the run; a nonzero exit or a line that reports a build or tool error fails. */
 export async function pieCommand(run: Run, pie: string, args: string[], commands: { arguments: string[]; exit_code: number }[], warnings: string[]): Promise<string> {

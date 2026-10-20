@@ -142,11 +142,11 @@ ordered-json-python-test: ordered-json-python-check
 ordered-json-rust-check: verify-rust
 ordered-json-rust-test: ordered-json-rust-check
 
-# php-extension builds packages/php-ext/src/modules/ordered_json.so in place, with phpize and configure when the build has
+# php-extension builds packages/php-ext/src/modules/polyspec_ordered_json.so in place, with phpize and configure when the build has
 # no Makefile yet and then make, which rebuilds what changed. config/parity.json loads it for the tests of the
 # implementation php-extension, so parity-check of kit depends on it.
 php-extension:
-	cd packages/php-ext/src && { test -f Makefile || { phpize && ./configure --enable-ordered-json; }; } && $(MAKE)
+	cd packages/php-ext/src && { test -f Makefile || { phpize && ./configure --enable-polyspec-ordered-json; }; } && $(MAKE)
 
 parity-check: php-extension
 

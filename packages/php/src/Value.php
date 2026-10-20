@@ -24,7 +24,7 @@ final class Value implements \JsonSerializable, \Stringable
         if ($maxDepth < 0 || $maxDepth > MAX_DEPTH) {
             throw new \InvalidArgumentException('maxDepth must be between 0 and 256');
         }
-        if (self::$native ??= \extension_loaded('ordered_json')) {
+        if (self::$native ??= \extension_loaded('polyspec_ordered_json')) {
             try {
                 $tape = \ordered_json_scan($source, $maxDepth);
             } catch (NativeParseError $e) {
@@ -59,7 +59,7 @@ final class Value implements \JsonSerializable, \Stringable
     /** @return array<string|int, Value> Members keyed by decoded name, in first insertion order. */
     private function hydrateMembers(): array
     {
-        if (self::$native ??= \extension_loaded('ordered_json')) {
+        if (self::$native ??= \extension_loaded('polyspec_ordered_json')) {
             return \ordered_json_hydrate($this->source, $this->tape, $this->index);
         }
         $members = [];
@@ -89,7 +89,7 @@ final class Value implements \JsonSerializable, \Stringable
     /** @return list<Value> */
     private function hydrateItems(): array
     {
-        if (self::$native ??= \extension_loaded('ordered_json')) {
+        if (self::$native ??= \extension_loaded('polyspec_ordered_json')) {
             return \ordered_json_hydrate($this->source, $this->tape, $this->index);
         }
         $items = [];
@@ -245,7 +245,7 @@ final class Value implements \JsonSerializable, \Stringable
     }
     public function compact(): string
     {
-        if (self::$native ??= \extension_loaded('ordered_json')) {
+        if (self::$native ??= \extension_loaded('polyspec_ordered_json')) {
             return \ordered_json_compact_node($this->source, $this->tape, $this->index);
         }
         $meta = $this->tape[$this->index];

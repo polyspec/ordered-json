@@ -7,7 +7,7 @@
   "packages": [
     { "kind": "npm", "directory": "packages/js", "name": "@polyspec/ordered-json" },
     { "kind": "composer", "directory": "packages/php", "name": "polyspec/ordered-json" },
-    { "kind": "composer", "directory": "packages/php-ext", "name": "polyspec/ordered-json-extension" },
+    { "kind": "composer", "directory": "packages/php-ext", "name": "polyspec/ordered-json-php-ext" },
     { "kind": "wheel", "directory": "packages/python", "name": "polyspec-ordered-json" }
   ],
   "manifests": {

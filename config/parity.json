@@ -69,11 +69,11 @@
       ],
       "args": [
         "-d",
-        "extension=packages/php-ext/src/modules/ordered_json.so"
+        "extension=packages/php-ext/src/modules/polyspec_ordered_json.so"
       ],
       "symbols": {
         "extractor": "php",
-        "entry": "packages/php-ext/src/ordered_json.stub.php"
+        "entry": "packages/php-ext/src/polyspec_ordered_json.stub.php"
       }
     },
     {

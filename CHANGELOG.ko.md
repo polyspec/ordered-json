@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 821d51d97c55d9f65257e54868de2c7cd4789c760710936e1e38b63649a95062 -->
+<!-- source-sha256: a04c306a100c6329e877062a0c2b18dff53c7bafab50f1b12dfe02fd7772c784 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- PHP 확장은 S10 표준의 이름을 따릅니다 (T2.8). PIE 패키지는 `polyspec/ordered-json-php-ext`(release asset `polyspec-ordered-json-php-ext-php-X.Y.Z.zip`), 확장과 module은 `polyspec_ordered_json`이며 `PHP_NEW_EXTENSION`과 `--enable-polyspec-ordered-json`이 따르고, stub은 `src/polyspec_ordered_json.stub.php`이며, 라이브러리, test, verifier와 parity 선언은 `polyspec_ordered_json`을 로드합니다. arginfo header는 열려 있습니다: `make php-ext-arginfo`가 kit에서 실패합니다. Red: `make lint-php-ext` exit 2, 4건; 공유 probe가 이름을 바꾸지 않은 `extension_loaded('ordered_json')`을 거부했습니다(`Unexpected PHP parser backend`, 115 case 중 1건); green: `scripts/verify.mts --only php-extension` official 예제 17개 + 공유 case 98개 통과, registry와 evidence test 17 passed, `make lint-php-ext`는 1건(arginfo header)만 남습니다.
 - `config/rebuild.json`은 `scripts/*.mts`의 각 tool의 class를 선언합니다 (T2.6). mdast, PIE, ajv, momoa는 ecosystem, verifier와 그 registry, records, `present`는 policy, `external-inputs.mts`는 replaced이며 T2.7이 이를 mise의 http backend로 옮깁니다. Red: `make rebuild-check` exit 2, `config/rebuild.json does not exist`; green: exit 0, `every tool that config/rebuild.json selects has its class`.
 - kit-standard 체크리스트의 한국어 문서는 영어 원본의 revision을 담습니다 (T2.5). 번역을 영어 행과 비교해 일치함을 확인한 뒤 `make documents-stamp`가 source-sha256을 썼습니다. Red: `make docs-check` exit 2, `1 findings in 25 document pairs`(revision); green: exit 0.
 - parity unit은 JSON 계약의 요구사항 RQ-001부터 RQ-024까지를 인용하고(kit K273), JavaScript probe는 폴더를 옮긴 뒤의 `packages/js/tests/probe.mjs`에서 실행하며, workflow 검사는 kit이 vendor하는 workflow를 제외합니다(T2.3).

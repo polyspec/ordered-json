@@ -180,7 +180,7 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
 <a id="package-php-ext"></a>
 ## Package php-ext (packages/php-ext)
 
-- The extension is checked alone by `make ordered-json-php-ext-check`, which runs `make verify-php-extension`. `make php-extension` builds `packages/php-ext/src/modules/ordered_json.so` in place and rebuilds what changed, and `make parity-check` loads it.
+- The extension is checked alone by `make ordered-json-php-ext-check`, which runs `make verify-php-extension`. `make php-extension` builds `packages/php-ext/src/modules/polyspec_ordered_json.so` in place and rebuilds what changed, and `make parity-check` loads it.
   Enforced by: `make parity-check`
 - Its `composer.lock` is locked to the platform `8.4.1` and requires PHP `>=8.4`, the same as the PHP package, and is re-locked with `composer update --lock` when its manifest changes.
   Enforced by: `make dependency-policy-check`

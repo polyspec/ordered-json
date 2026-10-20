@@ -1,7 +1,7 @@
-PHP_ARG_ENABLE([ordered-json], [whether to enable ordered_json],
-  [AS_HELP_STRING([--enable-ordered-json], [Enable the ordered_json native JSON parser])], [yes])
+PHP_ARG_ENABLE([polyspec-ordered-json], [whether to enable polyspec_ordered_json],
+  [AS_HELP_STRING([--enable-polyspec-ordered-json], [Enable the polyspec_ordered_json native JSON parser])], [yes])
 
-if test "$PHP_ORDERED_JSON" != "no"; then
+if test "$PHP_POLYSPEC_ORDERED_JSON" != "no"; then
   AS_CASE([$host_os], [darwin*], [
     AC_ARG_VAR([MACOSX_DEPLOYMENT_TARGET], [Minimum macOS version for the extension])
     AS_IF([test -z "$MACOSX_DEPLOYMENT_TARGET"], [
@@ -18,5 +18,5 @@ if test "$PHP_ORDERED_JSON" != "no"; then
     dnl A loadable bundle does not use the dynamic-library single-module flag.
     LT_MULTI_MODULE=yes
   ])
-  PHP_NEW_EXTENSION([ordered_json], [ordered_json.c hydrate.c], [$ext_shared])
+  PHP_NEW_EXTENSION([polyspec_ordered_json], [ordered_json.c hydrate.c], [$ext_shared])
 fi

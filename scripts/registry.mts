@@ -29,7 +29,7 @@ export type Commands = {
   artifacts?: string[];
 };
 
-const PHP_EXTENSION = 'extension={php-extension}/src/modules/ordered_json.so';
+const PHP_EXTENSION = 'extension={php-extension}/src/modules/polyspec_ordered_json.so';
 export const COMMANDS: Record<string, Commands> = {
   js: { command: ['node', '{js}/tests/probe.mjs'], runtime: { node: ['node', '--version'] } },
   rust: {
@@ -55,16 +55,16 @@ export const COMMANDS: Record<string, Commands> = {
       { cwd: '{php-extension}/src', ifExists: '{php-extension}/src/Makefile', command: ['make', 'distclean'] },
       { cwd: '{php-extension}/src', command: ['phpize', '--clean'] },
       { cwd: '{php-extension}/src', command: ['phpize'] },
-      { cwd: '{php-extension}/src', command: ['./configure', '--enable-ordered-json'] },
+      { cwd: '{php-extension}/src', command: ['./configure', '--enable-polyspec-ordered-json'] },
       { cwd: '{php-extension}/src', command: ['make', '-j2'] },
     ],
     command: ['php', '-n', '-d', PHP_EXTENSION, '{php}/tests/probe.php', '--native'],
     runtime: {
       php: ['php', '-n', '-r', 'echo PHP_VERSION;'],
       extension_version: ['php', '-n', '-d', PHP_EXTENSION, '-r',
-        "$native = phpversion('ordered_json'); if ($native !== ORDERED_JSON_VERSION) { fwrite(STDERR, \"phpversion('ordered_json') \" . var_export($native, true) . \" differs from ORDERED_JSON_VERSION \" . ORDERED_JSON_VERSION . \"\\n\"); exit(1); } echo ORDERED_JSON_VERSION;"],
+        "$native = phpversion('polyspec_ordered_json'); if ($native !== ORDERED_JSON_VERSION) { fwrite(STDERR, \"phpversion('polyspec_ordered_json') \" . var_export($native, true) . \" differs from ORDERED_JSON_VERSION \" . ORDERED_JSON_VERSION . \"\\n\"); exit(1); } echo ORDERED_JSON_VERSION;"],
     },
-    artifacts: ['{php-extension}/src/modules/ordered_json.so'],
+    artifacts: ['{php-extension}/src/modules/polyspec_ordered_json.so'],
   },
   python: {
     // The virtual environment of make ordered-json-install-python, into which the package is installed.

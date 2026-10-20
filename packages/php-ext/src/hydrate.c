@@ -1,15 +1,15 @@
 /* Child value hydration: creates Polyspec\OrderedJson\Value instances for the children of a container. */
 #include "ordered_json_internal.h"
 
-ZEND_DECLARE_MODULE_GLOBALS(ordered_json)
+ZEND_DECLARE_MODULE_GLOBALS(polyspec_ordered_json)
 
-PHP_GINIT_FUNCTION(ordered_json) {
-#if defined(ZTS) && defined(COMPILE_DL_ORDERED_JSON)
+PHP_GINIT_FUNCTION(polyspec_ordered_json) {
+#if defined(ZTS) && defined(COMPILE_DL_POLYSPEC_ORDERED_JSON)
     ZEND_TSRMLS_CACHE_UPDATE();
 #endif
-    memset(ordered_json_globals, 0, sizeof(*ordered_json_globals));
+    memset(polyspec_ordered_json_globals, 0, sizeof(*polyspec_ordered_json_globals));
 }
-PHP_RSHUTDOWN_FUNCTION(ordered_json) {
+PHP_RSHUTDOWN_FUNCTION(polyspec_ordered_json) {
     OJ_G(value_class).ce = NULL;
     return SUCCESS;
 }

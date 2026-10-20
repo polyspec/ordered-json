@@ -22,8 +22,8 @@ final class DescriptorTest extends TestCase
     protected function setUp(): void
     {
         self::assertTrue(
-            extension_loaded('ordered_json'),
-            'these tests cover the native backend; load the ordered_json extension',
+            extension_loaded('polyspec_ordered_json'),
+            'these tests cover the native backend; load the polyspec_ordered_json extension',
         );
         // The extension looks the value class up without autoloading it.
         self::assertTrue(class_exists(Value::class));

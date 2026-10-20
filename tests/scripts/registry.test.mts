@@ -89,7 +89,7 @@ test('the packages follow the polyspec naming convention and each Cargo package 
   assert.ok(js !== undefined && php !== undefined && extension !== undefined && rust !== undefined && go !== undefined, 'the roots of the five packages');
   const read = (file: string) => readFileSync(path.join(ROOT, file), 'utf8');
   const name = (file: string) => readJsonFile<{ name: string }>(path.join(ROOT, file), 'package-name.schema.json').name;
-  assert.deepEqual(['composer.json', `${php}/composer.json`, `${extension}/composer.json`].map(name), ['polyspec/ordered-json', 'polyspec/ordered-json', 'polyspec/ordered-json-extension']);
+  assert.deepEqual(['composer.json', `${php}/composer.json`, `${extension}/composer.json`].map(name), ['polyspec/ordered-json', 'polyspec/ordered-json', 'polyspec/ordered-json-php-ext']);
   assert.deepEqual(['package.json', `${js}/package.json`].map(name), ['@polyspec/ordered-json', '@polyspec/ordered-json']);
   const cargo = checkJson<{ package: { name: string }; lib: { name: string } }>(parse(read(`${rust}/Cargo.toml`)), 'cargo-manifest.schema.json', `${rust}/Cargo.toml`);
   assert.deepEqual([cargo.package.name, cargo.lib.name], ['polyspec-ordered-json', 'polyspec_ordered_json']);

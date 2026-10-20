@@ -9,7 +9,7 @@
          failOnDeprecation="true"
          failOnPhpunitDeprecation="true">
     <testsuites>
-        <testsuite name="ordered-json-extension">
+        <testsuite name="ordered-json-php-ext">
             <file>tests/ValueClassTest.php</file>
             <file>tests/DescriptorTest.php</file>
             <file>tests/ValueApiTest.php</file>

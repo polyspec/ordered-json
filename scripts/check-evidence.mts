@@ -171,7 +171,7 @@ function checkPieVerification(root: string, record: PieRecord): void {
   if (record.schema_version !== 1 || record.scope !== 'pie-build' || record.status !== 'passed' || Number.isNaN(Date.parse(record.checked_at ?? ''))) throw new Error('the PIE record is not a passed pie-build record of schema 1 with its time');
   checkSources(root, record.sources, 'the PIE record', 'make pie-check');
   if (!isDeepStrictEqual(record.packages, packageRevisions(root))) throw new Error('the package revisions of the PIE record differ from the current sources');
-  if (record.package !== 'polyspec/ordered-json-extension:*@dev') throw new Error(`the PIE record builds ${record.package}, not polyspec/ordered-json-extension:*@dev`);
+  if (record.package !== 'polyspec/ordered-json-php-ext:*@dev') throw new Error(`the PIE record builds ${record.package}, not polyspec/ordered-json-php-ext:*@dev`);
   const { pie } = externalPins(root);
   if (record.pie.phar_sha256 !== pie.phar_sha256 || !String(record.pie.version).includes(pie.release)) throw new Error('the PIE of the record differs from the pin in external-inputs.json');
   const declared = artifactPaths('php-extension', { paths: repositoryPaths(root), cache: '' }).map(file => path.relative(root, file));

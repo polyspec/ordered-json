@@ -1,5 +1,5 @@
 <!-- doc-id: php-ext-overview -->
-<!-- source-sha256: fe5eb6c0da7e4480e356fadb924f63977c1b8fffc2117f46dabb20882c4940d4 -->
+<!-- source-sha256: 267effbf10f064a98830eda0150ebb58cab2084ae22e4002220fa016a7a660ed -->
 # ordered-json for PHP extension
 
 [English](README.md)
@@ -9,9 +9,9 @@
 <a id="usage"></a>
 ## 사용
 
-PHP >= 8.2와 일치하는 개발 헤더를 요구하며 PIE 패키지는 `polyspec/ordered-json-extension`, 확장은 `ordered_json`입니다.
+PHP >= 8.2와 일치하는 개발 헤더를 요구하며 PIE 패키지는 `polyspec/ordered-json-php-ext`, 확장은 `polyspec_ordered_json`입니다.
 
-소스 빌드는 `src/modules/ordered_json.so`를 생성합니다. PHP의 `-d extension=/absolute/path/to/ordered_json.so`로 로드합니다. [PHP 라이브러리](https://github.com/polyspec/ordered-json/tree/main/packages/php)는 공통 Value API를 제공합니다.
+소스 빌드는 `src/modules/polyspec_ordered_json.so`를 생성합니다. PHP의 `-d extension=/absolute/path/to/polyspec_ordered_json.so`로 로드합니다. [PHP 라이브러리](https://github.com/polyspec/ordered-json/tree/main/packages/php)는 공통 Value API를 제공합니다.
 
 ~~~sh
 cd src
@@ -23,11 +23,11 @@ make -j2
 
 macOS의 configure는 지정된 `MACOSX_DEPLOYMENT_TARGET`을 유지합니다. 값이 없으면 대상 플래그를 포함한 현재 컴파일러 설정에서 구합니다. 최신 macOS 대상의 번들에는 동적 심볼 조회를 사용합니다. Libtool의 `LT_MULTI_MODULE` 옵션으로 불필요한 동적 라이브러리 단일 모듈 플래그 검사를 제외합니다.
 
-PIE 메타데이터는 `php-ext` 유형, `ordered_json` 확장 이름, `src` 빌드 경로를 정의합니다. 패키지 이름은 PHP 라이브러리와 구분합니다. 로컬 PIE 빌드는 이 체크아웃을 등록하고 개발 패키지를 빌드합니다.
+PIE 메타데이터는 `php-ext` 유형, `polyspec_ordered_json` 확장 이름, `src` 빌드 경로를 정의합니다. 패키지 이름은 PHP 라이브러리와 구분합니다. 로컬 PIE 빌드는 이 체크아웃을 등록하고 개발 패키지를 빌드합니다.
 
 ~~~sh
 pie repository:add path .
-pie build 'polyspec/ordered-json-extension:*@dev'
+pie build 'polyspec/ordered-json-php-ext:*@dev'
 ~~~
 
 PIE 설정은 `PIE_WORKING_DIRECTORY` 환경 변수로 격리할 수 있습니다. 빌드는 확장을 설치하거나 활성화하지 않습니다. Windows 바이너리와 ZTS 빌드는 검증되지 않았습니다. 공통 검사는 PHP 버전과 확장 버전을 별도로 기록합니다. PHP 라이브러리는 이 모노레포의 형제 `packages/php/` 패키지이며 네이티브 빌드나 PIE 패키지와는 별도입니다.

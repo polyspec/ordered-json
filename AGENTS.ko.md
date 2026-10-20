@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 45fe53ecce3f2a5b342f0e2c9ff51b48a40641dc8e0331eb887e03954b2e9e8b -->
+<!-- source-sha256: 54bdd79ddfc91e9674bd843955f4be1b8cfaebb19b99aec9f77d9fdb6f2bdcce -->
 # Development procedure
 
 [English](AGENTS.md)
@@ -181,7 +181,7 @@
 <a id="package-php-ext"></a>
 ## 패키지 php-ext (packages/php-ext)
 
-- extension은 `make ordered-json-php-ext-check`로 이 패키지만 검사하며, 이 target은 `make verify-php-extension`을 실행합니다. `make php-extension`이 `packages/php-ext/src/modules/ordered_json.so`를 제자리에서 빌드하고 바뀐 것만 다시 빌드하며, `make parity-check`가 이를 불러옵니다.
+- extension은 `make ordered-json-php-ext-check`로 이 패키지만 검사하며, 이 target은 `make verify-php-extension`을 실행합니다. `make php-extension`이 `packages/php-ext/src/modules/polyspec_ordered_json.so`를 제자리에서 빌드하고 바뀐 것만 다시 빌드하며, `make parity-check`가 이를 불러옵니다.
   Enforced by: `make parity-check`
 - `composer.lock`은 platform `8.4.1`로 잠기고 PHP `>=8.4`를 요구합니다. PHP 패키지와 같으며, manifest가 바뀌면 `composer update --lock`으로 다시 잠급니다.
   Enforced by: `make dependency-policy-check`

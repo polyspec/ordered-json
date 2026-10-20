@@ -1,5 +1,5 @@
 {
-  "name": "polyspec/ordered-json-extension",
+  "name": "polyspec/ordered-json-php-ext",
   "version": "0.0.9",
   "description": "Native PHP extension for strict JSON with document-order associative objects",
   "type": "php-ext",
@@ -21,7 +21,7 @@
     ]
   },
   "php-ext": {
-    "extension-name": "ordered_json",
+    "extension-name": "polyspec_ordered_json",
     "build-path": "src"
   },
   "config": {

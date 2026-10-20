@@ -130,8 +130,8 @@ test('the supplementary inputs and the PIE tool of a record are the pinned ones'
   writeRecord(path.join(root, AGGREGATE_RECORD), aggregate, root);
   const pie = {
     schema_version: 1, scope: 'pie-build', status: 'passed', checked_at: aggregate.checked_at, sources: aggregate.sources, packages: aggregate.packages,
-    pie: { version: 'PIE synthetic', phar_sha256: sha256('pie tool') }, package: 'polyspec/ordered-json-extension:*@dev',
-    commands: [{ arguments: ['build'], exit_code: 0 }], artifact: { path: `${REGISTRY.roots['php-extension']}/src/modules/ordered_json.so` },
+    pie: { version: 'PIE synthetic', phar_sha256: sha256('pie tool') }, package: 'polyspec/ordered-json-php-ext:*@dev',
+    commands: [{ arguments: ['build'], exit_code: 0 }], artifact: { path: `${REGISTRY.roots['php-extension']}/src/modules/polyspec_ordered_json.so` },
     cases: aggregate.cases, implementations: { 'php-extension': { status: 'passed', cases: 3, runtime: VERSIONS['php-extension'] } }, supplementary: aggregate.supplementary,
   };
   writeRecord(path.join(root, PIE_RECORD), pie, root);
