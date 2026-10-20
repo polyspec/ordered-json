@@ -65,3 +65,4 @@
 | T2.53 | Git ignores the go.work files that link writes | .gitignore with go.work and go.work.sum | `git check-ignore packages/go/go.work` and `git check-ignore packages/go/go.work.sum` | [o] |
 | T2.54 | Take the kit copies of K334 and K349 | PRINCIPLES.md, PRINCIPLES.ko.md, .golangci.yml, ruff.toml, scripts/kit/kit-bootstrap.mk | `make kit-check` | [o] |
 | T2.55 | The rust benchmark example handles the Result of each ok call (P8, K334) | packages/rust/examples/benchmark.rs, CHANGELOG.md(.ko) | `make lint-rust` and `make test-rust CASES=api` | [o] |
+| T2.56 | The Go package handles each error of orderedjson.go instead of dropping it (P8, K334) | packages/go/orderedjson.go, CHANGELOG.md(.ko) | `make lint-go` and `make test-go CASES=Official` | [ ] |

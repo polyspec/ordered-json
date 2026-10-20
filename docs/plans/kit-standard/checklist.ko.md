@@ -66,3 +66,4 @@
 | T2.53 | Git이 link가 쓰는 go.work 파일을 무시한다 | .gitignore with go.work and go.work.sum | `git check-ignore packages/go/go.work` and `git check-ignore packages/go/go.work.sum` | [o] |
 | T2.54 | K334과 K349의 kit copy를 받는다 | PRINCIPLES.md, PRINCIPLES.ko.md, .golangci.yml, ruff.toml, scripts/kit/kit-bootstrap.mk | `make kit-check` | [o] |
 | T2.55 | rust benchmark example은 각 ok 호출의 Result를 처리한다 (P8, K334) | packages/rust/examples/benchmark.rs, CHANGELOG.md(.ko) | `make lint-rust` and `make test-rust CASES=api` | [o] |
+| T2.56 | Go package는 orderedjson.go의 각 오류를 버리지 않고 처리한다 (P8, K334) | packages/go/orderedjson.go, CHANGELOG.md(.ko) | `make lint-go` and `make test-go CASES=Official` | [ ] |
