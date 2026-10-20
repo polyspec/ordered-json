@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 68b5f7c68ceea4ba8487b918b515d433dd4d2de39a004d3f76e321527abc6c62 -->
+<!-- source-sha256: 821d51d97c55d9f65257e54868de2c7cd4789c760710936e1e38b63649a95062 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- `config/rebuild.json`은 `scripts/*.mts`의 각 tool의 class를 선언합니다 (T2.6). mdast, PIE, ajv, momoa는 ecosystem, verifier와 그 registry, records, `present`는 policy, `external-inputs.mts`는 replaced이며 T2.7이 이를 mise의 http backend로 옮깁니다. Red: `make rebuild-check` exit 2, `config/rebuild.json does not exist`; green: exit 0, `every tool that config/rebuild.json selects has its class`.
 - kit-standard 체크리스트의 한국어 문서는 영어 원본의 revision을 담습니다 (T2.5). 번역을 영어 행과 비교해 일치함을 확인한 뒤 `make documents-stamp`가 source-sha256을 썼습니다. Red: `make docs-check` exit 2, `1 findings in 25 document pairs`(revision); green: exit 0.
 - parity unit은 JSON 계약의 요구사항 RQ-001부터 RQ-024까지를 인용하고(kit K273), JavaScript probe는 폴더를 옮긴 뒤의 `packages/js/tests/probe.mjs`에서 실행하며, workflow 검사는 kit이 vendor하는 workflow를 제외합니다(T2.3).
 - 패키지는 AGENTS, CHANGELOG와 Makefile을 두지 않습니다 (T2.2). 각 패키지는 루트 `AGENTS.md`와 `CHANGELOG.md`에 절을 가지며, 검사와 테스트는 루트 Makefile의 target(`ordered-json-<package>-check`와 `ordered-json-<package>-test`)입니다. `config/layout.yml`의 layout 예외는 제거되었습니다. 모든 Composer manifest의 PHP platform은 8.4.1이며 Composer lock을 다시 잠갔습니다. T2.1에서 Makefile이 잃은 recipe를 되돌렸습니다 (`verify-*`, `verify-all`, `typecheck`, `evidence-check`, `release-config-check`, `pie-check`, `benchmark`, `benchmark-check`, `ordered-json-test-scripts`와 `ordered-json-install-external`). 체크리스트에는 상위 행 T1.29가 있으며, 비교 대상 제품명은 변경 기록과 체크리스트에서 더 이상 적지 않습니다.

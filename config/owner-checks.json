@@ -311,6 +311,14 @@
         "dependency-policy-check",
         "dependency-policy-mutation-check"
       ]
+    },
+    {
+      "paths": [
+        "config/rebuild.json"
+      ],
+      "targets": [
+        "rebuild-check"
+      ]
     }
   ]
 }
