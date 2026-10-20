@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 86c0ae9c0a6db18603433c5450800dd4cdf75103f9ec7d285c76b4d5f7c7d741 -->
+<!-- source-sha256: 476862eb5f673959ea4b8050eb7196dc286fdd2f21179f3840a73240882dc738 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -9,7 +9,7 @@
 | T2.3 | parity unit은 JSON 계약의 요구사항을 인용하고, JavaScript probe는 옮긴 폴더에서 실행하며, workflow 검사는 kit이 vendor하는 workflow를 제외합니다 | `config/parity.json`, `docs/spec/json-contract.md`(.ko), `scripts/registry.mts`, `tests/scripts/workflow-rules.test.mts`, `CHANGELOG.md`(.ko), `docs/plans/kit-standard/checklist.md`(.ko) | `make parity-declarations-check` and `node node_modules/@polyspec/kit/dist/run-tests.mjs node -- tests/scripts/workflow-rules.test.mts` | [o] |
 | T2.4 | config/parity.json의 모든 unit은 모든 구현에서 성립하고, test가 이름으로 적은 spec requirement를 인용한다 (kit K273, K275, K276) | config/parity.json, docs/spec, the tests of every implementation | `make parity-declarations-check` | [~] |
 | T2.4-1 | 모든 unit은 모든 구현의 symbol을 선언합니다 (R1 missing-implementation, 84건: php-extension 41, php 15, python 14, js 14): 없는 구현은 빠진 API와 그 test를 구현하며, unit을 지우지 않습니다 | `config/parity.json`, `packages/*/`, `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make parity-declarations-check` | [o] |
-| T2.4-2 | 모든 unit의 모든 feature는 모든 구현에 binding이 있습니다 (R2 missing-binding, 172건: php 35, python 31, js 31, rust 29, php-extension 25, go 21). 각각 red를 먼저 보인 test입니다 | `config/parity.json`, `packages/*/tests`, `CHANGELOG.md`(.ko) | `make parity-declarations-check` | [ ] |
+| T2.4-2 | 모든 unit의 모든 feature는 모든 구현에 binding이 있습니다 (R2 missing-binding, 172건: php 35, python 31, js 31, rust 29, php-extension 25, go 21). 각각 red를 먼저 보인 test입니다 | `config/parity.json`, `packages/*/tests`, `CHANGELOG.md`(.ko) | `make parity-declarations-check` | [o] |
 | T2.4-3 | docs/spec/json-contract.md의 모든 requirement는 unit이 인용합니다 (R13 untraced-requirement, 2건: RQ-023, RQ-024) | `config/parity.json`, `docs/spec/json-contract.md`(.ko), the tests of every implementation, `CHANGELOG.md`(.ko) | `make parity-declarations-check` | [o] |
 | T2.4-4 | test는 unit이 인용한 requirement를 이름으로 적습니다 (R15 unnamed-requirement, 174건: go 38, php-extension 35, rust 30, python 25, js 25, php 21) | `packages/*/tests`, `CHANGELOG.md`(.ko) | `make parity-declarations-check` | [o] |
 | T2.5 | kit-standard 체크리스트의 한국어 문서는 영어 원본의 revision을 담습니다 | `docs/plans/kit-standard/checklist.ko.md` | `make docs-check` | [o] |
