@@ -299,15 +299,47 @@ impl Value {
             _ => None,
         }
     }
-    pub fn string_value(&self) -> Result<String> {
+    /// The UTF-8 bytes of the string; an unpaired surrogate is its three WTF-8 bytes, so the bytes are valid UTF-8 unless
+    /// the string holds one, which a Rust `String` cannot.
+    pub fn string_value(&self) -> Result<Vec<u8>> {
         if !matches!(self.node, Node::String(_)) {
             return Err(error("expected string"));
         }
         if self.flags & ESCAPED == 0 {
-            return Ok(self.content().to_owned());
+            return Ok(self.content().as_bytes().to_vec());
         }
-        String::from_utf16(self.string_units().unwrap())
-            .map_err(|_| error("unpaired surrogate; use string_units"))
+        let units = self.string_units().unwrap();
+        let mut bytes = Vec::with_capacity(units.len());
+        let mut index = 0;
+        while index < units.len() {
+            let unit = u32::from(units[index]);
+            index += 1;
+            let point = match units.get(index).map(|next| u32::from(*next)) {
+                Some(low @ 0xdc00..=0xdfff) if (0xd800..=0xdbff).contains(&unit) => {
+                    index += 1;
+                    0x10000 + ((unit - 0xd800) << 10) + (low - 0xdc00)
+                }
+                _ => unit,
+            };
+            match point {
+                0..=0x7f => bytes.push(point as u8),
+                0x80..=0x7ff => {
+                    bytes.extend([0xc0 | (point >> 6) as u8, 0x80 | (point & 63) as u8])
+                }
+                0x800..=0xffff => bytes.extend([
+                    0xe0 | (point >> 12) as u8,
+                    0x80 | ((point >> 6) & 63) as u8,
+                    0x80 | (point & 63) as u8,
+                ]),
+                _ => bytes.extend([
+                    0xf0 | (point >> 18) as u8,
+                    0x80 | ((point >> 12) & 63) as u8,
+                    0x80 | ((point >> 6) & 63) as u8,
+                    0x80 | (point & 63) as u8,
+                ]),
+            }
+        }
+        Ok(bytes)
     }
     pub fn number_literal(&self) -> Option<&str> {
         matches!(self.node, Node::Number).then(|| self.raw().trim())

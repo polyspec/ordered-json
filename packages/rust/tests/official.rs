@@ -36,7 +36,7 @@ fn tree(value: &Value) -> Tree {
 }
 
 fn text(value: &Value) -> String {
-    value.string_value().unwrap()
+    String::from_utf8(value.string_value().unwrap()).unwrap()
 }
 
 fn expected_tree(value: &Value) -> Tree {

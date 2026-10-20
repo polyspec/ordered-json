@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 6838d457e800aa40daad604006fe78764b1984183c85e68c751bf99db0ea95a7 -->
+<!-- source-sha256: a4b2d0ef49484e62b93f9981e536d51cc8eb8af216e3ced21cc44108444c2d46 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -49,3 +49,4 @@
 | T2.36 | 명세는 RQ-020을 모든 언어의 native JSON 인터페이스에 대한 하나의 규칙으로 말하고 Rust와 Go의 typed 형태를 그 확장으로 둡니다 | `docs/spec/json-contract.md`(.ko), `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make docs-check` | [o] |
 | T2.37 | 모든 언어의 host JSON 인터페이스는 중립 unit 둘(경계와 포함된 값)로, 그 typed 형태는 중립 API unit로 binding합니다: Rust serde와 Go Marshal은 test를 package test로 두고, Go는 encoding/json의 Marshaler를 쓰며, Python은 Value를 거부하는 JSONEncoder를 가집니다 | `packages/go/`, `packages/rust/`, `packages/python/`, `packages/js/tests`, `packages/php/tests`, `config/parity.json`, `CHANGELOG.md`(.ko) | `make parity-declarations-check` | [o] |
 | T2.38 | 명세는 RQ-009를 모든 구현에서 성립시킵니다: string value는 짝 없는 surrogate를 라이브러리 형태(Go, PHP, Rust는 WTF-8 byte)로 유지하며 Rust의 예외는 없습니다 | `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make docs-check` | [o] |
+| T2.39 | Rust의 string_value는 문자열의 WTF-8 바이트를 반환하므로 짝 없는 surrogate가 다른 모든 구현처럼 유지됩니다 (RQ-009) | `packages/rust/src/lib.rs`, `packages/rust/tests/`, `CHANGELOG.md`(.ko) | `make test-rust CASES=surrogate` | [o] |

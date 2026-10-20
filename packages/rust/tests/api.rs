@@ -63,7 +63,10 @@ fn invalid_utf8_reports_the_first_bad_byte() {
 fn utf8_validation_holds_for_long_multibyte_text() {
     let text = "\u{d55c}\u{1f30d}".repeat(64);
     let value = parse_bytes(format!("{{\"key\":\"{text}\"}}").as_bytes()).unwrap();
-    assert_eq!(value.get("key").unwrap().string_value().unwrap(), text);
+    assert_eq!(
+        value.get("key").unwrap().string_value().unwrap(),
+        text.as_bytes()
+    );
     let error = parse_bytes(b"[\"\xff\"]").unwrap_err();
     assert_eq!(error.message, "invalid UTF-8");
     assert_eq!(error.offset, 2);
@@ -136,10 +139,7 @@ fn unpaired_surrogate_stays_in_units() {
     let lone = Value::from_units(&[0x61, 0xd800]);
     assert_eq!(lone.compact(), "\"a\\ud800\"");
     assert_eq!(lone.string_units(), Some(&[0x61u16, 0xd800][..]));
-    assert_eq!(
-        lone.string_value().unwrap_err().message,
-        "unpaired surrogate; use string_units"
-    );
+    assert_eq!(lone.string_value().unwrap(), b"a\xed\xa0\x80");
 }
 
 // Requirements: RQ-009
@@ -147,7 +147,7 @@ fn unpaired_surrogate_stays_in_units() {
 fn surrogate_pair_decodes() {
     let pair = parse("\"\\ud83c\\udf0d\"").unwrap();
     assert_eq!(pair.string_units(), Some(&[0xd83cu16, 0xdf0d][..]));
-    assert_eq!(pair.string_value().unwrap(), "🌍");
+    assert_eq!(pair.string_value().unwrap(), "🌍".as_bytes());
 }
 
 // Requirements: RQ-015
@@ -223,7 +223,7 @@ fn public_api_exports_the_entry_points() {
         kinds,
         [Kind::String, Kind::Number, Kind::Boolean, Kind::Null]
     );
-    assert_eq!(items[0].string_value().unwrap(), "x");
+    assert_eq!(items[0].string_value().unwrap(), b"x");
     assert_eq!(items[1].number_literal(), Some("1"));
     assert_eq!(items[2].boolean_value(), Some(true));
     assert_eq!(parse_bytes(b"[]").unwrap().compact(), "[]");
@@ -272,17 +272,13 @@ fn returned_collections_are_immutable() {
 // Requirements: RQ-009
 #[test]
 fn string_value_keeps_an_unpaired_surrogate() {
-    // A Rust String holds no unpaired surrogate, so the string value is refused and points to the code units, which keep it;
-    // it is never replaced by U+FFFD.
+    // The string value is the library form: UTF-8 with an unpaired surrogate as WTF-8, never replaced by U+FFFD.
     let lone = parse("\"a\\ud800\"").unwrap();
-    assert_eq!(
-        lone.string_value().unwrap_err().message,
-        "unpaired surrogate; use string_units"
-    );
+    assert_eq!(lone.string_value().unwrap(), b"a\xed\xa0\x80");
     assert_eq!(lone.string_units(), Some(&[0x61u16, 0xd800][..]));
     assert_eq!(
         parse("\"\\ud83c\\udf0d\"").unwrap().string_value().unwrap(),
-        "\u{1f30d}"
+        "\u{1f30d}".as_bytes()
     );
 }
 
