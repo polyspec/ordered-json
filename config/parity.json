@@ -92,132 +92,6 @@
       "command": "packages/python/.venv/bin/python"
     }
   ],
-  "profiles": [
-    {
-      "name": "contract",
-      "implementations": [
-        "js",
-        "rust",
-        "go",
-        "php",
-        "php-extension",
-        "python"
-      ]
-    },
-    {
-      "name": "no-rust",
-      "implementations": [
-        "js",
-        "go",
-        "php",
-        "php-extension",
-        "python"
-      ],
-      "reason": "Rust values have no public constructor and no invalid state, Rust returns members and items as shared references, and Rust has no host JSON encoder in its standard library, so the three cases of those properties have no Rust form",
-      "spec": [
-        "docs/spec/api.md#values",
-        "docs/spec/api.md#objects"
-      ]
-    },
-    {
-      "name": "no-php",
-      "implementations": [
-        "js",
-        "rust",
-        "go",
-        "python"
-      ],
-      "reason": "PHP has no form of these cases: its strings are byte strings, so the PHP API and the extension take one string input and no separate UTF-8 byte input, and its arrays key their members by string or by integer, the decimal string of a numeric key, so no object key can be other than a string",
-      "spec": [
-        "docs/spec/api.md#values",
-        "docs/spec/api.md#objects",
-        "docs/spec/json-contract.md#strings"
-      ]
-    },
-    {
-      "name": "duplicates",
-      "implementations": [
-        "js",
-        "rust",
-        "php",
-        "php-extension",
-        "python"
-      ],
-      "reason": "the duplicate-key rejection is a binding extension of JavaScript, Rust, PHP and Python; Go has none",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "name": "go",
-      "implementations": [
-        "go"
-      ],
-      "reason": "Marshal and ParseBytesBorrowed are binding extensions of Go",
-      "spec": [
-        "docs/spec/api.md#bindings",
-        "docs/spec/api.md#objects"
-      ]
-    },
-    {
-      "name": "rust",
-      "implementations": [
-        "rust"
-      ],
-      "reason": "the serde module is a binding extension of Rust",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "name": "php-extension",
-      "implementations": [
-        "php-extension"
-      ],
-      "reason": "the extension is the native backend of the PHP package: its scanner, hydration and compact functions and their descriptors exist only there",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "name": "api",
-      "implementations": [
-        "js",
-        "rust",
-        "go",
-        "php",
-        "python"
-      ],
-      "reason": "the PHP extension is the native backend of the PHP package: its public API is its scanner, hydration and compact functions, and the Value API of PHP comes from the PHP package",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "name": "typed",
-      "implementations": [
-        "rust",
-        "go"
-      ],
-      "reason": "Rust and Go return members as a typed ordered map, name the kinds with an enumeration and carry the message of a parse error as a field; JavaScript, PHP and Python return host mappings, name the kinds with strings and keep the message in the host exception",
-      "spec": [
-        "docs/spec/api.md#objects",
-        "docs/spec/api.md#values"
-      ]
-    },
-    {
-      "name": "utf16-text",
-      "implementations": [
-        "js",
-        "python"
-      ],
-      "reason": "JavaScript and Python strings can hold an unpaired surrogate: text input can contain one, which the parser rejects, and string access returns one; Rust and Go strings are UTF-8 and PHP strings are bytes, which hold none",
-      "spec": [
-        "docs/spec/json-contract.md#parsing",
-        "docs/spec/json-contract.md#strings"
-      ]
-    }
-  ],
   "suites": [
     "examples/official.json"
   ],
@@ -231,7 +105,6 @@
     {
       "id": "official",
       "kind": "suite",
-      "profile": "contract",
       "requirements": [
         "RQ-022"
       ],
@@ -271,7 +144,6 @@
     {
       "id": "depth_argument_is_bounded",
       "kind": "feature",
-      "profile": "contract",
       "requirements": [
         "RQ-006"
       ],
@@ -311,7 +183,6 @@
     {
       "id": "depth_limit_is_enforced",
       "kind": "feature",
-      "profile": "contract",
       "requirements": [
         "RQ-006"
       ],
@@ -351,7 +222,6 @@
     {
       "id": "parse_errors_report_offsets",
       "kind": "feature",
-      "profile": "contract",
       "requirements": [
         "RQ-004"
       ],
@@ -391,7 +261,6 @@
     {
       "id": "rejection_names_its_kind",
       "kind": "feature",
-      "profile": "contract",
       "requirements": [
         "RQ-005"
       ],
@@ -431,7 +300,6 @@
     {
       "id": "wrong_kind_access_is_reported",
       "kind": "feature",
-      "profile": "contract",
       "requirements": [
         "RQ-014"
       ],
@@ -471,7 +339,6 @@
     {
       "id": "member_lookup_uses_decoded_names",
       "kind": "feature",
-      "profile": "contract",
       "requirements": [
         "RQ-002",
         "RQ-019"
@@ -512,7 +379,6 @@
     {
       "id": "repeated_key_keeps_first_position_and_last_value",
       "kind": "feature",
-      "profile": "contract",
       "requirements": [
         "RQ-001"
       ],
@@ -552,7 +418,6 @@
     {
       "id": "root_keeps_surrounding_text",
       "kind": "feature",
-      "profile": "contract",
       "requirements": [
         "RQ-018"
       ],
@@ -592,7 +457,6 @@
     {
       "id": "unpaired_surrogate_stays_in_units",
       "kind": "feature",
-      "profile": "contract",
       "requirements": [
         "RQ-009"
       ],
@@ -632,7 +496,6 @@
     {
       "id": "surrogate_pair_decodes",
       "kind": "feature",
-      "profile": "contract",
       "requirements": [
         "RQ-009"
       ],
@@ -672,7 +535,6 @@
     {
       "id": "factories_validate_arguments",
       "kind": "feature",
-      "profile": "contract",
       "requirements": [
         "RQ-015"
       ],
@@ -712,7 +574,6 @@
     {
       "id": "values_come_only_from_the_library",
       "kind": "feature",
-      "profile": "no-rust",
       "requirements": [
         "RQ-012"
       ],
@@ -747,7 +608,6 @@
     {
       "id": "returned_collections_are_immutable",
       "kind": "feature",
-      "profile": "no-rust",
       "requirements": [
         "RQ-013"
       ],
@@ -782,7 +642,6 @@
     {
       "id": "host_serialization_boundary",
       "kind": "feature",
-      "profile": "no-rust",
       "requirements": [
         "RQ-020"
       ],
@@ -817,7 +676,6 @@
     {
       "id": "bytes_input_is_validated",
       "kind": "feature",
-      "profile": "no-php",
       "requirements": [
         "RQ-007"
       ],
@@ -847,7 +705,6 @@
     {
       "id": "invalid_utf8_reports_the_first_bad_byte",
       "kind": "feature",
-      "profile": "contract",
       "requirements": [
         "RQ-004",
         "RQ-007"
@@ -888,7 +745,6 @@
     {
       "id": "ordered_map_rejects_non_string_key",
       "kind": "feature",
-      "profile": "no-php",
       "requirements": [
         "RQ-016"
       ],
@@ -918,7 +774,6 @@
     {
       "id": "strict_parse_rejects_duplicate_keys",
       "kind": "feature",
-      "profile": "duplicates",
       "requirements": [
         "RQ-017"
       ],
@@ -953,7 +808,6 @@
     {
       "id": "strict_parse_accepts_unique_keys",
       "kind": "feature",
-      "profile": "duplicates",
       "requirements": [
         "RQ-017"
       ],
@@ -988,7 +842,6 @@
     {
       "id": "serde_wire_bytes_and_round_trip",
       "kind": "feature",
-      "profile": "rust",
       "requirements": [
         "RQ-011",
         "RQ-010"
@@ -1004,7 +857,6 @@
     {
       "id": "serde_manifest_bytes_and_round_trip",
       "kind": "feature",
-      "profile": "rust",
       "requirements": [
         "RQ-011"
       ],
@@ -1019,7 +871,6 @@
     {
       "id": "serde_rejects_invalid_and_unconsumed_input",
       "kind": "feature",
-      "profile": "rust",
       "requirements": [
         "RQ-004",
         "RQ-005"
@@ -1035,7 +886,6 @@
     {
       "id": "serde_rejects_duplicate_struct_fields",
       "kind": "feature",
-      "profile": "rust",
       "requirements": [
         "RQ-017"
       ],
@@ -1050,7 +900,6 @@
     {
       "id": "serde_embedded_values_preserve_order_and_number_tokens",
       "kind": "feature",
-      "profile": "rust",
       "requirements": [
         "RQ-001",
         "RQ-010"
@@ -1066,7 +915,6 @@
     {
       "id": "serde_value_respects_container_depth",
       "kind": "feature",
-      "profile": "rust",
       "requirements": [
         "RQ-006"
       ],
@@ -1081,7 +929,6 @@
     {
       "id": "serde_value_preserves_unpaired_surrogate_token",
       "kind": "feature",
-      "profile": "rust",
       "requirements": [
         "RQ-009"
       ],
@@ -1096,7 +943,6 @@
     {
       "id": "marshal_preserves_typed_json_contract",
       "kind": "feature",
-      "profile": "go",
       "requirements": [
         "RQ-011",
         "RQ-020"
@@ -1112,7 +958,6 @@
     {
       "id": "marshal_keeps_empty_object_and_array_distinct",
       "kind": "feature",
-      "profile": "go",
       "requirements": [
         "RQ-003"
       ],
@@ -1127,7 +972,6 @@
     {
       "id": "marshal_validates_custom_marshaler_through_ordered_parser",
       "kind": "feature",
-      "profile": "go",
       "requirements": [
         "RQ-020",
         "RQ-015"
@@ -1143,7 +987,6 @@
     {
       "id": "marshal_rejects_unsupported_map_key",
       "kind": "feature",
-      "profile": "go",
       "requirements": [
         "RQ-016"
       ],
@@ -1158,7 +1001,6 @@
     {
       "id": "marshal_writes_null_for_nil_value_pointer",
       "kind": "feature",
-      "profile": "go",
       "requirements": [
         "RQ-020"
       ],
@@ -1173,7 +1015,6 @@
     {
       "id": "marshal_time_and_bytes_match_typed_values",
       "kind": "feature",
-      "profile": "go",
       "requirements": [
         "RQ-020"
       ],
@@ -1188,7 +1029,6 @@
     {
       "id": "marshal_promotes_embedded_fields",
       "kind": "feature",
-      "profile": "go",
       "requirements": [
         "RQ-020"
       ],
@@ -1203,7 +1043,6 @@
     {
       "id": "marshal_rejects_repeated_field_names",
       "kind": "feature",
-      "profile": "go",
       "requirements": [
         "RQ-017"
       ],
@@ -1218,7 +1057,6 @@
     {
       "id": "marshal_rejects_cyclic_values",
       "kind": "feature",
-      "profile": "go",
       "requirements": [
         "RQ-006",
         "RQ-020"
@@ -1234,7 +1072,6 @@
     {
       "id": "marshal_rejects_values_deeper_than_the_parser",
       "kind": "feature",
-      "profile": "go",
       "requirements": [
         "RQ-006"
       ],
@@ -1249,7 +1086,6 @@
     {
       "id": "marshal_matches_host_encoder_structures",
       "kind": "feature",
-      "profile": "go",
       "requirements": [
         "RQ-020"
       ],
@@ -1264,7 +1100,6 @@
     {
       "id": "marshal_omit_rules_follow_the_host_encoder",
       "kind": "feature",
-      "profile": "go",
       "requirements": [
         "RQ-020"
       ],
@@ -1279,7 +1114,6 @@
     {
       "id": "marshal_reports_non_finite_numbers",
       "kind": "feature",
-      "profile": "go",
       "requirements": [
         "RQ-010"
       ],
@@ -1294,7 +1128,6 @@
     {
       "id": "borrowed_input_is_copied_on_access",
       "kind": "feature",
-      "profile": "go",
       "requirements": [
         "RQ-018"
       ],
@@ -1309,7 +1142,6 @@
     {
       "id": "utf8_validation_holds_for_long_multibyte_text",
       "kind": "feature",
-      "profile": "contract",
       "requirements": [
         "RQ-007"
       ],
@@ -1349,7 +1181,6 @@
     {
       "id": "hydrate_without_the_value_class",
       "kind": "feature",
-      "profile": "php-extension",
       "requirements": [
         "RQ-021"
       ],
@@ -1364,7 +1195,6 @@
     {
       "id": "hydrate_object_members",
       "kind": "feature",
-      "profile": "php-extension",
       "requirements": [
         "RQ-021",
         "RQ-001"
@@ -1380,7 +1210,6 @@
     {
       "id": "hydrate_array_items",
       "kind": "feature",
-      "profile": "php-extension",
       "requirements": [
         "RQ-021",
         "RQ-003"
@@ -1396,7 +1225,6 @@
     {
       "id": "hydrate_rejects_malformed_descriptors",
       "kind": "feature",
-      "profile": "php-extension",
       "requirements": [
         "RQ-021",
         "RQ-015"
@@ -1412,7 +1240,6 @@
     {
       "id": "compact_node_rejects_mismatched_descriptors",
       "kind": "feature",
-      "profile": "php-extension",
       "requirements": [
         "RQ-021"
       ],
@@ -1427,7 +1254,6 @@
     {
       "id": "compact_node_copies_a_compact_token",
       "kind": "feature",
-      "profile": "php-extension",
       "requirements": [
         "RQ-021",
         "RQ-011"
@@ -1443,7 +1269,6 @@
     {
       "id": "scan_rejects_depth_outside_the_range",
       "kind": "feature",
-      "profile": "php-extension",
       "requirements": [
         "RQ-006"
       ],
@@ -1458,7 +1283,6 @@
     {
       "id": "scan_reports_the_parse_error_offset",
       "kind": "feature",
-      "profile": "php-extension",
       "requirements": [
         "RQ-004"
       ],
@@ -1473,7 +1297,6 @@
     {
       "id": "escaped_member_name_decodes",
       "kind": "feature",
-      "profile": "php-extension",
       "requirements": [
         "RQ-002"
       ],
@@ -1488,7 +1311,6 @@
     {
       "id": "unpaired_surrogate_member_name_keeps_wtf8_identity",
       "kind": "feature",
-      "profile": "php-extension",
       "requirements": [
         "RQ-009"
       ],
@@ -1503,7 +1325,6 @@
     {
       "id": "text_input_rejects_lone_surrogates",
       "kind": "feature",
-      "profile": "utf16-text",
       "requirements": [
         "RQ-008"
       ],
@@ -1523,7 +1344,6 @@
     {
       "id": "api-parse",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-023"
       ],
@@ -1553,7 +1373,6 @@
     {
       "id": "api-parse-bytes",
       "kind": "api",
-      "profile": "no-php",
       "requirements": [
         "RQ-007",
         "RQ-023"
@@ -1580,7 +1399,6 @@
     {
       "id": "api-max-depth",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-006"
       ],
@@ -1610,7 +1428,6 @@
     {
       "id": "api-depth-limit",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-006"
       ],
@@ -1640,7 +1457,6 @@
     {
       "id": "api-stringify",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-011",
         "RQ-023"
@@ -1671,7 +1487,6 @@
     {
       "id": "api-value",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-023"
       ],
@@ -1701,7 +1516,6 @@
     {
       "id": "api-parse-error",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-024"
       ],
@@ -1731,7 +1545,6 @@
     {
       "id": "api-parse-error-kind",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-005",
         "RQ-024"
@@ -1762,7 +1575,6 @@
     {
       "id": "api-parse-error-offset",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-004",
         "RQ-024"
@@ -1793,7 +1605,6 @@
     {
       "id": "api-value-compact",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-011"
       ],
@@ -1823,7 +1634,6 @@
     {
       "id": "api-value-raw",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-018"
       ],
@@ -1853,7 +1663,6 @@
     {
       "id": "api-value-kind",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-014"
       ],
@@ -1883,7 +1692,6 @@
     {
       "id": "api-value-members",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-013",
         "RQ-002"
@@ -1914,7 +1722,6 @@
     {
       "id": "api-value-get",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-019"
       ],
@@ -1944,7 +1751,6 @@
     {
       "id": "api-value-get-units",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-019",
         "RQ-009"
@@ -1975,7 +1781,6 @@
     {
       "id": "api-value-items",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-013",
         "RQ-003"
@@ -2006,7 +1811,6 @@
     {
       "id": "api-value-string-value",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-009"
       ],
@@ -2036,7 +1840,6 @@
     {
       "id": "api-value-string-units",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-009"
       ],
@@ -2066,7 +1869,6 @@
     {
       "id": "api-value-number-literal",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-010"
       ],
@@ -2096,7 +1898,6 @@
     {
       "id": "api-value-boolean-value",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-014"
       ],
@@ -2126,7 +1927,6 @@
     {
       "id": "api-factory-object",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-015",
         "RQ-003"
@@ -2157,7 +1957,6 @@
     {
       "id": "api-factory-array",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-015",
         "RQ-003"
@@ -2188,7 +1987,6 @@
     {
       "id": "api-factory-string",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-015"
       ],
@@ -2218,7 +2016,6 @@
     {
       "id": "api-factory-number",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-010",
         "RQ-015"
@@ -2249,7 +2046,6 @@
     {
       "id": "api-factory-boolean",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-015"
       ],
@@ -2279,7 +2075,6 @@
     {
       "id": "api-factory-null",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-015"
       ],
@@ -2309,7 +2104,6 @@
     {
       "id": "api-factory-from-units",
       "kind": "api",
-      "profile": "api",
       "requirements": [
         "RQ-009",
         "RQ-015"
@@ -2340,7 +2134,6 @@
     {
       "id": "api-ordered-map",
       "kind": "api",
-      "profile": "typed",
       "requirements": [
         "RQ-016"
       ],
@@ -2358,7 +2151,6 @@
     {
       "id": "api-ordered-map-get",
       "kind": "api",
-      "profile": "typed",
       "requirements": [
         "RQ-016",
         "RQ-019"
@@ -2377,7 +2169,6 @@
     {
       "id": "api-ordered-map-get-units",
       "kind": "api",
-      "profile": "typed",
       "requirements": [
         "RQ-016",
         "RQ-009"
@@ -2396,7 +2187,6 @@
     {
       "id": "api-ordered-map-insert",
       "kind": "api",
-      "profile": "typed",
       "requirements": [
         "RQ-016",
         "RQ-001"
@@ -2415,7 +2205,6 @@
     {
       "id": "api-ordered-map-len",
       "kind": "api",
-      "profile": "typed",
       "requirements": [
         "RQ-016"
       ],
@@ -2433,7 +2222,6 @@
     {
       "id": "api-ordered-map-keys",
       "kind": "api",
-      "profile": "typed",
       "requirements": [
         "RQ-016",
         "RQ-001"
@@ -2452,7 +2240,6 @@
     {
       "id": "api-kind-type",
       "kind": "api",
-      "profile": "typed",
       "requirements": [
         "RQ-014"
       ],
@@ -2470,7 +2257,6 @@
     {
       "id": "api-kind-object",
       "kind": "api",
-      "profile": "typed",
       "requirements": [
         "RQ-014"
       ],
@@ -2488,7 +2274,6 @@
     {
       "id": "api-kind-array",
       "kind": "api",
-      "profile": "typed",
       "requirements": [
         "RQ-014"
       ],
@@ -2506,7 +2291,6 @@
     {
       "id": "api-kind-string",
       "kind": "api",
-      "profile": "typed",
       "requirements": [
         "RQ-014"
       ],
@@ -2524,7 +2308,6 @@
     {
       "id": "api-kind-number",
       "kind": "api",
-      "profile": "typed",
       "requirements": [
         "RQ-014"
       ],
@@ -2542,7 +2325,6 @@
     {
       "id": "api-kind-boolean",
       "kind": "api",
-      "profile": "typed",
       "requirements": [
         "RQ-014"
       ],
@@ -2560,7 +2342,6 @@
     {
       "id": "api-kind-null",
       "kind": "api",
-      "profile": "typed",
       "requirements": [
         "RQ-014"
       ],
@@ -2578,7 +2359,6 @@
     {
       "id": "api-parse-error-message",
       "kind": "api",
-      "profile": "typed",
       "requirements": [
         "RQ-024"
       ],
@@ -2596,7 +2376,6 @@
     {
       "id": "string_value_keeps_an_unpaired_surrogate",
       "kind": "feature",
-      "profile": "utf16-text",
       "requirements": [
         "RQ-009"
       ],
@@ -2614,467 +2393,6 @@
       ]
     }
   ],
-  "nativeOnly": [
-    {
-      "implementation": "rust",
-      "symbol": "polyspec_ordered_json::serde",
-      "reason": "the serde module is a binding extension of Rust",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "rust",
-      "symbol": "polyspec_ordered_json::serde::Error",
-      "reason": "the serde module is a binding extension of Rust",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "rust",
-      "symbol": "polyspec_ordered_json::serde::Error::Encode",
-      "reason": "the serde module is a binding extension of Rust",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "rust",
-      "symbol": "polyspec_ordered_json::serde::Error::Json",
-      "reason": "the serde module is a binding extension of Rust",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "rust",
-      "symbol": "polyspec_ordered_json::serde::Error::Typed",
-      "reason": "the serde module is a binding extension of Rust",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "rust",
-      "symbol": "polyspec_ordered_json::serde::from_slice",
-      "reason": "the serde module is a binding extension of Rust",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "rust",
-      "symbol": "polyspec_ordered_json::serde::from_str",
-      "reason": "the serde module is a binding extension of Rust",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "rust",
-      "symbol": "polyspec_ordered_json::serde::to_string",
-      "reason": "the serde module is a binding extension of Rust",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "rust",
-      "symbol": "polyspec_ordered_json::parse_bytes_reject_duplicates",
-      "reason": "the duplicate-key rejection of Rust is a function of its own, a binding extension",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "rust",
-      "symbol": "polyspec_ordered_json::OrderedMap::new",
-      "reason": "a Rust map is built empty by its constructor, then filled with insert",
-      "spec": [
-        "docs/spec/api.md#objects"
-      ]
-    },
-    {
-      "implementation": "rust",
-      "symbol": "polyspec_ordered_json::OrderedMap::is_empty",
-      "reason": "the Rust collection convention pairs len with is_empty",
-      "spec": [
-        "docs/spec/api.md#objects"
-      ]
-    },
-    {
-      "implementation": "go",
-      "symbol": "github.com/polyspec/ordered-json/packages/go.Marshal",
-      "reason": "Marshal and its Marshaler boundary are a binding extension of Go",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "go",
-      "symbol": "github.com/polyspec/ordered-json/packages/go.Marshaler",
-      "reason": "Marshal and its Marshaler boundary are a binding extension of Go",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "go",
-      "symbol": "github.com/polyspec/ordered-json/packages/go.Marshaler.MarshalJSON",
-      "reason": "Marshal and its Marshaler boundary are a binding extension of Go",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "go",
-      "symbol": "github.com/polyspec/ordered-json/packages/go.ParseBytesBorrowed",
-      "reason": "ParseBytesBorrowed is the explicit zero-copy byte input of Go",
-      "spec": [
-        "docs/spec/api.md#objects"
-      ]
-    },
-    {
-      "implementation": "go",
-      "symbol": "github.com/polyspec/ordered-json/packages/go.ParseError.Error",
-      "reason": "a Go error implements the error interface with Error()",
-      "spec": [
-        "docs/spec/api.md#values"
-      ]
-    },
-    {
-      "implementation": "go",
-      "symbol": "github.com/polyspec/ordered-json/packages/go.Value.MarshalJSON",
-      "reason": "a Go Value meets the host JSON encoder at the MarshalJSON boundary, which writes the ordered compact text, so the host encoder does not reorder it",
-      "spec": [
-        "docs/spec/api.md#values",
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "go",
-      "symbol": "github.com/polyspec/ordered-json/packages/go.Value.String",
-      "reason": "a Go Value prints its compact text through the fmt.Stringer interface",
-      "spec": [
-        "docs/spec/api.md#values"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Value::parse",
-      "reason": "the PHP Value class parses text with the depth limit of the parse operation, as the PHP backends describe",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Value::parseRejectDuplicates",
-      "reason": "the duplicate-key rejection of PHP is a method of its own, a binding extension",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\ParseError::__construct",
-      "reason": "a PHP exception is created by the constructor of its class",
-      "spec": [
-        "docs/spec/api.md#values"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Value::__toString",
-      "reason": "a PHP Value converts to its compact text as a string",
-      "spec": [
-        "docs/spec/api.md#values"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Value::jsonSerialize",
-      "reason": "a PHP Value meets the host json_encode at the JsonSerializable boundary, which the PHP backends describe",
-      "spec": [
-        "docs/spec/api.md#values"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Parser",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Parser::__construct",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Parser::parse",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Tape",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Tape::ARRAY",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Tape::BOOLEAN",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Tape::COMPACT",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Tape::ESCAPED",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Tape::KIND",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Tape::KINDS",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Tape::LINK",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Tape::NULL",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Tape::NUMBER",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Tape::OBJECT",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Tape::SKIP",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\Tape::STRING",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\invalidUtf8Offset",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\keyText",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\quoteKey",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\quoteUnits",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\textUnits",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\tokenText",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\tokenUnits",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\unitsToUtf8",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php",
-      "symbol": "Polyspec\\OrderedJson\\utf8Units",
-      "reason": "a part of the pure PHP backend that the Value API and the extension share; PHP has no declaration private to a file",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php-extension",
-      "symbol": "ordered_json_scan",
-      "reason": "the extension is the native backend of the PHP package; its scanner, hydration and compact functions exist only there",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php-extension",
-      "symbol": "ordered_json_hydrate",
-      "reason": "the extension is the native backend of the PHP package; its scanner, hydration and compact functions exist only there",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "php-extension",
-      "symbol": "ordered_json_compact_node",
-      "reason": "the extension is the native backend of the PHP package; its scanner, hydration and compact functions exist only there",
-      "spec": [
-        "docs/spec/api.md#php"
-      ]
-    },
-    {
-      "implementation": "js",
-      "symbol": "@polyspec/ordered-json!Kind:type",
-      "reason": "the kinds of JavaScript are the strings of a TypeScript union type; Rust and Go name them with an enumeration",
-      "spec": [
-        "docs/spec/api.md#values"
-      ]
-    },
-    {
-      "implementation": "js",
-      "symbol": "@polyspec/ordered-json!ParseOptions:interface",
-      "reason": "the options of parse and parseBytes of JavaScript are a TypeScript interface, whose maxDepth is the depth limit and rejectDuplicates the duplicate-key rejection",
-      "spec": [
-        "docs/spec/api.md#values",
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "js",
-      "symbol": "@polyspec/ordered-json!ParseOptions#rejectDuplicates:member",
-      "reason": "the duplicate-key rejection of JavaScript is an option of its own, a binding extension",
-      "spec": [
-        "docs/spec/api.md#bindings"
-      ]
-    },
-    {
-      "implementation": "js",
-      "symbol": "@polyspec/ordered-json!Value#keys:member",
-      "reason": "a JavaScript object value returns its first parsed key tokens in order",
-      "spec": [
-        "docs/spec/api.md#objects"
-      ]
-    },
-    {
-      "implementation": "js",
-      "symbol": "@polyspec/ordered-json!Value#toJSON:member(1)",
-      "reason": "a JavaScript Value meets the host JSON.stringify at toJSON, which refuses it for stringify",
-      "spec": [
-        "docs/spec/api.md#values"
-      ]
-    },
-    {
-      "implementation": "js",
-      "symbol": "@polyspec/ordered-json!Value#toString:member(1)",
-      "reason": "a JavaScript Value converts to its compact text as a string",
-      "spec": [
-        "docs/spec/api.md#values"
-      ]
-    }
-  ],
-  "exclusions": [],
   "tools": [
     {
       "root": "tests/scripts",
