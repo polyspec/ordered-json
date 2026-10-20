@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- `CHECK_TARGETS` and the first job of `ci.yml` run `link-state-check` (T2.32), the gate of kit K305 that fails while an installed 0.0.x polyspec package is a copy among links. Red: `make kit-check` exit 2, `CHECK_TARGETS runs no link-state-check`; green: exit 0, the workflow-rules test passed.
 - The PRINCIPLES copies equal those of the installed kit after K304 to K307 (T2.31), written by `make kit-sync`. Red: `make kit-check` exit 2, 2 findings; green: exit 0.
 - The extension is tested by the PHPUnit files of `packages/php` run with it loaded (T2.19): `packages/php-ext` keeps no copy of them, no `phpunit.xml`, no `autoload-dev` and no relative path into `packages/php` (they went with T2.15-3), and `config/parity.json` binds the php-extension implementation to `packages/php/tests`. Red: the extension had its own subclasses `OfficialTest` and `ValueApiTest` and `../php/` paths in its `composer.json`, and `make test-php-ext` could not build; green: `make test-php-ext CASES=Test` 40 tests 185 assertions passed.
 - The PHP extension registers the classes and functions of the PHP library under the same names and signatures (T2.15): the spec, the private internals of the library and the C implementation are the sub-items T2.15-1 to T2.15-3. `make lint-php-ext` exit 0 and the Reflection comparison of `make test-php-ext` passed.

@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: e2d5122345bac5502e65557601784db8268fd1fc97bed318c517bc9326078b29 -->
+<!-- source-sha256: 18d07c66b1110d45e2681adb7ef769c92613a7a8b3451b2c29296877719cf689 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- `CHECK_TARGETS`와 `ci.yml`의 첫 job이 `link-state-check`를 실행합니다 (T2.32). 설치된 0.0.x polyspec package가 link 사이의 사본이면 실패하는 kit K305의 gate입니다. Red: `make kit-check` exit 2, `CHECK_TARGETS runs no link-state-check`; green: exit 0, workflow-rules test passed.
 - PRINCIPLES 사본은 K304부터 K307 뒤 `make kit-sync`가 쓴 설치된 kit의 것과 같습니다 (T2.31). Red: `make kit-check` exit 2, 2건; green: exit 0.
 - 확장은 확장을 올리고 실행한 `packages/php`의 PHPUnit 파일로 test합니다 (T2.19): `packages/php-ext`에는 그 사본, `phpunit.xml`, `autoload-dev`, `packages/php`로 향하는 상대 경로가 없으며(T2.15-3에서 없앰), `config/parity.json`은 php-extension 구현을 `packages/php/tests`에 binding합니다. Red: 확장이 자체 하위 class `OfficialTest`와 `ValueApiTest`, `composer.json`의 `../php/` 경로를 가졌고 `make test-php-ext`를 빌드할 수 없었음; green: `make test-php-ext CASES=Test` test 40개 assertion 185개 passed.
 - PHP 확장은 PHP 라이브러리의 class와 함수를 같은 이름과 signature로 등록합니다 (T2.15): 명세, 라이브러리의 비공개 내부, C 구현은 하위 항목 T2.15-1부터 T2.15-3입니다. `make lint-php-ext` exit 0이며 `make test-php-ext`의 Reflection 비교를 통과했습니다.

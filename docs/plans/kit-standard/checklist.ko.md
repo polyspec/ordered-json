@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: f7fab130b0ad0334a969b9e82d2f2bb44b851c7eff981fb0c6472ca060c5a756 -->
+<!-- source-sha256: b59c962e0015c7e3cd42779aa7746b0248e41f7b5204c4536be5fc937e97e9c1 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -42,3 +42,4 @@
 | T2.29 | kit 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.30 | AGENTS.md의 모든 규칙은 Own: 또는 Refines <id>:로 시작하며, 원칙을 되풀이하는 규칙은 없습니다 (kit K300) | `AGENTS.md`(.ko), `CHANGELOG.md`(.ko) | `make rules-check` | [o] |
 | T2.31 | kit 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
+| T2.32 | CHECK_TARGETS와 CI job은 link-state-check를 실행합니다 | `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |

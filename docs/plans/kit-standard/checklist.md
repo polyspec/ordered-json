@@ -41,3 +41,4 @@
 | T2.29 | The kit copies equal those of the installed kit | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.30 | Every rule of AGENTS.md begins with Own: or Refines <id>:, and none restates a principle | `AGENTS.md`(.ko), `CHANGELOG.md`(.ko) | `make rules-check` | [o] |
 | T2.31 | The kit copies equal those of the installed kit | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
+| T2.32 | CHECK_TARGETS and the CI jobs run link-state-check | `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
