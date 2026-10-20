@@ -145,6 +145,7 @@
         "PRINCIPLES.md",
         "PRINCIPLES.ko.md",
         "ruff.toml",
+        "clippy.toml",
         "phpcs.xml.dist",
         "phpstan.dist.neon",
         ".golangci.yml",
