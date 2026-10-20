@@ -6,6 +6,22 @@ namespace Polyspec\OrderedJson;
 
 const MAX_DEPTH = 256;
 
+/** @internal The UTF-8 bytes of a code point; a lone surrogate gives its three WTF-8 bytes. */
+function codePointToUtf8(int $point): string
+{
+    if ($point < 0x80) {
+        return chr($point);
+    }
+    if ($point < 0x800) {
+        return chr(0xc0 | ($point >> 6)) . chr(0x80 | ($point & 63));
+    }
+    if ($point < 0x10000) {
+        return chr(0xe0 | ($point >> 12)) . chr(0x80 | (($point >> 6) & 63)) . chr(0x80 | ($point & 63));
+    }
+    return chr(0xf0 | ($point >> 18)) . chr(0x80 | (($point >> 12) & 63))
+        . chr(0x80 | (($point >> 6) & 63)) . chr(0x80 | ($point & 63));
+}
+
 /** @internal Convert UTF-16 units to UTF-8, optionally retaining lone surrogates as WTF-8. */
 function unitsToUtf8(array $units, bool $allowUnpaired = true): string
 {
@@ -24,16 +40,7 @@ function unitsToUtf8(array $units, bool $allowUnpaired = true): string
         } elseif ($point >= 0xdc00 && $point <= 0xdfff && !$allowUnpaired) {
             throw new \UnexpectedValueException('Unpaired surrogate; use stringUnits()');
         }
-        if ($point < 0x80) {
-            $out .= chr($point);
-        } elseif ($point < 0x800) {
-            $out .= chr(0xc0 | ($point >> 6)) . chr(0x80 | ($point & 63));
-        } elseif ($point < 0x10000) {
-            $out .= chr(0xe0 | ($point >> 12)) . chr(0x80 | (($point >> 6) & 63)) . chr(0x80 | ($point & 63));
-        } else {
-            $out .= chr(0xf0 | ($point >> 18)) . chr(0x80 | (($point >> 12) & 63))
-                . chr(0x80 | (($point >> 6) & 63)) . chr(0x80 | ($point & 63));
-        }
+        $out .= codePointToUtf8($point);
     }
     return $out;
 }
@@ -208,16 +215,7 @@ function tokenText(string $content, bool $allowUnpaired): string
             if ($point >= 0xd800 && $point <= 0xdfff && !$allowUnpaired) {
                 throw new \UnexpectedValueException('Unpaired surrogate; use stringUnits()');
             }
-            if ($point < 0x80) {
-                $out .= chr($point);
-            } elseif ($point < 0x800) {
-                $out .= chr(0xc0 | $point >> 6) . chr(0x80 | $point & 63);
-            } elseif ($point < 0x10000) {
-                $out .= chr(0xe0 | $point >> 12) . chr(0x80 | $point >> 6 & 63) . chr(0x80 | $point & 63);
-            } else {
-                $out .= chr(0xf0 | $point >> 18) . chr(0x80 | $point >> 12 & 63)
-                    . chr(0x80 | $point >> 6 & 63) . chr(0x80 | $point & 63);
-            }
+            $out .= codePointToUtf8($point);
         }
         $slash = strpos($content, '\\', $offset);
     } while ($slash !== false);
