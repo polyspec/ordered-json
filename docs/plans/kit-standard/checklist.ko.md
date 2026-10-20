@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 7938555226fe8d3da939807d7f8ae0652848bee45c17cfebfec5705bcfb58882 -->
+<!-- source-sha256: 6cc0bef64c3d7e881703b13d96e725550ee5b1bd9f3638d67e34921ad6a15853 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -23,7 +23,7 @@
 | T2.13 | config/dependency-policy.json의 Composer platform은 manifest와 lock의 값인 PHP 8.4.1입니다 (PHPUnit 13, kit K259) | `config/dependency-policy.json`, `CHANGELOG.md`(.ko) | `make dependency-policy-check` | [o] |
 | T2.14 | config/duplication.json은 kit이 자신의 test를 제외하듯 패키지의 test를 제외합니다: test는 case를 온전히 적습니다 | `config/duplication.json`, `config/owner-checks.json`, `CHANGELOG.md`(.ko) | `make duplication-check` | [o] |
 | T2.16 | 각 패키지는 version의 원천이 하나입니다: 확장은 ordered_json.c의 상수 0.0.1이 아니라 composer.json의 version을 보고하며, 설치 문서는 두 번째 version을 적지 않습니다 | `packages/php-ext/src/ordered_json.c`, `scripts/registry.mts`, `docs/operations/installation.md`(.ko) | `make release-versions` | [o] |
-| T2.15 | PHP 확장은 내부 scan, hydrate, compact_node 함수가 아니라 PHP 라이브러리의 class와 함수를 같은 이름과 signature로 등록합니다 (S10). kit K1이 고쳐진 뒤 측정합니다 | `packages/php-ext/src/`, `packages/php/src/`, `docs/spec/api.md`(.ko) | `make lint-php-ext` | [~] |
+| T2.15 | PHP 확장은 내부 scan, hydrate, compact_node 함수가 아니라 PHP 라이브러리의 class와 함수를 같은 이름과 signature로 등록합니다 (S10). kit K1이 고쳐진 뒤 측정합니다 | `packages/php-ext/src/`, `packages/php/src/`, `docs/spec/api.md`(.ko) | `make lint-php-ext` | [o] |
 | T2.15-1 | 명세는 확장이 PHP 라이브러리 API를 등록한다고 말하며(S10) descriptor에 관한 RQ-021은 없앱니다 | `docs/spec/json-contract.md`(.ko), `docs/spec/api.md`(.ko), `docs/operations/installation.md`(.ko), `CHANGELOG.md`(.ko) | `make docs-check` | [o] |
 | T2.15-2 | PHP 라이브러리는 내부를 공개하지 않습니다: 공개 symbol은 Value, ParseError, parse, stringify, MAX_DEPTH뿐이며 확장이 로드되면 그 어느 것도 선언하지 않습니다 | `packages/php/src/`, `packages/php/composer.json`, `CHANGELOG.md`(.ko) | `make test-php CASES=Value` and `make lint-php` | [o] |
 | T2.15-3 | 확장은 PHP 라이브러리를 C로 구현합니다: Value, ParseError, parse, stringify, MAX_DEPTH를 같은 이름과 signature로 등록하며 descriptor 함수와 그 test는 없앱니다 | `packages/php-ext/src/`, `packages/php-ext/tests/`, `packages/php-ext/composer.json`, `packages/php-ext/phpunit.xml`, `config/parity.json`, `CHANGELOG.md`(.ko) | `make lint-php-ext` and `make test-php-ext CASES=Value` | [o] |
