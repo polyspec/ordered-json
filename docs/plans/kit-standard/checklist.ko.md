@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 1bd0b7102682bb28fbfaaa8481953a4f04d492261623209b718dfaa5fc26b68e -->
+<!-- source-sha256: d5357383c3c43b6e3b15eefdc3f79a8a6f62a82ad56bb7b4b64e760c1f71b6b8 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -14,3 +14,4 @@
 | T2.8 | PHP 확장은 S10을 따릅니다: polyspec/ordered-json-php-ext와 polyspec_ordered_json이라는 이름, 추적되는 arginfo header가 있는 stub 하나, build-php-ext가 var/php-ext에 빌드 | `packages/php-ext/`, `Makefile`, `scripts/registry.mts`, `scripts/check-pie.mts`, `config/parity.json`, `AGENTS.md`(.ko) | `make lint-php-ext` and `node node_modules/@polyspec/kit/dist/run-tests.mjs node -- tests/scripts/registry.test.mts` | [!] 원인: 이름 변경은 끝났고 php-extension의 공유 case로 검증했지만, make lint-php-ext는 아직 arginfo header가 없다고 보고하며, make php-ext-arginfo는 kit에서 실패합니다: php-extension.mts의 arginfo(167-171행)는 복사본에서 phpize 뒤에 make <header>를 실행하는데, ./configure 전에는 Makefile이 없습니다; 재시도: kit이 arginfo의 복사본에서 ./configure를 실행한 뒤; 그 다음 make php-ext-arginfo로 packages/php-ext/src/polyspec_ordered_json_arginfo.h를 쓰고, 직접 쓴 arginfo와 function table 대신 ordered_json.c에 include하며, build-php-ext로 빌드합니다 |
 | T2.9 | Go 패키지는 각 코드 조각을 한 번만 적습니다: slice와 array의 list marshalling, JSON string의 짧은 escape는 각각 하나의 함수입니다 | `packages/go/marshal.go`, `packages/go/orderedjson.go`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-go` | [o] |
 | T2.10 | PHP 패키지는 code point의 UTF-8 인코딩을 하나의 함수로 적습니다 | `packages/php/src/OrderedJson.php`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-php` | [o] |
+| T2.11 | Python parser는 member와 item의 scalar value를 하나의 method로 만듭니다 | `packages/python/src/polyspec/ordered_json/__init__.py`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-python` | [o] |

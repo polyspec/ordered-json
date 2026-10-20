@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 4cc63d314b35f858c32cb0e600fa53bfa2d2d3f428c46ca23abb82ef20366e70 -->
+<!-- source-sha256: f4cc251695ca60ad9f234245bc95ab3da9ed00fdbffd20541e189a8d6e5570f0 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Python parser는 member와 item의 scalar value를 하나의 method로 만듭니다 (T2.11). `_nested_scalar`가 인라인된 두 사본을 대신하고 그것만 쓰던 지역 변수는 사라지며, 동작은 바뀌지 않습니다. Red: `make duplication-check` exit 2, 10건 중 `packages/python/src`에 1건; green: 9건, `packages/python/src`에는 없음; `packages/python/tests`의 unittest 39 tests OK, `scripts/verify.mts --only python` 통과, `make lint-python` 통과; `benchmarks/python-parse/run.py` 비율은 이후 2.57~2.90(한도 3.0), 이전 2.40~2.99.
 - PHP 패키지는 code point의 UTF-8 인코딩을 하나의 함수로 적습니다 (T2.10). `codePointToUtf8`이 `unitsToUtf8`과 `tokenText`를 돕고, 동작은 바뀌지 않습니다. Red: `make duplication-check` exit 2, 11건 중 `packages/php/src`에 1건; green: 10건, `packages/php/src`에는 없음; `packages/php`의 PHPUnit 35 tests OK, `scripts/verify.mts --only php` 통과, `make lint-php` 통과.
 - Go 패키지는 각 코드 조각을 한 번만 적습니다 (T2.9). `marshalList`가 slice와 array의 요소를 쓰고, `writeShortEscape`가 `writeString`과 `StringFromUnits`를 위해 JSON string의 escape를 쓰며, 동작은 바뀌지 않습니다. Red: `make duplication-check` exit 2, 13건 중 `packages/go`에 2건; green: 11건, `packages/go`에는 없음; `go test ./...` ok, `scripts/verify.mts --only go` official 예제 17개 + 공유 case 98개 통과, `make lint-go` 통과.
 - PHP 확장은 S10 표준의 이름을 따릅니다 (T2.8). PIE 패키지는 `polyspec/ordered-json-php-ext`(release asset `polyspec-ordered-json-php-ext-php-X.Y.Z.zip`), 확장과 module은 `polyspec_ordered_json`이며 `PHP_NEW_EXTENSION`과 `--enable-polyspec-ordered-json`이 따르고, stub은 `src/polyspec_ordered_json.stub.php`이며, 라이브러리, test, verifier와 parity 선언은 `polyspec_ordered_json`을 로드합니다. arginfo header는 열려 있습니다: `make php-ext-arginfo`가 kit에서 실패합니다. Red: `make lint-php-ext` exit 2, 4건; 공유 probe가 이름을 바꾸지 않은 `extension_loaded('ordered_json')`을 거부했습니다(`Unexpected PHP parser backend`, 115 case 중 1건); green: `scripts/verify.mts --only php-extension` official 예제 17개 + 공유 case 98개 통과, registry와 evidence test 17 passed, `make lint-php-ext`는 1건(arginfo header)만 남습니다.

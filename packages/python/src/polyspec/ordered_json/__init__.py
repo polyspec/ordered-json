@@ -511,11 +511,6 @@ class _Parser:
             raise ParseError("invalid_utf8", error.start) from error
         source, ws_run = self.source, _WS_RUN.match
         member, item, reject = _MEMBER.match, _ITEM.match, self.reject_duplicates
-        new, scalar_kinds, strict_number = (
-            Value.__new__,
-            _SCALAR_KINDS,
-            _STRICT_NUMBER.fullmatch,
-        )
         stack: list[_Frame] = []
         found = _ROOT.match(source, 0)
         if found is None:
@@ -589,20 +584,9 @@ class _Parser:
                         value, pos = self._open(stack, following - 1)
                         break
                     start, end = found.span("v")
-                    kind = scalar_kinds[source[start]]
-                    if kind == "number" and strict_number(source, start, end) is None:
-                        self._number_check(found, start)
-                    value = new(Value)
-                    value._source = source
-                    value._start = start
-                    value._end = end
-                    value._kind = kind
-                    value._compact = True
-                    value._root = False
-                    if last != _MEMBER_DELIMITER:
-                        raise ParseError(
-                            "expected_delimiter", ws_run(source, end).end()
-                        )
+                    value = self._nested_scalar(
+                        found, start, end, last != _MEMBER_DELIMITER
+                    )
                     following = found.end()
                     spaces = following - pos - (key_end - key_start) - (end - start) - 2
                     if spaces:
@@ -630,20 +614,9 @@ class _Parser:
                         value, pos = self._open(stack, following - 1)
                         break
                     start, end = found.span("v")
-                    kind = scalar_kinds[source[start]]
-                    if kind == "number" and strict_number(source, start, end) is None:
-                        self._number_check(found, start)
-                    value = new(Value)
-                    value._source = source
-                    value._start = start
-                    value._end = end
-                    value._kind = kind
-                    value._compact = True
-                    value._root = False
-                    if last != _ITEM_DELIMITER:
-                        raise ParseError(
-                            "expected_delimiter", ws_run(source, end).end()
-                        )
+                    value = self._nested_scalar(
+                        found, start, end, last != _ITEM_DELIMITER
+                    )
                     following = found.end()
                     spaces = following - pos - (end - start) - 1
                     if spaces:
@@ -668,6 +641,26 @@ class _Parser:
             return None, start + 1
         self.whitespace += after - start - 1
         return self._close(stack.pop(), after + 1, not stack), after + 1
+
+    def _nested_scalar(
+        self, found: re.Match, start: int, end: int, undelimited: bool
+    ) -> "Value":
+        """The scalar value of a member or an item between start and end; undelimited is a scalar that no
+        delimiter follows."""
+        source = self.source
+        kind = _SCALAR_KINDS[source[start]]
+        if kind == "number" and _STRICT_NUMBER.fullmatch(source, start, end) is None:
+            self._number_check(found, start)
+        value = Value.__new__(Value)
+        value._source = source
+        value._start = start
+        value._end = end
+        value._kind = kind
+        value._compact = True
+        value._root = False
+        if undelimited:
+            raise ParseError("expected_delimiter", _WS_RUN.match(source, end).end())
+        return value
 
     def _scalar(self, found: re.Match, start: int) -> tuple["Value", int]:
         """The scalar value of the root token that found matched from start, and its end."""
