@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 44db151a79091bcc994364e2cf620a2f54240bccc800d0a2945f12d636210f00 -->
+<!-- source-sha256: 436f80ca05b8c07c5c448b961686a5a7187dfba61a65ad3efe1eeae2c2c67f03 -->
 # API 계약
 
 [English](api.md)
@@ -40,7 +40,7 @@ PHP 바인딩은 `Value::parseRejectDuplicates(source)`를 제공합니다. 일�
 
 Python 바인딩은 `parse(source, options)`와 `parse_bytes(data, options)`의 `ParseOptions`에서 JavaScript 옵션의 snake case 표기인 `reject_duplicates=True`를 받습니다. 이 옵션이 있으면 이스케이프 표기가 같은 UTF-16 키를 만드는 경우를 포함하여 어느 깊이든 해석된 객체 키가 반복될 때 두 번째 키 토큰의 첫 바이트 위치에서 `duplicate_object_key` 종류의 `ParseError`로 거부합니다. text 입력은 source text의 문자 그대로 된 짝 없는 surrogate도 그 문자의 UTF-8 인코딩이 가질 위치의 바이트 위치에서 `unescaped_lone_surrogate` 종류로 거부합니다. 그 위치에 유효한 UTF-8 인코딩이 없기 때문입니다. `Value.string_value()`는 surrogate pair를 한 문자로, 짝 없는 surrogate를 자기 문자 그대로 돌려주며, 이는 JavaScript 바인딩과 같습니다. 그 밖의 유효한 값과 오류 및 위치는 바뀌지 않습니다. 배포본은 package `polyspec.ordered_json`에 PEP 561의 `py.typed` 표시를 담으므로 type checker가 그 annotation을 읽습니다.
 
-문자열 접근은 surrogate pair를 한 문자로 반환합니다. 이스케이프된 짝 없는 surrogate는 대체되지 않습니다: 문자열 값은 라이브러리의 형태로 이를 유지하며, JavaScript와 Python에서는 host 문자열의 단독 surrogate로, Go와 PHP에서는 WTF-8로 유지하고, `String`이 이를 담을 수 없는 Rust는 `string_value()`를 `string_units()`를 가리키는 메시지와 함께 거부합니다. 텍스트 입력의 짝 없는 surrogate 원문은 UTF-8 인코딩이 없으므로 Rust, Go, PHP는 그 WTF-8 바이트를 문법을 읽기 전에 `invalid UTF-8`로 거부하고 JavaScript와 Python은 `unescaped_lone_surrogate`로 거부합니다.
+문자열 접근은 surrogate pair를 한 문자로 반환합니다. 이스케이프된 짝 없는 surrogate는 대체되지 않습니다: 문자열 값은 라이브러리의 형태로 이를 유지하며, JavaScript와 Python에서는 host 문자열의 단독 surrogate로, Go, PHP, Rust에서는 WTF-8 바이트로 유지하며, Rust의 `String`이 이를 담을 수 없으므로 Rust의 `string_value()`가 그 바이트(`Vec<u8>`, 짝 없는 surrogate가 없으면 유효한 UTF-8)를 반환합니다. 텍스트 입력의 짝 없는 surrogate 원문은 UTF-8 인코딩이 없으므로 Rust, Go, PHP는 그 WTF-8 바이트를 문법을 읽기 전에 `invalid UTF-8`로 거부하고 JavaScript와 Python은 `unescaped_lone_surrogate`로 거부합니다.
 
 각 언어의 표준 JSON 인터페이스는 JavaScript의 `Value.toJSON`, PHP의 `Value::jsonSerialize`, Python의 `ordered_json.JSONEncoder`, Go의 `Value.MarshalJSON`, Rust의 Serde trait입니다. JavaScript, PHP, Python은 native 구조가 값을 담고 있어도 값을 거부하며 `stringify`를 가리키는 메시지를 냅니다. Python은 호출자가 `json.dumps`의 `cls`로 넘기는 `JSONEncoder.default`로 거부하고, 그것 없이 `json.dumps`는 자체 `TypeError`로 거부합니다. Go와 Rust는 native 구조 안에서도 값의 compact contract bytes를 씁니다. 아래의 typed 형태는 그 규칙을 native 구조 전체로 넓힙니다.
 

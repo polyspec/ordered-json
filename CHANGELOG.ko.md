@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 1c32ecc1b3f6c11ec71d4ea13f06624e8cfdf9fe2e29d34f8352e70b6a4dd7ad -->
+<!-- source-sha256: edbdf923f07c64534f449cf7beb6097e905e4e667925e246774338ee3f361b54 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- 명세는 RQ-009를 모든 구현에서 성립시킵니다 (T2.38): `docs/spec/api.md`(.ko)는 더 이상 Rust가 짝 없는 surrogate의 `string_value()`를 거부하게 두지 않으며 Go, PHP, Rust는 그 WTF-8 바이트를 반환합니다(Rust는 `Vec<u8>`). Red: 명세가 Rust의 예외를 적었음; green: `make docs-check` passed; 코드는 T2.39에서 따릅니다.
 - `config/parity.json`의 모든 unit은 모든 구현에서 성립하고 test가 이름으로 적은 requirement를 인용합니다 (T2.4): profile, `nativeOnly`, `exclusions`는 없어졌고(S6), 하위 항목 T2.4-1부터 T2.4-4가 R1, R2, R13, R15 결과를 닫았으며, 여섯 구현의 extractor는 어느 unit도 선언하지 않은 공개 symbol을 나열하지 않습니다. Red: `make parity-declarations-check` exit 2, schema 결과 98건에 이어 R1, R2, R13, R15 결과 432건; green: exit 0, `every declaration holds`.
 - 모든 unit의 모든 feature는 모든 구현에 binding이 있습니다 (T2.4-2): R2 결과(missing binding 172건: php 35, python 31, js 31, rust 29, php-extension 25, go 21)는 기존 동작의 binding(T2.26, T2.27, T2.28), 라이브러리를 따르는 PHP와 확장 test(T2.15-3, T2.22), 중립 host 직렬화 unit(T2.37), 없앤 unit만 인용하던 requirement(RQ-003, RQ-010, RQ-011)의 unit으로 닫았습니다. Red: `make parity-declarations-check` R2 172건; green: `every declaration holds`.
 - 모든 API unit은 모든 구현의 symbol을 선언합니다 (T2.4-1): R1 결과(missing implementation 84건: php-extension 41, php 15, python 14, js 14)는 확장의 구현(T2.15-3), `Kind` 열거형(T2.35), 중립 object entry, byte 입력, 오류, host 인터페이스 unit(T2.34, T2.37), Go zero-copy 파싱 제거(T2.33)로 닫았습니다. Red: `make parity-declarations-check` R1 84건; green: `every declaration holds`이며 여섯 구현의 extractor가 선언 없는 공개 symbol을 나열하지 않음.
