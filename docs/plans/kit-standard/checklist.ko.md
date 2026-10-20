@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 498e0699b14dbc3d9489dddc340a345bcc39529bef7125adcc9f794f80a8f3c1 -->
+<!-- source-sha256: f7fab130b0ad0334a969b9e82d2f2bb44b851c7eff981fb0c6472ca060c5a756 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -41,3 +41,4 @@
 | T2.28 | Rust, Go, PHP는 UTF-8과 surrogate unit을 binding합니다 (RQ-007, RQ-008, RQ-009): PHP의 byte 입력을 검증하고, text의 짝 없는 surrogate 원문은 문법 전에 거부하며, 이스케이프된 짝 없는 surrogate의 string value는 library 형태로 유지합니다(Go와 PHP는 WTF-8, Rust는 unit을 가리키며 거부) | `packages/go/orderedjson.go`, `packages/php/src/`, `packages/*/tests`, `config/parity.json`, `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make test-go CASES=Surrogate` and `make test-php CASES=Surrogate` | [o] |
 | T2.29 | kit 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.30 | AGENTS.md의 모든 규칙은 Own: 또는 Refines <id>:로 시작하며, 원칙을 되풀이하는 규칙은 없습니다 (kit K300) | `AGENTS.md`(.ko), `CHANGELOG.md`(.ko) | `make rules-check` | [o] |
+| T2.31 | kit 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
