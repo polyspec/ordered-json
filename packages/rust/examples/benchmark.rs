@@ -4,11 +4,7 @@ use sha2::{Digest, Sha256};
 use std::{env, fs, hint::black_box, time::Instant};
 
 fn iterations() -> usize {
-    env::var("OJ_BENCH_ITERATIONS")
-        .ok()
-        .and_then(|value| value.parse().ok())
-        .filter(|value| *value > 0)
-        .unwrap_or(1000)
+    setting("OJ_BENCH_ITERATIONS", 1000)
 }
 
 struct Stats {
@@ -16,12 +12,17 @@ struct Stats {
     p95: f64,
     samples: Vec<f64>,
 }
+// An unset variable takes the fallback; a value that is not a positive integer stops the benchmark,
+// because a silent default would measure a different workload than the one asked for (P8).
 fn setting(name: &str, fallback: usize) -> usize {
-    env::var(name)
-        .ok()
-        .and_then(|v| v.parse().ok())
-        .filter(|v| *v > 0)
-        .unwrap_or(fallback)
+    match env::var(name) {
+        Ok(text) => match text.parse::<usize>() {
+            Ok(value) if value > 0 => value,
+            _ => panic!("{name} must be a positive integer, got {text:?}"),
+        },
+        Err(env::VarError::NotPresent) => fallback,
+        Err(error) => panic!("{name} is not readable: {error}"),
+    }
 }
 fn measure<F: FnMut() -> Vec<u8>>(
     mut f: F,

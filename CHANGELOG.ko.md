@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T2.55: Rust 벤치마크 예제는 설정을 명시된 규칙으로 읽는다. 변수가 없으면 기본값을 쓰고, 양의 정수가 아닌 값이면 기본값으로 바꾸지 않고 실행을 멈춘다(P8, 삼킨 parse 오류 없음). red: `make lint-rust`가 exit 2, `examples/benchmark.rs`에서 `Result::ok` finding 4개를 보고했고, green: `make lint-rust`가 exit 0, `make test-rust CASES=api`가 1 passed. (T2.55)
 - T2.54: PRINCIPLES.md, PRINCIPLES.ko.md, .golangci.yml, ruff.toml, scripts/kit/kit-bootstrap.mk는 로컬 수정이 아니라 @polyspec/kit 0.0.54의 K334와 K349 kit copy다. red: `make kit-check`가 exit 2, finding 5개(다섯 copy가 설치된 kit과 다름)를 보고했고, green: exit 0. (T2.54)
 - T2.53: .gitignore가 link가 consumer에 쓰는 packages/go/go.work와 go.work.sum을 무시한다. red: git check-ignore가 두 파일 모두 무시하지 않는다고 보고했고, green: 두 파일 모두 무시한다고 보고한다. (T2.53)
 - T2.52: config/owner-checks.json은 kit 복사본인 Rust lint 설정 clippy.toml에 kit 복사본의 소유 규칙을 준다. red: owner-validate가 clippy.toml을 어떤 소유자와도 맞지 않는 경로로 보고했고, green: 추적되는 모든 경로가 소유된다고 보고한다. (T2.52)

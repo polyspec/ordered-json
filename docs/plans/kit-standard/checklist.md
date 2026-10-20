@@ -64,4 +64,4 @@
 | T2.52 | Every copy of kit the repository holds has an owner rule | config/owner-checks.json with clippy.toml in the kit copies rule | `make owner-validate` | [o] |
 | T2.53 | Git ignores the go.work files that link writes | .gitignore with go.work and go.work.sum | `git check-ignore packages/go/go.work` and `git check-ignore packages/go/go.work.sum` | [o] |
 | T2.54 | Take the kit copies of K334 and K349 | PRINCIPLES.md, PRINCIPLES.ko.md, .golangci.yml, ruff.toml, scripts/kit/kit-bootstrap.mk | `make kit-check` | [o] |
-| T2.55 | The rust benchmark example handles the Result of each ok call (P8, K334) | packages/rust/examples/benchmark.rs, CHANGELOG.md(.ko) | `make lint-rust` and `make test-rust CASES=api` | [ ] |
+| T2.55 | The rust benchmark example handles the Result of each ok call (P8, K334) | packages/rust/examples/benchmark.rs, CHANGELOG.md(.ko) | `make lint-rust` and `make test-rust CASES=api` | [o] |

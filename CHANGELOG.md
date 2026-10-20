@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T2.55: the Rust benchmark example reads its settings with a stated rule: an unset variable takes its default, and a value that is not a positive integer stops the run instead of falling back to the default (P8, no swallowed parse error). Red: `make lint-rust` exit 2, 4 `Result::ok` findings in `examples/benchmark.rs`; green: `make lint-rust` exit 0, `make test-rust CASES=api` 1 passed. (T2.55)
 - T2.54: PRINCIPLES.md, PRINCIPLES.ko.md, .golangci.yml, ruff.toml and scripts/kit/kit-bootstrap.mk are the kit copies of K334 and K349 of @polyspec/kit 0.0.54, not local edits. Red: `make kit-check` exit 2, 5 findings (the 5 copies differ from the installed kit); green: exit 0. (T2.54)
 - T2.53: .gitignore covers packages/go/go.work and go.work.sum, which link writes into the consumer; red: git check-ignore reported neither file as ignored, green: it reports both. (T2.53)
 - T2.52: config/owner-checks.json gives clippy.toml, the kit copy of Rust lint settings, the owner rule of the kit copies; red: owner-validate reported clippy.toml as a path that matches no owner, green: it reports every tracked path owned. (T2.52)
