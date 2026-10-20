@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: a5f67f9bc59f5cfa52bca952cc5de4b50accae8ccb5ccc805a566d1d4b6749e7 -->
+<!-- source-sha256: 9dd2176d9bcd00bf2ae98f57b108a641e06d3c34efd177a660623fdb1c2ef51d -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- PRINCIPLES 사본은 K282부터 K297의 반영 뒤 `make kit-sync`가 다시 쓴 설치된 kit의 것과 같습니다 (T2.24). Red: `make kit-check` exit 2, 2건(PRINCIPLES.md와 PRINCIPLES.ko.md가 다름); green: exit 0.
 - `config/rebuild.json`은 `paths`를 두지 않고, kit이 layout으로 찾은 모든 tool이 class를 가집니다 (T2.18): benchmark tool 6개는 이유와 함께 `policy`이고, kit(K294)은 vendor된 사본을 더 이상 보고하지 않습니다. Red: `make rebuild-check` exit 2(`paths`, 이어서 미분류 사본 9건); green: exit 0, `every tool that config/rebuild.json selects has its class`.
 - 언어마다 손으로 쓴 parser는 남기고, 그 생태계 reader가 실패하는 contract case를 적은 rebuild 기록을 둡니다 (T2.23): `docs/rebuild/json-js.md`(JSON.parse: 115개 중 106, RQ-001 정수 모양 key 순서), `json-go.md`(encoding/json Token: 102, RQ-009와 RQ-007), `json-python.md`(json.loads: 114, RQ-004와 RQ-006), `json-php.md`(json_decode: 99, RQ-010과 RQ-009), `json-rust.md`(serde_json: 105, RQ-010과 RQ-009)이며 각각 `config/rebuild.json`에서 `record`로 분류합니다. Red: case를 적은 기록이 없었음; green: `make rebuild-check` exit 0, `make docs-check` 문서 쌍 30개 passed.
 - RQ-023과 RQ-024처럼 어느 unit도 인용하지 않던 requirement를 두 feature unit이 test합니다 (T2.4-3): `public_api_exports_the_entry_points`(RQ-023: parse, serialization, factory, accessor 함수)와 `parse_error_exposes_kind_offset_and_message`(RQ-024)이며, js, rust, go, php, python과 php-extension binding(상속한 PHP test case 실행)에 각각 test가 있습니다. Red: `make parity-declarations-check` R13 untraced-requirement 2건(RQ-023, RQ-024); green: R13 0건. Test: node:test 2 passed, cargo test 2 passed, go test 2 passed, PHPUnit 2 passed, unittest 2 passed; 확장 실행은 T2.8을 기다립니다.
