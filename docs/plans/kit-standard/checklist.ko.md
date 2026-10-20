@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 2374f8fd3ffa14de53cc1b78b918f909c8fdaf738a737ac14436b07ed8873555 -->
+<!-- source-sha256: 28ee69fa5231daa205ee24013f04f5d2c7d35d8a1820b4ff12b75a2323679315 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -55,3 +55,4 @@
 | T2.42 | Rust에는 Value의 Serde trait 구현만 있습니다: 자체 serializer, to_string, from_str, from_slice, Error를 가진 serde 모듈(serde_json의 사본)은 test, fixture와 함께 없앱니다 (S1) | `packages/rust/src/serde.rs`, `packages/rust/src/lib.rs`, `packages/rust/Cargo.toml`, `packages/rust/Cargo.lock`, `packages/rust/tests/`, `config/dependency-review.json`, `CHANGELOG.md`(.ko) | `make test-rust CASES=serde` and `make lint-rust` | [o] |
 | T2.43 | kit 사본은 설치된 kit의 것과 같습니다 | `config/php-lint/`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.44 | PRINCIPLES 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
+| T2.45 | CHECK_TARGETS와 CI job은 bypass-check를 실행합니다 | `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |

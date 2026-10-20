@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- `CHECK_TARGETS` and the first job of `ci.yml` run `bypass-check` (T2.45), the gate of kit that fails while a test, script or Makefile impersonates CI, assumes a gate up to date or skips a hook. Red: `make kit-check` exit 2, `CHECK_TARGETS runs no bypass-check`; green: exit 0, workflow-rules test passed.
 - The PRINCIPLES copies equal those of the installed kit (T2.44), written by `make kit-sync`. Red: `make kit-check` exit 2, 2 findings; green: exit 0.
 - The php-lint copies equal those of the installed kit (T2.43), written by `make kit-sync`. Red: `make kit-check` exit 2, 2 findings (`config/php-lint/composer.json` and `composer.lock` differ); green: exit 0.
 - Rust has only the Serde trait impls of `Value` (T2.42): the module `serde` with its own serializer, `to_string`, `from_str`, `from_slice` and `Error`, a copy of `serde_json` (S1), is removed with its tests, its two fixtures and the dependency `serde_ignored`; `serde_json` encodes and decodes any structure that holds values with their contract bytes, and `Deserialize` parses with the normal grammar as Go `UnmarshalJSON` does. Red: the spec (T2.40) and the Go side no longer have the typed codec while Rust still exported it (13 public symbols under `serde`, 456 lines); green: cargo test 24 + 2 + 17 + 3 passed, `scripts/verify.mts --only rust`, `make lint-rust`, `make parity-declarations-check` and `make dependency-policy-check` exit 0.

@@ -54,3 +54,4 @@
 | T2.42 | Rust has only the Serde trait impls of Value: the serde module with its own serializer, to_string, from_str, from_slice and Error (a copy of serde_json) is removed with its tests and fixtures (S1) | `packages/rust/src/serde.rs`, `packages/rust/src/lib.rs`, `packages/rust/Cargo.toml`, `packages/rust/Cargo.lock`, `packages/rust/tests/`, `config/dependency-review.json`, `CHANGELOG.md`(.ko) | `make test-rust CASES=serde` and `make lint-rust` | [o] |
 | T2.43 | The kit copies equal those of the installed kit | `config/php-lint/`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.44 | The PRINCIPLES copies equal those of the installed kit | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
+| T2.45 | CHECK_TARGETS and the CI jobs run bypass-check | `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |

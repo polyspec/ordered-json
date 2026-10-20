@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: e6194a586625b06ccdeec0691170ee89ed765e44c6fbb3e9025401f21b8857e3 -->
+<!-- source-sha256: 7eb5e9ae71e5ef5e0be12aff705d62c6373932e3e9ebf4c1dcc89bb19b3379d1 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- `CHECK_TARGETS`와 `ci.yml`의 첫 job이 `bypass-check`를 실행합니다 (T2.45). test, script, Makefile이 CI를 흉내 내거나 gate를 최신으로 가정하거나 hook을 건너뛰면 실패하는 kit의 gate입니다. Red: `make kit-check` exit 2, `CHECK_TARGETS runs no bypass-check`; green: exit 0, workflow-rules test passed.
 - PRINCIPLES 사본은 `make kit-sync`가 쓴 설치된 kit의 것과 같습니다 (T2.44). Red: `make kit-check` exit 2, 2건; green: exit 0.
 - php-lint 사본은 `make kit-sync`가 쓴 설치된 kit의 것과 같습니다 (T2.43). Red: `make kit-check` exit 2, 2건(`config/php-lint/composer.json`과 `composer.lock`이 다름); green: exit 0.
 - Rust에는 `Value`의 Serde trait 구현만 있습니다 (T2.42): 자체 serializer, `to_string`, `from_str`, `from_slice`, `Error`를 가진 `serde` 모듈(`serde_json`의 사본, S1)을 test, fixture 2개, 의존성 `serde_ignored`와 함께 없앱니다. `serde_json`이 값을 담은 모든 구조를 contract bytes로 인코딩하고 디코딩하며 `Deserialize`는 Go `UnmarshalJSON`처럼 일반 문법으로 파싱합니다. Red: 명세(T2.40)와 Go 쪽에는 typed codec이 없는데 Rust는 여전히 내보냄(`serde` 아래 공개 symbol 13개, 456줄); green: cargo test 24 + 2 + 17 + 3 passed, `scripts/verify.mts --only rust`, `make lint-rust`, `make parity-declarations-check`, `make dependency-policy-check` exit 0.
