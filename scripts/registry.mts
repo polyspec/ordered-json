@@ -52,13 +52,13 @@ export const COMMANDS: Record<string, Commands> = {
     command: ['{cache}/go-probe'],
     runtime: { go: ['go', 'version'] },
   },
-  php: { command: ['php', '-n', '{php}/tests/probe.php'], runtime: { php: ['php', '-n', '-r', 'echo PHP_VERSION;'] } },
+  php: { command: ['php', '-n', '-d', 'auto_prepend_file={php}/vendor/autoload.php', '{php}/tests/probe.php'], runtime: { php: ['php', '-n', '-r', 'echo PHP_VERSION;'] } },
   'php-extension': {
     dependencies: ['php'],
     buildInCopy: true,
     // The build of kit publishes the library; the copy of the package serves the PIE check, which builds in it.
     prepare: [{ cwd: '{repository}', command: ['make', 'build-php-ext'] }],
-    command: ['php', '-n', '-d', PHP_EXTENSION, '{php}/tests/probe.php', '--native'],
+    command: ['php', '-n', '-d', PHP_EXTENSION, '{php}/tests/probe.php'],
     runtime: {
       php: ['php', '-n', '-r', 'echo PHP_VERSION;'],
       // The extension reports the version of its package: the version of composer.json is the one source (config.m4 defines it).

@@ -149,11 +149,11 @@ async function main(): Promise<void> {
     if (!existsSync(extension)) throw new Error('the PHP extension of the benchmark was not built');
     // The directory of each implementation is its root in config/parity.json.
     const packages = repositoryPaths();
-    const php = { ...env, OJ_PACKAGE: packages.php };
+    const php = env;
     const commands: [string, string, Argv, NodeJS.ProcessEnv][] = [
       ['js', ROOT, ['node', 'benchmarks/js.mjs', ...files], { ...env, OJ_PACKAGE: packages.js }],
       ['go', pathOf(packages, 'go'), ['go', 'run', './internal/benchmark', ...files], env],
-      ['php', ROOT, ['php', '-n', 'benchmarks/php.php', 'custom', ...files], php],
+      ['php', ROOT, ['php', '-n', '-d', `auto_prepend_file=${path.join(pathOf(packages, 'php'), 'vendor/autoload.php')}`, 'benchmarks/php.php', 'custom', ...files], php],
       ['php-native', ROOT, ['php', '-n', 'benchmarks/php.php', 'native-json', ...files], php],
       ['php-extension', ROOT, ['php', '-n', '-d', `extension=${extension}`, 'benchmarks/php.php', 'extension', ...files], php],
       ['rust', ROOT, ['cargo', 'run', '--locked', '--release', '--quiet', '--manifest-path', path.join(pathOf(packages, 'rust'), 'Cargo.toml'), '--example', 'benchmark', '--', ...files], { ...env, CARGO_TARGET_DIR: path.join(run.cache, 'rust-target') }],

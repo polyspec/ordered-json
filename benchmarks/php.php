@@ -2,13 +2,7 @@
 
 declare(strict_types=1);
 
-// The package of the PHP implementation, which benchmarks/run.mts names by its root in config/parity.json.
-$package = getenv('OJ_PACKAGE');
-if ($package === false) {
-    fwrite(STDERR, "OJ_PACKAGE names the directory of the PHP package\n");
-    exit(2);
-}
-require $package . '/vendor/autoload.php';
+// The library is whatever the run loaded: the Composer autoloader of the package (auto_prepend_file) or the extension.
 
 use Polyspec\OrderedJson\Value;
 

@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+// The library is whatever the run loaded: the Composer autoloader of the package (auto_prepend_file) or the extension.
+require __DIR__ . '/ProbeTree.php';
 
 use Polyspec\OrderedJson\ParseError;
 use Polyspec\OrderedJson\Tests\ProbeTree;
@@ -10,11 +11,6 @@ use Polyspec\OrderedJson\Value;
 
 use function Polyspec\OrderedJson\parse;
 use function Polyspec\OrderedJson\stringify;
-
-$expectNative = in_array('--native', $argv, true);
-if ($expectNative !== extension_loaded('polyspec_ordered_json')) {
-    throw new RuntimeException('Unexpected PHP parser backend');
-}
 
 // No test cases or expectations here; the common verifier supplies documents.
 while (($line = fgets(STDIN)) !== false) {

@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: f6369ed818cd6730f3e2c33540d719c13af861c4c59f564dc215b3f477be098d -->
+<!-- source-sha256: 58389a2f89d7b37ec218c266201f8d9f2be85ac2cbde3dfb41e43757e06f6df5 -->
 # API 계약
 
 [English](api.md)
@@ -90,6 +90,6 @@ JavaScript는 기존 UTF-16 텍스트로 문자열을 생성할 수 있습니다
 
 PHP 라이브러리는 `polyspec/ordered-json`입니다. 공개 symbol은 class `Polyspec\OrderedJson\Value`, 예외 `Polyspec\OrderedJson\ParseError`, 함수 `Polyspec\OrderedJson\parse`와 `Polyspec\OrderedJson\stringify`, 상수 `Polyspec\OrderedJson\MAX_DEPTH`이며 라이브러리의 나머지는 이들에 대해 비공개입니다.
 
-PIE package `polyspec/ordered-json-php-ext`인 확장 `polyspec_ordered_json`은 라이브러리를 C로 구현하고 그 class, 함수, 상수를 같은 이름과 signature로 등록합니다. 확장이 로드되면 라이브러리는 그 어느 것도 선언하지 않으므로 하나의 test suite가 순수 PHP 구현과 확장에 대해 실행되며 결과, 오류, offset은 같습니다. 확장은 자기 package의 version, 곧 `packages/php-ext`의 `composer.json` version을 보고합니다.
+PIE package `polyspec/ordered-json-php-ext`인 확장 `polyspec_ordered_json`은 라이브러리를 C로 구현하고 그 class, 함수, 상수를 같은 이름과 signature로 등록합니다. 프로세스는 라이브러리나 확장 중 하나만 로드하며(라이브러리는 source를 무조건 올리므로 함수를 다시 선언하게 됩니다), 하나의 test suite가 순수 PHP 구현과 라이브러리 source 없이 확장에 대해 실행되며 결과, 오류, offset은 같습니다. 확장은 자기 package의 version, 곧 `packages/php-ext`의 `composer.json` version을 보고합니다.
 
 네이티브 빌드는 PHP 버전, 플랫폼, 스레드 안전 설정과 일치해야 합니다. [네이티브 설치](../operations/installation.ko.md#native-php)를 확인합니다.

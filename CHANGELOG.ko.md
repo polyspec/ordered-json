@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 2c9258d2352874c058e7771526f0d6e431bd7b99b213c58c524198b7e461fba5 -->
+<!-- source-sha256: 60de310254034b0699ef8c808303a6096733ccd09d3d33c926ebca9adbed714c -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- 어느 구현의 code나 test도 다른 구현에 따라 갈라지지 않습니다 (T2.51): PHP 라이브러리는 source를 무조건 올리고(`src/bootstrap.php`와 그 `extension_loaded` guard는 없어짐), verifier의 probe와 PHP benchmark는 실행이 올린 것을 그대로 쓰고(순수 라이브러리는 Composer autoloader의 `auto_prepend_file`, 확장은 아무것도 없음) backend를 단정하지 않으며, `packages/php/phpunit.xml`은 `bootstrap`을 버려 kit의 확장 실행(K329)이 라이브러리 source를 올리지 않고, `config/duplication.json`과 `config/parity.json`의 예외 이유 둘은 kit이 정의한 종류(`test:`, `harness:`)로 시작하며, `divergence-check`가 `CHECK_TARGETS`와 `ci.yml`의 첫 job에 들어갑니다. Red: `make divergence-check` exit 2, divergence 4건(이유 2건, `bootstrap.php:7`, `probe.php:15`)과 guard를 없애면 `make test-php-ext`가 `Cannot redeclare function parse()`로 fatal; green: `make divergence-check` exit 0, `make test-php-ext CASES=Test` test 45개 assertion 202개(`make test-php`와 같음), php와 php-extension의 `scripts/verify.mts` passed, `make typecheck`, `make lint-php` passed.
 - PRINCIPLES 사본은 `make kit-sync`가 쓴 설치된 kit의 것과 같습니다 (T2.50). Red: `make kit-check` exit 2, 2건; green: exit 0.
 - Python test는 package입니다 (T2.25): `packages/python/tests/__init__.py`로 `make test-python`이 case를 고르고, kit K324가 package 환경의 interpreter로 실행하므로 설치된 package를 import할 수 있습니다(S3). editable install의 build 디렉터리는 ignore합니다. Red: `make test-python CASES=public_api`가 디렉터리를 거부하고 이어서 `ModuleNotFoundError: polyspec`로 실패; green: `make test-python CASES=depth_limit` 1 passed, `CASES=public_api` 1 passed.
 - PRINCIPLES 사본은 `make kit-sync`가 쓴 설치된 kit의 것과 같습니다 (T2.49). Red: `make kit-check` exit 2, 2건; green: exit 0.
