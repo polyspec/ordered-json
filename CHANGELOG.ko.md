@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 646b0e29b020e242c36533b3d69748e389de269f6053a6bb15c8eb32acd9335c -->
+<!-- source-sha256: 76e6d82bc76da82f0ad0ba3eb3b562f0eb6d4698172975fd1770dfb039a54450 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- 언어마다 손으로 쓴 parser는 남기고, 그 생태계 reader가 실패하는 contract case를 적은 rebuild 기록을 둡니다 (T2.23): `docs/rebuild/json-js.md`(JSON.parse: 115개 중 106, RQ-001 정수 모양 key 순서), `json-go.md`(encoding/json Token: 102, RQ-009와 RQ-007), `json-python.md`(json.loads: 114, RQ-004와 RQ-006), `json-php.md`(json_decode: 99, RQ-010과 RQ-009), `json-rust.md`(serde_json: 105, RQ-010과 RQ-009)이며 각각 `config/rebuild.json`에서 `record`로 분류합니다. Red: case를 적은 기록이 없었음; green: `make rebuild-check` exit 0, `make docs-check` 문서 쌍 30개 passed.
 - RQ-023과 RQ-024처럼 어느 unit도 인용하지 않던 requirement를 두 feature unit이 test합니다 (T2.4-3): `public_api_exports_the_entry_points`(RQ-023: parse, serialization, factory, accessor 함수)와 `parse_error_exposes_kind_offset_and_message`(RQ-024)이며, js, rust, go, php, python과 php-extension binding(상속한 PHP test case 실행)에 각각 test가 있습니다. Red: `make parity-declarations-check` R13 untraced-requirement 2건(RQ-023, RQ-024); green: R13 0건. Test: node:test 2 passed, cargo test 2 passed, go test 2 passed, PHPUnit 2 passed, unittest 2 passed; 확장 실행은 T2.8을 기다립니다.
 - PRINCIPLES 사본은 설치된 kit 0.0.54의 것과 같습니다 (T2.17). `make kit-sync`가 씁니다. Red: `make kit-check` exit 2, 101건 중 `PRINCIPLES.md`와 `PRINCIPLES.ko.md`가 다르다는 2건; green: 99건, PRINCIPLES에 관한 것은 없음(남은 것은 parity와 rebuild 설정이며 T2.4와 T2.18 항목).
 - `config/duplication.json`은 `packages/*/tests/**`를 제외합니다 (T2.14). 이유는 kit이 자신의 test에 쓴 것과 같습니다: test는 case를 온전히 적습니다. Red: `make duplication-check` exit 2, package test에만 3건; green: exit 0, `no piece of code exists twice`.
