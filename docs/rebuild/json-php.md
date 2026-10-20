@@ -7,7 +7,7 @@ Verdict: **none fits.** The PHP package keeps its own parser. Measured on 2026-1
 
 ## Covers
 
-- `packages/php/src/Parser.php`
+- `packages/php/src/Value.php`
 
 ## Requirement
 

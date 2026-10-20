@@ -20,7 +20,7 @@
       "Polyspec\\OrderedJson\\": "src/"
     },
     "files": [
-      "src/OrderedJson.php"
+      "src/bootstrap.php"
     ]
   },
   "autoload-dev": {

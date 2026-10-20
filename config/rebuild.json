@@ -34,7 +34,7 @@
       "kind": "record",
       "record": "docs/rebuild/json-js.md"
     },
-    "packages/php/src/Parser.php": {
+    "packages/php/src/Value.php": {
       "kind": "record",
       "record": "docs/rebuild/json-php.md"
     },

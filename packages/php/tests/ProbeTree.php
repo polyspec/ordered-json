@@ -6,8 +6,6 @@ namespace Polyspec\OrderedJson\Tests;
 
 use Polyspec\OrderedJson\Value;
 
-use function Polyspec\OrderedJson\quoteKey;
-
 /**
  * The serializations of the probe of the common verifier (probe.php): the JSON text of a string, the value tree of a
  * parsed value and the value rebuilt through the factories. The probe holds no test cases or expectations; the common
@@ -18,6 +16,33 @@ final class ProbeTree
     public static function quote(string $s): string
     {
         return json_encode($s, JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * The UTF-16 units of the UTF-8 or WTF-8 text of a member name that the library returned (an unpaired surrogate is
+     * its three WTF-8 bytes).
+     *
+     * @return list<int>
+     */
+    public static function units(string $text): array
+    {
+        $units = [];
+        for ($i = 0, $n = strlen($text); $i < $n;) {
+            $first = ord($text[$i]);
+            $length = $first < 0x80 ? 1 : ($first < 0xe0 ? 2 : ($first < 0xf0 ? 3 : 4));
+            $point = $length === 1 ? $first : $first & (0x7f >> $length);
+            for ($j = 1; $j < $length; $j++) {
+                $point = $point << 6 | ord($text[$i + $j]) & 0x3f;
+            }
+            $i += $length;
+            if ($point > 0xffff) {
+                $point -= 0x10000;
+                $units[] = 0xd800 | $point >> 10;
+                $point = 0xdc00 | $point & 0x3ff;
+            }
+            $units[] = $point;
+        }
+        return $units;
     }
 
     public static function text(Value $v): string
@@ -59,7 +84,7 @@ final class ProbeTree
     {
         $parts = [];
         foreach ($v->members() as $key => $value) {
-            $parts[] = '[' . quoteKey((string)$key) . ',' . self::tree($value) . ']';
+            $parts[] = '[' . Value::fromUnits(self::units((string)$key))->raw() . ',' . self::tree($value) . ']';
         }
         return '["object",[' . implode(',', $parts) . ']]';
     }

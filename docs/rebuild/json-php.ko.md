@@ -1,5 +1,5 @@
 <!-- doc-id: rebuild-json-php -->
-<!-- source-sha256: 7891268b7d24a161c4f721952d92c001824ca6dab323599a141883660c15366a -->
+<!-- source-sha256: 56319298e4f424dfd078f87bbbd0ef42d77fe8978ad4f212620939652333343e -->
 # 재구현 기록: PHP JSON parser
 
 [English](json-php.md)
@@ -8,7 +8,7 @@
 
 ## 대상
 
-- `packages/php/src/Parser.php`
+- `packages/php/src/Value.php`
 
 ## 요구사항
 

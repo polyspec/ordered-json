@@ -10,7 +10,6 @@ use Polyspec\OrderedJson\Value;
 
 use function Polyspec\OrderedJson\parse;
 use function Polyspec\OrderedJson\stringify;
-use function Polyspec\OrderedJson\utf8Units;
 
 /**
  * The official examples of examples/official.json for both PHP backends, run by PHPUnit: each case is the data set of
@@ -55,7 +54,7 @@ abstract class OfficialTestCase extends TestCase
     {
         return match ($value->kind()) {
             'object' => ['object', array_map(
-                static fn(string|int $key, Value $member) => [utf8Units((string)$key, true), self::tree($member)],
+                static fn(string|int $key, Value $member) => [ProbeTree::units((string)$key), self::tree($member)],
                 array_keys($value->members()),
                 array_values($value->members()),
             )],
