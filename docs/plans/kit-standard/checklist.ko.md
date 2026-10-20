@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 44dca916fa1324b4870f5a71b8d916e653ed58b474d5aaa11354a175d3c04c1d -->
+<!-- source-sha256: 03ef5ce7c618d7d89a5326359ce3457e3c782ee6f63e9233f1137bedc67ce7d6 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -30,3 +30,4 @@
 | T2.20 | 의존성 review 기록은 commit된 manifest와 lock에 일치합니다 | `config/dependency-review.json`, `CHANGELOG.md`(.ko) | `make dependency-policy-check` | [!] 원인: phpunit 13.4.3, ruff 0.17.1과 review 기록은 반영했고 dependency-policy-check의 1건이 남았습니다: packages/python/pyproject.toml의 build-system requires에 있는 setuptools 84.0.0 < 84.2.0을 make dependency-review UPDATE=1이 pin할 수 없습니다: kit의 scripts/kit/pyproject-dependencies.mts 30-43행(dependencyArrays)이 build-system.requires를 빼서 pin-python-dependency.mts 47행이 "no exact pin of setuptools in the dependency arrays"로 실패합니다; 재시도: kit이 dependencyArrays에서 build-system의 requirements를 pin한 뒤 |
 | T2.21 | CHECK_TARGETS와 CI job은 kit-gates의 모든 gate를 실행합니다: rules-check, rebuild-check, language-check, test-markers-check, duplication-check, lint-php-ext, test-php-ext | `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make kit-check` and `node node_modules/@polyspec/kit/dist/run-tests.mjs node -- tests/scripts/workflow-rules.test.mts` | [!] 원인: CHECK_TARGETS의 7건은 고쳤고(make kit-check 105건에서 98건; tests/scripts/workflow-rules.test.mts 17 passed), 남은 98건은 T2.4가 맡은 config/parity.json의 schema 결과(profile, profiles, nativeOnly, exclusions)입니다; 재시도: T2.4 뒤 |
 | T2.22 | packages/php의 OfficialTest와 ValueApiTest는 확장이 로드되지 않았음을 단정하지 않고, 확장이 있든 없든 성립하는 동작을 단정합니다 (S10 ruling 8: 같은 파일이 두 구현을 test합니다) | `packages/php/tests/OfficialTest.php`, `packages/php/tests/ValueApiTest.php`, `packages/php-ext/tests/`, `CHANGELOG.md`(.ko) | `make test-php CASES=Official` and `make test-php-ext CASES=Official` | [ ] |
+| T2.23 | 각 언어 생태계의 JSON이 contract를 만족하는 곳에서는 그것 위에 만듭니다: 표준 JSON reader와 writer가 RQ id를 만족하면 손으로 쓴 parser나 serializer를 대체하고, 손으로 쓴 것은 실패하는 case를 적은 rebuild 기록과 함께서만 남깁니다 | `docs/rebuild/`, `packages/*/`, `config/rebuild.json`, `CHANGELOG.md`(.ko) | `make rebuild-check` | [~] |
