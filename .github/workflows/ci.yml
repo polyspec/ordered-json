@@ -62,7 +62,7 @@ jobs:
         run: make install-tools
       - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci-targets TARGETS="kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check ordered-json-test-scripts typecheck lint-ts lint-python"
+        run: make ci-targets TARGETS="kit-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check ordered-json-test-scripts typecheck lint-ts lint-python"
       # actions/upload-artifact v7.0.1: the report of this job, var/report/ci-targets.
       - name: report
         if: ${{ !cancelled() }}
@@ -106,7 +106,7 @@ jobs:
         if: ${{ !cancelled() }}
         env:
           JSON_TEST_SUITE: .cache/JSONTestSuite
-        run: make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php pie-check"
+        run: make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-php-ext test-php-ext pie-check"
       # actions/upload-artifact v7.0.1
       - name: report
         if: ${{ !cancelled() }}
