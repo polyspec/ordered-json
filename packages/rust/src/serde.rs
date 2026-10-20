@@ -94,6 +94,21 @@ struct Writer {
     depth: usize,
 }
 impl Writer {
+    fn float<T: Serialize>(&mut self, v: T, finite: bool) -> Result<(), Error> {
+        if !finite {
+            return Err(Error::Encode("non-finite number".into()));
+        }
+        self.text
+            .push_str(&serde_json::to_string(&v).map_err(Error::Typed)?);
+        Ok(())
+    }
+    /// Opens the object of an enum variant that holds a tuple or a struct: `{"name":` and the opening bracket.
+    fn variant(&mut self, name: &str, open: char) -> Result<(), Error> {
+        self.begin('{')?;
+        self.quoted(name)?;
+        self.text.push(':');
+        self.begin(open)
+    }
     fn quoted(&mut self, v: &str) -> Result<(), Error> {
         self.text
             .push_str(&serde_json::to_string(v).map_err(Error::Typed)?);
@@ -122,6 +137,20 @@ struct Compound<'a> {
     raw: bool,
 }
 impl Compound<'_> {
+    fn raw_field<T: Serialize + ?Sized>(&mut self, k: &str, v: &T) -> Result<(), Error> {
+        if k != RAW_TOKEN || !self.first {
+            return Err(Error::Encode("invalid raw JSON field".into()));
+        }
+        let value = serde_json::to_value(v).map_err(Error::Typed)?;
+        let text = value
+            .as_str()
+            .ok_or_else(|| Error::Encode("raw JSON must be text".into()))?;
+        self.w
+            .text
+            .push_str(&super::parse(text).map_err(Error::Json)?.compact());
+        self.first = false;
+        Ok(())
+    }
     fn comma(&mut self) {
         if !self.first {
             self.w.text.push(',')
@@ -221,20 +250,10 @@ impl<'a> ser::Serializer for &'a mut Writer {
         Ok(())
     }
     fn serialize_f32(self, v: f32) -> Result<(), Error> {
-        if !v.is_finite() {
-            return Err(Error::Encode("non-finite number".into()));
-        }
-        self.text
-            .push_str(&serde_json::to_string(&v).map_err(Error::Typed)?);
-        Ok(())
+        self.float(v, v.is_finite())
     }
     fn serialize_f64(self, v: f64) -> Result<(), Error> {
-        if !v.is_finite() {
-            return Err(Error::Encode("non-finite number".into()));
-        }
-        self.text
-            .push_str(&serde_json::to_string(&v).map_err(Error::Typed)?);
-        Ok(())
+        self.float(v, v.is_finite())
     }
     fn serialize_char(self, v: char) -> Result<(), Error> {
         self.quoted(&v.to_string())
@@ -311,10 +330,7 @@ impl<'a> ser::Serializer for &'a mut Writer {
         n: &'static str,
         _: usize,
     ) -> Result<Compound<'a>, Error> {
-        self.begin('{')?;
-        self.quoted(n)?;
-        self.text.push(':');
-        self.begin('[')?;
+        self.variant(n, '[')?;
         Ok(Compound {
             w: self,
             first: true,
@@ -358,10 +374,7 @@ impl<'a> ser::Serializer for &'a mut Writer {
         n: &'static str,
         _: usize,
     ) -> Result<Compound<'a>, Error> {
-        self.begin('{')?;
-        self.quoted(n)?;
-        self.text.push(':');
-        self.begin('{')?;
+        self.variant(n, '{')?;
         Ok(Compound {
             w: self,
             first: true,
@@ -376,46 +389,25 @@ impl<'a> ser::Serializer for &'a mut Writer {
         self.quoted(&v.to_string())
     }
 }
-impl SerializeSeq for Compound<'_> {
-    type Ok = ();
-    type Error = Error;
-    fn serialize_element<T: Serialize + ?Sized>(&mut self, v: &T) -> Result<(), Error> {
-        self.value(v)
-    }
-    fn end(self) -> Result<(), Error> {
-        self.finish()
-    }
+// The sequence-like compounds hold only values: each element is a value, and the end closes the compound.
+macro_rules! compound_elements {
+    ($trait:ident, $method:ident) => {
+        impl $trait for Compound<'_> {
+            type Ok = ();
+            type Error = Error;
+            fn $method<T: Serialize + ?Sized>(&mut self, v: &T) -> Result<(), Error> {
+                self.value(v)
+            }
+            fn end(self) -> Result<(), Error> {
+                self.finish()
+            }
+        }
+    };
 }
-impl SerializeTuple for Compound<'_> {
-    type Ok = ();
-    type Error = Error;
-    fn serialize_element<T: Serialize + ?Sized>(&mut self, v: &T) -> Result<(), Error> {
-        self.value(v)
-    }
-    fn end(self) -> Result<(), Error> {
-        self.finish()
-    }
-}
-impl SerializeTupleStruct for Compound<'_> {
-    type Ok = ();
-    type Error = Error;
-    fn serialize_field<T: Serialize + ?Sized>(&mut self, v: &T) -> Result<(), Error> {
-        self.value(v)
-    }
-    fn end(self) -> Result<(), Error> {
-        self.finish()
-    }
-}
-impl SerializeTupleVariant for Compound<'_> {
-    type Ok = ();
-    type Error = Error;
-    fn serialize_field<T: Serialize + ?Sized>(&mut self, v: &T) -> Result<(), Error> {
-        self.value(v)
-    }
-    fn end(self) -> Result<(), Error> {
-        self.finish()
-    }
-}
+compound_elements!(SerializeSeq, serialize_element);
+compound_elements!(SerializeTuple, serialize_element);
+compound_elements!(SerializeTupleStruct, serialize_field);
+compound_elements!(SerializeTupleVariant, serialize_field);
 impl SerializeMap for Compound<'_> {
     type Ok = ();
     type Error = Error;
@@ -436,47 +428,29 @@ impl SerializeMap for Compound<'_> {
         self.finish()
     }
 }
-impl SerializeStruct for Compound<'_> {
-    type Ok = ();
-    type Error = Error;
-    fn serialize_field<T: Serialize + ?Sized>(
-        &mut self,
-        k: &'static str,
-        v: &T,
-    ) -> Result<(), Error> {
-        if self.raw {
-            if k != RAW_TOKEN || !self.first {
-                return Err(Error::Encode("invalid raw JSON field".into()));
+// The keyed compounds write a field as a key and a value; the raw compound of RAW_TOKEN, which only a struct opens, takes
+// the one field that holds the JSON text, and no variant compound is raw.
+macro_rules! compound_fields {
+    ($trait:ident) => {
+        impl $trait for Compound<'_> {
+            type Ok = ();
+            type Error = Error;
+            fn serialize_field<T: Serialize + ?Sized>(
+                &mut self,
+                k: &'static str,
+                v: &T,
+            ) -> Result<(), Error> {
+                if self.raw {
+                    return self.raw_field(k, v);
+                }
+                self.key(k)?;
+                self.value(v)
             }
-            let value = serde_json::to_value(v).map_err(Error::Typed)?;
-            let text = value
-                .as_str()
-                .ok_or_else(|| Error::Encode("raw JSON must be text".into()))?;
-            self.w
-                .text
-                .push_str(&super::parse(text).map_err(Error::Json)?.compact());
-            self.first = false;
-            return Ok(());
+            fn end(self) -> Result<(), Error> {
+                self.finish()
+            }
         }
-        self.key(k)?;
-        self.value(v)
-    }
-    fn end(self) -> Result<(), Error> {
-        self.finish()
-    }
+    };
 }
-impl SerializeStructVariant for Compound<'_> {
-    type Ok = ();
-    type Error = Error;
-    fn serialize_field<T: Serialize + ?Sized>(
-        &mut self,
-        k: &'static str,
-        v: &T,
-    ) -> Result<(), Error> {
-        self.key(k)?;
-        self.value(v)
-    }
-    fn end(self) -> Result<(), Error> {
-        self.finish()
-    }
-}
+compound_fields!(SerializeStruct);
+compound_fields!(SerializeStructVariant);

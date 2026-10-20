@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: d5357383c3c43b6e3b15eefdc3f79a8a6f62a82ad56bb7b4b64e760c1f71b6b8 -->
+<!-- source-sha256: c73a7e2356050e8cdd307d99234dac3ab46f787b5f3d6471c01815a4320290d2 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -15,3 +15,4 @@
 | T2.9 | Go 패키지는 각 코드 조각을 한 번만 적습니다: slice와 array의 list marshalling, JSON string의 짧은 escape는 각각 하나의 함수입니다 | `packages/go/marshal.go`, `packages/go/orderedjson.go`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-go` | [o] |
 | T2.10 | PHP 패키지는 code point의 UTF-8 인코딩을 하나의 함수로 적습니다 | `packages/php/src/OrderedJson.php`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-php` | [o] |
 | T2.11 | Python parser는 member와 item의 scalar value를 하나의 method로 만듭니다 | `packages/python/src/polyspec/ordered_json/__init__.py`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-python` | [o] |
+| T2.12 | Rust serializer는 각 코드 조각을 한 번만 적습니다: float 검사, variant 열기, compound serializer의 element method는 각각 하나의 정의입니다 | `packages/rust/src/serde.rs`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-rust` | [o] |
