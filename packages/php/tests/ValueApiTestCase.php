@@ -289,7 +289,8 @@ abstract class ValueApiTestCase extends TestCase
         self::assertSame('{"a":["x",1,true,null]}', stringify($built));
         $items = parse(stringify($built))->get('a')?->items();
         self::assertNotNull($items);
-        self::assertSame(['string', 'number', 'boolean', 'null'], array_map(static fn(Value $item) => $item->kind(), $items));
+        $kinds = array_map(static fn(Value $item) => $item->kind(), $items);
+        self::assertSame(['string', 'number', 'boolean', 'null'], $kinds);
         self::assertSame('x', $items[0]->stringValue());
         self::assertSame('1', $items[1]->numberLiteral());
         self::assertTrue($items[2]->booleanValue());

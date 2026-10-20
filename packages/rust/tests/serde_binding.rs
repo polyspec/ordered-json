@@ -38,6 +38,7 @@ struct Manifest {
     commands: Vec<String>,
 }
 
+// Requirements: RQ-010, RQ-011
 #[test]
 fn serde_wire_bytes_and_round_trip() {
     let value = Wire {
@@ -49,6 +50,7 @@ fn serde_wire_bytes_and_round_trip() {
     assert_eq!(encoded.as_bytes(), fixture.as_bytes());
     assert_eq!(from_str::<Wire>(&encoded).unwrap(), value);
 }
+// Requirements: RQ-011
 #[test]
 fn serde_manifest_bytes_and_round_trip() {
     let value = Manifest {
@@ -77,6 +79,7 @@ fn serde_manifest_bytes_and_round_trip() {
     assert_eq!(encoded.as_bytes(), fixture);
     assert_eq!(from_slice::<Manifest>(fixture).unwrap(), value);
 }
+// Requirements: RQ-004, RQ-005
 #[test]
 fn serde_rejects_invalid_and_unconsumed_input() {
     for input in [
@@ -95,6 +98,7 @@ fn serde_rejects_invalid_and_unconsumed_input() {
     assert_eq!(to_string(&i128::MIN).unwrap(), i128::MIN.to_string());
     assert!(to_string(&BTreeMap::from([(1, "value")])).is_err());
 }
+// Requirements: RQ-017
 #[test]
 fn serde_rejects_duplicate_struct_fields() {
     struct Repeated;
@@ -117,6 +121,7 @@ struct RawWire {
     keys: Value,
 }
 
+// Requirements: RQ-001, RQ-010
 #[test]
 fn serde_embedded_values_preserve_order_and_number_tokens() {
     let raw = r#"{"z":123456789012345678901234567890.123456789,"a":[{"b":2,"a":"한"}]}"#;
@@ -137,6 +142,7 @@ fn serde_embedded_values_preserve_order_and_number_tokens() {
     assert!(from_str::<RawWire>(r#"{"call":"view","props":{"x":1,"x":2},"keys":{}}"#).is_err());
 }
 
+// Requirements: RQ-006
 #[test]
 fn serde_value_respects_container_depth() {
     let text = format!("{}0{}", "[".repeat(256), "]".repeat(256));
@@ -147,6 +153,7 @@ fn serde_value_respects_container_depth() {
     assert!(from_str::<Value>(&format!("[{}]", text)).is_err());
 }
 
+// Requirements: RQ-009
 #[test]
 fn serde_value_preserves_unpaired_surrogate_token() {
     let value = Value::from_units(&[0xd800]);

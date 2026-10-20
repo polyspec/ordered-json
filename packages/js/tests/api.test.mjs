@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {MAX_DEPTH, ParseError, Value, parse, parseBytes, stringify} from '../index.js';
 
+// Requirements: RQ-012
 test('values_come_only_from_the_library', () => {
   assert.throws(() => new Value(), {name: 'TypeError', message: 'Use parse() or Value factories'});
   assert.throws(() => stringify({kind: 'array'}), {name: 'TypeError'});
@@ -12,6 +13,7 @@ test('values_come_only_from_the_library', () => {
   assert.equal(stringify(parse('[1]')), '[1]');
 });
 
+// Requirements: RQ-013
 test('returned_collections_are_immutable', () => {
   const array = parse('[1,2]');
   assert.ok(Object.isFrozen(array.items));
@@ -24,6 +26,7 @@ test('returned_collections_are_immutable', () => {
   assert.equal(object.members.size, 2, 'members returns a fresh map for each access');
 });
 
+// Requirements: RQ-014
 test('wrong_kind_access_is_reported', () => {
   assert.throws(() => parse('[]').members, {name: 'TypeError', message: 'Expected object, got array'});
   assert.throws(() => parse('{}').items, {name: 'TypeError', message: 'Expected array, got object'});
@@ -32,6 +35,7 @@ test('wrong_kind_access_is_reported', () => {
   assert.throws(() => parse('null').booleanValue(), {name: 'TypeError', message: 'Expected boolean, got null'});
 });
 
+// Requirements: RQ-002, RQ-019
 test('member_lookup_uses_decoded_names', () => {
   const value = parse('{"a\\u00e9":1,"b":2}');
   assert.equal(value.get('aé').numberLiteral(), '1');
@@ -39,18 +43,21 @@ test('member_lookup_uses_decoded_names', () => {
   assert.throws(() => value.get(1), {name: 'TypeError', message: 'Key must be a string'});
 });
 
+// Requirements: RQ-001
 test('repeated_key_keeps_first_position_and_last_value', () => {
   const members = parse('{"a":1,"b":2,"a":3}').members;
   assert.deepEqual([...members.keys()], ['a', 'b']);
   assert.equal(members.get('a').numberLiteral(), '3');
 });
 
+// Requirements: RQ-020
 test('host_serialization_boundary', () => {
   const value = parse('[1]');
   assert.throws(() => JSON.stringify(value), {name: 'TypeError', message: 'Use stringify(value) from ordered-json'});
   assert.equal(String(value), '[1]');
 });
 
+// Requirements: RQ-018
 test('root_keeps_surrounding_text', () => {
   const value = parse('  [1] \n');
   assert.equal(value.raw, '  [1] \n');
@@ -58,6 +65,7 @@ test('root_keeps_surrounding_text', () => {
   assert.equal(value.items[0].raw, '1');
 });
 
+// Requirements: RQ-006
 test('depth_argument_is_bounded', () => {
   assert.throws(() => parse(123), {name: 'TypeError', message: 'Expected JSON text'});
   for (const maxDepth of [-1, MAX_DEPTH + 1, 1.5]) {
@@ -65,11 +73,13 @@ test('depth_argument_is_bounded', () => {
   }
 });
 
+// Requirements: RQ-006
 test('depth_limit_is_enforced', () => {
   assert.equal(parse('[[1]]', {maxDepth: 2}).items.length, 1);
   assert.throws(() => parse('[[1]]', {maxDepth: 1}), {name: 'ParseError', message: /maximum nesting depth/i});
 });
 
+// Requirements: RQ-007
 test('bytes_input_is_validated', () => {
   assert.throws(() => parseBytes([1, 2]), {name: 'TypeError', message: 'Expected Uint8Array'});
   assert.throws(() => parseBytes(new Uint8Array([0x5b, 0x22, 0xff, 0x22, 0x5d])),
@@ -77,6 +87,7 @@ test('bytes_input_is_validated', () => {
   assert.equal(stringify(parseBytes(new TextEncoder().encode('{"a":1}'))), '{"a":1}');
 });
 
+// Requirements: RQ-005
 test('rejection_names_its_kind', () => {
   // The wording is JavaScript's own; the kind is the shared contract.
   const kinds = new Map([
@@ -93,6 +104,7 @@ test('rejection_names_its_kind', () => {
   }
 });
 
+// Requirements: RQ-004, RQ-007
 test('invalid_utf8_reports_the_first_bad_byte', () => {
   // The bad byte sits at index 2 of ["<bad>"]; the error names that position.
   const bad = new Uint8Array([0x5b, 0x22, 0xff, 0x22, 0x5d]);
@@ -102,6 +114,7 @@ test('invalid_utf8_reports_the_first_bad_byte', () => {
   assert.equal(error.offset, 2);
 });
 
+// Requirements: RQ-004
 test('parse_errors_report_offsets', () => {
   const plain = (() => { try { parse('[1,]'); } catch (error) { return error; } })();
   assert.ok(plain instanceof ParseError);
@@ -111,21 +124,25 @@ test('parse_errors_report_offsets', () => {
   assert.equal(astral.offset, 6);
 });
 
+// Requirements: RQ-009
 test('surrogate_pair_decodes', () => {
   assert.deepEqual(parse('"\\ud83c\\udf0d"').stringUnits(), [0xd83c, 0xdf0d]);
   assert.equal(parse('"\\ud83c\\udf0d"').stringValue(), '🌍');
 });
 
+// Requirements: RQ-009
 test('unpaired_surrogate_stays_in_units', () => {
   const lone = parse('"a\\ud800"');
   assert.deepEqual(lone.stringUnits(), [0x61, 0xd800]);
   assert.equal(stringify(lone), '"a\\ud800"');
 });
 
+// Requirements: RQ-009
 test('string_value_keeps_an_unpaired_surrogate', () => {
   assert.equal(parse('"a\\ud800"').stringValue(), 'a\ud800');
 });
 
+// Requirements: RQ-008
 test('text_input_rejects_lone_surrogates', () => {
   // The offset counts UTF-16 units and names the surrogate itself; the text is checked before its grammar, as bytes are
   // checked for UTF-8 before theirs.
@@ -134,11 +151,13 @@ test('text_input_rejects_lone_surrogates', () => {
   }
 });
 
+// Requirements: RQ-016
 test('ordered_map_rejects_non_string_key', () => {
   assert.throws(() => Value.object([[Value.number('1'), Value.null()]]), {name: 'TypeError', message: 'Expected string, got number'});
   for (const key of [1, null]) assert.throws(() => Value.object([[key, Value.null()]]), {name: 'TypeError'});
 });
 
+// Requirements: RQ-007
 test('utf8_validation_holds_for_long_multibyte_text', () => {
   const text = '\ud55c\u{1f30d}'.repeat(64);
   const encoded = new TextEncoder().encode(`{"key":"${text}"}`);
@@ -147,6 +166,7 @@ test('utf8_validation_holds_for_long_multibyte_text', () => {
     {name: 'ParseError', kind: 'invalid_utf8', offset: 2});
 });
 
+// Requirements: RQ-015
 test('factories_validate_arguments', () => {
   assert.throws(() => Value.string(1), {name: 'TypeError', message: 'Expected string'});
   assert.throws(() => Value.number(1), {name: 'TypeError', message: 'Pass a number literal as a string'});
@@ -158,6 +178,7 @@ test('factories_validate_arguments', () => {
   assert.throws(() => Value.object([['a', {}]]), {name: 'TypeError'});
 });
 
+// Requirements: RQ-017
 test('strict_parse_rejects_duplicate_keys', () => {
   const sources = [
     '{"a":1,"a":2}',
@@ -178,6 +199,7 @@ test('strict_parse_rejects_duplicate_keys', () => {
   }
 });
 
+// Requirements: RQ-017
 test('strict_parse_accepts_unique_keys', () => {
   const source = '{"a":1,"nested":[{"b":2}],"state":null}';
   assert.equal(stringify(parse(source, {rejectDuplicates: true})), source);

@@ -1,5 +1,6 @@
 use polyspec_ordered_json::{parse_bytes, parse_bytes_reject_duplicates};
 
+// Requirements: RQ-017
 #[test]
 fn strict_parse_rejects_duplicate_keys() {
     for source in [
@@ -17,6 +18,7 @@ fn strict_parse_rejects_duplicate_keys() {
     }
 }
 
+// Requirements: RQ-017
 #[test]
 fn strict_parse_accepts_unique_keys() {
     let source = br#"{"a":1,"nested":[{"b":2}],"state":null}"#;

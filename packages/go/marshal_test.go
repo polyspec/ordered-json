@@ -12,6 +12,7 @@ type inner struct {
 	A int `json:"a"`
 }
 
+// Requirements: RQ-011, RQ-020
 func TestMarshalPreservesTypedJSONContract(t *testing.T) {
 	type document struct {
 		First  string         `json:"first"`
@@ -37,6 +38,7 @@ func TestMarshalPreservesTypedJSONContract(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-003
 func TestMarshalKeepsEmptyObjectAndArrayDistinct(t *testing.T) {
 	got, err := Marshal(struct {
 		Object map[string]string `json:"object"`
@@ -55,6 +57,7 @@ type marshalFixture struct{}
 
 func (marshalFixture) MarshalJSON() ([]byte, error) { return []byte(`{"b":2,"a":1}`), nil }
 
+// Requirements: RQ-015, RQ-020
 func TestMarshalValidatesCustomMarshalerThroughOrderedParser(t *testing.T) {
 	got, err := Marshal(marshalFixture{})
 	if err != nil {
@@ -69,6 +72,7 @@ func TestMarshalValidatesCustomMarshalerThroughOrderedParser(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-020
 func TestMarshalWritesNullForNilValuePointer(t *testing.T) {
 	var nothing *Value
 	got, err := Marshal(struct {
@@ -104,12 +108,14 @@ func TestMarshalWritesNullForNilValuePointer(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-016
 func TestMarshalRejectsUnsupportedMapKey(t *testing.T) {
 	if _, err := Marshal(map[int]string{1: "x"}); err == nil {
 		t.Fatal("Marshal() accepted non-string map key")
 	}
 }
 
+// Requirements: RQ-020
 func TestMarshalTimeAndBytesMatchTypedValues(t *testing.T) {
 	got, err := Marshal(struct {
 		When time.Time `json:"when"`
@@ -134,6 +140,7 @@ type promoted struct {
 	B int `json:"b"`
 }
 
+// Requirements: RQ-020
 func TestMarshalPromotesEmbeddedFields(t *testing.T) {
 	got, err := Marshal(promoted{inner: inner{A: 1}, B: 2})
 	if err != nil {
@@ -149,12 +156,14 @@ type collides struct {
 	A int `json:"a"`
 }
 
+// Requirements: RQ-017
 func TestMarshalRejectsRepeatedFieldNames(t *testing.T) {
 	if _, err := Marshal(collides{inner: inner{A: 1}, A: 2}); err == nil {
 		t.Fatal("Marshal() silently dropped a field with a repeated name")
 	}
 }
 
+// Requirements: RQ-006, RQ-020
 func TestMarshalRejectsCyclicValues(t *testing.T) {
 	type node struct {
 		Next *node `json:"next"`
@@ -167,6 +176,7 @@ func TestMarshalRejectsCyclicValues(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-006
 func TestMarshalRejectsValuesDeeperThanTheParser(t *testing.T) {
 	var deep any = "leaf"
 	for i := 0; i <= MaxDepth; i++ {

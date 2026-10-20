@@ -5,6 +5,7 @@ use polyspec_ordered_json::{
     parse, parse_bytes, parse_with_max_depth, stringify, Kind, OrderedMap, Value, MAX_DEPTH,
 };
 
+// Requirements: RQ-006
 #[test]
 fn depth_argument_is_bounded() {
     let error = parse_with_max_depth("[]", MAX_DEPTH + 1).unwrap_err();
@@ -12,6 +13,7 @@ fn depth_argument_is_bounded() {
     assert_eq!(error.offset, 0);
 }
 
+// Requirements: RQ-006
 #[test]
 fn depth_limit_is_enforced() {
     assert!(parse_with_max_depth("[[1]]", 2).is_ok());
@@ -19,6 +21,7 @@ fn depth_limit_is_enforced() {
     assert_eq!(shallow.message, "maximum nesting depth exceeded");
 }
 
+// Requirements: RQ-007
 #[test]
 fn bytes_input_is_validated() {
     let error = parse_bytes(b"[\"\xff\"]").unwrap_err();
@@ -30,6 +33,7 @@ fn bytes_input_is_validated() {
     );
 }
 
+// Requirements: RQ-005
 #[test]
 fn rejection_names_its_kind() {
     // The wording is Rust's own; the kind is the shared contract.
@@ -45,6 +49,7 @@ fn rejection_names_its_kind() {
     }
 }
 
+// Requirements: RQ-004, RQ-007
 #[test]
 fn invalid_utf8_reports_the_first_bad_byte() {
     // The bad byte sits at index 2 of ["<bad>"]; the error names that position.
@@ -53,6 +58,7 @@ fn invalid_utf8_reports_the_first_bad_byte() {
     assert_eq!(error.offset, 2);
 }
 
+// Requirements: RQ-007
 #[test]
 fn utf8_validation_holds_for_long_multibyte_text() {
     let text = "\u{d55c}\u{1f30d}".repeat(64);
@@ -63,6 +69,7 @@ fn utf8_validation_holds_for_long_multibyte_text() {
     assert_eq!(error.offset, 2);
 }
 
+// Requirements: RQ-004
 #[test]
 fn parse_errors_report_offsets() {
     let error = parse("[1,]").unwrap_err();
@@ -70,6 +77,7 @@ fn parse_errors_report_offsets() {
     assert_eq!(error.to_string(), "expected JSON value at byte 3");
 }
 
+// Requirements: RQ-016
 #[test]
 fn ordered_map_rejects_non_string_key() {
     let mut members = OrderedMap::new();
@@ -80,6 +88,7 @@ fn ordered_map_rejects_non_string_key() {
     assert!(members.is_empty());
 }
 
+// Requirements: RQ-001
 #[test]
 fn repeated_key_keeps_first_position_and_last_value() {
     let mut members = OrderedMap::new();
@@ -105,6 +114,7 @@ fn repeated_key_keeps_first_position_and_last_value() {
     );
 }
 
+// Requirements: RQ-002, RQ-019
 #[test]
 fn member_lookup_uses_decoded_names() {
     let value = parse("{\"a\\u00e9\":1,\"b\":2}").unwrap();
@@ -120,6 +130,7 @@ fn member_lookup_uses_decoded_names() {
     assert!(value.get_units(&[0x63]).is_none());
 }
 
+// Requirements: RQ-009
 #[test]
 fn unpaired_surrogate_stays_in_units() {
     let lone = Value::from_units(&[0x61, 0xd800]);
@@ -131,6 +142,7 @@ fn unpaired_surrogate_stays_in_units() {
     );
 }
 
+// Requirements: RQ-009
 #[test]
 fn surrogate_pair_decodes() {
     let pair = parse("\"\\ud83c\\udf0d\"").unwrap();
@@ -138,6 +150,7 @@ fn surrogate_pair_decodes() {
     assert_eq!(pair.string_value().unwrap(), "🌍");
 }
 
+// Requirements: RQ-015
 #[test]
 fn factories_validate_arguments() {
     assert_eq!(
@@ -158,6 +171,7 @@ fn factories_validate_arguments() {
     assert_eq!(Value::object(&OrderedMap::new()).unwrap().compact(), "{}");
 }
 
+// Requirements: RQ-014
 #[test]
 fn wrong_kind_access_is_reported() {
     let array = parse("[1]").unwrap();
@@ -171,6 +185,7 @@ fn wrong_kind_access_is_reported() {
     assert_eq!(object.kind(), Kind::Object);
 }
 
+// Requirements: RQ-018
 #[test]
 fn root_keeps_surrounding_text() {
     let value = parse("  [1] \n").unwrap();
@@ -204,7 +219,10 @@ fn public_api_exports_the_entry_points() {
     let parsed = parse(&stringify(&built)).unwrap();
     let items = parsed.members().unwrap().get("a").unwrap().items().unwrap();
     let kinds: Vec<Kind> = items.iter().map(Value::kind).collect();
-    assert_eq!(kinds, [Kind::String, Kind::Number, Kind::Boolean, Kind::Null]);
+    assert_eq!(
+        kinds,
+        [Kind::String, Kind::Number, Kind::Boolean, Kind::Null]
+    );
     assert_eq!(items[0].string_value().unwrap(), "x");
     assert_eq!(items[1].number_literal(), Some("1"));
     assert_eq!(items[2].boolean_value(), Some(true));

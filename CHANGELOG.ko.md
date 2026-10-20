@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 0af1c401670f6d3dff930d98ca80e3201fbcc1cdac3a0ff95ec2c92200395de1 -->
+<!-- source-sha256: 2737764d0b0715d03b9ae66cbbdb601fc083dbae7cf7aa904f16e2d1db72f906 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- 각 test는 parity unit이 인용한 requirement를 이름으로 적습니다 (T2.4-4): 모든 binding(js, rust, go, python, php, php-extension case)의 test 위에 `Requirements: RQ-nnn` 주석을 두고, 하위 class가 상속한 case를 실행하는 곳에는 class 문서를 둡니다. Red: `make parity-declarations-check` R15 unnamed-requirement 178건; green: R15 0건(R1 84건과 R2 172건은 T2.4-1과 T2.4-2 항목에 남음). T2.4-3 test의 서식도 함께 고쳤습니다: `make lint-php`, `make lint-python`, `cargo fmt --check` 통과.
 - 확장은 자기 package의 version을 보고합니다 (T2.16): `config.m4`가 `../composer.json`(package, PIE build, kit의 build 모두에서 `src/` 옆에 있음, K295)에서 `PHP_POLYSPEC_ORDERED_JSON_VERSION`을 정의하고, `ordered_json.c`가 이를 쓰며, 상수 `ORDERED_JSON_VERSION = 0.0.1`은 없앴고, verifier의 `extension_version` runtime 검사는 같은 C 파일의 상수가 아니라 `composer.json`의 version과 `phpversion('polyspec_ordered_json')`을 비교합니다. Red: `runtimeVersions(['php-extension'])`가 `phpversion('polyspec_ordered_json') '0.0.1' differs from the version 0.0.9 of composer.json`으로 실패; green: `{ php: '8.4.26', extension_version: '0.0.9' }`, `scripts/verify.mts --only php-extension` passed, registry test 7 passed, `make release-versions TAG=v0.0.9` passed.
 - PHP 확장은 S10을 따릅니다 (T2.8): 이름 `polyspec/ordered-json-php-ext`와 `polyspec_ordered_json`, `@generate-function-entries`를 가진 stub 하나, `make php-ext-arginfo`가 쓰고 손으로 쓴 arginfo와 function table 대신 `ordered_json.c`가 include하는 추적되는 arginfo header, 그리고 `var/php-ext/polyspec_ordered_json.so`를 빌드하는 `make build-php-ext`이며, verifier(`scripts/registry.mts`), PIE 검사, `config/parity.json`, `make parity-check`가 이를 불러옵니다. 제자리 빌드인 `make php-extension`은 없앴습니다. Red: `make lint-php-ext` exit 2(arginfo header 없음, K290 전에는 `make php-ext-arginfo`가 kit에서 실패); green: `make lint-php-ext` exit 0, `make build-php-ext`가 library를 빌드, `scripts/verify.mts --only php-extension` 공식 예제 17 + 공유 case 98 passed, registry test 7 passed.
 - 의존성 review 기록은 manifest 및 lock과 일치하고 모든 registry 의존성이 최신 stable release입니다 (T2.20): PHPUnit 13.4.3, ruff 0.17.1, setuptools 84.2.0(kit K296 뒤 `make dependency-review UPDATE=1`이 pin). Red: `make dependency-policy-check` exit 2, 4건(2026-10-15 review 뒤의 lock), 이어서 1건(setuptools); green: exit 0.

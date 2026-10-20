@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class ValueClassTest extends TestCase
 {
+    // Requirements: RQ-021
     public function testHydrateWithoutTheValueClass(): void
     {
         self::assertTrue(

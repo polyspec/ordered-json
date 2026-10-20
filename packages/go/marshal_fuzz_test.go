@@ -99,6 +99,7 @@ func (r *marshalRNG) value(depth int) any {
 	}
 }
 
+// Requirements: RQ-020
 func TestMarshalMatchesHostEncoderStructures(t *testing.T) {
 	cases := 20000
 	if testing.Short() {
@@ -144,6 +145,7 @@ func TestMarshalMatchesHostEncoderStructures(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-020
 func TestMarshalOmitRulesFollowTheHostEncoder(t *testing.T) {
 	type omissions struct {
 		EmptyString string         `json:"emptystring,omitempty"`
@@ -167,6 +169,7 @@ func TestMarshalOmitRulesFollowTheHostEncoder(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-010
 func TestMarshalReportsNonFiniteNumbers(t *testing.T) {
 	for _, value := range []float64{math.NaN(), math.Inf(1), math.Inf(-1)} {
 		if _, err := Marshal(map[string]float64{"x": value}); err == nil {

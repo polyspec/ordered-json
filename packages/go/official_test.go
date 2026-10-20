@@ -12,6 +12,7 @@ import (
 // through the factories (docs/spec/json-contract.md#acceptance). The examples are read with the library: their trees hold
 // lone surrogates, which encoding/json replaces, and every string of a tree is compared as its UTF-16 code units.
 
+// Requirements: RQ-022
 func TestOfficial(t *testing.T) {
 	source, err := os.ReadFile("../../examples/official.json")
 	if err != nil {

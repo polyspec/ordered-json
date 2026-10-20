@@ -21,6 +21,7 @@ from polyspec.ordered_json import (
 
 
 class StandardCases(unittest.TestCase):
+    # Requirements: RQ-006
     def test_depth_argument_is_bounded(self):
         for limit in (-1, MAX_DEPTH + 1, 257):
             with self.subTest(limit=limit):
@@ -31,6 +32,7 @@ class StandardCases(unittest.TestCase):
         with self.assertRaises(ParseError):
             parse("[]", ParseOptions(max_depth=0))
 
+    # Requirements: RQ-006
     def test_depth_limit_is_enforced(self):
         document = "[" * (MAX_DEPTH + 1) + "]" * (MAX_DEPTH + 1)
         with self.assertRaises(ParseError) as caught:
@@ -38,12 +40,14 @@ class StandardCases(unittest.TestCase):
         self.assertEqual(caught.exception.kind, "maximum_depth_exceeded")
         self.assertEqual(caught.exception.offset, MAX_DEPTH)
 
+    # Requirements: RQ-004
     def test_parse_errors_report_offsets(self):
         # U+D55C (a Korean syllable) is three UTF-8 bytes, so the offset of the control character is a byte position.
         with self.assertRaises(ParseError) as caught:
             parse_bytes(b'["\xed\x95\x9c\x01"]')
         self.assertEqual((caught.exception.offset, caught.exception.unit), (5, "byte"))
 
+    # Requirements: RQ-005
     def test_rejection_names_its_kind(self):
         for document, kind in (
             ("{", "expected_object_key"),
@@ -64,6 +68,7 @@ class StandardCases(unittest.TestCase):
                     parse(document)
                 self.assertEqual(caught.exception.kind, kind)
 
+    # Requirements: RQ-014
     def test_wrong_kind_access_is_reported(self):
         value = parse('{"a":"b"}').get("a")
         with self.assertRaisesRegex(TypeError, "Expected number, got string"):
@@ -71,12 +76,14 @@ class StandardCases(unittest.TestCase):
         with self.assertRaisesRegex(TypeError, "Expected array, got string"):
             value.items()
 
+    # Requirements: RQ-002, RQ-019
     def test_member_lookup_uses_decoded_names(self):
         value = parse('{"\\u0062":1,"b":2,"\\ud83d\\ude00":3}')
         self.assertEqual(value.get("b").number_literal(), "2")
         self.assertEqual(value.get_units((0xD83D, 0xDE00)).number_literal(), "3")
         self.assertIsNone(value.get("missing"))
 
+    # Requirements: RQ-001
     def test_repeated_key_keeps_first_position_and_last_value(self):
         value = parse('{"b":1,"a":2,"b":3}')
         self.assertEqual(stringify(value), '{"b":3,"a":2}')
@@ -85,22 +92,26 @@ class StandardCases(unittest.TestCase):
         with self.assertRaises(ParseError):
             parse('{"a":1,"a":tru}')
 
+    # Requirements: RQ-018
     def test_root_keeps_surrounding_text(self):
         value = parse(" 1 ")
         self.assertEqual(value.raw, " 1 ")
         self.assertEqual(value.number_literal(), "1")
         self.assertEqual(parse(" [1] ").raw, " [1] ")
 
+    # Requirements: RQ-009
     def test_unpaired_surrogate_stays_in_units(self):
         value = parse('{"k":"\\ud800"}').get("k")
         self.assertEqual(value.string_units(), [0xD800])
         self.assertEqual(stringify(value), '"\\ud800"')
 
+    # Requirements: RQ-009
     def test_surrogate_pair_decodes(self):
         value = parse('{"k":"\\ud83d\\ude00"}').get("k")
         self.assertEqual(value.string_units(), [0xD83D, 0xDE00])
         self.assertEqual(value.string_value(), "😀")
 
+    # Requirements: RQ-015
     def test_factories_validate_arguments(self):
         with self.assertRaises(TypeError):
             Value.string(1)
@@ -119,12 +130,14 @@ class StandardCases(unittest.TestCase):
         with self.assertRaises(TypeError):
             Value.object({1: Value.null()})
 
+    # Requirements: RQ-012
     def test_values_come_only_from_the_library(self):
         with self.assertRaises(TypeError):
             Value()
         with self.assertRaises(TypeError):
             stringify({"a": 1})
 
+    # Requirements: RQ-013
     def test_returned_collections_are_immutable(self):
         value = parse('{"a":1,"b":[1,2]}')
         members = value.members()
@@ -135,11 +148,13 @@ class StandardCases(unittest.TestCase):
             [stringify(item) for item in value.get("b").items()], ["1", "2"]
         )
 
+    # Requirements: RQ-020
     def test_host_serialization_boundary(self):
         # The host encoder has no ordered knowledge and refuses the value.
         with self.assertRaises(TypeError):
             json.dumps(parse('{"a":1}'))
 
+    # Requirements: RQ-007
     def test_bytes_input_is_validated(self):
         with self.assertRaises(ParseError) as caught:
             parse_bytes(b'["\xc3"]')
@@ -147,6 +162,7 @@ class StandardCases(unittest.TestCase):
             (caught.exception.kind, caught.exception.offset), ("invalid_utf8", 2)
         )
 
+    # Requirements: RQ-004, RQ-007
     def test_invalid_utf8_reports_the_first_bad_byte(self):
         # bytes.decode validates the document: the rejection is caused by its UnicodeDecodeError,
         # whose start is the offset, and the package holds no UTF-8 checker of its own.
@@ -168,6 +184,7 @@ class StandardCases(unittest.TestCase):
                 self.assertIsInstance(caught.exception.__cause__, UnicodeDecodeError)
                 self.assertEqual(caught.exception.__cause__.start, offset)
 
+    # Requirements: RQ-016
     def test_ordered_map_rejects_non_string_key(self):
         with self.assertRaises(TypeError):
             Value.object({1: Value.null()})
@@ -176,6 +193,7 @@ class StandardCases(unittest.TestCase):
 
 
 class PackageCases(unittest.TestCase):
+    # Requirements: RQ-017
     def test_strict_parse_rejects_duplicate_keys(self):
         for document, offset in (
             ('{"b":1,"b":2}', 7),
@@ -189,6 +207,7 @@ class PackageCases(unittest.TestCase):
                 self.assertEqual(caught.exception.kind, "duplicate_object_key")
                 self.assertEqual(caught.exception.offset, offset)
 
+    # Requirements: RQ-017
     def test_strict_parse_accepts_unique_keys(self):
         value = parse('{"b":1,"a":2}', ParseOptions(reject_duplicates=True))
         self.assertEqual(stringify(value), '{"b":1,"a":2}')
@@ -198,9 +217,11 @@ class PackageCases(unittest.TestCase):
         with self.assertRaises(TypeError):
             parse("1", ParseOptions(reject_duplicates=1))
 
+    # Requirements: RQ-009
     def test_string_value_keeps_an_unpaired_surrogate(self):
         self.assertEqual(parse('"a\\ud800"').string_value(), "a\ud800")
 
+    # Requirements: RQ-007
     def test_utf8_validation_holds_for_long_multibyte_text(self):
         text = "\ud55c\U0001f30d" * 64
         self.assertEqual(
@@ -211,6 +232,7 @@ class PackageCases(unittest.TestCase):
         self.assertEqual(caught.exception.kind, "invalid_utf8")
         self.assertEqual(caught.exception.offset, 2)
 
+    # Requirements: RQ-008
     def test_text_input_rejects_lone_surrogates(self):
         with self.assertRaises(ParseError) as caught:
             parse('["한"]\ud800')
@@ -221,10 +243,18 @@ class PackageCases(unittest.TestCase):
         # RQ-023: the parse, serialization, factory and accessor functions are exported.
         for name in ("parse", "parse_bytes", "stringify", "Value"):
             self.assertTrue(callable(getattr(ordered_json, name)), name)
-        built = Value.object([("a", Value.array([Value.string("x"), Value.number("1"), Value.boolean(True), Value.null()]))])
+        scalars = [
+            Value.string("x"),
+            Value.number("1"),
+            Value.boolean(True),
+            Value.null(),
+        ]
+        built = Value.object([("a", Value.array(scalars))])
         self.assertEqual(stringify(built), '{"a":["x",1,true,null]}')
         items = parse(stringify(built)).get("a").items()
-        self.assertEqual([item.kind for item in items], ["string", "number", "boolean", "null"])
+        self.assertEqual(
+            [item.kind for item in items], ["string", "number", "boolean", "null"]
+        )
         self.assertEqual(items[0].string_value(), "x")
         self.assertEqual(items[1].number_literal(), "1")
         self.assertIs(items[2].boolean_value(), True)

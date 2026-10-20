@@ -29,6 +29,7 @@ final class DescriptorTest extends TestCase
         self::assertTrue(class_exists(Value::class));
     }
 
+    // Requirements: RQ-001, RQ-021
     public function testHydrateObjectMembers(): void
     {
         $members = ordered_json_hydrate(self::SOURCE, self::tape(), 0);
@@ -36,6 +37,7 @@ final class DescriptorTest extends TestCase
         self::assertSame(['1', '[2,3]'], self::tokens($members));
     }
 
+    // Requirements: RQ-003, RQ-021
     public function testHydrateArrayItems(): void
     {
         self::assertSame(
@@ -44,6 +46,7 @@ final class DescriptorTest extends TestCase
         );
     }
 
+    // Requirements: RQ-002
     public function testEscapedMemberNameDecodes(): void
     {
         $escaped = '{"aé🌍":1}';
@@ -51,6 +54,7 @@ final class DescriptorTest extends TestCase
         self::assertSame(["a\u{e9}\u{1f30d}"], array_keys($members));
     }
 
+    // Requirements: RQ-009
     public function testUnpairedSurrogateMemberNameKeepsWtf8Identity(): void
     {
         $lone = '{"a\ud800":1}';
@@ -58,6 +62,7 @@ final class DescriptorTest extends TestCase
         self::assertSame(["a\xed\xa0\x80"], array_keys($members));
     }
 
+    // Requirements: RQ-015, RQ-021
     public function testHydrateRejectsMalformedDescriptors(): void
     {
         $tape = self::tape();
@@ -76,6 +81,7 @@ final class DescriptorTest extends TestCase
         }
     }
 
+    // Requirements: RQ-021
     public function testCompactNodeRejectsMismatchedDescriptors(): void
     {
         self::expectThrown(
@@ -85,6 +91,7 @@ final class DescriptorTest extends TestCase
         self::expectThrown(ValueError::class, static fn() => ordered_json_compact_node(self::SOURCE, self::tape(), -1));
     }
 
+    // Requirements: RQ-011, RQ-021
     public function testCompactNodeCopiesACompactToken(): void
     {
         self::assertSame(
@@ -94,12 +101,14 @@ final class DescriptorTest extends TestCase
         self::assertSame(self::SOURCE, ordered_json_compact_node(self::SOURCE, self::tape(), 0));
     }
 
+    // Requirements: RQ-006
     public function testScanRejectsDepthOutsideTheRange(): void
     {
         self::expectThrown(ValueError::class, static fn() => ordered_json_scan('[]', -1));
         self::expectThrown(ValueError::class, static fn() => ordered_json_scan('[]', 257));
     }
 
+    // Requirements: RQ-004
     public function testScanReportsTheParseErrorOffset(): void
     {
         try {

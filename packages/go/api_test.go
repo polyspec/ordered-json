@@ -11,12 +11,14 @@ import (
 // contract through the adapter; argument validation, map building, UTF-16
 // units, wrong-kind access and the zero value are reachable only from here.
 
+// Requirements: RQ-006
 func TestDepthArgumentIsBounded(t *testing.T) {
 	if _, err := ParseWithMaxDepth("[]", MaxDepth+1); err == nil || err.Error() != "maxDepth must be between 0 and 256" {
 		t.Fatalf("ParseWithMaxDepth(257) error = %v", err)
 	}
 }
 
+// Requirements: RQ-006
 func TestDepthLimitIsEnforced(t *testing.T) {
 	if _, err := ParseWithMaxDepth("[[1]]", 2); err != nil {
 		t.Fatalf("ParseWithMaxDepth(2) error = %v", err)
@@ -28,6 +30,7 @@ func TestDepthLimitIsEnforced(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-005
 func TestRejectionNamesItsKind(t *testing.T) {
 	// The wording is Go's own; the kind is the shared contract.
 	cases := map[string]string{
@@ -49,6 +52,7 @@ func TestRejectionNamesItsKind(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-004, RQ-007
 func TestInvalidUTF8ReportsTheFirstBadByte(t *testing.T) {
 	// The bad byte sits at index 2 of ["<bad>"]; the error names that position.
 	var failure *ParseError
@@ -61,6 +65,7 @@ func TestInvalidUTF8ReportsTheFirstBadByte(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-004
 func TestParseErrorsReportOffsets(t *testing.T) {
 	var failure *ParseError
 	_, err := Parse("[1,]")
@@ -77,6 +82,7 @@ func TestParseErrorsReportOffsets(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-018
 func TestBorrowedInputIsCopiedOnAccess(t *testing.T) {
 	// Borrowed parsing reads the caller's bytes, so text handed back is copied.
 	source := []byte(`{"a":"text"}`)
@@ -103,6 +109,7 @@ func TestBorrowedInputIsCopiedOnAccess(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-007
 func TestBytesInputIsValidated(t *testing.T) {
 	var invalid *ParseError
 	_, err := ParseBytes([]byte{'[', '"', 0xff, '"', ']'})
@@ -118,6 +125,7 @@ func TestBytesInputIsValidated(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-014
 func TestWrongKindAccessIsReported(t *testing.T) {
 	array, object := mustParse(t, "[1]"), mustParse(t, `{"a":1}`)
 	cases := []struct {
@@ -143,6 +151,7 @@ func TestWrongKindAccessIsReported(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-016
 func TestOrderedMapRejectsNonStringKey(t *testing.T) {
 	members := &OrderedMap{}
 	number, err := Number("1")
@@ -160,6 +169,7 @@ func TestOrderedMapRejectsNonStringKey(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-001
 func TestRepeatedKeyKeepsFirstPositionAndLastValue(t *testing.T) {
 	members := &OrderedMap{}
 	for _, pair := range [][2]string{{"a", "1"}, {"b", "2"}, {"a", "3"}} {
@@ -187,6 +197,7 @@ func TestRepeatedKeyKeepsFirstPositionAndLastValue(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-002, RQ-019
 func TestMemberLookupUsesDecodedNames(t *testing.T) {
 	value := mustParse(t, `{"a\u00e9":1,"b":2}`)
 	if child := value.Get("aé"); child == nil {
@@ -205,6 +216,7 @@ func TestMemberLookupUsesDecodedNames(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-009
 func TestUnpairedSurrogateStaysInUnits(t *testing.T) {
 	lone := mustParse(t, `"a\ud800"`)
 	units, err := lone.StringUnits()
@@ -222,6 +234,7 @@ func TestUnpairedSurrogateStaysInUnits(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-009
 func TestSurrogatePairDecodes(t *testing.T) {
 	pair := mustParse(t, `"\ud83c\udf0d"`)
 	units, err := pair.StringUnits()
@@ -236,6 +249,7 @@ func TestSurrogatePairDecodes(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-007
 func TestUtf8ValidationHoldsForLongMultibyteText(t *testing.T) {
 	text := strings.Repeat("\ud55c\U0001f30d", 64)
 	value, err := ParseBytes([]byte(`{"key":"` + text + `"}`))
@@ -251,6 +265,7 @@ func TestUtf8ValidationHoldsForLongMultibyteText(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-015
 func TestFactoriesValidateArguments(t *testing.T) {
 	if _, err := Number(" 1"); err == nil || err.Error() != "expected number literal without whitespace" {
 		t.Fatalf("Number(\" 1\") error = %v", err)
@@ -276,6 +291,7 @@ func TestFactoriesValidateArguments(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-012
 func TestValuesComeOnlyFromTheLibrary(t *testing.T) {
 	var zero Value
 	if _, err := Stringify(&zero); err == nil || err.Error() != "expected orderedjson Value" {
@@ -289,6 +305,7 @@ func TestValuesComeOnlyFromTheLibrary(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-013
 func TestReturnedCollectionsAreImmutable(t *testing.T) {
 	array := mustParse(t, "[1,2]")
 	items, err := array.Items()
@@ -315,6 +332,7 @@ func TestReturnedCollectionsAreImmutable(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-018
 func TestRootKeepsSurroundingText(t *testing.T) {
 	value := mustParse(t, "  [1] \n")
 	if value.Raw() != "  [1] \n" {
@@ -332,6 +350,7 @@ func TestRootKeepsSurroundingText(t *testing.T) {
 	}
 }
 
+// Requirements: RQ-020
 func TestHostSerializationBoundary(t *testing.T) {
 	// MarshalJSON is the documented integration point; it writes the ordered text.
 	encoded, err := json.Marshal(mustParse(t, `{"b":1,"a":2}`))
