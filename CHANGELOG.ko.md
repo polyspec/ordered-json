@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: f05d17e3b44f484d9a43d3ba16573fd2de83fba24528d8561a8fc764420049f6 -->
+<!-- source-sha256: fc05728d419985cd6120a240194c33751ad7ff4cc7a329dec94c87b6372dfce8 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- PRINCIPLES 사본은 `make kit-sync`가 쓴 설치된 kit의 것과 같습니다 (T2.49). Red: `make kit-check` exit 2, 2건; green: exit 0.
 - benchmark는 `make build-php-ext`가 게시한 확장(registry의 `builtExtension`)을 올리고, Go zero-copy 파싱, PHP 확장, 이 계획의 Rust와 Go 변경 뒤 clean checkout에서 `benchmarks/results.json`을 다시 측정합니다 (T2.47). Red: `make benchmark`가 PIE 경로를 읽어 `the PHP extension of the benchmark was not built`로 멈춤; green: `make benchmark` exit 0, `source.dirty` false, 비교는 `not-comparable`(환경이 commit된 baseline과 다름); `make typecheck` passed.
 - PRINCIPLES 사본은 `make kit-sync`가 쓴 설치된 kit의 것과 같습니다 (T2.46). Red: `make kit-check` exit 2, 2건; green: exit 0.
 - `CHECK_TARGETS`와 `ci.yml`의 첫 job이 `bypass-check`를 실행합니다 (T2.45). test, script, Makefile이 CI를 흉내 내거나 gate를 최신으로 가정하거나 hook을 건너뛰면 실패하는 kit의 gate입니다. Red: `make kit-check` exit 2, `CHECK_TARGETS runs no bypass-check`; green: exit 0, workflow-rules test passed.
