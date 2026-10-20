@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 7e35fc2028ee65c49081f0ab403f70fb20db13a88d3542c6d26e43adb3c39e04 -->
+<!-- source-sha256: 188391cf66d3a9b71eee7410b0c55cd6c19b8a5fc81f1eb97fe63ece8c468770 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.59: ordered-json은 kit f9eb43dd의 복사본을 받는다. make kit-sync가 scripts/kit/kit-bootstrap.mk와 config/layout.kit.yml을 쓰고, make hooks가 .githooks/commit-msg를 쓴다. red: make kit-check가 설치된 kit과 다른 복사본 두 개로 exit 2였고, green: make kit-check가 exit 0. (T2.59)
 - T2.58: 영문 CHANGELOG.md와 kit-standard 체크리스트의 한국어 쌍이 영문 원문의 source-sha256을 다시 기록한다. red: make docs-check가 67cd062 이후 두 marker가 낡았다고 보고했고, green: 통과한다. (T2.58)
 
 - T2.57: Go package는 errcheck gate가 찾은 모든 오류를 처리한다(P8). `orderedjson.go`는 `Compact`의 오류를 panic하거나(`String`) 반환하고(`Array`, `Object`), literal은 `mustBuild`로 만들며, 이 함수는 내부 literal이 parse되지 않을 때만 panic한다. `api_test.go`는 test helper `must`로 각 호출을 확인한다. `internal/benchmark/main.go`는 Rust benchmark와 같은 방식으로 설정을 읽고(변수가 없으면 기본값, 양의 정수가 아니면 실행을 멈춤), `strconv`와 `json.Marshal`의 오류를 확인한다. `internal/probe/main.go`는 `StringUnits`의 오류를 확인한다. red: `make lint-go`가 exit 2, errcheck finding 33개(orderedjson.go 7, api_test.go 21, benchmark 3, probe 2)를 보고했고, green: `make lint-go`가 exit 0, issue 0개, deadcode passed, `make test-go CASES=Official` 18 passed, api test 29 passed. T2.56은 이 row로 합쳐졌다. (T2.57)
