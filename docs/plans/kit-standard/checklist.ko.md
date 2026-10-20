@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 97ba318cc6874ab304662550ba903694c2a35057472962d28e1b40c32b7858f9 -->
+<!-- source-sha256: 0a6922fbcb7f72c96a5fd175fc03beedf31c9a7367c7a67dd6ccfdf4617dc54d -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -36,3 +36,4 @@
 | T2.26 | Rust API는 type이 본질적으로 보장하는 contract 동작의 binding을 가집니다: 값은 library에서만 나오고(RQ-012) 반환된 collection은 변경할 수 없습니다(RQ-013) | `packages/rust/tests/api.rs`, `CHANGELOG.md`(.ko) | `make test-rust CASES=come_only` | [o] |
 | T2.27 | Go package는 요청 시 반복된 decode된 object key를 거부합니다 (RQ-017): ParseRejectDuplicates이며 kind는 duplicate_object_key, 위치는 두 번째 key의 첫 byte입니다 | `packages/go/orderedjson.go`, `packages/go/api_test.go`, `config/parity.json`, `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make test-go CASES=StrictParse` | [o] |
 | T2.28 | Rust, Go, PHP는 UTF-8과 surrogate unit을 binding합니다 (RQ-007, RQ-008, RQ-009): PHP의 byte 입력을 검증하고, text의 짝 없는 surrogate 원문은 문법 전에 거부하며, 이스케이프된 짝 없는 surrogate의 string value는 library 형태로 유지합니다(Go와 PHP는 WTF-8, Rust는 unit을 가리키며 거부) | `packages/go/orderedjson.go`, `packages/php/src/`, `packages/*/tests`, `config/parity.json`, `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make test-go CASES=Surrogate` and `make test-php CASES=Surrogate` | [o] |
+| T2.29 | kit 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
