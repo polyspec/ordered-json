@@ -1,6 +1,7 @@
 #include "ordered_json_internal.h"
 #include "Zend/zend_exceptions.h"
 #include "ext/standard/info.h"
+#include "polyspec_ordered_json_arginfo.h"
 
 #define ORDERED_JSON_VERSION "0.0.1"
 #define ORDERED_JSON_MAX_DEPTH 256
@@ -407,21 +408,6 @@ static zend_string *oj_compact(zend_string *source, const oj_tape *t, size_t ind
     return out;
 }
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ordered_json_scan, 0, 1, IS_ARRAY, 0)
-    ZEND_ARG_TYPE_INFO(0, source, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, maxDepth, IS_LONG, 0, "256")
-ZEND_END_ARG_INFO()
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ordered_json_hydrate, 0, 3, IS_ARRAY, 0)
-    ZEND_ARG_TYPE_INFO(0, source, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, node, IS_ARRAY, 0)
-    ZEND_ARG_TYPE_INFO(0, index, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ordered_json_compact_node, 0, 2, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, source, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, node, IS_ARRAY, 0)
-    ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, index, IS_LONG, 0, "0")
-ZEND_END_ARG_INFO()
-
 PHP_FUNCTION(ordered_json_scan) {
     zend_string *source;
     zend_long max_depth = ORDERED_JSON_MAX_DEPTH;
@@ -465,12 +451,6 @@ PHP_FUNCTION(ordered_json_compact_node) {
     RETURN_STR(out);
 }
 
-static const zend_function_entry ordered_json_functions[] = {
-    PHP_FE(ordered_json_scan, arginfo_ordered_json_scan)
-    PHP_FE(ordered_json_hydrate, arginfo_ordered_json_hydrate)
-    PHP_FE(ordered_json_compact_node, arginfo_ordered_json_compact_node)
-    PHP_FE_END
-};
 PHP_MINIT_FUNCTION(polyspec_ordered_json) {
     zend_class_entry ce;
     INIT_CLASS_ENTRY(ce, "Polyspec\\OrderedJson\\NativeParseError", NULL);
@@ -488,7 +468,7 @@ PHP_MINFO_FUNCTION(polyspec_ordered_json) {
 }
 zend_module_entry polyspec_ordered_json_module_entry = {
     STANDARD_MODULE_HEADER,
-    "polyspec_ordered_json", ordered_json_functions,
+    "polyspec_ordered_json", ext_functions,
     PHP_MINIT(polyspec_ordered_json), NULL, NULL, PHP_RSHUTDOWN(polyspec_ordered_json), PHP_MINFO(polyspec_ordered_json),
     ORDERED_JSON_VERSION, PHP_MODULE_GLOBALS(polyspec_ordered_json), PHP_GINIT(polyspec_ordered_json), NULL, NULL,
     STANDARD_MODULE_PROPERTIES_EX

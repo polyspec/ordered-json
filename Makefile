@@ -39,7 +39,7 @@ include scripts/kit/kit-bootstrap.mk
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
 CHECK_TARGETS := kit-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check docs-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-php-ext test-php-ext lint-python pie-check ordered-json-test-scripts typecheck lint-ts
 
-.PHONY: check ordered-json-test-scripts typecheck ordered-json-install-php ordered-json-install-python php-extension verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
+.PHONY: check ordered-json-test-scripts typecheck ordered-json-install-php ordered-json-install-python verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
 	benchmark benchmark-check python-parse-budget release-config-check install ordered-json-install ordered-json-install-rust ordered-json-install-external \
 	ordered-json-js-check ordered-json-js-test ordered-json-go-check ordered-json-go-test ordered-json-php-check ordered-json-php-test \
 	ordered-json-php-ext-check ordered-json-php-ext-test ordered-json-python-check ordered-json-python-test ordered-json-rust-check ordered-json-rust-test
@@ -142,13 +142,9 @@ ordered-json-python-test: ordered-json-python-check
 ordered-json-rust-check: verify-rust
 ordered-json-rust-test: ordered-json-rust-check
 
-# php-extension builds packages/php-ext/src/modules/polyspec_ordered_json.so in place, with phpize and configure when the build has
-# no Makefile yet and then make, which rebuilds what changed. config/parity.json loads it for the tests of the
-# implementation php-extension, so parity-check of kit depends on it.
-php-extension:
-	cd packages/php-ext/src && { test -f Makefile || { phpize && ./configure --enable-polyspec-ordered-json; }; } && $(MAKE)
-
-parity-check: php-extension
+# parity-check loads the library that build-php-ext (kit, S10) publishes into var/php-ext, which config/parity.json names for the
+# implementation php-extension.
+parity-check: build-php-ext
 
 # python-parse-budget compares the CPU time of the Python parse with the pure PHP parse on one generated document and fails
 # when the Python median exceeds three times the PHP median (benchmarks/python-parse/run.py). A person runs it after a

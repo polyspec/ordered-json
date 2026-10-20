@@ -29,7 +29,9 @@ export type Commands = {
   artifacts?: string[];
 };
 
-const PHP_EXTENSION = 'extension={php-extension}/src/modules/polyspec_ordered_json.so';
+// The library that make build-php-ext (kit, S10) publishes, relative to the repository.
+const EXTENSION_BUILD = 'var/php-ext/polyspec_ordered_json.so';
+const PHP_EXTENSION = 'extension={extension}';
 export const COMMANDS: Record<string, Commands> = {
   js: { command: ['node', '{js}/tests/probe.mjs'], runtime: { node: ['node', '--version'] } },
   rust: {
@@ -51,13 +53,8 @@ export const COMMANDS: Record<string, Commands> = {
   'php-extension': {
     dependencies: ['php'],
     buildInCopy: true,
-    prepare: [
-      { cwd: '{php-extension}/src', ifExists: '{php-extension}/src/Makefile', command: ['make', 'distclean'] },
-      { cwd: '{php-extension}/src', command: ['phpize', '--clean'] },
-      { cwd: '{php-extension}/src', command: ['phpize'] },
-      { cwd: '{php-extension}/src', command: ['./configure', '--enable-polyspec-ordered-json'] },
-      { cwd: '{php-extension}/src', command: ['make', '-j2'] },
-    ],
+    // The build of kit publishes the library; the copy of the package serves the PIE check, which builds in it.
+    prepare: [{ cwd: '{repository}', command: ['make', 'build-php-ext'] }],
     command: ['php', '-n', '-d', PHP_EXTENSION, '{php}/tests/probe.php', '--native'],
     runtime: {
       php: ['php', '-n', '-r', 'echo PHP_VERSION;'],
@@ -168,8 +165,12 @@ function expand(value: string, variables: Record<string, string>): string {
 const expandArgv = ([program, ...args]: Argv, variables: Record<string, string>): Argv =>
   [expand(program, variables), ...args.map(argument => expand(argument, variables))];
 
-/** One verification run: its temporary root, the directories that its commands use and the cache of its built probes. */
-export type Run = { root: string; paths: Record<string, string>; cache: string };
+/**
+ * One verification run: its temporary root, the directories that its commands use, the cache of its built probes and the
+ * PHP extension its probe loads (make build-php-ext publishes var/php-ext/polyspec_ordered_json.so; the PIE check names the
+ * module that PIE built).
+ */
+export type Run = { root: string; paths: Record<string, string>; cache: string; extension?: string };
 
 /**
  * Runs `body` in a run directory of its own, removed when the run ends. A repository whose implementation declares
@@ -207,11 +208,12 @@ export function copySources(source: string, target: string): void {
   console.log(`copied ${names.length} source files from ${source} to ${target}`);
 }
 
-/** The variables of the commands of a run: the directory of each implementation and the cache. */
-const variablesOf = (run: Pick<Run, 'paths' | 'cache'>): Record<string, string> => ({ ...run.paths, cache: run.cache });
+/** The variables of the commands of a run: the directory of each implementation, the cache, the repository and the extension. */
+const variablesOf = (run: Pick<Run, 'paths' | 'cache' | 'extension'>): Record<string, string> =>
+  ({ ...run.paths, cache: run.cache, repository: ROOT, extension: run.extension ?? path.join(ROOT, EXTENSION_BUILD) });
 
 /** The environment of the commands of `name`: the caller's, with the variables that the implementation declares. */
-function environmentOf(name: string, run: Pick<Run, 'paths' | 'cache'>, registry = REGISTRY): NodeJS.ProcessEnv {
+function environmentOf(name: string, run: Pick<Run, 'paths' | 'cache' | 'extension'>, registry = REGISTRY): NodeJS.ProcessEnv {
   const declared = commandsOf(name, registry).env ?? {};
   return { ...process.env, ...Object.fromEntries(Object.entries(declared).map(([key, value]) => [key, expand(value, variablesOf(run))])) };
 }
@@ -278,7 +280,7 @@ export class Failures extends Error {
  * Runs the prepare steps of each selected implementation. A failed step ends the build of its implementation only; the
  * others build to their end, and Failures then names every failure. Returns the warning lines of the builds.
  */
-export async function prepare(selected: string[], run: Pick<Run, 'paths' | 'cache'>, registry = REGISTRY): Promise<{ implementation: string; message: string }[]> {
+export async function prepare(selected: string[], run: Pick<Run, 'paths' | 'cache' | 'extension'>, registry = REGISTRY): Promise<{ implementation: string; message: string }[]> {
   const variables = variablesOf(run);
   const warnings: { implementation: string; message: string }[] = [];
   const failures: string[] = [];
@@ -314,18 +316,18 @@ export async function prepare(selected: string[], run: Pick<Run, 'paths' | 'cach
 }
 
 /** The probe command of each selected implementation in the run. */
-export const probeCommands = (selected: string[], run: Pick<Run, 'paths' | 'cache'>, registry = REGISTRY): Record<string, Argv> =>
+export const probeCommands = (selected: string[], run: Pick<Run, 'paths' | 'cache' | 'extension'>, registry = REGISTRY): Record<string, Argv> =>
   Object.fromEntries(selected.map(name => [name, expandArgv(commandsOf(name, registry).command, variablesOf(run))]));
 
 /** The files that the build of `name` leaves behind, as its commands declare them. */
-export const artifactPaths = (name: string, run: Pick<Run, 'paths' | 'cache'>, registry = REGISTRY): string[] =>
+export const artifactPaths = (name: string, run: Pick<Run, 'paths' | 'cache' | 'extension'>, registry = REGISTRY): string[] =>
   (commandsOf(name, registry).artifacts ?? []).map(value => expand(value, variablesOf(run)));
 
 /**
  * The runtime versions of every selected implementation, each command run in the directory of its implementation, whose pin
  * files select the toolchain; Failures names every command that failed or printed nothing, after all ran.
  */
-export function runtimeVersions(selected: string[], run: Pick<Run, 'paths' | 'cache'>, registry = REGISTRY): Record<string, Record<string, string>> {
+export function runtimeVersions(selected: string[], run: Pick<Run, 'paths' | 'cache' | 'extension'>, registry = REGISTRY): Record<string, Record<string, string>> {
   const result: Record<string, Record<string, string>> = {};
   const failures: string[] = [];
   const failed = new Set<string>();

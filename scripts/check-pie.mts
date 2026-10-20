@@ -41,8 +41,8 @@ async function buildAndVerify(run: Run, pie: string, suite: string | undefined) 
   // A linked module carries a fresh UUID and signature, so its hash names this run only: it guards the module during the run
   // and is not recorded.
   const moduleHash = sha256(readFileSync(module));
-  const { results, counts } = await verifyProbes(probeCommands(['php-extension'], run), suite);
-  const versions = runtimeVersions(['php-extension'], run);
+  const { results, counts } = await verifyProbes(probeCommands(['php-extension'], { ...run, extension: module }), suite);
+  const versions = runtimeVersions(['php-extension'], { ...run, extension: module });
   const current = sourceManifest();
   if (current.sha256 !== sources.sha256) throw new Error(`the sources changed during the PIE verification:\n${manifestDifferences(sources, current).join('\n')}`);
   if (JSON.stringify(packages) !== JSON.stringify(packageRevisions()) || (suite !== undefined && JSON.stringify(supplementary) !== JSON.stringify(supplementaryManifest(suite)))

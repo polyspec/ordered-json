@@ -1,4 +1,6 @@
 <?php
+
+/** @generate-function-entries */
 /** Native descriptors are tapes of three integers per value: meta, start and end. */
 function ordered_json_scan(string $source, int $maxDepth = 256): array {}
 function ordered_json_hydrate(string $source, array $node, int $index): array {}
