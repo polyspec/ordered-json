@@ -3,7 +3,6 @@
 #include "ext/standard/info.h"
 #include "polyspec_ordered_json_arginfo.h"
 
-#define ORDERED_JSON_VERSION "0.0.1"
 #define ORDERED_JSON_MAX_DEPTH 256
 
 /* Objects with more members than this detect repeated keys with a hash table. */
@@ -457,20 +456,19 @@ PHP_MINIT_FUNCTION(polyspec_ordered_json) {
     oj_error_ce = zend_register_internal_class_ex(&ce, zend_ce_exception);
     zend_declare_property_long(oj_error_ce, "offset", sizeof("offset") - 1, 0, ZEND_ACC_PUBLIC);
     zend_declare_property_string(oj_error_ce, "kind", sizeof("kind") - 1, "", ZEND_ACC_PUBLIC);
-    REGISTER_STRING_CONSTANT("ORDERED_JSON_VERSION", ORDERED_JSON_VERSION, CONST_CS | CONST_PERSISTENT);
     return SUCCESS;
 }
 PHP_MINFO_FUNCTION(polyspec_ordered_json) {
     php_info_print_table_start();
     php_info_print_table_row(2, "polyspec_ordered_json support", "enabled");
-    php_info_print_table_row(2, "version", ORDERED_JSON_VERSION);
+    php_info_print_table_row(2, "version", PHP_POLYSPEC_ORDERED_JSON_VERSION);
     php_info_print_table_end();
 }
 zend_module_entry polyspec_ordered_json_module_entry = {
     STANDARD_MODULE_HEADER,
     "polyspec_ordered_json", ext_functions,
     PHP_MINIT(polyspec_ordered_json), NULL, NULL, PHP_RSHUTDOWN(polyspec_ordered_json), PHP_MINFO(polyspec_ordered_json),
-    ORDERED_JSON_VERSION, PHP_MODULE_GLOBALS(polyspec_ordered_json), PHP_GINIT(polyspec_ordered_json), NULL, NULL,
+    PHP_POLYSPEC_ORDERED_JSON_VERSION, PHP_MODULE_GLOBALS(polyspec_ordered_json), PHP_GINIT(polyspec_ordered_json), NULL, NULL,
     STANDARD_MODULE_PROPERTIES_EX
 };
 #ifdef COMPILE_DL_POLYSPEC_ORDERED_JSON

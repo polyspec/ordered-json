@@ -18,5 +18,8 @@ if test "$PHP_POLYSPEC_ORDERED_JSON" != "no"; then
     dnl A loadable bundle does not use the dynamic-library single-module flag.
     LT_MULTI_MODULE=yes
   ])
+  dnl The version of the extension is the version of its package: composer.json lies beside src/, in the package and in the build of kit.
+  PHP_POLYSPEC_ORDERED_JSON_VERSION=`sed -n 's/.*"version": *"\([[^"]]*\)".*/\1/p' "$srcdir/../composer.json"`
+  AC_DEFINE_UNQUOTED([PHP_POLYSPEC_ORDERED_JSON_VERSION], ["$PHP_POLYSPEC_ORDERED_JSON_VERSION"], [The version of the package])
   PHP_NEW_EXTENSION([polyspec_ordered_json], [ordered_json.c hydrate.c], [$ext_shared])
 fi

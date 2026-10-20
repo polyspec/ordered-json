@@ -58,8 +58,9 @@ export const COMMANDS: Record<string, Commands> = {
     command: ['php', '-n', '-d', PHP_EXTENSION, '{php}/tests/probe.php', '--native'],
     runtime: {
       php: ['php', '-n', '-r', 'echo PHP_VERSION;'],
+      // The extension reports the version of its package: the version of composer.json is the one source (config.m4 defines it).
       extension_version: ['php', '-n', '-d', PHP_EXTENSION, '-r',
-        "$native = phpversion('polyspec_ordered_json'); if ($native !== ORDERED_JSON_VERSION) { fwrite(STDERR, \"phpversion('polyspec_ordered_json') \" . var_export($native, true) . \" differs from ORDERED_JSON_VERSION \" . ORDERED_JSON_VERSION . \"\\n\"); exit(1); } echo ORDERED_JSON_VERSION;"],
+        "$package = json_decode(file_get_contents('{php-extension}/composer.json'), true, 8, JSON_THROW_ON_ERROR)['version']; $native = phpversion('polyspec_ordered_json'); if ($native !== $package) { fwrite(STDERR, \"phpversion('polyspec_ordered_json') \" . var_export($native, true) . \" differs from the version \" . $package . \" of composer.json\\n\"); exit(1); } echo $native;"],
     },
     artifacts: ['{php-extension}/src/modules/polyspec_ordered_json.so'],
   },
