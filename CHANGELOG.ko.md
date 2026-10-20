@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 9fe6802049510794c20f110ef545adfb4bc1f6e60f5abb367922d646a7c5bcf9 -->
+<!-- source-sha256: cdba36d024dba82424d4d1449e8c1c31472e7e9d3fff3053919689ded835f6b3 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,7 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
-- 확장은 확장을 올리고 실행한 `packages/php`의 PHPUnit 파일로 test합니다 (T2.19, kit K285): `packages/php-ext`에는 그 사본, `phpunit.xml`, `autoload-dev`, `packages/php`로 향하는 상대 경로가 없으며(T2.15-3에서 없앰), `config/parity.json`은 php-extension 구현을 `packages/php/tests`에 binding합니다. Red: 확장이 자체 하위 class `OfficialTest`와 `ValueApiTest`, `composer.json`의 `../php/` 경로를 가졌고 `make test-php-ext`를 빌드할 수 없었음; green: `make test-php-ext CASES=Test` test 40개 assertion 185개 passed.
+- 확장은 확장을 올리고 실행한 `packages/php`의 PHPUnit 파일로 test합니다 (T2.19): `packages/php-ext`에는 그 사본, `phpunit.xml`, `autoload-dev`, `packages/php`로 향하는 상대 경로가 없으며(T2.15-3에서 없앰), `config/parity.json`은 php-extension 구현을 `packages/php/tests`에 binding합니다. Red: 확장이 자체 하위 class `OfficialTest`와 `ValueApiTest`, `composer.json`의 `../php/` 경로를 가졌고 `make test-php-ext`를 빌드할 수 없었음; green: `make test-php-ext CASES=Test` test 40개 assertion 185개 passed.
 - PHP 확장은 PHP 라이브러리의 class와 함수를 같은 이름과 signature로 등록합니다 (T2.15): 명세, 라이브러리의 비공개 내부, C 구현은 하위 항목 T2.15-1부터 T2.15-3입니다. `make lint-php-ext` exit 0이며 `make test-php-ext`의 Reflection 비교를 통과했습니다.
 - 확장은 PHP 라이브러리를 C로 구현합니다 (T2.15-3): `Polyspec\OrderedJson\Value`(그 node들이 공유하는 참조 횟수 tape 위의 Zend object), `ParseError`, 함수 `parse`와 `stringify`, 상수 `MAX_DEPTH`를 stub과 arginfo header에서 `packages/php`의 이름과 signature로 등록합니다(라이브러리는 stub이 쓸 수 없는 `self` 대신 `Value`를 반환). descriptor 함수 `ordered_json_scan`, `ordered_json_hydrate`, `ordered_json_compact_node`, `NativeParseError`, 상수 `ORDERED_JSON_VERSION`, 이를 test하던 unit 10개, RQ-021, `packages/php-ext`의 test는 없앴습니다: 확장은 `packages/php`의 PHPUnit 파일을 확장을 올리고 실행해 test하며 `config/parity.json`이 php-extension 구현을 그 파일에 binding하고 symbol을 선언합니다. `packages/php-ext`는 package를 잠그지 않습니다. Red: `make test-php-ext`가 `NativeParseError`, `ordered_json_compact_node`, `ordered_json_hydrate`, `ordered_json_scan`을 라이브러리 선언 없이 등록되었다고 나열; green: `make lint-php-ext` exit 0, Reflection 비교 통과, `make test-php-ext CASES=Test` test 40개 assertion 185개(`make test-php`와 같음), `scripts/verify.mts --only php-extension` 공식 예제 17 + 공유 case 98 passed.
 - PHP test는 더 이상 확장이 로드되지 않았음을 단정하지 않습니다 (T2.22): `packages/php/tests`의 `OfficialTest`와 `ValueApiTest`가 test class 자체이며(abstract `*TestCase` class와 backend만 단정하던 하위 class는 없앴음), `make test-php`가 순수 PHP 라이브러리에서, `make test-php-ext`가 같은 파일을 확장을 올리고 실행합니다(S10). Red: 확장을 올리면 모든 case가 `these tests cover the pure PHP backend; run them without the polyspec_ordered_json extension`로 실패; green: `make test-php CASES=Test` 40 passed, assertion 185개(확장 실행은 T2.15-3에 포함).
