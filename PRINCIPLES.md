@@ -164,7 +164,7 @@ tool lands, a standard binds the work as written here.
   Enforced by: `make layout-check`
 - S6 Language parity: every implementation of a repository tests the same feature units, vectors and API at the same
   level, and each requirement that docs/spec defines (a bullet `**<id>**` or a heading `<id>`) is cited by a unit, so
-  every implementation tests it. Every unit holds in every implementation: no profile, no exclusion and no native-only symbol.
+  every implementation tests it. Every unit holds in every implementation: no profile, no exclusion and no native-only symbol. A case of a directory suite lists the requirements it tests in its `case.json`.
   Enforced by: `make parity-declarations-check`, `make parity-check`
 - S7 Test placement: a test of a basic feature lives in the package and repository that own the feature; a consumer keeps
   only tests from the consumer's point of view.
@@ -182,5 +182,7 @@ tool lands, a standard binds the work as written here.
   `polyspec/<repository>-php-ext` and `polyspec_<repository>`, a hyphen of the repository name an underscore. `make
   build-php-ext` builds it with phpize after checking that the stub hash of its arginfo header, which `make
   php-ext-arginfo` writes with the gen_stub.php of the PHP, is that of the stub; `make test-php-ext` compares by Reflection
-  what it registers with the PHP library before its unit tests.
+  what it registers with the PHP library before its unit tests, which are the PHPUnit files of `packages/php` run with the extension
+  loaded, and those of `packages/php-ext` when it holds any; its parity implementation shares the tests of `packages/php` by
+  this layout, with no relative path in a configuration.
   Enforced by: `make lint-php-ext`, `make test-php-ext`, `make layout-check`

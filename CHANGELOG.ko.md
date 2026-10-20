@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 823463deef4cf1ff45672dfa3f9080eea842543fd384e6811ad6a993d7d21930 -->
+<!-- source-sha256: 6348cbd773ababa1b97a93f338282863c5fb73f8074591e9a158697533c4412c -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- PRINCIPLES 사본은 설치된 kit 0.0.54의 것과 같습니다 (T2.17). `make kit-sync`가 씁니다. Red: `make kit-check` exit 2, 101건 중 `PRINCIPLES.md`와 `PRINCIPLES.ko.md`가 다르다는 2건; green: 99건, PRINCIPLES에 관한 것은 없음(남은 것은 parity와 rebuild 설정이며 T2.4와 T2.18 항목).
 - `config/duplication.json`은 `packages/*/tests/**`를 제외합니다 (T2.14). 이유는 kit이 자신의 test에 쓴 것과 같습니다: test는 case를 온전히 적습니다. Red: `make duplication-check` exit 2, package test에만 3건; green: exit 0, `no piece of code exists twice`.
 - `config/dependency-policy.json`의 Composer platform은 PHP 8.4.1입니다 (T2.13). 세 manifest와 lock의 값이며 PHPUnit 13.4.2가 필요로 합니다(kit K259). Red: `make dependency-policy-check` exit 2, 10건 중 규칙 `platform` 6건; green: 4건, `platform`은 없음; 남은 4건은 2026-10-15 review 뒤에 바뀐 lock이며 kit K283 뒤에 `make dependency-review RECORD=1`로 기록합니다.
 - Rust serializer는 각 코드 조각을 한 번만 적습니다 (T2.12). `Writer::float`가 float를 검사하고 쓰며, `Writer::variant`가 tuple 또는 struct variant의 object를 열고, `Compound::raw_field`가 raw JSON field를 받으며, 매크로 `compound_elements`와 `compound_fields`가 compound의 동일한 trait 구현을 만들고, 동작은 바뀌지 않습니다. Red: `make duplication-check` exit 2, 9건 중 `packages/rust/src/serde.rs`에 6건; green: 3건, `packages/rust`에는 없음; `cargo test --locked --offline` 41 tests ok, `scripts/verify.mts --only rust` 통과, `make lint-rust` 통과.

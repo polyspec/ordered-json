@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 17cf74c9edabc2ac085fc4ee23631340f0e766911abbd2f155293f118ab67996 -->
+<!-- source-sha256: 92792c3bd3b34525fe9d8e512ce46bd72929875fbd28897f2b0d28c6d2de7f5d -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -20,3 +20,4 @@
 | T2.14 | config/duplication.json은 kit이 자신의 test를 제외하듯 패키지의 test를 제외합니다: test는 case를 온전히 적습니다 | `config/duplication.json`, `config/owner-checks.json`, `CHANGELOG.md`(.ko) | `make duplication-check` | [o] |
 | T2.16 | 각 패키지는 version의 원천이 하나입니다: 확장은 ordered_json.c의 상수 0.0.1이 아니라 composer.json의 version을 보고하며, 설치 문서는 두 번째 version을 적지 않습니다 | `packages/php-ext/src/ordered_json.c`, `scripts/registry.mts`, `docs/operations/installation.md`(.ko) | `make release-versions` | [ ] |
 | T2.15 | PHP 확장은 내부 scan, hydrate, compact_node 함수가 아니라 PHP 라이브러리의 class와 함수를 같은 이름과 signature로 등록합니다 (S10). kit K1이 고쳐진 뒤 측정합니다 | `packages/php-ext/src/`, `packages/php/src/`, `docs/spec/api.md`(.ko) | `make lint-php-ext` | [ ] |
+| T2.17 | PRINCIPLES 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`, `PRINCIPLES.ko.md`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
