@@ -64,3 +64,4 @@
 | T2.51 | 어느 구현의 code나 test도 다른 구현에 따라 갈라지지 않습니다 (P32): PHP 라이브러리는 source를 무조건 올리고, probe는 backend가 아니라 동작을 단정하며, 예외는 kit이 정의한 종류의 이유를 대고, divergence-check가 suite와 CI에서 실행됩니다 | `packages/php/src/bootstrap.php`, `packages/php/composer.json`, `composer.json`, `packages/php/tests/probe.php`, `scripts/registry.mts`, `config/duplication.json`, `config/parity.json`, `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make divergence-check` and `make test-php-ext CASES=Test` | [o] |
 | T2.52 | 저장소가 가진 kit 복사본마다 소유 규칙을 둔다 | config/owner-checks.json with clippy.toml in the kit copies rule | `make owner-validate` | [o] |
 | T2.53 | Git이 link가 쓰는 go.work 파일을 무시한다 | .gitignore with go.work and go.work.sum | `git check-ignore packages/go/go.work` and `git check-ignore packages/go/go.work.sum` | [o] |
+| T2.54 | K334과 K349의 kit copy를 받는다 | PRINCIPLES.md, PRINCIPLES.ko.md, .golangci.yml, ruff.toml, scripts/kit/kit-bootstrap.mk | `make kit-check` | [o] |

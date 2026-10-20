@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T2.54: PRINCIPLES.md, PRINCIPLES.ko.md, .golangci.yml, ruff.toml, scripts/kit/kit-bootstrap.mk는 로컬 수정이 아니라 @polyspec/kit 0.0.54의 K334와 K349 kit copy다. red: `make kit-check`가 exit 2, finding 5개(다섯 copy가 설치된 kit과 다름)를 보고했고, green: exit 0. (T2.54)
 - T2.53: .gitignore가 link가 consumer에 쓰는 packages/go/go.work와 go.work.sum을 무시한다. red: git check-ignore가 두 파일 모두 무시하지 않는다고 보고했고, green: 두 파일 모두 무시한다고 보고한다. (T2.53)
 - T2.52: config/owner-checks.json은 kit 복사본인 Rust lint 설정 clippy.toml에 kit 복사본의 소유 규칙을 준다. red: owner-validate가 clippy.toml을 어떤 소유자와도 맞지 않는 경로로 보고했고, green: 추적되는 모든 경로가 소유된다고 보고한다. (T2.52)
 - 고정된 외부 입력은 mise의 tool입니다 (T2.7): `mise.toml`이 `http:pie`(release 1.4.10의 PHAR와 sha256)와 `http:jsontestsuite`(고정된 revision의 archive와 sha256)를 선언하고, `mise.lock`이 둘을 모든 platform에서 pin하며 `make install-tools`가 `var/tools/mise/installs`에 설치합니다. `scripts/external-inputs.mts`, 그 test, target `ordered-json-install-external`, 변수 `PIE`, `.cache` 사본은 없어졌습니다. `scripts/records.mts`의 `externalPins`는 release, PHAR hash, revision을 `mise.toml`에서 읽고 `external-inputs.json`은 suite archive의 사실(case 318개와 그 입력의 digest)만 둡니다. Red: K327 전에는 `make toolchain-lock`이 `http:pie`를 거부했고 `scripts/external-inputs.mts`는 이 항목이 대체한다고 분류됐음; green: `make rebuild-check`, `toolchain-check`, `dependency-policy-check`, `divergence-check`, `lint-ts` exit 0, 설치된 suite는 고정된 case 318개와 digest를 가짐, `scripts/verify.mts --suite`가 js에서 416 case passed, `make pie-check`가 설치된 PIE로 확장을 빌드하고 통과, evidence와 environment test passed.
