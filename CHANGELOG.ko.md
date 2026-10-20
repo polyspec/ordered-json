@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 5a6a5cafcd96e556827f40f46467f818d2648e882657c090d6faec7adb7f9a2a -->
+<!-- source-sha256: 12480653ca3213c00b4a0fb9a448a954e5af1b55c61f3e6d546f51835e30f405 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- PHP test는 더 이상 확장이 로드되지 않았음을 단정하지 않습니다 (T2.22): `packages/php/tests`의 `OfficialTest`와 `ValueApiTest`가 test class 자체이며(abstract `*TestCase` class와 backend만 단정하던 하위 class는 없앴음), `make test-php`가 순수 PHP 라이브러리에서, `make test-php-ext`가 같은 파일을 확장을 올리고 실행합니다(S10). Red: 확장을 올리면 모든 case가 `these tests cover the pure PHP backend; run them without the polyspec_ordered_json extension`로 실패; green: `make test-php CASES=Test` 40 passed, assertion 185개(확장 실행은 T2.15-3에 포함).
 - PHP 라이브러리는 내부를 비공개로 둡니다 (T2.15-2): `Parser`, `Tape`와 helper 함수 10개는 더 이상 공개 symbol이 아닙니다. scanner는 `Value`의 private static method이고 tape 상수와 UTF-8 helper도 그 private static method이므로 공개 symbol은 `Value`, `ParseError`, `parse`, `stringify`, `MAX_DEPTH`입니다. Composer `files` 항목인 `src/bootstrap.php`는 확장이 같은 상수와 함수를 등록하므로 확장이 없을 때만 `src/OrderedJson.php`를 require하며, test는 더 이상 라이브러리 helper를 호출하지 않습니다(`ProbeTree::units`). Red: kit의 symbol extractor가 읽은 `packages/php/src`의 공개 symbol 56개(API 밖 26개); green: 30개로 API와 정확히 같음; PHPUnit `Value` 24, `Official` 17 passed, `scripts/verify.mts --only php` passed, `make lint-php` passed.
 - 명세는 확장이 PHP 라이브러리를 구현한다고 말합니다 (T2.15-1): scan descriptor에 관한 RQ-021을 `docs/spec/json-contract.md`(.ko)에서 없애고, `docs/spec/api.md`(.ko)는 PHP 라이브러리의 공개 symbol(`Value`, `ParseError`, `parse`, `stringify`, `MAX_DEPTH`)을 나열하며 확장이 이를 같은 이름과 signature로 등록하고(S10) 자기 package의 version을 보고한다고 말하고, `docs/operations/installation.md`(.ko)는 `make build-php-ext`로 빌드하며 더 이상 package의 version을 적지 않습니다. Red: 명세가 `ordered_json_scan`, `ordered_json_hydrate`, `ordered_json_compact_node`를 설명했고 표가 0.0.9인 package에 0.0.3을 적었음; green: `make docs-check` 문서 쌍 30개 passed.
 - `AGENTS.md`의 모든 규칙은 `Own:`으로 시작합니다 (T2.30): 62개 규칙은 이 저장소 자신의 용어를 말하며, 외부 생태계의 표준 도구에 관한 원칙(P14)을 되풀이하던 규칙은 한국어 쌍과 함께 제거했습니다. Red: `make rules-check` exit 2, 91건(그중 62건이 `begins with neither Own: nor Refines`); green: exit 0, `every rule names its check; 13 rules are enforced by no tool`.
