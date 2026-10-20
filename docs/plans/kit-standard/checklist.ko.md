@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 28ee69fa5231daa205ee24013f04f5d2c7d35d8a1820b4ff12b75a2323679315 -->
+<!-- source-sha256: 1bb843eaebd5f1b4744766c1685282369cf01817dd27bf2fe957939f149be79c -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -56,3 +56,4 @@
 | T2.43 | kit 사본은 설치된 kit의 것과 같습니다 | `config/php-lint/`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.44 | PRINCIPLES 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.45 | CHECK_TARGETS와 CI job은 bypass-check를 실행합니다 | `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
+| T2.46 | PRINCIPLES 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |

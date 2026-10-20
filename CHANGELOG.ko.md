@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 7eb5e9ae71e5ef5e0be12aff705d62c6373932e3e9ebf4c1dcc89bb19b3379d1 -->
+<!-- source-sha256: 900dd838baaee21a2700f270e0a8ed8136eeb47c2cfa6aaf2246ba0fb5da76c1 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- PRINCIPLES 사본은 `make kit-sync`가 쓴 설치된 kit의 것과 같습니다 (T2.46). Red: `make kit-check` exit 2, 2건; green: exit 0.
 - `CHECK_TARGETS`와 `ci.yml`의 첫 job이 `bypass-check`를 실행합니다 (T2.45). test, script, Makefile이 CI를 흉내 내거나 gate를 최신으로 가정하거나 hook을 건너뛰면 실패하는 kit의 gate입니다. Red: `make kit-check` exit 2, `CHECK_TARGETS runs no bypass-check`; green: exit 0, workflow-rules test passed.
 - PRINCIPLES 사본은 `make kit-sync`가 쓴 설치된 kit의 것과 같습니다 (T2.44). Red: `make kit-check` exit 2, 2건; green: exit 0.
 - php-lint 사본은 `make kit-sync`가 쓴 설치된 kit의 것과 같습니다 (T2.43). Red: `make kit-check` exit 2, 2건(`config/php-lint/composer.json`과 `composer.lock`이 다름); green: exit 0.
