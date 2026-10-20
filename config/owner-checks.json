@@ -319,6 +319,14 @@
       "targets": [
         "rebuild-check"
       ]
+    },
+    {
+      "paths": [
+        "config/duplication.json"
+      ],
+      "targets": [
+        "duplication-check"
+      ]
     }
   ]
 }

@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 0a0f6f9a49d367ac9f4723b56dc0ebaf7c87fc4eec181f9945eea731740b6a7a -->
+<!-- source-sha256: 823463deef4cf1ff45672dfa3f9080eea842543fd384e6811ad6a993d7d21930 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- `config/duplication.json`은 `packages/*/tests/**`를 제외합니다 (T2.14). 이유는 kit이 자신의 test에 쓴 것과 같습니다: test는 case를 온전히 적습니다. Red: `make duplication-check` exit 2, package test에만 3건; green: exit 0, `no piece of code exists twice`.
 - `config/dependency-policy.json`의 Composer platform은 PHP 8.4.1입니다 (T2.13). 세 manifest와 lock의 값이며 PHPUnit 13.4.2가 필요로 합니다(kit K259). Red: `make dependency-policy-check` exit 2, 10건 중 규칙 `platform` 6건; green: 4건, `platform`은 없음; 남은 4건은 2026-10-15 review 뒤에 바뀐 lock이며 kit K283 뒤에 `make dependency-review RECORD=1`로 기록합니다.
 - Rust serializer는 각 코드 조각을 한 번만 적습니다 (T2.12). `Writer::float`가 float를 검사하고 쓰며, `Writer::variant`가 tuple 또는 struct variant의 object를 열고, `Compound::raw_field`가 raw JSON field를 받으며, 매크로 `compound_elements`와 `compound_fields`가 compound의 동일한 trait 구현을 만들고, 동작은 바뀌지 않습니다. Red: `make duplication-check` exit 2, 9건 중 `packages/rust/src/serde.rs`에 6건; green: 3건, `packages/rust`에는 없음; `cargo test --locked --offline` 41 tests ok, `scripts/verify.mts --only rust` 통과, `make lint-rust` 통과.
 - Python parser는 member와 item의 scalar value를 하나의 method로 만듭니다 (T2.11). `_nested_scalar`가 인라인된 두 사본을 대신하고 그것만 쓰던 지역 변수는 사라지며, 동작은 바뀌지 않습니다. Red: `make duplication-check` exit 2, 10건 중 `packages/python/src`에 1건; green: 9건, `packages/python/src`에는 없음; `packages/python/tests`의 unittest 39 tests OK, `scripts/verify.mts --only python` 통과, `make lint-python` 통과; `benchmarks/python-parse/run.py` 비율은 이후 2.57~2.90(한도 3.0), 이전 2.40~2.99.
