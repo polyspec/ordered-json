@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: fc05728d419985cd6120a240194c33751ad7ff4cc7a329dec94c87b6372dfce8 -->
+<!-- source-sha256: 5c76756727d62d362c0533fd0c5eb0405cb93a07067f2766c5d857a7c99e00cd -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Python test는 package입니다 (T2.25): `packages/python/tests/__init__.py`로 `make test-python`이 case를 고르고, kit K324가 package 환경의 interpreter로 실행하므로 설치된 package를 import할 수 있습니다(S3). editable install의 build 디렉터리는 ignore합니다. Red: `make test-python CASES=public_api`가 디렉터리를 거부하고 이어서 `ModuleNotFoundError: polyspec`로 실패; green: `make test-python CASES=depth_limit` 1 passed, `CASES=public_api` 1 passed.
 - PRINCIPLES 사본은 `make kit-sync`가 쓴 설치된 kit의 것과 같습니다 (T2.49). Red: `make kit-check` exit 2, 2건; green: exit 0.
 - benchmark는 `make build-php-ext`가 게시한 확장(registry의 `builtExtension`)을 올리고, Go zero-copy 파싱, PHP 확장, 이 계획의 Rust와 Go 변경 뒤 clean checkout에서 `benchmarks/results.json`을 다시 측정합니다 (T2.47). Red: `make benchmark`가 PIE 경로를 읽어 `the PHP extension of the benchmark was not built`로 멈춤; green: `make benchmark` exit 0, `source.dirty` false, 비교는 `not-comparable`(환경이 commit된 baseline과 다름); `make typecheck` passed.
 - PRINCIPLES 사본은 `make kit-sync`가 쓴 설치된 kit의 것과 같습니다 (T2.46). Red: `make kit-check` exit 2, 2건; green: exit 0.

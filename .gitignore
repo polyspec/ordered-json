@@ -10,6 +10,7 @@ __pycache__/
 
 # Generated files of the install, build, cache and test runs (AGENTS.md, Generated files)
 dist/
+build/
 dist.next/
 dist.old/
 *.tsbuildinfo

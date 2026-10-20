@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The Python tests are a package (T2.25): `packages/python/tests/__init__.py` lets `make test-python` select a case, and kit K324 runs it with the interpreter of the package environment, so the installed package is importable (S3). The build directory of the editable install is ignored. Red: `make test-python CASES=public_api` refused the directory, then failed with `ModuleNotFoundError: polyspec`; green: `make test-python CASES=depth_limit` 1 passed and `CASES=public_api` 1 passed.
 - The PRINCIPLES copies equal those of the installed kit (T2.49), written by `make kit-sync`. Red: `make kit-check` exit 2, 2 findings; green: exit 0.
 - The benchmark loads the extension that `make build-php-ext` publishes (`builtExtension` of the registry) and `benchmarks/results.json` is measured again from the clean checkout after the Go zero-copy parse, the PHP extension and the Rust and Go changes of this plan (T2.47). Red: `make benchmark` stopped with `the PHP extension of the benchmark was not built` because it read the PIE path; green: `make benchmark` exit 0, `source.dirty` false, comparison `not-comparable` (the environment differs from the committed baseline); `make typecheck` passed.
 - The PRINCIPLES copies equal those of the installed kit (T2.46), written by `make kit-sync`. Red: `make kit-check` exit 2, 2 findings; green: exit 0.

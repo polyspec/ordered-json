@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 30dc17e2e415647ad099a564277e8df1a69f2fe5badaec2a9eb2b5cbd65d5dd2 -->
+<!-- source-sha256: fae59c1974d4b4eaa48bc031d2ea7c3d8452189fba24f188556efaecc620d621 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -35,7 +35,7 @@
 | T2.22 | packages/php의 OfficialTest와 ValueApiTest는 확장이 로드되지 않았음을 단정하지 않고, 확장이 있든 없든 성립하는 동작을 단정합니다 (S10 ruling 8: 같은 파일이 두 구현을 test합니다) | `packages/php/tests/OfficialTest.php`, `packages/php/tests/ValueApiTest.php`, `packages/php-ext/tests/`, `CHANGELOG.md`(.ko) | `make test-php CASES=Official` and `make test-php-ext CASES=Official` | [o] |
 | T2.23 | 각 언어 생태계의 JSON이 contract를 만족하는 곳에서는 그것 위에 만듭니다: 표준 JSON reader와 writer가 RQ id를 만족하면 손으로 쓴 parser나 serializer를 대체하고, 손으로 쓴 것은 실패하는 case를 적은 rebuild 기록과 함께만 남깁니다 | `docs/rebuild/`, `packages/*/`, `config/rebuild.json`, `CHANGELOG.md`(.ko) | `make rebuild-check` | [o] |
 | T2.24 | kit 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), the copies of `kit.copies`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
-| T2.25 | Python test는 package입니다: packages/python/tests에 __init__.py가 있어 make test-python이 case를 고릅니다 (kit K298) | `packages/python/tests/__init__.py`, `CHANGELOG.md`(.ko) | `make test-python CASES=depth_limit` | [!] 원인: tests/__init__.py를 추가해 make test-python이 case를 찾지만 ModuleNotFoundError: No module named polyspec으로 실패합니다: kit의 scripts/kit/runtime-targets.mts 91행이 --venv 없이 mise python을 실행하며(run-tests.mts는 --venv를 받습니다), 그래서 test가 import하는 package(S3: 설치되며 경로에 두지 않음)를 import할 수 없습니다; 재시도: test-python이 packages/python/.venv의 interpreter를 실행한 뒤 |
+| T2.25 | Python test는 package입니다: packages/python/tests에 __init__.py가 있어 make test-python이 case를 고릅니다 (kit K298) | `packages/python/tests/__init__.py`, `CHANGELOG.md`(.ko) | `make test-python CASES=depth_limit` | [o] |
 | T2.26 | Rust API는 type이 본질적으로 보장하는 contract 동작의 binding을 가집니다: 값은 library에서만 나오고(RQ-012) 반환된 collection은 변경할 수 없습니다(RQ-013) | `packages/rust/tests/api.rs`, `CHANGELOG.md`(.ko) | `make test-rust CASES=come_only` | [o] |
 | T2.27 | Go package는 요청 시 반복된 decode된 object key를 거부합니다 (RQ-017): ParseRejectDuplicates이며 kind는 duplicate_object_key, 위치는 두 번째 key의 첫 byte입니다 | `packages/go/orderedjson.go`, `packages/go/api_test.go`, `config/parity.json`, `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make test-go CASES=StrictParse` | [o] |
 | T2.28 | Rust, Go, PHP는 UTF-8과 surrogate unit을 binding합니다 (RQ-007, RQ-008, RQ-009): PHP의 byte 입력을 검증하고, text의 짝 없는 surrogate 원문은 문법 전에 거부하며, 이스케이프된 짝 없는 surrogate의 string value는 library 형태로 유지합니다(Go와 PHP는 WTF-8, Rust는 unit을 가리키며 거부) | `packages/go/orderedjson.go`, `packages/php/src/`, `packages/*/tests`, `config/parity.json`, `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make test-go CASES=Surrogate` and `make test-php CASES=Surrogate` | [o] |
