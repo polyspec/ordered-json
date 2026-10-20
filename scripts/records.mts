@@ -1,13 +1,14 @@
 // The records of a run: make verify-all writes the aggregate record and make pie-check the PIE record into var/records, which
 // Git ignores. A record is the evidence of the run that wrote it, and CI uploads both in the report of its run; a committed
 // record would hash every tracked file and go stale with the next commit, so no record is committed. A record names the
-// sources it checked (the tracked files with their sha256), the revision of each package and the external inputs, which
-// external-inputs.json pins.
+// sources it checked (the tracked files with their sha256), the revision of each package and the external inputs: the PIE
+// PHAR and the supplementary suite, which mise.toml declares and mise.lock pins, and the facts of the suite archive that
+// external-inputs.json states.
 import { createHash } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { readJsonFile } from './json.mts';
+import { parse as parseToml } from 'smol-toml';
+import { checkJson, readJsonFile } from './json.mts';
 import { REGISTRY, ROOT, trackedFiles } from './registry.mts';
 
 export const AGGREGATE_RECORD = 'var/records/verification.json';
@@ -73,26 +74,45 @@ export function writeRecord(file: string, record: unknown, root = ROOT): void {
 }
 
 export type Pins = {
-  pie: { release: string; url: string; phar_sha256: string };
-  supplementary: { project: string; url: string; revision: string; cases: number; inputs_sha256: string };
+  pie: { release: string; phar_sha256: string };
+  supplementary: { project: string; revision: string; cases: number; inputs_sha256: string };
 };
 export type Supplementary = { project: string; revision: string; cases: number; inputs_sha256: string };
 
-/** The identity that external-inputs.json pins for each external input that a record may name. */
-export function externalPins(root = ROOT): Pins {
-  // The schema requires schema 1, the release of PIE with the sha256 of its PHAR, and the revision, the inputs sha256 and a
-  // positive case count of the supplementary suite.
-  return readJsonFile<Pins>(path.join(root, 'external-inputs.json'), 'external-inputs.schema.json');
+/** The release and the sha256 of the http tool `name` that mise.toml of `root` declares. */
+function miseHttpTool(root: string, name: string): { version: string; checksum: string } {
+  const { tools } = checkJson<{ tools: Record<string, string | { version?: string; checksum?: string }> }>(parseToml(readFileSync(path.join(root, 'mise.toml'), 'utf8')), 'mise-config.schema.json', 'mise.toml');
+  const tool = tools[name];
+  if (typeof tool !== 'object' || typeof tool.version !== 'string' || typeof tool.checksum !== 'string' || !tool.checksum.startsWith('sha256:')) throw new Error(`mise.toml ${name} declares no version and sha256 checksum`);
+  return { version: tool.version, checksum: tool.checksum.slice('sha256:'.length) };
 }
 
-/** The supplementary suite of the checkout `suite`: its project, revision, case count and the digest of its inputs. */
-export function supplementaryManifest(suite: string): Supplementary {
+/**
+ * The identity of each external input that a record may name: the PIE release and the sha256 of its PHAR and the revision of
+ * the supplementary suite come from the http tools of mise.toml, which mise.lock pins; the case count and the digest of the
+ * inputs of that archive come from external-inputs.json.
+ */
+export function externalPins(root = ROOT): Pins {
+  const { supplementary } = readJsonFile<{ supplementary: { cases: number; inputs_sha256: string } }>(path.join(root, 'external-inputs.json'), 'external-inputs.schema.json');
+  const pie = miseHttpTool(root, 'http:pie');
+  return {
+    pie: { release: pie.version, phar_sha256: pie.checksum },
+    supplementary: { project: 'nst/JSONTestSuite', revision: miseHttpTool(root, 'http:jsontestsuite').version, ...supplementary },
+  };
+}
+
+/** The PIE PHAR and the supplementary suite that mise installed (make install-tools). */
+export const installedPie = (root = ROOT): string => path.join(root, 'var/tools/mise/installs/http-pie', externalPins(root).pie.release, 'pie');
+export const installedSuite = (root = ROOT): string => path.join(root, 'var/tools/mise/installs/http-jsontestsuite', externalPins(root).supplementary.revision);
+
+/** The supplementary suite in the folder `suite`, of the declared `revision`: its project, revision, case count and the digest of its inputs. */
+export function supplementaryManifest(suite: string, revision = externalPins().supplementary.revision): Supplementary {
   const directory = path.join(suite, 'test_parsing');
   const files = Object.fromEntries(readdirSync(directory).filter(name => name.endsWith('.json')).sort().map(name => [name, sha256(readFileSync(path.join(directory, name)))]));
   if (Object.keys(files).length === 0) throw new Error(`the supplementary suite ${suite} has no case in test_parsing/`);
   return {
     project: 'nst/JSONTestSuite',
-    revision: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: suite, encoding: 'utf8' }).trim(),
+    revision,
     cases: Object.keys(files).length,
     inputs_sha256: digestOf(files),
   };

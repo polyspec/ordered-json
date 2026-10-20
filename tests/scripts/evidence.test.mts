@@ -30,7 +30,8 @@ function evidence(context: TestContext, { before = '', after = '' } = {}) {
   write(SOURCE, 'export const fixture = true;\n');
   json(OFFICIAL, { cases: [{ id: 'fixture', input: '{}', tree: ['object', []], compact: '{}' }] });
   write(`${FIXTURES}/valid/object.json`, '{}');
-  json('external-inputs.json', { schema_version: 1, pie: { release: 'synthetic', url: 'https://example.invalid/pie', phar_sha256: sha256('pie tool') }, supplementary: { ...SUPPLEMENTARY, url: 'https://example.invalid/suite' } });
+  write('mise.toml', `[tools]\n"http:pie" = { version = "synthetic", url = "https://example.invalid/pie", checksum = "sha256:${sha256('pie tool')}" }\n"http:jsontestsuite" = { version = "${SUPPLEMENTARY.revision}", url = "https://example.invalid/suite", checksum = "sha256:${sha256('suite archive')}" }\n`);
+  json('external-inputs.json', { schema_version: 1, supplementary: { cases: SUPPLEMENTARY.cases, inputs_sha256: SUPPLEMENTARY.inputs_sha256 } });
   const record = (supplementary = 0) => createRecord(root, sourceManifest(root), Object.fromEntries(IMPLEMENTATIONS.map(name => [name, { status: 'passed', cases: 2 + supplementary }])), { official: 1, fixtures: 1, supplementary }, VERSIONS, supplementary ? SUPPLEMENTARY : null);
   writeRecord(path.join(root, AGGREGATE_RECORD), record(), root);
   const change = (file: string, from: string, to: string) => {

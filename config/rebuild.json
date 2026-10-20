@@ -54,10 +54,6 @@
       "kind": "ecosystem",
       "tool": "PIE"
     },
-    "scripts/external-inputs.mts": {
-      "kind": "replaced",
-      "reason": "mise installs a pinned url with a sha256 through its http backend, as mise.toml does for composer.phar; item T2.7 moves the PIE PHAR and the JSONTestSuite revision to it and removes this installer"
-    },
     "scripts/json.mts": {
       "kind": "ecosystem",
       "tool": "ajv"

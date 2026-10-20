@@ -23,8 +23,7 @@ rules:
       - "!tests/scripts"
 
   # S5: the root files of ordered-json beyond the list of kit (K145).
-  # external-inputs.json: the pinned downloads of make ordered-json-install-external (the PIE PHAR and the supplementary suite),
-  # scripts/external-inputs.mts.
+  # external-inputs.json: the facts of the archive of the supplementary suite, which mise.toml declares.
   - id: layout-root-files
     vars: { root_files: "{external-inputs.json}" }
 

@@ -116,7 +116,7 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
   Enforced by: `make dependency-policy-check`
 - Own: No command installs a tool on demand. Node.js, Rust, Go, Python, PHP and npm are pinned by tracked files: Go, Python, Composer and the other tools of `mise.toml` are exact releases locked by digests in `mise.lock`, and PHP is pinned by its minor release in `.php-version`, which `make toolchain-check` compares as major.minor. Every command except the consumer install runs cargo, go, npm and Composer offline, so a missing download fails with a message to run `make install`.
   Enforced by: `make toolchain-check`
-- Own: Only `make install-tools TOOLS=npm`, `make install-packages` and `make install` download. The first installs npm, the second the packages of `package-lock.json`, and `make install` the tools of `mise.lock`, the Rust toolchain, the crates of `packages/rust/Cargo.lock` and the inputs that `external-inputs.json` pins.
+- Own: Only `make install-tools TOOLS=npm`, `make install-packages` and `make install` download. The first installs npm, the second the packages of `package-lock.json`, and `make install` the tools of `mise.lock`, the Rust toolchain, and the crates of `packages/rust/Cargo.lock`; the PIE PHAR and the supplementary suite are the tools `http:pie` and `http:jsontestsuite` of `mise.toml`.
   Enforced by: `make cargo-downloads-check`
 - Own: A test reads only the outputs it creates and does not depend on untracked state. Records, documentation checks, shared cases and build copies read the files Git tracks, and each run builds in its own run directory with its own `CARGO_TARGET_DIR`.
   Enforced by: `make ordered-json-test-scripts`

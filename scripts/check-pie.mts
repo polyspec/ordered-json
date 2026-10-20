@@ -1,14 +1,13 @@
 // Builds the PHP extension with PIE and verifies that module with the shared cases (make pie-check), then writes the PIE
 // record var/records/pie-verification.json. PIE builds a copy of the extension sources in the run directory, so the build
-// never cleans or replaces files of the checkout. The PHAR and the suite are the pinned ones of external-inputs.json, compared
-// before any work.
+// never cleans or replaces files of the checkout. The PHAR and the suite are the ones that mise.toml declares and mise installs,
+// compared with their pins before any work.
 //
-//   node scripts/check-pie.mts --pie <pie.phar> [--suite <JSONTestSuite checkout>]
+//   node scripts/check-pie.mts [--pie <pie.phar>] [--suite <JSONTestSuite folder>]
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { PIE_FIX } from './external-inputs.mts';
-import { PIE_RECORD, externalPins, inputIssues, manifestDifferences, packageRevisions, sha256, sourceManifest, supplementaryManifest, writeRecord } from './records.mts';
+import { PIE_RECORD, externalPins, inputIssues, installedPie, manifestDifferences, packageRevisions, sha256, sourceManifest, supplementaryManifest, writeRecord } from './records.mts';
 import { ROOT, artifactPaths, pathOf, probeCommands, runStreamed, runtimeVersions, withRun, type Run } from './registry.mts';
 import { SUITE_FIX, verifyProbes } from './verify.mts';
 
@@ -64,24 +63,21 @@ async function buildAndVerify(run: Run, pie: string, suite: string | undefined) 
 
 async function main(): Promise<number> {
   const { values } = parseArgs({ options: { pie: { type: 'string' }, suite: { type: 'string' } } });
-  if (values.pie === undefined) {
-    console.error('usage: node scripts/check-pie.mts --pie <pie.phar> [--suite <checkout>]');
-    return 2;
-  }
-  // A check runs offline, so a missing download names make install, which makes it.
-  if (!existsSync(values.pie)) {
-    console.error(`the PIE PHAR ${values.pie} does not exist; ${PIE_FIX}`);
+  const phar = values.pie ?? installedPie();
+  // A check runs offline, so a missing download names make install-tools, which makes it.
+  if (!existsSync(phar)) {
+    console.error(`the PIE PHAR ${phar} does not exist; run make install-tools, which installs the http:pie of mise.toml`);
     return 1;
   }
   if (values.suite !== undefined && !existsSync(path.join(values.suite, 'test_parsing'))) {
     console.error(`the supplementary suite ${values.suite} has no test_parsing/; ${SUITE_FIX}`);
     return 1;
   }
-  const pie = path.resolve(values.pie);
+  const pie = path.resolve(phar);
   const suite = values.suite === undefined ? undefined : path.resolve(values.suite);
   const issues = inputIssues(externalPins(), { pie: sha256(readFileSync(pie)), ...(suite === undefined ? {} : { supplementary: supplementaryManifest(suite) }) });
   if (issues.length) {
-    for (const issue of issues) console.error(`external input differs from external-inputs.json: ${issue}`);
+    for (const issue of issues) console.error(`external input differs from its pin: ${issue}`);
     return 1;
   }
   const record = await withRun(['php-extension'], run => buildAndVerify(run, pie, suite));

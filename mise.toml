@@ -16,3 +16,7 @@ golangci-lint = "2.14.0"
 # composer.phar is one file, so its sha256 is declared here, from getcomposer.org/download/<version>/composer.phar.sha256sum,
 # and mise.lock records it.
 "http:composer" = { version = "2.10.3", url = "https://getcomposer.org/download/{{ version }}/composer.phar", checksum = "sha256:7a2d379d5b8ffdaa028580ef26494c36d2feef4b178d3dd1473a4dbc5e17c8d6", bin = "composer" }
+# The PIE PHAR is one file, as composer.phar is: its sha256 is that of the release asset pie.phar, and mise.lock records it.
+"http:pie" = { version = "1.4.10", url = "https://github.com/php/pie/releases/download/{{version}}/pie.phar", checksum = "sha256:b88792235c8e80be568436d4cb043b49fd1869c89b64e83d23e2882ae19d70a8", bin = "pie" }
+# The supplementary suite is the archive of one revision of nst/JSONTestSuite; mise.lock records its sha256.
+"http:jsontestsuite" = { version = "1ef36fa01286573e846ac449e8683f8833c5b26a", url = "https://github.com/nst/JSONTestSuite/archive/{{version}}.tar.gz", checksum = "sha256:32ab2fb37cc26679dbd9164dbb7053bcef10134643d53cb0cef45de7680dcdcc" }

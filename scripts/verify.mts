@@ -26,7 +26,7 @@ const CONTRACT = 'docs/spec/json-contract.md';
 const KINDS_ANCHOR = '<a id="rejection-kinds"></a>';
 /** Each probe reply has this long after its request; a whole run has no limit. */
 const CASE_SECONDS = 60;
-export const SUITE_FIX = 'run make install, which installs the suite of external-inputs.json into .cache/JSONTestSuite';
+export const SUITE_FIX = 'run make install-tools, which installs the http:jsontestsuite of mise.toml';
 
 type Expected = Accepted | { ok: false };
 export type Case = { name: string; file: string; expected: Expected };
@@ -356,7 +356,7 @@ async function record(suite: string | undefined): Promise<void> {
   const before = sourceManifest();
   const supplementary: Supplementary | null = suite === undefined ? null : supplementaryManifest(suite);
   const issues = inputIssues(externalPins(), supplementary ? { supplementary } : {});
-  if (issues.length) throw new Failures(issues.map(issue => `external input differs from external-inputs.json: ${issue}`));
+  if (issues.length) throw new Failures(issues.map(issue => `external input differs from its pin: ${issue}`));
   const warnings: { implementation: string; message: string }[] = [];
   const { results, counts, versions } = await withRun(IMPLEMENTATIONS, async run => ({ ...await verify(IMPLEMENTATIONS, run, suite, warnings), versions: runtimeVersions(IMPLEMENTATIONS, run) }));
   if (suite !== undefined && !isDeepStrictEqual(supplementaryManifest(suite), supplementary)) throw new Error('the supplementary inputs changed during verification; no record was written');

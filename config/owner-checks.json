@@ -70,7 +70,6 @@
         "scripts/check-pie.mts",
         ".gitignore",
         "Makefile",
-        "scripts/external-inputs.mts",
         "tsconfig.json"
       ],
       "targets": [

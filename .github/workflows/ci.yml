@@ -98,14 +98,14 @@ jobs:
         run: make install-packages
       # The tools of mise.lock (Go, Python, Composer, cargo-audit and the rest) with the phpcs and PHPStan of config/php-lint, the
       # Rust toolchain of rust-toolchain.toml, the crates of packages/rust/Cargo.lock, the Composer projects of the root and the
-      # PHP packages, the PIE PHAR and the supplementary suite of external-inputs.json.
+      # PHP packages (the PIE PHAR and the supplementary suite are tools of mise.lock).
       - name: make install
         if: ${{ !cancelled() }}
         run: make install
       - name: make ci-targets
         if: ${{ !cancelled() }}
         env:
-          JSON_TEST_SUITE: .cache/JSONTestSuite
+          JSON_TEST_SUITE: var/tools/mise/installs/http-jsontestsuite/latest
         run: make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-php-ext test-php-ext pie-check"
       # actions/upload-artifact v7.0.1
       - name: report

@@ -6,7 +6,6 @@ PYTHON := $(CURDIR)/var/tools/mise/shims/python3
 UV := $(CURDIR)/var/tools/mise/shims/uv
 COMPOSER := $(CURDIR)/var/tools/mise/shims/composer
 JSON_TEST_SUITE ?=
-PIE ?= .cache/pie/pie.phar
 
 # The tools of every run are the releases that the tracked declaration files name: npm in the packageManager of
 # package.json, Rust in rust-toolchain.toml, PHP in .php-version, and Node.js, Go, Python, Composer and the other tools
@@ -40,7 +39,7 @@ include scripts/kit/kit-bootstrap.mk
 CHECK_TARGETS := kit-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check docs-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-php-ext test-php-ext lint-python pie-check ordered-json-test-scripts typecheck lint-ts
 
 .PHONY: check ordered-json-test-scripts typecheck ordered-json-install-php ordered-json-install-python verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
-	benchmark benchmark-check python-parse-budget release-config-check install ordered-json-install ordered-json-install-rust ordered-json-install-external \
+	benchmark benchmark-check python-parse-budget release-config-check install ordered-json-install ordered-json-install-rust \
 	ordered-json-js-check ordered-json-js-test ordered-json-go-check ordered-json-go-test ordered-json-php-check ordered-json-php-test \
 	ordered-json-php-ext-check ordered-json-php-ext-test ordered-json-python-check ordered-json-python-test ordered-json-rust-check ordered-json-rust-test
 
@@ -51,12 +50,13 @@ check:
 
 # install makes every download that the checks read after make install-packages: the tools of mise.lock, the Rust toolchain of
 # rust-toolchain.toml, the crates of packages/rust/Cargo.lock, the Composer projects of the PHP packages with their PHPUnit,
-# the virtual environment of the Python package, and the PIE PHAR and the supplementary suite of external-inputs.json.
+# the virtual environment of the Python package; the PIE PHAR and the supplementary suite are tools of mise.toml (http:pie and
+# http:jsontestsuite), which install-tools installs.
 # It is the only target that downloads, besides dependency-review and release-consumer-lock.
 # install runs the bootstrap of kit as the prerequisite install-kit of ordered-json-install (K246-2).
 install: ordered-json-install
 
-ordered-json-install: install-kit ordered-json-install-rust cargo-downloads-fetch ordered-json-install-php ordered-json-install-python ordered-json-install-external
+ordered-json-install: install-kit ordered-json-install-rust cargo-downloads-fetch ordered-json-install-php ordered-json-install-python
 
 ordered-json-install-rust:
 	$(ONLINE) rustup toolchain install --no-self-update
@@ -76,10 +76,6 @@ ordered-json-install-php:
 ordered-json-install-python:
 	$(MAKE) --no-print-directory python-venv DIR=packages/python/.venv
 	$(ONLINE) $(UV) pip install --python packages/python/.venv/bin/python --link-mode copy --no-deps -e packages/python
-
-# ordered-json-install-external installs the PIE PHAR and the supplementary suite that external-inputs.json pins (scripts/external-inputs.mts).
-ordered-json-install-external:
-	$(ONLINE) $(NODE) scripts/external-inputs.mts
 
 # ordered-json-test-scripts runs the node:test tool tests of tests/scripts, or the files of TESTS, through run-tests of @polyspec/kit,
 # which gives each test its own deadline; typecheck checks the TypeScript of scripts/, tests/scripts/ and benchmarks/ with the tsc
@@ -110,10 +106,10 @@ evidence-check:
 release-config-check:
 	$(NODE) $(KIT)/release.$(KIT_EXT) versions "v$$($(NODE) -p "require('./package.json').version")"
 
-# pie-check builds the extension with the PIE PHAR of external-inputs.json, verifies the module with the shared cases and writes
+# pie-check builds the extension with the PIE PHAR of mise.toml, verifies the module with the shared cases and writes
 # var/records/pie-verification.json (scripts/check-pie.mts).
 pie-check: toolchain-check cargo-downloads-check
-	$(NODE) scripts/check-pie.mts --pie "$(PIE)"$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
+	$(NODE) scripts/check-pie.mts$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
 
 benchmark: toolchain-check cargo-downloads-check
 	$(NODE) benchmarks/run.mts

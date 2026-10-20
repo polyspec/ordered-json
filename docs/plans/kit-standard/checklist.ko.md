@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: e62e658e2afd8e5e0fccfb06d4f7b54e2c8c80239a7434ab0024007e0cba62c6 -->
+<!-- source-sha256: 1e0fe91a13818e1e334672999394f650e070ad3e8cc803a056efbc20fd4a0dd3 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -13,7 +13,7 @@
 | T2.4-3 | docs/spec/json-contract.md의 모든 requirement는 unit이 인용합니다 (R13 untraced-requirement, 2건: RQ-023, RQ-024) | `config/parity.json`, `docs/spec/json-contract.md`(.ko), the tests of every implementation, `CHANGELOG.md`(.ko) | `make parity-declarations-check` | [o] |
 | T2.4-4 | test는 unit이 인용한 requirement를 이름으로 적습니다 (R15 unnamed-requirement, 174건: go 38, php-extension 35, rust 30, python 25, js 25, php 21) | `packages/*/tests`, `CHANGELOG.md`(.ko) | `make parity-declarations-check` | [o] |
 | T2.5 | kit-standard 체크리스트의 한국어 문서는 영어 원본의 revision을 담습니다 | `docs/plans/kit-standard/checklist.ko.md` | `make docs-check` | [o] |
-| T2.7 | 고정된 외부 입력(PIE PHAR와 JSONTestSuite revision)은 composer.phar와 같이 url과 sha256을 받는 mise의 http backend가 설치하고, scripts/external-inputs.mts는 제거합니다 | `mise.toml`, `mise.lock`, `external-inputs.json`, `scripts/external-inputs.mts`, `scripts/check-pie.mts`, `scripts/records.mts`, `Makefile` | `make rebuild-check` | [!] 원인: mise.toml에는 kit의 tool만 선언할 수 있습니다: make toolchain-lock이 "http:pie"를 "mise.toml tools declares http:pie, which kit does not check"로 거부합니다(kit의 scripts/kit/toolchain-mise.mts 83행; MISE_TOOLS 36-50행에는 http:composer는 있으나 저장소의 tool은 없음). 그래서 PIE PHAR와 JSONTestSuite archive를 mise의 http backend로 설치할 수 없습니다; 재시도: kit이 저장소가 url과 checksum을 가진 http: tool을 mise.toml에 선언하게 하고 mise.lock에서 digest를 검사한 뒤 |
+| T2.7 | 고정된 외부 입력(PIE PHAR와 JSONTestSuite revision)은 composer.phar와 같이 url과 sha256을 받는 mise의 http backend가 설치하고, scripts/external-inputs.mts는 제거합니다 | `mise.toml`, `mise.lock`, `external-inputs.json`, `scripts/external-inputs.mts`, `scripts/check-pie.mts`, `scripts/records.mts`, `Makefile` | `make rebuild-check` | [o] |
 | T2.6 | config/rebuild.json은 scripts/의 각 tool의 class를 선언합니다 (S1) | `config/rebuild.json`, `config/owner-checks.json`, `CHANGELOG.md`(.ko) | `make rebuild-check` | [o] |
 | T2.8 | PHP 확장은 S10을 따릅니다: polyspec/ordered-json-php-ext와 polyspec_ordered_json이라는 이름, 추적되는 arginfo header가 있는 stub 하나, build-php-ext가 var/php-ext에 빌드 | `packages/php-ext/`, `Makefile`, `scripts/registry.mts`, `scripts/check-pie.mts`, `config/parity.json`, `AGENTS.md`(.ko) | `make lint-php-ext` and `node node_modules/@polyspec/kit/dist/run-tests.mjs node -- tests/scripts/registry.test.mts` | [o] |
 | T2.9 | Go 패키지는 각 코드 조각을 한 번만 적습니다: slice와 array의 list marshalling, JSON string의 짧은 escape는 각각 하나의 함수입니다 | `packages/go/marshal.go`, `packages/go/orderedjson.go`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-go` | [o] |
