@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The benchmark loads the extension that `make build-php-ext` publishes (`builtExtension` of the registry) and `benchmarks/results.json` is measured again from the clean checkout after the Go zero-copy parse, the PHP extension and the Rust and Go changes of this plan (T2.47). Red: `make benchmark` stopped with `the PHP extension of the benchmark was not built` because it read the PIE path; green: `make benchmark` exit 0, `source.dirty` false, comparison `not-comparable` (the environment differs from the committed baseline); `make typecheck` passed.
 - The PRINCIPLES copies equal those of the installed kit (T2.46), written by `make kit-sync`. Red: `make kit-check` exit 2, 2 findings; green: exit 0.
 - `CHECK_TARGETS` and the first job of `ci.yml` run `bypass-check` (T2.45), the gate of kit that fails while a test, script or Makefile impersonates CI, assumes a gate up to date or skips a hook. Red: `make kit-check` exit 2, `CHECK_TARGETS runs no bypass-check`; green: exit 0, workflow-rules test passed.
 - The PRINCIPLES copies equal those of the installed kit (T2.44), written by `make kit-sync`. Red: `make kit-check` exit 2, 2 findings; green: exit 0.

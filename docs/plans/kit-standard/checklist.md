@@ -56,4 +56,4 @@
 | T2.44 | The PRINCIPLES copies equal those of the installed kit | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.45 | CHECK_TARGETS and the CI jobs run bypass-check | `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.46 | The PRINCIPLES copies equal those of the installed kit | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
-| T2.47 | The benchmark loads the extension that make build-php-ext publishes, and the committed result is measured again after the Go zero-copy parse and the PHP extension changed | `benchmarks/run.mts`, `scripts/registry.mts`, `benchmarks/results.json`, `CHANGELOG.md`(.ko) | `make benchmark-check` | [~] |
+| T2.47 | The benchmark loads the extension that make build-php-ext publishes, and the committed result is measured again after the Go zero-copy parse and the PHP extension changed | `benchmarks/run.mts`, `scripts/registry.mts`, `benchmarks/results.json`, `CHANGELOG.md`(.ko) | `make benchmark-check` | [o] |

@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 032f8bd98f4e7b6fb7e44ef6cb096f41fb664ad8d7f418c9e952c326e2aaa1e3 -->
+<!-- source-sha256: c2a18e4ae185cc20f13528231d6a4cab6beb281547179d2136ceef326d40af93 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -57,4 +57,4 @@
 | T2.44 | PRINCIPLES 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.45 | CHECK_TARGETS와 CI job은 bypass-check를 실행합니다 | `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.46 | PRINCIPLES 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
-| T2.47 | benchmark는 make build-php-ext가 게시한 확장을 올리며, Go zero-copy 파싱과 PHP 확장이 바뀐 뒤 commit된 결과를 다시 측정합니다 | `benchmarks/run.mts`, `scripts/registry.mts`, `benchmarks/results.json`, `CHANGELOG.md`(.ko) | `make benchmark-check` | [~] |
+| T2.47 | benchmark는 make build-php-ext가 게시한 확장을 올리며, Go zero-copy 파싱과 PHP 확장이 바뀐 뒤 commit된 결과를 다시 측정합니다 | `benchmarks/run.mts`, `scripts/registry.mts`, `benchmarks/results.json`, `CHANGELOG.md`(.ko) | `make benchmark-check` | [o] |
