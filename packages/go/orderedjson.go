@@ -416,6 +416,17 @@ func (v *Value) MarshalJSON() ([]byte, error) {
 	raw, err := Stringify(v)
 	return []byte(raw), err
 }
+
+// UnmarshalJSON parses the document of a field with the parser of the library, so the value keeps its order, its number
+// tokens and its unpaired surrogates, and a document that the parser rejects is an error of the decoder.
+func (v *Value) UnmarshalJSON(data []byte) error {
+	parsed, err := ParseBytes(data)
+	if err != nil {
+		return err
+	}
+	*v = *parsed
+	return nil
+}
 func (v *Value) Compact() (string, error) {
 	if !v.valid() {
 		return "", fmt.Errorf("expected orderedjson Value")
@@ -808,4 +819,28 @@ func (p *parser) addMember(base int, index map[string]int, key, value *Value) ma
 	}
 	p.members = append(p.members, member{name, key, value})
 	return index
+}
+
+// writeShortEscape writes the two-character escape of c that JSON defines (quote, backslash and the control characters
+// with a letter), and reports whether c had one.
+func writeShortEscape(out *strings.Builder, c rune) bool {
+	switch c {
+	case '"':
+		out.WriteString(`\"`)
+	case '\\':
+		out.WriteString(`\\`)
+	case '\b':
+		out.WriteString(`\b`)
+	case '\f':
+		out.WriteString(`\f`)
+	case '\n':
+		out.WriteString(`\n`)
+	case '\r':
+		out.WriteString(`\r`)
+	case '\t':
+		out.WriteString(`\t`)
+	default:
+		return false
+	}
+	return true
 }

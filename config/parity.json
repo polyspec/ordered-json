@@ -2532,7 +2532,7 @@
         },
         {
           "implementation": "rust",
-          "symbol": "polyspec_ordered_json::serde"
+          "symbol": "polyspec_ordered_json::Value::compact"
         },
         {
           "implementation": "go",
@@ -2549,139 +2549,6 @@
         {
           "implementation": "python",
           "symbol": "ordered_json.JSONEncoder.default"
-        }
-      ]
-    },
-    {
-      "id": "api-host-typed-encode",
-      "kind": "api",
-      "requirements": [
-        "RQ-020"
-      ],
-      "symbols": [
-        {
-          "implementation": "js",
-          "symbol": "@polyspec/ordered-json!Value#toJSON:member(1)"
-        },
-        {
-          "implementation": "rust",
-          "symbol": "polyspec_ordered_json::serde::to_string"
-        },
-        {
-          "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/go.Marshal"
-        },
-        {
-          "implementation": "php",
-          "symbol": "Polyspec\\OrderedJson\\Value::jsonSerialize"
-        },
-        {
-          "implementation": "php-extension",
-          "symbol": "Polyspec\\OrderedJson\\Value::jsonSerialize"
-        },
-        {
-          "implementation": "python",
-          "symbol": "ordered_json.JSONEncoder"
-        }
-      ]
-    },
-    {
-      "id": "api-host-typed-decode",
-      "kind": "api",
-      "requirements": [
-        "RQ-020"
-      ],
-      "symbols": [
-        {
-          "implementation": "js",
-          "symbol": "@polyspec/ordered-json!parse:function(1)"
-        },
-        {
-          "implementation": "rust",
-          "symbol": "polyspec_ordered_json::serde::from_str"
-        },
-        {
-          "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/go.Parse"
-        },
-        {
-          "implementation": "php",
-          "symbol": "Polyspec\\OrderedJson\\parse"
-        },
-        {
-          "implementation": "php-extension",
-          "symbol": "Polyspec\\OrderedJson\\parse"
-        },
-        {
-          "implementation": "python",
-          "symbol": "ordered_json.parse"
-        }
-      ]
-    },
-    {
-      "id": "api-host-typed-decode-bytes",
-      "kind": "api",
-      "requirements": [
-        "RQ-020",
-        "RQ-007"
-      ],
-      "symbols": [
-        {
-          "implementation": "js",
-          "symbol": "@polyspec/ordered-json!parseBytes:function(1)"
-        },
-        {
-          "implementation": "rust",
-          "symbol": "polyspec_ordered_json::serde::from_slice"
-        },
-        {
-          "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/go.ParseBytes"
-        },
-        {
-          "implementation": "php",
-          "symbol": "Polyspec\\OrderedJson\\parse"
-        },
-        {
-          "implementation": "php-extension",
-          "symbol": "Polyspec\\OrderedJson\\parse"
-        },
-        {
-          "implementation": "python",
-          "symbol": "ordered_json.parse_bytes"
-        }
-      ]
-    },
-    {
-      "id": "api-host-error",
-      "kind": "api",
-      "requirements": [
-        "RQ-024"
-      ],
-      "symbols": [
-        {
-          "implementation": "js",
-          "symbol": "@polyspec/ordered-json!ParseError:class"
-        },
-        {
-          "implementation": "rust",
-          "symbol": "polyspec_ordered_json::serde::Error"
-        },
-        {
-          "implementation": "go",
-          "symbol": "github.com/polyspec/ordered-json/packages/go.ParseError"
-        },
-        {
-          "implementation": "php",
-          "symbol": "Polyspec\\OrderedJson\\ParseError"
-        },
-        {
-          "implementation": "php-extension",
-          "symbol": "Polyspec\\OrderedJson\\ParseError"
-        },
-        {
-          "implementation": "python",
-          "symbol": "ordered_json.ParseError"
         }
       ]
     },
@@ -2997,6 +2864,39 @@
           "implementation": "python",
           "test": "packages/python/tests/test_api.py",
           "id": "test_serialization_is_idempotent"
+        }
+      ]
+    },
+    {
+      "id": "api-host-deserialization",
+      "kind": "api",
+      "requirements": [
+        "RQ-020"
+      ],
+      "symbols": [
+        {
+          "implementation": "js",
+          "symbol": "@polyspec/ordered-json!parse:function(1)"
+        },
+        {
+          "implementation": "rust",
+          "symbol": "polyspec_ordered_json::parse"
+        },
+        {
+          "implementation": "go",
+          "symbol": "github.com/polyspec/ordered-json/packages/go.Value.UnmarshalJSON"
+        },
+        {
+          "implementation": "php",
+          "symbol": "Polyspec\\OrderedJson\\parse"
+        },
+        {
+          "implementation": "php-extension",
+          "symbol": "Polyspec\\OrderedJson\\parse"
+        },
+        {
+          "implementation": "python",
+          "symbol": "ordered_json.parse"
         }
       ]
     }

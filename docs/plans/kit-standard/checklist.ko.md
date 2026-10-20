@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: e8f455ee8109ed1fa89f0ef1530606da568305c372c1e59075c9ba4bae619de6 -->
+<!-- source-sha256: 4ed9b914d65ef584d61900c118dd82190871bd1d3b41b98a3de2fb226d6ba722 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -51,3 +51,4 @@
 | T2.38 | 명세는 RQ-009를 모든 구현에서 성립시킵니다: string value는 짝 없는 surrogate를 라이브러리 형태(Go, PHP, Rust는 WTF-8 byte)로 유지하며 Rust의 예외는 없습니다 | `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make docs-check` | [o] |
 | T2.39 | Rust의 string_value는 문자열의 WTF-8 바이트를 반환하므로 짝 없는 surrogate가 다른 모든 구현처럼 유지됩니다 (RQ-009) | `packages/rust/src/lib.rs`, `packages/rust/tests/`, `CHANGELOG.md`(.ko) | `make test-rust CASES=surrogate` | [o] |
 | T2.40 | 명세는 Go와 Rust의 native 통합(Marshaler와 Unmarshaler method, Serde trait 구현)만 말하며 encoding/json이나 serde_json과 중복되는 라이브러리의 typed 인코더는 말하지 않습니다 (S1) | `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make docs-check` | [o] |
+| T2.41 | Go Value는 json.Marshaler와 함께 json.Unmarshaler를 구현하고, encoding/json의 사본인 package의 typed Marshal은 test와 함께 없앱니다 (S1) | `packages/go/orderedjson.go`, `packages/go/marshal.go`, `packages/go/api_test.go`, `config/parity.json`, `CHANGELOG.md`(.ko) | `make test-go CASES=HostSerialization` and `make lint-go` | [o] |
