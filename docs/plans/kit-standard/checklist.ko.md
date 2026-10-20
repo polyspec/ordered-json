@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 74fa7eb815e846a63cf60dddbd9ff74235a2421f15e7f18d58de34917976b689 -->
+<!-- source-sha256: 5f6f38ce07c59bf8bcda3ca48b8824474b957b57e818ec63cf2de20d43f67cba -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -18,3 +18,4 @@
 | T2.12 | Rust serializer는 각 코드 조각을 한 번만 적습니다: float 검사, variant 열기, compound serializer의 element method는 각각 하나의 정의입니다 | `packages/rust/src/serde.rs`, `CHANGELOG.md`(.ko) | `make duplication-check` and `make lint-rust` | [o] |
 | T2.13 | config/dependency-policy.json의 Composer platform은 manifest와 lock의 값인 PHP 8.4.1입니다 (PHPUnit 13, kit K259) | `config/dependency-policy.json`, `CHANGELOG.md`(.ko) | `make dependency-policy-check` | [o] |
 | T2.14 | config/duplication.json은 kit이 자신의 test를 제외하듯 패키지의 test를 제외합니다: test는 case를 온전히 적습니다 | `config/duplication.json`, `config/owner-checks.json`, `CHANGELOG.md`(.ko) | `make duplication-check` | [o] |
+| T2.16 | 각 패키지는 version의 원천이 하나입니다: 확장은 ordered_json.c의 상수 0.0.1이 아니라 composer.json의 version을 보고하며, 설치 문서는 두 번째 version을 적지 않습니다 | `packages/php-ext/src/ordered_json.c`, `scripts/registry.mts`, `docs/operations/installation.md`(.ko) | `make release-versions` | [ ] |
