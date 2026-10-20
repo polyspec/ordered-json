@@ -113,7 +113,7 @@ Each requirement is one testable statement of this contract. A unit of config/pa
 - **RQ-017** The strict parse rejects a duplicate key and accepts a document without one.
 - **RQ-018** The raw source span of a value is the original text, including the surrounding whitespace of the root and the overwritten keys.
 - **RQ-019** Member lookup finds a member by its decoded name.
-- **RQ-020** Host encoders refuse a value and direct the caller to the library serializer, and the typed Go encoder matches the standard encoder.
+- **RQ-020** A value integrates with the standard JSON serialization interface of its language: where that interface can write a value as the library does (Go `encoding/json`, Rust serde) it writes the contract bytes, also when a native structure embeds the value; where it would reorder or rewrite it (JavaScript `JSON.stringify`, PHP `json_encode`, Python `json`) it refuses and directs the caller to the library serializer. No interface writes another document.
 - **RQ-022** Every implementation gives the official examples the expected results.
 - **RQ-023** The public API exports the parse, serialization, factory and accessor functions.
 - **RQ-024** A parse error exposes its kind, its offset and its message.

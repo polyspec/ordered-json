@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 1465e9fabc6aa2bfdba40fb7fceb4ba6e8952cf294a78eccbe7f6e55606fc992 -->
+<!-- source-sha256: 5ec0abd699a021c8d65695e61b5552f962f4e732ffe730bd2d99153c6032b70e -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -46,3 +46,4 @@
 | T2.33 | Go에는 zero-copy ParseBytesBorrowed가 없습니다: contract 밖이므로(S6: native 전용 symbol 없음) symbol, flag, test, unit을 없애고 benchmark는 ParseBytes로 파싱합니다 | `packages/go/orderedjson.go`, `packages/go/api_test.go`, `packages/go/internal/benchmark/main.go`, `config/parity.json`, `docs/spec/api.md`(.ko), `benchmarks/README.md`(.ko), `CHANGELOG.md`(.ko) | `make test-go CASES=Parse` and `make lint-go` | [o] |
 | T2.34 | object entry, byte 입력, 오류 message는 언어별 표현에 binding한 중립 API unit입니다: JavaScript, PHP, Python은 Value의 members, get, object, PHP의 byte 입력은 parse, message는 ParseError class이며 PHP의 key test는 문자열이 아닌 key가 없음을 보입니다 | `config/parity.json`, `packages/php/tests/ValueApiTest.php`, `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make parity-declarations-check` and `make test-php CASES=NonStringKey` | [o] |
 | T2.35 | kind 이름은 모든 구현의 상수입니다 (S6): Rust, Go처럼 JavaScript(TypeScript 선언), Python, PHP에서도 Kind는 enum입니다 | `packages/js/index.js`, `packages/js/index.d.ts`, `packages/python/src/polyspec/ordered_json/__init__.py`, `packages/php/src/Kind.php`, `packages/php-ext/src/`, `config/parity.json`, `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make parity-declarations-check` | [o] |
+| T2.36 | 명세는 RQ-020을 모든 언어의 native JSON 인터페이스에 대한 하나의 규칙으로 말하고 Rust와 Go의 typed 형태를 그 확장으로 둡니다 | `docs/spec/json-contract.md`(.ko), `docs/spec/api.md`(.ko), `CHANGELOG.md`(.ko) | `make docs-check` | [o] |

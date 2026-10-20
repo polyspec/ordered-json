@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: a8b52fbbf51e755116b1efd209531cef7f9cb1d709d347f52514e7823ff23f57 -->
+<!-- source-sha256: 818bbc358fbb19c071c93396752d416ffb77ece005ae41cddd18187faa07c35b -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- 명세는 RQ-020을 하나의 규칙으로 말합니다 (T2.36): 모든 언어는 값을 표준 JSON 직렬화 인터페이스와 통합하며, 그 인터페이스는 contract bytes를 쓰거나(Go `encoding/json`, Rust serde, native 구조 안에서도) 거부하며 라이브러리 직렬화기를 가리킵니다(JavaScript, PHP, Python). `docs/spec/api.md`(.ko)는 각 언어의 인터페이스를 이름 붙이고 Go의 typed `Marshal`과 Rust의 `serde::to_string`을 그 규칙을 native 구조 전체로 넓힌 확장으로 제시합니다. Red: RQ-020은 호스트 인코더가 거부하고 typed Go 인코더가 표준과 일치한다고 말해 Rust와 다른 언어가 binding할 수 없었음; green: `make docs-check` 문서 쌍 30개 passed.
 - 종류 이름은 모든 구현의 열거형 `Kind`입니다 (T2.35): `packages/js/index.d.ts`의 TypeScript enum과 `index.js`의 frozen 객체 `Kind`, Python의 `StrEnum` `Kind`(`Value.kind`는 문자열과 같은 그 멤버를 반환), PHP의 backed enum `Polyspec\\OrderedJson\\Kind`(확장도 stub에서 등록하며 Reflection이 userland enum을 final로 보고하므로 final로 표시); `docs/spec/api.md`(.ko)가 열거형을 명세하고 `api-kind-*` unit 7개가 각 구현의 symbol을 선언합니다. Red: `make parity-declarations-check` R1 28건(js, php, php-extension, python의 kind unit); green: R1 0건. 확장 유무의 PHPUnit test 41개 assertion 188개 passed, unittest passed, `scripts/verify.mts` probe 4개 passed, `make lint-ts`, `lint-php`, `lint-python`, `lint-php-ext`, `typecheck` passed.
 - object entry, byte 입력, 오류 message는 중립 API unit입니다 (T2.34): `api-ordered-map*`는 Rust와 Go의 `OrderedMap`과 함께 JavaScript, PHP, Python, php-extension의 `Value` members, get, object를 선언하고, `api-parse-bytes`는 PHP의 byte 입력으로 `parse`를, `api-parse-error-message`는 표준 예외 message를 가진 `ParseError` class를 선언하며, `ordered_map_rejects_non_string_key`는 PHP와 확장에 `testOrderedMapRejectsNonStringKey`를 binding합니다(PHP 배열 키는 문자열 또는 정수이므로 다른 키는 객체에 닿지 않음). `docs/spec/api.md`(.ko)의 Go 문장은 더 이상 `ParseBytesBorrowed`를 말하지 않습니다. Red: `make parity-declarations-check` R1 58건, R2 101건; green: R1 28건(Kind unit), R2 99건. PHPUnit `NonStringKey`는 확장 유무와 관계없이 통과합니다.
 - Go에는 zero-copy 파싱이 없습니다 (T2.33): `ParseBytesBorrowed`, 그 `flagBorrowed` 처리, test, unit `borrowed_input_is_copied_on_access`는 contract 밖이므로(S6은 native 전용 symbol을 허용하지 않음) 없애며 Go benchmark는 `ParseBytes`로 파싱합니다. benchmark README와 API 표도 더 이상 이를 적지 않습니다. Red: `make parity-declarations-check` R2 missing-binding이 `borrowed_input_is_copied_on_access`에서 5개 구현; green: 그 5건이 없어짐; go test 6 passed, `scripts/verify.mts --only go` passed, `make lint-go` passed. commit된 Go benchmark 결과는 이 변경보다 앞서므로 다른 것과 함께 다시 측정합니다.
