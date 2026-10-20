@@ -32,6 +32,9 @@ export type Commands = {
 // The library that make build-php-ext (kit, S10) publishes, relative to the repository.
 const EXTENSION_BUILD = 'var/php-ext/polyspec_ordered_json.so';
 const PHP_EXTENSION = 'extension={extension}';
+
+/** The PHP extension that make build-php-ext published: the library that the probe of the verifier and the benchmark load. */
+export const builtExtension = (): string => path.join(ROOT, EXTENSION_BUILD);
 export const COMMANDS: Record<string, Commands> = {
   js: { command: ['node', '{js}/tests/probe.mjs'], runtime: { node: ['node', '--version'] } },
   rust: {
@@ -211,7 +214,7 @@ export function copySources(source: string, target: string): void {
 
 /** The variables of the commands of a run: the directory of each implementation, the cache, the repository and the extension. */
 const variablesOf = (run: Pick<Run, 'paths' | 'cache' | 'extension'>): Record<string, string> =>
-  ({ ...run.paths, cache: run.cache, repository: ROOT, extension: run.extension ?? path.join(ROOT, EXTENSION_BUILD) });
+  ({ ...run.paths, cache: run.cache, repository: ROOT, extension: run.extension ?? builtExtension() });
 
 /** The environment of the commands of `name`: the caller's, with the variables that the implementation declares. */
 function environmentOf(name: string, run: Pick<Run, 'paths' | 'cache' | 'extension'>, registry = REGISTRY): NodeJS.ProcessEnv {

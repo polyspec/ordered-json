@@ -14,7 +14,7 @@ import { isDeepStrictEqual, parseArgs } from 'node:util';
 import { parseJson, readJsonFile } from '../scripts/json.mts';
 import { present } from '../scripts/present.mts';
 import { writeRecord } from '../scripts/records.mts';
-import { ROOT, artifactPaths, pathOf, prepare, repositoryPaths, withRun, type Argv } from '../scripts/registry.mts';
+import { ROOT, builtExtension, pathOf, prepare, repositoryPaths, withRun, type Argv } from '../scripts/registry.mts';
 
 type Protocol = { warmup: number; warmup_ms: number; iterations: number; samples: number; median_tolerance: number; p95_tolerance: number };
 type Entry = { file: string; input_bytes: number; sha256: string } & Record<(typeof COUNTS)[number] | 'max_depth', number>;
@@ -145,8 +145,8 @@ async function main(): Promise<void> {
   const env = { ...process.env, OJ_BENCH_ITERATIONS: String(protocol.iterations), OJ_BENCH_WARMUP: String(protocol.warmup), OJ_BENCH_WARMUP_MS: String(protocol.warmup_ms), OJ_BENCH_SAMPLES: String(protocol.samples) };
   const rows = await withRun(['php-extension'], async (run) => {
     await prepare(['php-extension'], run);
-    const [extension] = artifactPaths('php-extension', run);
-    if (extension === undefined || !existsSync(extension)) throw new Error('the PHP extension of the benchmark was not built');
+    const extension = builtExtension();
+    if (!existsSync(extension)) throw new Error('the PHP extension of the benchmark was not built');
     // The directory of each implementation is its root in config/parity.json.
     const packages = repositoryPaths();
     const php = { ...env, OJ_PACKAGE: packages.php };
