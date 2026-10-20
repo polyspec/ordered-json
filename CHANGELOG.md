@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Go has no zero-copy parse (T2.33): `ParseBytesBorrowed`, its `flagBorrowed` handling, its test and the unit `borrowed_input_is_copied_on_access` are removed because they lie outside the contract (S6 allows no native-only symbol), and the Go benchmark parses with `ParseBytes`; the benchmark README and the API table no longer name it. Red: `make parity-declarations-check` R2 missing-binding for `borrowed_input_is_copied_on_access` in 5 implementations; green: those 5 are gone; go test 6 passed, `scripts/verify.mts --only go` passed, `make lint-go` passed. The committed Go benchmark result predates the change and is re-measured with the others.
 - `CHECK_TARGETS` and the CI jobs run every gate of kit-gates (T2.21): after the parity declaration lost its profiles (T2.4) the 98 schema findings are gone. Green: `make kit-check` exit 0, `tests/scripts/workflow-rules.test.mts` 17 passed.
 - `CHECK_TARGETS` and the first job of `ci.yml` run `link-state-check` (T2.32), the gate of kit K305 that fails while an installed 0.0.x polyspec package is a copy among links. Red: `make kit-check` exit 2, `CHECK_TARGETS runs no link-state-check`; green: exit 0, the workflow-rules test passed.
 - The PRINCIPLES copies equal those of the installed kit after K304 to K307 (T2.31), written by `make kit-sync`. Red: `make kit-check` exit 2, 2 findings; green: exit 0.

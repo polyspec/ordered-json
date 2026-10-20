@@ -6,7 +6,6 @@ import (
 	"strings"
 	"unicode/utf16"
 	"unicode/utf8"
-	"unsafe"
 )
 
 const MaxDepth = 256
@@ -42,8 +41,6 @@ const (
 	flagCompact uint8 = 1 << iota
 	// flagRoot marks a parse result; its Raw text includes surrounding whitespace.
 	flagRoot
-	// flagBorrowed marks a source that aliases caller memory, so derived text is copied.
-	flagBorrowed
 	// flagRejectDuplicates is a parser flag only: a repeated decoded key is an error, not an overwrite.
 	flagRejectDuplicates
 	// flagEscaped marks a string token that contains escape sequences.
@@ -315,9 +312,6 @@ func (v *Value) StringValue() (string, error) {
 	}
 	content := v.source[v.start+1 : v.end-1]
 	if v.flags&flagEscaped == 0 {
-		if v.flags&flagBorrowed != 0 {
-			return strings.Clone(content), nil
-		}
 		return content, nil
 	}
 	// An unpaired surrogate has no UTF-8 encoding; the string value keeps it as WTF-8, the form of the keys (unitsName).
@@ -427,11 +421,7 @@ func (v *Value) Compact() (string, error) {
 		return "", fmt.Errorf("expected orderedjson Value")
 	}
 	if v.flags&flagCompact != 0 {
-		out := v.source[v.start:v.end]
-		if v.flags&flagBorrowed != 0 {
-			out = strings.Clone(out)
-		}
-		return out, nil
+		return v.source[v.start:v.end], nil
 	}
 	var out strings.Builder
 	out.Grow(v.end - v.start)
@@ -472,13 +462,6 @@ func (v *Value) writeJSON(out *strings.Builder) {
 func Parse(source string) (*Value, error)      { return ParseWithMaxDepth(source, MaxDepth) }
 func ParseBytes(source []byte) (*Value, error) { return Parse(string(source)) }
 
-// ParseBytesBorrowed parses source without copying its bytes.
-//
-// The caller must not modify source for the lifetime of the returned Value.
-// Use ParseBytes when the input buffer may be reused or mutated.
-func ParseBytesBorrowed(source []byte) (*Value, error) {
-	return parse(unsafe.String(unsafe.SliceData(source), len(source)), MaxDepth, flagBorrowed)
-}
 func ParseWithMaxDepth(source string, maxDepth int) (*Value, error) {
 	return parse(source, maxDepth, 0)
 }

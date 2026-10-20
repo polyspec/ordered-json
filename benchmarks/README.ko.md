@@ -1,5 +1,5 @@
 <!-- doc-id: performance-benchmarks -->
-<!-- source-sha256: f96f54d06c94c66aeae7f211269525f506fc366ab6e6d45782b8c9953878c8e1 -->
+<!-- source-sha256: 1a3367d0e08dc6c6290f73b90e9365e7015bf0eca30803eae396ef9bf34a39ba -->
 # 성능 벤치마크
 
 `run.mts`는 모든 런타임에서 같은 입력 문서, 워밍업 횟수, 반복 횟수,
@@ -16,11 +16,6 @@ Rust 표준 라이브러리에는 JSON 파서가 없으므로 네이티브 비�
 사실상 표준인 `serde_json`입니다. JavaScript, Go, PHP는 각 런타임의
 네이티브 JSON API를 사용합니다. PHP는 순수 PHP 구현과 네이티브 확장도
 별도로 측정합니다.
-
-Go ordered-json 벤치마크는 명시적인 `ParseBytesBorrowed` 경로를 사용합니다.
-fixture 바이트 복사를 피하며 측정 전체에서 각 입력 버퍼를 유지하고 변경하지
-않습니다. 입력 버퍼를 변경할 수 있는 일반 호출자는 `ParseBytes`를 사용해야
-합니다.
 
 네이티브 측정값은 동등한 동작이라고 주장하는 값이 아니라 별도의 기준값입니다.
 일반적인 네이티브 API는 객체 순서나 정확한 숫자 토큰을 보존하지 않습니다.

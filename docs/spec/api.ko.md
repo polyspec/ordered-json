@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 16bfee5fd709b78469d0d7ccd7ebb48a5d95f2d884e34d9d8d1383c5beb982c9 -->
+<!-- source-sha256: 6563f97c8a29a1b1b5cbf2aaaec2e0e3dc98a7852a98aa9a3d93b623a4f50cd3 -->
 # API 계약
 
 [English](api.md)
@@ -16,7 +16,7 @@
 | 동작 | JavaScript | Rust | Go | PHP | Python |
 | --- | --- | --- | --- | --- | --- |
 | 텍스트 파싱 | `parse(source, options)` | `parse(source)` | `Parse(source)` | `parse(source, maxDepth)` | `parse(source, options)` |
-| UTF-8 바이트 | `parseBytes(bytes, options)` | `parse_bytes(bytes)` | `ParseBytes(bytes)` / `ParseBytesBorrowed(bytes)` | `parse(source)` | `parse_bytes(data, options)` |
+| UTF-8 바이트 | `parseBytes(bytes, options)` | `parse_bytes(bytes)` | `ParseBytes(bytes)` | `parse(source)` | `parse_bytes(data, options)` |
 | 깊이 한도 | `options.maxDepth` | `parse_with_max_depth(source, limit)` | `ParseWithMaxDepth(source, limit)` | `maxDepth` | `options.max_depth` |
 | 기본 출력 | `stringify(value)` | `stringify(&value)` | `Stringify(value)` | `stringify($value)` | `stringify(value)` |
 | compact 출력 | `stringify(value)` | `value.compact()` | `value.Compact()` | `$value->compact()` | `value.compact()` |

@@ -42,3 +42,4 @@
 | T2.30 | Every rule of AGENTS.md begins with Own: or Refines <id>:, and none restates a principle | `AGENTS.md`(.ko), `CHANGELOG.md`(.ko) | `make rules-check` | [o] |
 | T2.31 | The kit copies equal those of the installed kit | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.32 | CHECK_TARGETS and the CI jobs run link-state-check | `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
+| T2.33 | Go has no zero-copy ParseBytesBorrowed: it is outside the contract (S6: no native-only symbol), so the symbol, its flag, its test and its unit are removed and the benchmark parses with ParseBytes | `packages/go/orderedjson.go`, `packages/go/api_test.go`, `packages/go/internal/benchmark/main.go`, `config/parity.json`, `docs/spec/api.md`(.ko), `benchmarks/README.md`(.ko), `CHANGELOG.md`(.ko) | `make test-go CASES=Parse` and `make lint-go` | [o] |

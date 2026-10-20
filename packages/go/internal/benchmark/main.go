@@ -78,7 +78,7 @@ func main() {
 			panic(err)
 		}
 		parseOrdered := func() *orderedjson.Value {
-			v, err := orderedjson.ParseBytesBorrowed(source)
+			v, err := orderedjson.ParseBytes(source)
 			if err != nil {
 				panic(err)
 			}

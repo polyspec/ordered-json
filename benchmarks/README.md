@@ -61,11 +61,6 @@ in its standard library. The JavaScript, Go, and PHP baselines use their
 runtime-native JSON APIs. PHP reports both the pure PHP implementation and the
 native extension implementation.
 
-The Go ordered-json benchmark uses the explicit `ParseBytesBorrowed` path. It
-avoids copying the fixture bytes, and the benchmark keeps each input buffer
-alive and unchanged for the entire measurement. General callers should use
-`ParseBytes` when the input buffer may be modified.
-
 <a id="python-parse"></a>
 ## Python parse ratio
 

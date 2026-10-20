@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: bb53a803b0487b43236d0d820deccc5b7118a787a479ca5ee0fe4775792d9b84 -->
+<!-- source-sha256: aa9f23f83443f075c542c2b26069eeddd084cc1dc88b3e4d28a39bedca065cb7 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Go에는 zero-copy 파싱이 없습니다 (T2.33): `ParseBytesBorrowed`, 그 `flagBorrowed` 처리, test, unit `borrowed_input_is_copied_on_access`는 contract 밖이므로(S6은 native 전용 symbol을 허용하지 않음) 없애며 Go benchmark는 `ParseBytes`로 파싱합니다. benchmark README와 API 표도 더 이상 이를 적지 않습니다. Red: `make parity-declarations-check` R2 missing-binding이 `borrowed_input_is_copied_on_access`에서 5개 구현; green: 그 5건이 없어짐; go test 6 passed, `scripts/verify.mts --only go` passed, `make lint-go` passed. commit된 Go benchmark 결과는 이 변경보다 앞서므로 다른 것과 함께 다시 측정합니다.
 - `CHECK_TARGETS`와 CI job은 kit-gates의 모든 gate를 실행합니다 (T2.21): parity 선언이 profile을 잃은 뒤(T2.4) schema 결과 98건이 없어졌습니다. Green: `make kit-check` exit 0, `tests/scripts/workflow-rules.test.mts` 17 passed.
 - `CHECK_TARGETS`와 `ci.yml`의 첫 job이 `link-state-check`를 실행합니다 (T2.32). 설치된 0.0.x polyspec package가 link 사이의 사본이면 실패하는 kit K305의 gate입니다. Red: `make kit-check` exit 2, `CHECK_TARGETS runs no link-state-check`; green: exit 0, workflow-rules test passed.
 - PRINCIPLES 사본은 K304부터 K307 뒤 `make kit-sync`가 쓴 설치된 kit의 것과 같습니다 (T2.31). Red: `make kit-check` exit 2, 2건; green: exit 0.

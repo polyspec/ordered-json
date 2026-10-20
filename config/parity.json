@@ -1156,20 +1156,6 @@
       ]
     },
     {
-      "id": "borrowed_input_is_copied_on_access",
-      "kind": "feature",
-      "requirements": [
-        "RQ-018"
-      ],
-      "bindings": [
-        {
-          "implementation": "go",
-          "test": "packages/go/api_test.go",
-          "id": "TestBorrowedInputIsCopiedOnAccess"
-        }
-      ]
-    },
-    {
       "id": "utf8_validation_holds_for_long_multibyte_text",
       "kind": "feature",
       "requirements": [

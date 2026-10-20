@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 3756dafea97fea01d9ffabca41434b87727b67adcd92cbbb78206bb22f1b9a6d -->
+<!-- source-sha256: ffa44e4768be83d5b64a819e793ae70b4b23363ff6fd5339848f0df8907e7867 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -43,3 +43,4 @@
 | T2.30 | AGENTS.md의 모든 규칙은 Own: 또는 Refines <id>:로 시작하며, 원칙을 되풀이하는 규칙은 없습니다 (kit K300) | `AGENTS.md`(.ko), `CHANGELOG.md`(.ko) | `make rules-check` | [o] |
 | T2.31 | kit 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`(.ko), `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.32 | CHECK_TARGETS와 CI job은 link-state-check를 실행합니다 | `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
+| T2.33 | Go에는 zero-copy ParseBytesBorrowed가 없습니다: contract 밖이므로(S6: native 전용 symbol 없음) symbol, flag, test, unit을 없애고 benchmark는 ParseBytes로 파싱합니다 | `packages/go/orderedjson.go`, `packages/go/api_test.go`, `packages/go/internal/benchmark/main.go`, `config/parity.json`, `docs/spec/api.md`(.ko), `benchmarks/README.md`(.ko), `CHANGELOG.md`(.ko) | `make test-go CASES=Parse` and `make lint-go` | [o] |
