@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 6cc0bef64c3d7e881703b13d96e725550ee5b1bd9f3638d67e34921ad6a15853 -->
+<!-- source-sha256: bdd0b8459b729810f02c5cb3258a842d72af26679a10fcc23e560b4d3411ec5c -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -29,7 +29,7 @@
 | T2.15-3 | 확장은 PHP 라이브러리를 C로 구현합니다: Value, ParseError, parse, stringify, MAX_DEPTH를 같은 이름과 signature로 등록하며 descriptor 함수와 그 test는 없앱니다 | `packages/php-ext/src/`, `packages/php-ext/tests/`, `packages/php-ext/composer.json`, `packages/php-ext/phpunit.xml`, `config/parity.json`, `CHANGELOG.md`(.ko) | `make lint-php-ext` and `make test-php-ext CASES=Value` | [o] |
 | T2.17 | PRINCIPLES 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`, `PRINCIPLES.ko.md`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.18 | config/rebuild.json은 paths를 두지 않고, kit이 layout으로 찾은 모든 tool을 분류합니다 | `config/rebuild.json`, `CHANGELOG.md`(.ko) | `make rebuild-check` | [o] |
-| T2.19 | 확장의 test는 확장을 올리고 실행하는 packages/php의 PHPUnit 파일입니다: packages/php-ext는 그 사본도 packages/php로 향하는 상대 경로도 두지 않습니다 (kit K285) | `packages/php-ext/tests/`, `packages/php-ext/composer.json`, `packages/php-ext/phpunit.xml`, `packages/php/tests/`, `CHANGELOG.md`(.ko) | `make test-php-ext CASES=OfficialTest` | [!] 원인: 변경을 소유한 검사인 make test-php-ext를 실행할 수 없습니다: make build-php-ext가 없는 arginfo header에서 멈춥니다(T2.8, kit php-extension.mts 167-171행); packages/php의 test도 확장이 로드되지 않았음을 단정합니다(packages/php/tests/OfficialTest.php, ValueApiTest.php). 이는 T2.15가 확장에서 라이브러리 API를 등록할 때까지 유지됩니다; 재시도: T2.8과 T2.15 뒤 |
+| T2.19 | 확장의 test는 확장을 올리고 실행하는 packages/php의 PHPUnit 파일입니다: packages/php-ext는 그 사본도 packages/php로 향하는 상대 경로도 두지 않습니다 (kit K285) | `packages/php-ext/tests/`, `packages/php-ext/composer.json`, `packages/php-ext/phpunit.xml`, `packages/php/tests/`, `CHANGELOG.md`(.ko) | `make test-php-ext CASES=OfficialTest` | [~] |
 | T2.20 | 의존성 review 기록은 commit된 manifest와 lock에 일치합니다 | `config/dependency-review.json`, `CHANGELOG.md`(.ko) | `make dependency-policy-check` | [o] |
 | T2.21 | CHECK_TARGETS와 CI job은 kit-gates의 모든 gate를 실행합니다: rules-check, rebuild-check, language-check, test-markers-check, duplication-check, lint-php-ext, test-php-ext | `Makefile`, `.github/workflows/ci.yml`, `CHANGELOG.md`(.ko) | `make kit-check` and `node node_modules/@polyspec/kit/dist/run-tests.mjs node -- tests/scripts/workflow-rules.test.mts` | [!] 원인: CHECK_TARGETS의 7건은 고쳤고(make kit-check 105건에서 98건; tests/scripts/workflow-rules.test.mts 17 passed), 남은 98건은 T2.4가 맡은 config/parity.json의 schema 결과(profile, profiles, nativeOnly, exclusions)입니다; 재시도: T2.4 뒤 |
 | T2.22 | packages/php의 OfficialTest와 ValueApiTest는 확장이 로드되지 않았음을 단정하지 않고, 확장이 있든 없든 성립하는 동작을 단정합니다 (S10 ruling 8: 같은 파일이 두 구현을 test합니다) | `packages/php/tests/OfficialTest.php`, `packages/php/tests/ValueApiTest.php`, `packages/php-ext/tests/`, `CHANGELOG.md`(.ko) | `make test-php CASES=Official` and `make test-php-ext CASES=Official` | [o] |
