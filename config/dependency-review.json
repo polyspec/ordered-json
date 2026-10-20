@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "comment": "Written by make dependency-review RECORD=1 (scripts/kit/dependency-review.mts) from the registries; make dependency-policy-check compares the checkout with it without a network.",
-  "reviewed": "2026-10-15T08:14:37.724Z",
+  "reviewed": "2026-10-20T04:41:47.279Z",
   "locks": [
     {
       "lock": "package-lock.json",
-      "sha256": "dd1120c5c8e4787c2fcafa4872092ba9bed4e96706069d1e3ff797fe9a615430",
+      "sha256": "55780f5c2c60c597021e44976f71c2b881f6c21528939f11c4516fceb476a574",
       "advisories": [
         {
           "package": "sprintf-js",
@@ -19,17 +19,17 @@
     },
     {
       "lock": "composer.lock",
-      "sha256": "ee129c937cead6523dce31a75b28780a05b8240f6a2901281f85bb4d490315cd",
+      "sha256": "6c0e6a412f7a43a471f67463827ed5e42a928f38491651b38397427a38f518a1",
       "advisories": []
     },
     {
       "lock": "packages/php/composer.lock",
-      "sha256": "468c6e1ca0ea3ec55eaab9447f205bbefe1518a0fbb00604e615c3ccf95105bf",
+      "sha256": "c983715bcfe31da99e9fe2eeed7c97555dd0edb186f90b242a3a91780fcd2fb4",
       "advisories": []
     },
     {
       "lock": "packages/php-ext/composer.lock",
-      "sha256": "5ff215f511dca15670383eca9cc28620163aaf9ada7bad7eaeb1637b4e956d78",
+      "sha256": "c0e1d848bad81903e581f7e0bdd18ee9846ce2c2c748da6a0656a02cf2eb0864",
       "advisories": []
     },
     {
@@ -125,29 +125,29 @@
       "ecosystem": "composer",
       "manifest": "packages/php/composer.json",
       "package": "phpunit/phpunit",
-      "version": "13.4.2",
-      "latest": "13.4.2"
+      "version": "13.4.3",
+      "latest": "13.4.3"
     },
     {
       "ecosystem": "composer",
       "manifest": "packages/php-ext/composer.json",
       "package": "phpunit/phpunit",
-      "version": "13.4.2",
-      "latest": "13.4.2"
+      "version": "13.4.3",
+      "latest": "13.4.3"
     },
     {
       "ecosystem": "pypi",
       "manifest": "packages/python/pyproject.toml",
       "package": "setuptools",
       "version": "84.0.0",
-      "latest": "84.0.0"
+      "latest": "84.2.0"
     },
     {
       "ecosystem": "pypi",
       "manifest": "mise.toml",
       "package": "ruff",
-      "version": "0.17.0",
-      "latest": "0.17.0"
+      "version": "0.17.1",
+      "latest": "0.17.1"
     }
   ],
   "vcs": []

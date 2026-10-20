@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 2b6465f046e9639fe322357d33d45c292bb7155e88f7fd70153c283847be61fe -->
+<!-- source-sha256: eb20c3475cc52fa5c6d1148ab689e5dbb5341c38e801641a1f37fe2b3be0c45e -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -23,3 +23,4 @@
 | T2.17 | PRINCIPLES 사본은 설치된 kit의 것과 같습니다 | `PRINCIPLES.md`, `PRINCIPLES.ko.md`, `CHANGELOG.md`(.ko) | `make kit-check` | [o] |
 | T2.18 | config/rebuild.json은 paths를 두지 않고, kit이 layout으로 찾은 모든 tool을 분류합니다 | `config/rebuild.json`, `CHANGELOG.md`(.ko) | `make rebuild-check` | [!] 원인: paths를 제거하고 benchmark tool 6개를 분류했지만 rebuild-check는 vendor된 scripts/kit 사본 9개를 아직 미분류로 보고합니다: kit의 scripts/kit/rebuild-check.mts 38행이 사본을 설치된 kit이 아니라(kit-check.mts 78행) kit.copies가 없는 저장소의 package.json(copiesOf(manifest))에서 가져옵니다; 재시도: kit이 toolSources에서 설치된 @polyspec/kit의 사본을 읽은 뒤 |
 | T2.19 | 확장의 test는 확장을 올리고 실행하는 packages/php의 PHPUnit 파일입니다: packages/php-ext는 그 사본도 packages/php로 향하는 상대 경로도 두지 않습니다 (kit K285) | `packages/php-ext/tests/`, `packages/php-ext/composer.json`, `packages/php-ext/phpunit.xml`, `packages/php/tests/`, `CHANGELOG.md`(.ko) | `make test-php-ext CASES=OfficialTest` | [!] 원인: 변경을 소유한 검사인 make test-php-ext를 실행할 수 없습니다: make build-php-ext가 없는 arginfo header에서 멈춥니다(T2.8, kit php-extension.mts 167-171행); packages/php의 test도 확장이 로드되지 않았음을 단정합니다(packages/php/tests/OfficialTest.php, ValueApiTest.php). 이는 T2.15가 확장에서 라이브러리 API를 등록할 때까지 유지됩니다; 재시도: T2.8과 T2.15 뒤 |
+| T2.20 | 의존성 review 기록은 commit된 manifest와 lock에 일치합니다 | `config/dependency-review.json`, `CHANGELOG.md`(.ko) | `make dependency-policy-check` | [!] 원인: phpunit 13.4.3, ruff 0.17.1과 review 기록은 반영했고 dependency-policy-check의 1건이 남았습니다: packages/python/pyproject.toml의 build-system requires에 있는 setuptools 84.0.0 < 84.2.0을 make dependency-review UPDATE=1이 pin할 수 없습니다: kit의 scripts/kit/pyproject-dependencies.mts 30-43행(dependencyArrays)이 build-system.requires를 빼서 pin-python-dependency.mts 47행이 "no exact pin of setuptools in the dependency arrays"로 실패합니다; 재시도: kit이 dependencyArrays에서 build-system의 requirements를 pin한 뒤 |
