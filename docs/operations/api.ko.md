@@ -1,10 +1,10 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 58389a2f89d7b37ec218c266201f8d9f2be85ac2cbde3dfb41e43757e06f6df5 -->
+<!-- source-sha256: 8b65afefe08188c175d3f506ab3005ec54cb50e0e41292cc45f99c10a62adcf5 -->
 # API 계약
 
 [English](api.md)
 
-[JSON 계약](json-contract.ko.md)은 모든 구현의 공통 동작을 정의합니다. 이 문서는 현재 언어별 API를 정의합니다. 현재 식별자는 [설치 문서](../operations/installation.ko.md)에 작성합니다.
+[JSON 계약](../spec/json-contract.ko.md)은 모든 구현의 공통 동작을 정의합니다. 이 문서는 현재 언어별 API를 정의합니다. 현재 식별자는 [설치 문서](installation.ko.md)에 작성합니다.
 
 프로젝트는 `ordered-json`이고 모든 패키지 이름은 polyspec 관례를 따릅니다. JavaScript는 npm 패키지 `@polyspec/ordered-json`을 사용합니다. Rust는 Cargo 패키지 `polyspec-ordered-json`을 사용하며 `polyspec_ordered_json`으로 가져옵니다. Go는 `github.com/polyspec/ordered-json/packages/go` 모듈과 `orderedjson` 패키지를 사용합니다. PHP는 `polyspec/ordered-json` Composer 패키지, `Polyspec\OrderedJson` 네임스페이스, PIE 패키지 `polyspec/ordered-json-php-ext`의 `polyspec_ordered_json` 확장을 사용하며, 확장은 Composer 패키지의 class, 함수, 상수를 같은 이름으로 등록합니다. Python은 패키지 `polyspec-ordered-json`을 사용하며 `polyspec` 아래 namespace package인 `polyspec.ordered_json`으로 가져옵니다.
 
@@ -92,4 +92,4 @@ PHP 라이브러리는 `polyspec/ordered-json`입니다. 공개 symbol은 class 
 
 PIE package `polyspec/ordered-json-php-ext`인 확장 `polyspec_ordered_json`은 라이브러리를 C로 구현하고 그 class, 함수, 상수를 같은 이름과 signature로 등록합니다. 프로세스는 라이브러리나 확장 중 하나만 로드하며(라이브러리는 source를 무조건 올리므로 함수를 다시 선언하게 됩니다), 하나의 test suite가 순수 PHP 구현과 라이브러리 source 없이 확장에 대해 실행되며 결과, 오류, offset은 같습니다. 확장은 자기 package의 version, 곧 `packages/php-ext`의 `composer.json` version을 보고합니다.
 
-네이티브 빌드는 PHP 버전, 플랫폼, 스레드 안전 설정과 일치해야 합니다. [네이티브 설치](../operations/installation.ko.md#native-php)를 확인합니다.
+네이티브 빌드는 PHP 버전, 플랫폼, 스레드 안전 설정과 일치해야 합니다. [네이티브 설치](installation.ko.md#native-php)를 확인합니다.

@@ -24,7 +24,7 @@ unknown fields, type errors and non-finite numbers fail. Embedded `Value` fields
 object order and number tokens.
 
 
-The [JSON contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.md) and [API contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.md) define behavior. Source is provided by this repository. The Cargo package is not configured for registry publication. Registry publication and versioned releases are not verified; a source version string is not a release record.
+The [JSON contract](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.md) and [API contract](https://github.com/polyspec/ordered-json/blob/main/docs/operations/api.md) define behavior. Source is provided by this repository. The Cargo package is not configured for registry publication. Registry publication and versioned releases are not verified; a source version string is not a release record.
 
 <a id="verification"></a>
 ## Verification

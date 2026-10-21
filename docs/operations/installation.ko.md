@@ -1,5 +1,5 @@
 <!-- doc-id: installation -->
-<!-- source-sha256: 5e44ca2689592e7c2dc4f42c8957d429fbdf50cc37c1f4ac8d4ebc42aa3c6bb0 -->
+<!-- source-sha256: 5e043a21c49b4f968a53ebe94e37e3f4585dd5199a4a26e663e619afcad4b749 -->
 # 설치와 실행
 
 [English](installation.md)
@@ -93,4 +93,4 @@ php -n -d extension="$PWD/var/php-ext/polyspec_ordered_json.so" script.php
 
 macOS의 configure는 명시된 `MACOSX_DEPLOYMENT_TARGET`을 유지하며 값이 없으면 `CFLAGS`의 대상 플래그를 포함한 현재 C 컴파일러에서 구합니다. 로드 가능한 번들은 최신 대상에서 동적 심볼 조회를 사용하고 사용하지 않는 동적 라이브러리 단일 모듈 플래그 검사를 제외합니다.
 
-공통 PHP API와 파서 선택 규칙은 [API 계약](../spec/api.ko.md#php)에 정의합니다. 네이티브 소스나 PHP 빌드 설정을 변경하면 모듈을 다시 빌드합니다.
+공통 PHP API와 파서 선택 규칙은 [API 계약](api.ko.md#php)에 정의합니다. 네이티브 소스나 PHP 빌드 설정을 변경하면 모듈을 다시 빌드합니다.

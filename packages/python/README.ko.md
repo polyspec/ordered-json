@@ -1,5 +1,5 @@
 <!-- doc-id: python-overview -->
-<!-- source-sha256: 3cebc4768f08220fd84c7c985a2f5a22a0aa2513cb7d97df7e825429f62b81b1 -->
+<!-- source-sha256: 7c37befb524f6c4e84c5328e5bdc9ac2b8ba26aa7f82315102db0ed0495590fd -->
 # Python용 ordered-json
 
 [English](README.md)
@@ -26,7 +26,7 @@ output = stringify(value)
 
 `parse(source, ParseOptions(reject_duplicates=True))`는 모든 깊이에서 반복된 decode된 object key를, 마지막 값을 유지하는 대신, 두 번째 key token의 첫 byte에서 `duplicate_object_key` kind의 `ParseError`로 거부합니다.
 
-[JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.md)이 동작을 정의합니다. source는 이 저장소가 제공합니다. registry 게시와 version 릴리스는 검증하지 않으며, source version 문자열은 릴리스 기록이 아닙니다.
+[JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/operations/api.md)이 동작을 정의합니다. source는 이 저장소가 제공합니다. registry 게시와 version 릴리스는 검증하지 않으며, source version 문자열은 릴리스 기록이 아닙니다.
 
 <a id="verification"></a>
 ## 검증

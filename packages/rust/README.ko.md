@@ -1,5 +1,5 @@
 <!-- doc-id: rust-overview -->
-<!-- source-sha256: 781a3dfb70a50205852abc66d9f945d2648d3295d95218ca707f7285aba19dab -->
+<!-- source-sha256: 1fa030fbcc9d46989603e0bc0e86d9b9514a777178ff57a147d9d914a79cf93e -->
 # ordered-json for Rust
 
 [English](README.md)
@@ -25,7 +25,7 @@ let output = stringify(&value);
 포함된 `Value` 필드는 객체 순서와 숫자 토큰을 유지합니다.
 
 
-동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. Cargo 패키지는 레지스트리 게시가 설정되지 않았습니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
+동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/operations/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. Cargo 패키지는 레지스트리 게시가 설정되지 않았습니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
 
 <a id="verification"></a>
 ## 검증

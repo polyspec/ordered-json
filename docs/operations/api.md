@@ -3,7 +3,7 @@
 
 [한국어](api.ko.md)
 
-The [JSON contract](json-contract.md) defines behavior shared by all implementations. This document defines the current language bindings. The current identifiers are listed in [installation](../operations/installation.md).
+The [JSON contract](../spec/json-contract.md) defines behavior shared by all implementations. This document defines the current language bindings. The current identifiers are listed in [installation](installation.md).
 
 The project is `ordered-json`, and every package name follows the polyspec convention. JavaScript uses npm package `@polyspec/ordered-json`. Rust uses Cargo package `polyspec-ordered-json` and imports `polyspec_ordered_json`. Go uses module `github.com/polyspec/ordered-json/packages/go` and package `orderedjson`. PHP uses Composer package `polyspec/ordered-json`, namespace `Polyspec\OrderedJson`, and extension `polyspec_ordered_json` from the PIE package `polyspec/ordered-json-php-ext`, which registers the classes, functions and constant of the Composer package under the same names. Python uses package `polyspec-ordered-json` and imports `polyspec.ordered_json`, a namespace package under `polyspec`.
 
@@ -91,4 +91,4 @@ The PHP library is `polyspec/ordered-json`. Its public symbols are the class `Po
 
 The extension `polyspec_ordered_json`, the PIE package `polyspec/ordered-json-php-ext`, implements the library in C and registers those classes, functions and the constant under the same names and signatures. A process loads the library or the extension, never both (the library loads its sources unconditionally and would redeclare the functions), so one test suite runs against the pure PHP implementation and, with none of the library's sources, against the extension, and the results, errors and offsets are the same. The extension reports the version of its package, `composer.json` of `packages/php-ext`.
 
-Native builds must match the PHP version, platform, and thread-safety configuration. See [native installation](../operations/installation.md#native-php).
+Native builds must match the PHP version, platform, and thread-safety configuration. See [native installation](installation.md#native-php).

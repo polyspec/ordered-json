@@ -1,5 +1,5 @@
 <!-- doc-id: features -->
-<!-- source-sha256: 645ec1ea0d7f1239cab6043e8a3fba42464ce3ece7ac627d7637b697e955fdb2 -->
+<!-- source-sha256: 12bdbc38bbb81f8a7dadaa8da06cdc2e433f84728ce4c95bfc6b67db2e0a94da -->
 # 기능 상태
 
 [English](features.md)
@@ -17,9 +17,9 @@
 | F-OUTPUT | 연관배열 직렬화와 원문 조회 | implemented | shared-suite | [결과](operations/validation.ko.md#records) | source-only | [직렬화](spec/json-contract.ko.md#serialization) |
 | F-IDEMPOTENT | 반복 파싱과 직렬화에서 같은 타입 트리와 출력을 유지 | implemented | shared-suite | [결과](operations/validation.ko.md#records) | source-only | [직렬화](spec/json-contract.ko.md#serialization) |
 | F-CONSTRUCT | 순서 있는 연관배열과 Value 객체 배열로 생성 | implemented | shared-suite | [결과](operations/validation.ko.md#records) | source-only | [생성](spec/json-contract.ko.md#construction) |
-| F-RUST-SERDE | 선언 순서와 엄격한 입력 검사를 갖춘 Rust 타입 인코딩·디코딩 | implemented | package-tests | [결과](operations/validation.ko.md#records) | source-only | [바인딩](spec/api.ko.md#bindings) |
-| F-STRICT-KEYS | Rust, JavaScript, PHP, Python에서 해석된 객체 키의 반복을 거부하는 파싱 | implemented | package-tests | [결과](operations/validation.ko.md#records) | source-only | [바인딩](spec/api.ko.md#bindings) |
-| F-PHP-NATIVE | 공통 PHP API를 사용하는 PHP 확장 파서와 직렬화 | implemented | shared-suite | [결과](operations/validation.ko.md#records) | source-only | [PHP](spec/api.ko.md#php) |
+| F-RUST-SERDE | 선언 순서와 엄격한 입력 검사를 갖춘 Rust 타입 인코딩·디코딩 | implemented | package-tests | [결과](operations/validation.ko.md#records) | source-only | [바인딩](operations/api.ko.md#bindings) |
+| F-STRICT-KEYS | Rust, JavaScript, PHP, Python에서 해석된 객체 키의 반복을 거부하는 파싱 | implemented | package-tests | [결과](operations/validation.ko.md#records) | source-only | [바인딩](operations/api.ko.md#bindings) |
+| F-PHP-NATIVE | 공통 PHP API를 사용하는 PHP 확장 파서와 직렬화 | implemented | shared-suite | [결과](operations/validation.ko.md#records) | source-only | [PHP](operations/api.ko.md#php) |
 | F-DOCS | 영한 문서, 링크·상태 검사, 검증 최신 여부 | implemented | docs-tests | [결과](operations/validation.ko.md#records) | source-only | [절차](operations/documentation-plan.ko.md#checks) |
 | F-REPOS | 독립적으로 빌드할 수 있는 구현 패키지와 공통 적합성을 갖춘 단일 저장소 | implemented | shared-suite | [결과](operations/validation.ko.md#records) | source-only | [저장소](operations/repositories.ko.md) |
 | F-BENCHMARK | 저장소 내부의 재현 가능한 벤치마크 프로토콜과 커밋된 결과 | implemented | benchmark | [결과](../benchmarks/results.json) | source-only | [벤치마크](../benchmarks/README.ko.md) |

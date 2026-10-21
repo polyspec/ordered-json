@@ -92,4 +92,4 @@ php -n -d extension="$PWD/var/php-ext/polyspec_ordered_json.so" script.php
 
 On macOS, configure preserves an explicit `MACOSX_DEPLOYMENT_TARGET` or derives the missing value from the active C compiler, including target flags in `CFLAGS`. The loadable bundle uses dynamic symbol lookup for modern targets and omits the unused dynamic-library single-module flag check.
 
-The common PHP API and backend selection rules are defined in the [API contract](../spec/api.md#php). Rebuild the module after native source or PHP build configuration changes.
+The common PHP API and backend selection rules are defined in the [API contract](api.md#php). Rebuild the module after native source or PHP build configuration changes.

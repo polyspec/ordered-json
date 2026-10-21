@@ -1,5 +1,5 @@
 <!-- doc-id: go-overview -->
-<!-- source-sha256: 472ea80a06e89a493ae03dd4060abae1f26e8cc972a99a189cfeef7697e50dde -->
+<!-- source-sha256: 75beb2675f8a2a7675efb4dc6949ac4f1b1e78f6deb4070713dee91e99352db3 -->
 # ordered-json for Go
 
 [English](README.md)
@@ -22,7 +22,7 @@ _ = output
 ~~~
 
 
-동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
+동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/operations/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
 
 <a id="verification"></a>
 ## 검증

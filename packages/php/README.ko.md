@@ -1,5 +1,5 @@
 <!-- doc-id: php-overview -->
-<!-- source-sha256: 694ec1bec3c9d9abe0d4b3b3941864d28ca7521d5552bfd2a523b521e327e226 -->
+<!-- source-sha256: 2d5bfbc7cc012cbac3264e29c74704b6cc30f5c91671c227316c1b1d5011cd3d -->
 # ordered-json for PHP
 
 [English](README.md)
@@ -24,7 +24,7 @@ $output = Polyspec\OrderedJson\stringify($value);
 
 `Polyspec\OrderedJson\Value::parseRejectDuplicates($source)`는 마지막 값을 유지하지 않고 어느 깊이든 해석된 객체 키가 반복되면 `duplicate_object_key` 종류의 `Polyspec\OrderedJson\ParseError`로 거부합니다. 확장이 로드되어 있어도 순수 PHP parser로 파싱합니다.
 
-동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
+동작은 [JSON 계약](https://github.com/polyspec/ordered-json/blob/main/docs/spec/json-contract.ko.md)과 [API 계약](https://github.com/polyspec/ordered-json/blob/main/docs/operations/api.ko.md)에 정의합니다. 소스는 이 저장소에서 제공합니다. 레지스트리 게시와 버전 릴리스는 검증되지 않았으며 소스 버전 문자열은 릴리스 기록이 아닙니다.
 
 <a id="verification"></a>
 ## 검증

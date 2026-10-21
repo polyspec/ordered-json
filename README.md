@@ -72,7 +72,7 @@ The aggregate record applies to the common revision and all package sources in t
 ## Documents
 
 - [JSON contract](docs/spec/json-contract.md)
-- [API contract](docs/spec/api.md)
+- [API contract](docs/operations/api.md)
 - [Repository contract](docs/operations/repositories.md)
 - [Feature state](docs/features.md)
 - [Distribution state](docs/operations/distribution.md)
