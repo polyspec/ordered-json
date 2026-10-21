@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: cabf09458a1213ca9c5466a24222fc973af6ea4bd45d7f9a3ebecd131c55a936 -->
+<!-- source-sha256: e363d9215193a2e5ed4e248f7dd3a91e55555651ecf053fddc5b22529c34dea4 -->
 # Development procedure
 
 [English](AGENTS.md)
@@ -73,7 +73,7 @@
   Enforced by: `make parity-declarations-check`
 - Own: 모든 언어 probe는 [official.json](examples/official.json)과 [scripts/verify.mts](scripts/verify.mts)를 사용합니다. 공통 사례는 그 파일이나 `contracts/fixtures/` 아래에 추가합니다. 언어별 예제나 기대 결과는 만들지 않습니다.
   Enforced by: `make verify-all`
-- Own: 계약 변경은 하나의 저장소 revision에서 verifier와 영향받는 패키지를 함께 갱신합니다. [repository contract](docs/spec/repositories.ko.md)를 참조합니다.
+- Own: 계약 변경은 하나의 저장소 revision에서 verifier와 영향받는 패키지를 함께 갱신합니다. [repository contract](docs/operations/repositories.ko.md)를 참조합니다.
   Enforced by: `make verify-all`
 
 <a id="release"></a>

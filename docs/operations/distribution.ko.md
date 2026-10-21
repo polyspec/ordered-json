@@ -1,5 +1,5 @@
 <!-- doc-id: distribution -->
-<!-- source-sha256: cd6371f03d6ee4219e8965798e221932533dfe9abe4118fd6052a62787f23e0a -->
+<!-- source-sha256: c04afd34533366a9cbfdf6db967174bd79de488c74b8564a53ec300e0acc33bb -->
 # 배포
 
 [English](distribution.md)
@@ -7,7 +7,7 @@
 <a id="state"></a>
 ## 확인된 상태
 
-저장소는 다섯 [구현 패키지](../spec/repositories.ko.md#ownership)를 하나의 리비전에 담습니다. GitHub 릴리스와 버전 태그는 `gh release list -R polyspec/ordered-json`과 저장소의 Releases 페이지에 나열되며, 추적 파일은 이를 다시 적지 않습니다. `make release-proof TAG=<tag>`는 릴리스를 [config/release.json](../../config/release.json)이 선언한 archive와 비교하며, 네트워크가 필요하고 릴리스가 만들어진 뒤에 실행합니다. `vX.Y.Z` 릴리스는 [릴리스 asset](installation.ko.md#release-assets)에 나열된 asset을 첨부하고, Go 모듈 릴리스 `packages/go/vX.Y.Z`는 asset을 첨부하지 않습니다. `published`로 표시한 기능 행은 릴리스 tag와 asset 이름을 적으며([기능](../features.ko.md)), 그 형식은 `make evidence-check`가 오프라인으로 검사합니다.
+저장소는 다섯 [구현 패키지](repositories.ko.md#ownership)를 하나의 리비전에 담습니다. GitHub 릴리스와 버전 태그는 `gh release list -R polyspec/ordered-json`과 저장소의 Releases 페이지에 나열되며, 추적 파일은 이를 다시 적지 않습니다. `make release-proof TAG=<tag>`는 릴리스를 [config/release.json](../../config/release.json)이 선언한 archive와 비교하며, 네트워크가 필요하고 릴리스가 만들어진 뒤에 실행합니다. `vX.Y.Z` 릴리스는 [릴리스 asset](installation.ko.md#release-assets)에 나열된 asset을 첨부하고, Go 모듈 릴리스 `packages/go/vX.Y.Z`는 asset을 첨부하지 않습니다. `published`로 표시한 기능 행은 릴리스 tag와 asset 이름을 적으며([기능](../features.ko.md)), 그 형식은 `make evidence-check`가 오프라인으로 검사합니다.
 
 이 저장소는 세 채널로 배포합니다. `vX.Y.Z` release의 GitHub release asset(npm tarball, PHP 라이브러리와 PHP 확장의 Composer zip, Python wheel), `packages/rust/`의 Rust 크레이트 `polyspec-ordered-json`을 git tag로, Go 모듈 `github.com/polyspec/ordered-json/packages/go`를 tag `packages/go/vX.Y.Z`로 배포합니다. 어떤 release도 레지스트리에 게시하지 않습니다. npm, crates.io, Packagist, PyPI는 release를 받지 않으며, 어떤 workflow도 레지스트리에 게시하지 않습니다. 확인된 로컬 배포는 소스 체크아웃입니다. PIE 메타데이터와 성공한 PIE 빌드는 로컬 빌드 호환성을 확인하며 Packagist 게시 근거는 아닙니다. 확장 패키지는 `polyspec/ordered-json-php-ext`, PHP 라이브러리는 `polyspec/ordered-json`입니다.
 

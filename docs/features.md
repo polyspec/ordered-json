@@ -20,7 +20,7 @@
 | F-STRICT-KEYS | Parsing that rejects repeated decoded object keys in Rust, JavaScript, PHP and Python | implemented | package-tests | [result](operations/validation.md#records) | source-only | [binding](spec/api.md#bindings) |
 | F-PHP-NATIVE | PHP extension parser and serializer with the shared PHP API | implemented | shared-suite | [result](operations/validation.md#records) | source-only | [PHP](spec/api.md#php) |
 | F-DOCS | Bilingual documents, link/status checks, verification freshness | implemented | docs-tests | [result](operations/validation.md#records) | source-only | [procedure](operations/documentation-plan.md#checks) |
-| F-REPOS | Single repository with independently buildable implementation packages and shared conformance | implemented | shared-suite | [result](operations/validation.md#records) | source-only | [repositories](spec/repositories.md) |
+| F-REPOS | Single repository with independently buildable implementation packages and shared conformance | implemented | shared-suite | [result](operations/validation.md#records) | source-only | [repositories](operations/repositories.md) |
 | F-BENCHMARK | Repository-contained reproducible benchmark protocol and committed results | implemented | benchmark | [result](../benchmarks/results.json) | source-only | [benchmarks](../benchmarks/README.md) |
 
 <a id="limits"></a>

@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 2383f81864ad17e9b0390bf26f453c4984674cb0c8d4858aa983871ad28bd35e -->
+<!-- source-sha256: 1d892190d763d699d1914b772cb34955e17f0fba50658281300d5ca5fd59eac0 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -102,6 +102,8 @@
   패키지를 다룹니다.
 
 ## 0.0.9
+
+- T2.62: 저장소 계약을 docs/spec에서 docs/operations로 옮겼다. 요구사항을 정의하지 않는 배치 문서이기 때문이다: docs/spec/repositories.md와 한국어 쌍, 그리고 그것을 가리키는 링크(parity 선언의 R19). Red: 낡은 경로가 남아 있는 동안 연결 파일마다 make text-absent가 exit 1이고, 115eeea에서 parity가 실패했다. Green: 모든 연결 파일에서 text-absent가 통과하고 make docs-check와 make layout-check가 통과한다 (T2.62). (T2.62).
 
 - T1.49: `packages/php-ext`의 Composer manifest는 `repositories`와 `polyspec/ordered-json`의 개발 요구를 선언하지 않습니다. 그 test는 `autoload-dev`로 `../php/src`의 PHP 라이브러리를 읽으므로, extension의 release zip은 저장소 밖에서 설치되는 manifest를 담습니다.
 - T1.48: 공유 도구는 `@polyspec/kit` 0.0.45이며, 그 knip은 pin된 런타임의 binary를 무시합니다(kit K152).

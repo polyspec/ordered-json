@@ -72,7 +72,7 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
   Enforced by: `make parity-declarations-check`
 - Own: All language probes use [official.json](examples/official.json) and [scripts/verify.mts](scripts/verify.mts). Shared cases are added there or under `contracts/fixtures/`. No language-specific examples or expected results are created.
   Enforced by: `make verify-all`
-- Own: A contract change updates the verifier and the affected packages in one repository revision. See the [repository contract](docs/spec/repositories.md).
+- Own: A contract change updates the verifier and the affected packages in one repository revision. See the [repository contract](docs/operations/repositories.md).
   Enforced by: `make verify-all`
 
 <a id="release"></a>

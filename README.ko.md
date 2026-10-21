@@ -1,5 +1,5 @@
 <!-- doc-id: overview -->
-<!-- source-sha256: f24f9239ef57590905a5d838634846b10d6f0c631cc0056bd1f3bc48031de1d1 -->
+<!-- source-sha256: fa6bebf5f988f09267ddf5e04e22c2bcb7c3e99406c6e75e87e0680d688975c4 -->
 # ordered-json
 
 [English](README.md)
@@ -74,7 +74,7 @@ make check
 
 - [JSON 계약](docs/spec/json-contract.ko.md)
 - [API 계약](docs/spec/api.ko.md)
-- [저장소 계약](docs/spec/repositories.ko.md)
+- [저장소 계약](docs/operations/repositories.ko.md)
 - [기능 상태](docs/features.ko.md)
 - [배포 상태](docs/operations/distribution.ko.md)
 - [변경 기록](CHANGELOG.ko.md)

@@ -1,5 +1,5 @@
 <!-- doc-id: features -->
-<!-- source-sha256: c0086f109e473aa0c46bf54e585534ec771ca1785e0c1f52886ca4bdd81e2d58 -->
+<!-- source-sha256: 645ec1ea0d7f1239cab6043e8a3fba42464ce3ece7ac627d7637b697e955fdb2 -->
 # 기능 상태
 
 [English](features.md)
@@ -21,7 +21,7 @@
 | F-STRICT-KEYS | Rust, JavaScript, PHP, Python에서 해석된 객체 키의 반복을 거부하는 파싱 | implemented | package-tests | [결과](operations/validation.ko.md#records) | source-only | [바인딩](spec/api.ko.md#bindings) |
 | F-PHP-NATIVE | 공통 PHP API를 사용하는 PHP 확장 파서와 직렬화 | implemented | shared-suite | [결과](operations/validation.ko.md#records) | source-only | [PHP](spec/api.ko.md#php) |
 | F-DOCS | 영한 문서, 링크·상태 검사, 검증 최신 여부 | implemented | docs-tests | [결과](operations/validation.ko.md#records) | source-only | [절차](operations/documentation-plan.ko.md#checks) |
-| F-REPOS | 독립적으로 빌드할 수 있는 구현 패키지와 공통 적합성을 갖춘 단일 저장소 | implemented | shared-suite | [결과](operations/validation.ko.md#records) | source-only | [저장소](spec/repositories.ko.md) |
+| F-REPOS | 독립적으로 빌드할 수 있는 구현 패키지와 공통 적합성을 갖춘 단일 저장소 | implemented | shared-suite | [결과](operations/validation.ko.md#records) | source-only | [저장소](operations/repositories.ko.md) |
 | F-BENCHMARK | 저장소 내부의 재현 가능한 벤치마크 프로토콜과 커밋된 결과 | implemented | benchmark | [결과](../benchmarks/results.json) | source-only | [벤치마크](../benchmarks/README.ko.md) |
 
 <a id="limits"></a>
