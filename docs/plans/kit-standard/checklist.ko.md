@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: fa8087048488f77f7edc3a8314a3ea6def3071108dc3b9abef0308040addc026 -->
+<!-- source-sha256: ce9660bc9de8298ff30cbcc974c0d3740102dbae3966185ab6be6d0a0d385131 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -73,3 +73,4 @@
 | T2.60 | ordered-json은 8813c04a의 kit 사본을 받으며(K354 K394 K386 K348-1 K360-2 K349-2 K392-1 K393), make kit-sync와 make hooks가 쓴다 | the copies of kit, .githooks | `make kit-check` | [o] |
 | T2.61 | docs/spec/api.md가 기술하는 언어 binding마다 목록 항목이나 id가 있는 제목으로 요구사항 하나를 정의해 parity 선언의 R19 검사가 통과한다 (kit R19; id는 소유자가 정한다) | docs/spec/api.md, docs/spec/api.ko.md | `make parity-declarations-check` | [o] |
 | T2.62 | docs/spec/repositories.md는 라이브러리 계약이 아닌 저장소 배치 문서이고 요구사항을 정의하지 않으므로 한국어 쌍과 함께 docs/operations/repositories.md로 옮긴다(link-owner 판정); 그것을 가리키던 모든 파일은 새 경로를 쓰며 text-absent가 이를 검사한다 (kit R19) | docs/spec/repositories.md, docs/spec/repositories.ko.md, docs/operations/repositories.md, docs/operations/repositories.ko.md, and the files that linked them | `make text-absent FILE=AGENTS.md TEXT=docs/spec/repositories.md`, `make text-absent FILE=README.md TEXT=docs/spec/repositories.md`, `make text-absent FILE=AGENTS.ko.md TEXT=docs/spec/repositories.md`, `make text-absent FILE=README.ko.md TEXT=docs/spec/repositories.md`, `make text-absent FILE=docs/features.md TEXT=docs/spec/repositories.md`, `make text-absent FILE=docs/features.ko.md TEXT=docs/spec/repositories.md`, `make text-absent FILE=docs/operations/distribution.ko.md TEXT=docs/spec/repositories.md`, `make text-absent FILE=docs/operations/distribution.md TEXT=docs/spec/repositories.md` | [o] |
+| T2.63 | Value::parse가 참조 순환을 남기지 않는다: scanner의 closure들이 서로를 참조로 잡아 파싱마다 순환이 남고 gc_collect_cycles만 회수하며, 많은 행의 가져오기가 memory_limit을 넘는다(packages/php/src/Value.php의 scan); 수집기를 끈 채 파싱해도 순환이 남지 않는다 (limepie P-82) | packages/php/src/Value.php, packages/php/tests/ValueMemoryTest.php | `node node_modules/@polyspec/kit/dist/run-tests.mjs phpunit --cwd packages/php -- --filter 'NoReferenceCycle'`, `make lint-php` | [o] |

@@ -104,6 +104,8 @@
 
 ## 0.0.9
 
+- T2.63: Value::parse left reference cycles on every parse, because the scanner closures capture each other by reference, so a large import kept its memory until the cycle collector ran and reached memory_limit (limepie P-82). The scanner now drops its closure variables on return and on a parse error, so no cycle remains. Red: with the collector disabled, 50 parses left 400 cycles and the new tests fail; green: the tests of ValueApiTest pass, lint-php passes and make parity-declarations-check holds (T2.63). (T2.63).
+
 - T2.61: The bindings reference moves from docs/spec to docs/operations, since it defines no requirement of its own: docs/spec/api.md and its Korean twin, and the links that name them, including the changelog's. Red: make parity-declarations-check exits 2 on 605b7a7 with the R19 of api.md; green: it holds, and make docs-check and make layout-check pass (T2.61). (T2.61).
 
 - T2.62: The repository contract moves from docs/spec to docs/operations, since it defines no requirement and is a layout document: docs/spec/repositories.md and its Korean twin, and the links that name them (R19 of the parity declaration). Red: make text-absent on each linking file exits 1 while the stale path remains, and the parity red at 115eeea; green: text-absent passes on every linking file and make docs-check and make layout-check pass (T2.62). (T2.62).

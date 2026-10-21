@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: a64b4ea7421e4bfea32ea02d4eabe16134041c1b2d35c3b0dccd32211a16e849 -->
+<!-- source-sha256: 0e0ee4f86539909cc4890d0aa3962ce3ab1778926a1ad26771669dc0d20d74cf -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -102,6 +102,8 @@
   패키지를 다룹니다.
 
 ## 0.0.9
+
+- T2.63: Value::parse가 파싱마다 참조 순환을 남겼다. scanner의 closure들이 서로를 참조로 잡아서 수집기가 돌기 전까지 메모리가 남았고 큰 가져오기가 memory_limit에 닿았다(limepie P-82). 이제 scanner는 반환하거나 파싱 오류를 던질 때 closure 변수를 비워 순환을 남기지 않는다. Red: 수집기를 끈 채 50번 파싱하면 순환 400개가 남아 새 테스트가 실패했다. Green: ValueApiTest가 통과하고 lint-php와 parity 검사가 통과한다 (T2.63). (T2.63).
 
 - T2.61: 바인딩 참조를 docs/spec에서 docs/operations로 옮겼다. 자체 요구사항을 정의하지 않기 때문이다: docs/spec/api.md와 한국어 쌍, 그리고 그것을 가리키는 링크(변경 기록의 링크 포함). Red: 605b7a7에서 make parity-declarations-check가 api.md의 R19로 exit 2; Green: 통과하고 make docs-check와 make layout-check가 통과한다 (T2.61). (T2.61).
 

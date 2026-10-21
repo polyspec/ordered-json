@@ -514,12 +514,19 @@ final class Value implements \JsonSerializable, \Stringable
             $tape[] = $pos;
             return $pos;
         };
-        $pos = $value(0, 0);
-        $pos += strspn($source, self::WHITESPACE, $pos);
-        if ($pos !== $length) {
-            throw new ParseError('Unexpected trailing input', $pos);
+        try {
+            $pos = $value(0, 0);
+            $pos += strspn($source, self::WHITESPACE, $pos);
+            if ($pos !== $length) {
+                throw new ParseError('Unexpected trailing input', $pos);
+            }
+            return $tape;
+        } finally {
+            // The closures capture each other by reference, so they form cycles that only the cycle collector frees.
+            // Dropping the variables here leaves no cycle, on success and on a parse error alike.
+            $value = null;
+            $container = null;
         }
-        return $tape;
     }
 
     /** The UTF-8 bytes of a code point; a lone surrogate gives its three WTF-8 bytes. */

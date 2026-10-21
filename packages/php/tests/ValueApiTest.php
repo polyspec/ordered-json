@@ -414,4 +414,50 @@ final class ValueApiTest extends TestCase
         self::assertSame('{"b":3,"a":2}', $once);
         self::assertSame($once, stringify(Value::parse($once)));
     }
+
+    /**
+     * Parsing leaves no reference cycle: a cycle is freed only by the cycle collector, so a large import keeps its
+     * memory until the collector runs (limepie P-82).
+     */
+    public function testParseLeavesNoReferenceCycle(): void
+    {
+        $enabled = gc_enabled();
+        gc_collect_cycles();
+        gc_disable();
+        try {
+            for ($i = 0; $i < 50; $i++) {
+                Value::parse('{"a":1,"b":[true,null],"c":{"d":"e"}}');
+                Value::parseRejectDuplicates('[1,{"k":"v"}]');
+            }
+            self::assertSame(0, gc_collect_cycles());
+        } finally {
+            if ($enabled) {
+                gc_enable();
+            }
+        }
+    }
+
+    /** A parse that fails leaves no reference cycle either. */
+    public function testFailedParseLeavesNoReferenceCycle(): void
+    {
+        $enabled = gc_enabled();
+        gc_collect_cycles();
+        gc_disable();
+        $failures = 0;
+        try {
+            for ($i = 0; $i < 20; $i++) {
+                try {
+                    Value::parse('{"a":[1,');
+                } catch (ParseError) {
+                    $failures++;
+                }
+            }
+            self::assertSame(20, $failures);
+            self::assertSame(0, gc_collect_cycles());
+        } finally {
+            if ($enabled) {
+                gc_enable();
+            }
+        }
+    }
 }
