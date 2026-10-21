@@ -5,6 +5,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+- T1.59: the changelog names no comparison against an external implementation; that comparison is external benchmarking and is not kept in the repository (T1.59).
 - T2.60: ordered-json takes the copies of kit at 8813c04a (K354 K394 K386 K348-1 K360-2 K349-2 K392-1 K393), written by make kit-sync and make hooks; red: make kit-check exit 2 with scripts/kit/kit-bootstrap.mk and scripts/kit/bootstrap/install-mise.mts differing from @polyspec/kit 0.0.54 and config/commit-identity.json missing, green: make kit-check and make link-check exit 0. (T2.60)
 
 - T2.59: ordered-json takes the copies of kit at f9eb43dd: make kit-sync writes scripts/kit/kit-bootstrap.mk and config/layout.kit.yml, and make hooks writes .githooks/commit-msg; red: make kit-check exit 2 with two copies that differ from the installed kit, green: make kit-check exit 0. (T2.59)
@@ -625,20 +626,15 @@
 - Each verification run builds in its own temporary run directory and removes it at the end.
   `make check`, `scripts/verify.py`, the PIE check and the benchmark build the PHP extension
   from a copy of the `php-extension/` source files there, the Go probe is written there, PIE
-  works there, and the comparison compiles its Erlang modules there. The extension was
+  works there. The extension was
   built in `php-extension/src` with `make distclean`, `phpize` and `configure`, and the Go probe,
-  the PIE work directory and the Erlang modules used fixed paths under `.cache/`, so two runs of
+  the PIE work directory and the probe build directories used fixed paths under `.cache/`, so two runs of
   one checkout cleaned or replaced each other's build output while the other run used it. The
   registry key `build_in_copy` selects the copied build; the copy holds tracked and unignored
   files and rejects a symbolic link. The PIE record names the artifact relative to the run
   directory. The ignored output of the former in-place builds (the `phpize`, `configure` and
   `make` files and `modules/` in `php-extension/src`, `.cache/probes` and `.cache/pie-check`) was
   removed from the checkout, since no command reads it.
-- The comparison streams the Erlang compile output with its exit status and elapsed time,
-  and sends each project one case at a time with the shared 60 s reply deadline, printing each
-  case with its elapsed time. The compile had a 45 s limit and each project run one 60 s limit
-  for all cases, so a slow compile or a slow whole run failed by the clock, and nothing was
-  printed until each command ended.
 - Build steps stream their output. Each `prepare` step and each PIE command prints a start line,
   every output line as it arrives, and its exit status with the elapsed time. Both collected the
   output and printed it after the command ended, so the PIE build showed nothing for about 42 s.

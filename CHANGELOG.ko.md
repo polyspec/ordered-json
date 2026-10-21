@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 0e0ee4f86539909cc4890d0aa3962ce3ab1778926a1ad26771669dc0d20d74cf -->
+<!-- source-sha256: e525584b157c41c5d97b9cf57b6e036178fddf9be03e2660cae7a8ecbf06bdcb -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T1.59: changelog는 외부 구현과의 비교를 이름으로 적지 않는다. 그 비교는 외부 벤치마킹이므로 저장소에 두지 않는다 (T1.59).
 - T2.60: ordered-json은 kit 8813c04a의 복사본(K354 K394 K386 K348-1 K360-2 K349-2 K392-1 K393)을 받는다. 복사본은 make kit-sync와 make hooks가 쓴다. red: make kit-check가 exit 2였고 scripts/kit/kit-bootstrap.mk와 scripts/kit/bootstrap/install-mise.mts가 @polyspec/kit 0.0.54와 달랐으며 config/commit-identity.json이 없었다. green: make kit-check와 make link-check가 exit 0. (T2.60)
 - T2.59: ordered-json은 kit f9eb43dd의 복사본을 받는다. make kit-sync가 scripts/kit/kit-bootstrap.mk와 config/layout.kit.yml을 쓰고, make hooks가 .githooks/commit-msg를 쓴다. red: make kit-check가 설치된 kit과 다른 복사본 두 개로 exit 2였고, green: make kit-check가 exit 0. (T2.59)
 - T2.58: 영문 CHANGELOG.md와 kit-standard 체크리스트의 한국어 쌍이 영문 원문의 source-sha256을 다시 기록한다. red: make docs-check가 67cd062 이후 두 marker가 낡았다고 보고했고, green: 통과한다. (T2.58)
@@ -546,18 +547,14 @@
 - 각 검증 실행은 자신만의 임시 실행 디렉터리에서 빌드하고 끝나면 그 디렉터리를 제거합니다.
   `make check`, `scripts/verify.py`, PIE 검사, 벤치마크는 그 디렉터리에 복사한 `php-extension/`
   소스 파일로 PHP 확장을 빌드하고, Go probe는 그 디렉터리에 기록되며, PIE는 그 디렉터리에서
-  작업하고, 비교는 Erlang 모듈을 그 디렉터리에서 컴파일합니다. 확장은 `php-extension/src`
-  에서 `make distclean`, `phpize`, `configure`로 빌드되었고 Go probe, PIE 작업 디렉터리, Erlang
-  모듈은 `.cache/` 아래 고정 경로를 사용했기 때문에, 한 체크아웃의 두 실행이 다른 실행이 사용
+  작업합니다. 확장은 `php-extension/src`
+  에서 `make distclean`, `phpize`, `configure`로 빌드되었고 Go probe, PIE 작업 디렉터리, 프로브 빌드 디렉터리는
+  `.cache/` 아래 고정 경로를 사용했기 때문에, 한 체크아웃의 두 실행이 다른 실행이 사용
   중인 빌드 출력을 지우거나 교체했습니다. registry 키 `build_in_copy`가 복사본 빌드를 선택하며,
   복사본은 추적 중이거나 무시되지 않은 파일을 담고 symbolic link를 거부합니다. PIE 기록은
   산출물을 실행 디렉터리 기준 경로로 명시합니다. 이전 제자리 빌드가 남긴 무시된 출력
   (`php-extension/src`의 `phpize`, `configure`, `make` 파일과 `modules/`, `.cache/probes`,
   `.cache/pie-check`)은 어떤 명령도 읽지 않으므로 체크아웃에서 제거했습니다.
-- 비교는 Erlang 컴파일 출력을 종료 상태, 경과 시간과 함께 흘려 보내고, 각 프로젝트에
-  사례를 한 번에 하나씩 공통 60 s 응답 deadline으로 보내며 사례마다 경과 시간을 출력합니다.
-  컴파일에는 45 s 한도, 프로젝트 실행마다 전체 사례에 60 s 한도 하나가 있어서, 느린 컴파일이나
-  느린 전체 실행은 시계 때문에 실패했고 각 명령이 끝날 때까지 아무것도 출력되지 않았습니다.
 - 빌드 단계 출력을 흘려 보냅니다. 각 `prepare` 단계와 PIE 명령은 시작 줄, 도착하는 대로의 출력
   줄, 종료 상태와 경과 시간을 출력합니다. 두 곳 모두 출력을 모았다가 명령이 끝난 뒤에 출력해서,
   PIE 빌드는 약 42 s 동안 아무것도 보이지 않았습니다.
