@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: e525584b157c41c5d97b9cf57b6e036178fddf9be03e2660cae7a8ecbf06bdcb -->
+<!-- source-sha256: 314e5bc00ac0e26c332b148183b66b79c5ee0a46a37d22d12d2dd6ae3b344733 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.64: package-lock.json은 GitHub 릴리스 tarball 대신 make npm-install DIR=.로 형제 체크아웃의 @polyspec/kit을 연결하며, ordered-json은 make kit-sync가 쓰는 kit 0.0.54의 복사본을 받는다. red: make link-state-check가 체크아웃의 mise trusted-configs를 신뢰하지 않는다는 finding으로 exit 2였고, green: make install-tools 후 make npm-install DIR=.와 make link-state-check가 exit 0. (T2.64)
 - T1.59: changelog는 외부 구현과의 비교를 이름으로 적지 않는다. 그 비교는 외부 벤치마킹이므로 저장소에 두지 않는다 (T1.59).
 - T2.60: ordered-json은 kit 8813c04a의 복사본(K354 K394 K386 K348-1 K360-2 K349-2 K392-1 K393)을 받는다. 복사본은 make kit-sync와 make hooks가 쓴다. red: make kit-check가 exit 2였고 scripts/kit/kit-bootstrap.mk와 scripts/kit/bootstrap/install-mise.mts가 @polyspec/kit 0.0.54와 달랐으며 config/commit-identity.json이 없었다. green: make kit-check와 make link-check가 exit 0. (T2.60)
 - T2.59: ordered-json은 kit f9eb43dd의 복사본을 받는다. make kit-sync가 scripts/kit/kit-bootstrap.mk와 config/layout.kit.yml을 쓰고, make hooks가 .githooks/commit-msg를 쓴다. red: make kit-check가 설치된 kit과 다른 복사본 두 개로 exit 2였고, green: make kit-check가 exit 0. (T2.59)
