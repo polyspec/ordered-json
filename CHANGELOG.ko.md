@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 07924e4e0404c8da335f44c87656099df96b4018d3c947bd272f15230a1a655d -->
+<!-- source-sha256: 24cc30dc69ec8e85f2da49cf87f72599e38d94353695262a3cfa8a9dccfa1d82 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- make kit-sync가 install-mise.mts(kit K532)를 가져오고, owner 규칙이 각 언어의 source를 그 lint와 duplication-check로 보내며(kit K534) 지워진 파일을 이름 붙이지 않는다. red: make kit-check와 make owner-validate가 실패했고, 변경 뒤 green(T2.69).
 - make kit-sync가 K514 이후 kit이 자기 패키지에서 읽는 lint 설정을 지우고, CHECK_TARGETS가 suppression-check를 실행한다. red: make kit-check가 낡은 사본에 15개 finding을 보고했다(T2.68).
 - T2.64: package-lock.json은 GitHub 릴리스 tarball 대신 make npm-install DIR=.로 형제 체크아웃의 @polyspec/kit을 연결하며, ordered-json은 make kit-sync가 쓰는 kit 0.0.54의 복사본을 받는다. red: make link-state-check가 체크아웃의 mise trusted-configs를 신뢰하지 않는다는 finding으로 exit 2였고, green: make install-tools 후 make npm-install DIR=.와 make link-state-check가 exit 0. (T2.64)
 - T1.59: changelog는 외부 구현과의 비교를 이름으로 적지 않는다. 그 비교는 외부 벤치마킹이므로 저장소에 두지 않는다 (T1.59).
