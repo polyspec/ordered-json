@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 8accf9a46b2258e014d36d0aff451cdff32b67e14a2efa3f5224aac299ca68e0 -->
+<!-- source-sha256: e9aa9b2d3f469ef2bcfb1247d77e6d9a7678cb94054ddc7d8b33675bedf23fde -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -77,3 +77,4 @@
 | T2.64 | package-lock.json이 @polyspec/kit을 GitHub release tarball로 고정한다 대신 형제 checkout을 쓴다; 레시피가 그 원천에서 설치하므로 사용자 규칙(로컬 릴리즈 설치 금지)에 어긋난다;  기다린다 | package-lock.json | `make npm-install DIR=.`, `make link-state-check` | [o] |
 | T2.65 | tests/release-consumer/composer/composer.lock이 polyspec/ordered-json을 release zip artifact로 고정한다(release-consumer 테스트) 대신 형제 checkout을 쓴다; 레시피가 그 원천에서 설치하므로 사용자 규칙(로컬 릴리즈 설치 금지)에 어긋난다;  기다린다 | tests/release-consumer/composer/composer.lock | `make text-absent FILE=tests/release-consumer/composer/composer.lock TEXT=artifacts/` | [!] 원인: kit K438 보류: 이 소비자 락은 공개된 산출물을 기록하며 K438 웨이브만 설치한다; 재시도: kit K438 웨이브가 실행될 때 |
 | T2.66 | tests/release-consumer/npm/package-lock.json이 @polyspec/ordered-json을 로컬 tarball 파일에서 설치한다(release-consumer 테스트) 대신 형제 checkout을 쓴다; 레시피가 그 원천에서 설치하므로 사용자 규칙(로컬 릴리즈 설치 금지)에 어긋난다;  기다린다 | tests/release-consumer/npm/package-lock.json | `make text-absent FILE=tests/release-consumer/npm/package-lock.json TEXT=file:polyspec-ordered-json` | [!] 원인: kit K438 보류: 이 소비자 락은 공개된 산출물을 기록하며 K438 웨이브만 설치한다; 재시도: kit K438 웨이브가 실행될 때 |
+| T2.67 | 모든 다른 행이 닫힌 뒤 main의 최종 커밋에서 전체 테스트 실행(CI gates.yml)이 통과한다; 실행은 main의 최종 백업 push로 시작된다 | docs/plans/kit-standard/checklist.md, docs/plans/kit-standard/checklist.ko.md | `gh run view --exit-status $(gh run list --branch main --workflow gates.yml --limit 1 --json databaseId --jq '.[0].databaseId')` | [ ] |
