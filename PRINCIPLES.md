@@ -156,8 +156,8 @@ repository.
   output is never tracked in Git.
   Enforced by: `make duplication-check`, `make rebuild-check`, `.githooks/pre-commit`
 - P35 A finding that looks blocked by a release is a defect of the link tooling and is reported as a kit defect with its
-  file and line. No tracked lock waits for a release: a tracked file locks no 0.0.x polyspec package, and the declarations of
-  such packages live in config/polyspec.json (K314, K468).
+  file and line. No tracked lock waits for a release: a tracked lock records the release of each polyspec package, and the link
+  replaces the installed folder with the sibling checkout (K448, K507).
   Enforced by: none, whether a finding is a link defect or a release question is a judgement of the report.
 - P36 No deferral: a defect that is found is registered as a row and worked now, never left for later.
   Enforced by: none, whether a found defect is worked now is a judgement of the one who found it.
@@ -192,10 +192,7 @@ tool lands, a standard binds the work as written here.
   (`*.test.{ts,mts,cts,mjs,cjs,js}`, vitest's `*.{test,spec}.*`, `*Test.php`, `*_test.go`, `tests/` and `#[test]`,
   `test_*.py`); a repository may add files but never narrow the set, and a file named like a test is run by a binding.
   Enforced by: `make parity-declarations-check`
-- S4 Versions: a version is chosen only after every locked dependency is shown to work with it; the latest LTS where the
-  ecosystem has one, otherwise the latest stable release the dependencies support, or a newer non-LTS close to the LTS.
-  The declared floor equals the pinned toolchain at the pin's precision, every repository uses the same pins, an exception
-  is declared with its scope, reason and retry condition, and nothing falls back silently to a source build.
+- S4 Versions: kit enforces no version or pin; each package manager and its lock decide.
   Enforced by: `make toolchain-check`, `make dependency-policy-check`
 - S5 Folders: every monorepo has the same root folders (`packages/`, `contracts/`, `docs/`, `scripts/`, `tests/`,
   `examples/`, `benchmarks/`, `config/`). Runtime ports of the main spec live in `packages/<runtime>/`, other components in
@@ -231,7 +228,7 @@ tool lands, a standard binds the work as written here.
   are the PHPUnit files of every library run with the extension loaded and none of the sources of the library (its dependencies and
   autoload-dev are loaded, its own autoload is not, so the library has no guard against the extension), and those of `packages/php-ext` when it holds any; its
   parity implementation shares the tests of the libraries by this layout, with no relative path in a configuration.
-  The PHP library is library code only: an application on a userland framework, such as a Symfony Console CLI, is its own
+  The PHP library is library code only: an application on a userland framework, such as a PHP console application, is its own
   Composer package that requires the library, since an internal class cannot extend a userland class. A Composer package of
   type `project` is an application: it is outside the extension run and the S10 library checks, and `make test-php` runs its
   tests as its own package.
