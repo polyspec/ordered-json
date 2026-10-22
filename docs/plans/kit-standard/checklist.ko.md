@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: bf678cdb913be59c0736db6394c4b46b3ed08ad82f5bc18ea0fc1d55553d2ee7 -->
+<!-- source-sha256: 79ea24f4779dc1ef31c8b16469042bed943b528f293a2902351c759c429f72e6 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -76,4 +76,4 @@
 | T2.63 | Value::parse가 참조 순환을 남기지 않는다: scanner의 closure들이 서로를 참조로 잡아 파싱마다 순환이 남고 gc_collect_cycles만 회수하며, 많은 행의 가져오기가 memory_limit을 넘는다(packages/php/src/Value.php의 scan); 수집기를 끈 채 파싱해도 순환이 남지 않는다 (limepie P-82) | packages/php/src/Value.php, packages/php/tests/ValueMemoryTest.php | `node node_modules/@polyspec/kit/dist/run-tests.mjs phpunit --cwd packages/php -- --filter 'NoReferenceCycle'`, `make lint-php` | [o] |
 | T2.64 | package-lock.json이 @polyspec/kit을 GitHub release tarball로 고정한다 대신 형제 checkout을 쓴다; 레시피가 그 원천에서 설치하므로 사용자 규칙(로컬 릴리즈 설치 금지)에 어긋난다;  기다린다 | package-lock.json | `make npm-install DIR=.`, `make link-state-check` | [ ] |
 | T2.65 | tests/release-consumer/composer/composer.lock이 polyspec/ordered-json을 release zip artifact로 고정한다(release-consumer 테스트) 대신 형제 checkout을 쓴다; 레시피가 그 원천에서 설치하므로 사용자 규칙(로컬 릴리즈 설치 금지)에 어긋난다;  기다린다 | tests/release-consumer/composer/composer.lock | `make text-absent FILE=tests/release-consumer/composer/composer.lock TEXT=artifacts/` | [!] 원인: kit K438 보류: 이 소비자 락은 공개된 산출물을 기록하며 K438 웨이브만 설치한다; 재시도: kit K438 웨이브가 실행될 때 |
-| T2.66 | tests/release-consumer/npm/package-lock.json이 @polyspec/ordered-json을 로컬 tarball 파일에서 설치한다(release-consumer 테스트) 대신 형제 checkout을 쓴다; 레시피가 그 원천에서 설치하므로 사용자 규칙(로컬 릴리즈 설치 금지)에 어긋난다;  기다린다 | tests/release-consumer/npm/package-lock.json | `make text-absent FILE=tests/release-consumer/npm/package-lock.json TEXT=file:polyspec-ordered-json` | [ ] |
+| T2.66 | tests/release-consumer/npm/package-lock.json이 @polyspec/ordered-json을 로컬 tarball 파일에서 설치한다(release-consumer 테스트) 대신 형제 checkout을 쓴다; 레시피가 그 원천에서 설치하므로 사용자 규칙(로컬 릴리즈 설치 금지)에 어긋난다;  기다린다 | tests/release-consumer/npm/package-lock.json | `make text-absent FILE=tests/release-consumer/npm/package-lock.json TEXT=file:polyspec-ordered-json` | [!] 원인: kit K438 보류: 이 소비자 락은 공개된 산출물을 기록하며 K438 웨이브만 설치한다; 재시도: kit K438 웨이브가 실행될 때 |
