@@ -5,7 +5,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
-- T2.68: make kit-sync removes the lint configurations that kit reads from its package since K514, and CHECK_TARGETS runs suppression-check; red: make kit-check reported 15 findings on the stale copies.
+- make kit-sync removes the lint configurations that kit reads from its package since K514, and CHECK_TARGETS runs suppression-check; Red: make kit-check reported 15 findings on the stale copies (T2.68).
 - T2.64: package-lock.json links @polyspec/kit from the sibling checkout with make npm-install DIR=. instead of a GitHub release tarball, and ordered-json takes the copies of kit 0.0.54 that make kit-sync writes; red: make link-state-check exit 2 with the finding that the mise trusted-configs of the checkout is not trusted, green: after make install-tools, make npm-install DIR=. and make link-state-check exit 0. (T2.64)
 - T1.59: the changelog names no comparison against an external implementation; that comparison is external benchmarking and is not kept in the repository (T1.59).
 - T2.60: ordered-json takes the copies of kit at 8813c04a (K354 K394 K386 K348-1 K360-2 K349-2 K392-1 K393), written by make kit-sync and make hooks; red: make kit-check exit 2 with scripts/kit/kit-bootstrap.mk and scripts/kit/bootstrap/install-mise.mts differing from @polyspec/kit 0.0.54 and config/commit-identity.json missing, green: make kit-check and make link-check exit 0. (T2.60)
