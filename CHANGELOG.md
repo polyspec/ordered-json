@@ -5,6 +5,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.79: the row is recorded as done; its change is on main (f343462) (T2.79)
 - T2.76: the row is recorded as done; its deletion landed as a refactor on main (T2.76)
 - T2.76: the row is recorded as done in the main checkout (T2.76)
 - T2.76: the row is recorded as done; its change landed as the commit before this one (T2.76)

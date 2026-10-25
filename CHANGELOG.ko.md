@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: c3af5fbdba77b57140bac4f83a34849ef3cf38a25975ddd8181e39c38fb4aa9d -->
+<!-- source-sha256: 38491ed206c2c8659ceade23e29d70081fd94e032e511cd787e0a0f5addf235a -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.79: 행을 완료로 기록한다. 변경은 main의 f343462에 있다 (T2.79)
 - T2.76: 행을 완료로 기록한다. 삭제는 main에 refactor로 착지했다 (T2.76)
 - T2.76: 행을 main 체크아웃에서 완료로 기록한다 (T2.76)
 - T2.76: 행을 완료로 기록한다. 착지한 변경은 이 커밋 앞의 커밋이다 (T2.76)
