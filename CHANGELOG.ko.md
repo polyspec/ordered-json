@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 24dd22804b9b21db3ff930701005a525e13de6d6f1cd431a8943798fac329afc -->
+<!-- source-sha256: 892617397b1e81b456c42fc7be0b612c3164b7b53c95dfc7d5d438d1c6680939 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.76: 행을 완료로 기록한다. 착지한 변경은 이 커밋 앞의 커밋이다 (T2.76)
 - T2.74: K614 배치: kit-sync 사본을 지우고, 부트스트랩은 ../kit을 include하며, 공유 루트 파일은 ../kit 링크다 (T2.74)
 - T2.73: 행을 완료로 기록한다. 착지한 변경은 이 커밋 앞의 커밋이다 (T2.73)
 - T2.73: 추적되는 훅이 kit과 같다: K603에서 게이트를 뺀 pre-commit, prepare-commit-msg, reference-transaction을 커밋한다 (T2.73)
