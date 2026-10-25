@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 18f481a9932b3332b1baa0ac168dbc67093333b6e9b400e3762bc269de343d18 -->
+<!-- source-sha256: 5b82e11ef62d314b932e31813f6dfc1dfff8ecdd7a3291cb51b82465b5540be5 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -85,3 +85,4 @@
 | T2.72 | make hooks가 PRINCIPLES.md가 명명하는 pre-merge-commit 훅을 쓰고, rules-check가 통과한다 | .githooks/pre-merge-commit | `make rules-check` | [o] |
 | T2.73 | make hooks가 쓰는 훅(K603의 pre-commit, prepare-commit-msg, reference-transaction)을 커밋해서 추적되는 훅이 kit과 같아진다 | .githooks/pre-commit, .githooks/prepare-commit-msg, .githooks/reference-transaction | `make hooks-check` | [o] |
 | T2.74 | K614: Makefile은 ../kit/scripts/kit/kit-bootstrap.mk를 include하고, make kit-sync가 kit-sync 사본을 지우며, config/php-lint는 없고, PRINCIPLES.md 등 4개는 kit 링크이며, 지워진 경로의 owner glob은 없다 | Makefile, config/owner-checks.json, PRINCIPLES.md, PRINCIPLES.ko.md, .editorconfig, .claude/settings.json, config/php-lint | `make kit-check` | [o] |
+| T2.76 | K614 커밋이 스테이징하지 않은 kit-sync 사본(scripts/kit/bootstrap, scripts/kit/kit-bootstrap.mk, config/php-lint)을 main에서 지운다 | the stale copies listed in the K614 layout | `make kit-check` | [ ] |
