@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: ca5a33c11095e511f7bfc7c03f1f038b7d5c570ec8918751ea42dbe47c3ee33e -->
+<!-- source-sha256: 1b19485d557a1f6102e71d649a1fc483763829f5cda4a21ed631b925726b34a1 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.71: ParseError는 KINDS에 없는 메시지를 빈 kind 대신 LogicException으로 거부한다 (T2.71)
 - T2.70: packages/js/index.js의 UTF-8 decode catch는 오류를 바인딩하고 디코더의 TypeError로 좁히며, 다른 오류는 다시 던진다 (K561) (T2.70)
 - make kit-sync가 install-mise.mts(kit K532)를 가져오고, owner 규칙이 각 언어의 source를 그 lint와 duplication-check로 보내며(kit K534) 지워진 파일을 이름 붙이지 않는다. red: make kit-check와 make owner-validate가 실패했고, 변경 뒤 green(T2.69).
 - make kit-sync가 K514 이후 kit이 자기 패키지에서 읽는 lint 설정을 지우고, CHECK_TARGETS가 suppression-check를 실행한다. red: make kit-check가 낡은 사본에 15개 finding을 보고했다(T2.68).

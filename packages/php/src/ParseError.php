@@ -26,7 +26,10 @@ final class ParseError extends \InvalidArgumentException
     public readonly string $kind;
     public function __construct(string $message, public readonly int $offset)
     {
-        $this->kind = self::KINDS[$message] ?? '';
+        if (!isset(self::KINDS[$message])) {
+            throw new \LogicException("ParseError has no kind for the message \"$message\"");
+        }
+        $this->kind = self::KINDS[$message];
         parent::__construct("$message at byte $offset");
     }
 }

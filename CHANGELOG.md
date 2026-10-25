@@ -5,6 +5,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.71: ParseError refuses a message that KINDS does not hold, with a LogicException, instead of an empty kind (T2.71)
 - T2.70: the UTF-8 decode catch of packages/js/index.js binds the error and narrows it to the decoder TypeError, and rethrows any other error (K561) (T2.70)
 - make kit-sync brings install-mise.mts (kit K532), and the owner rules route the sources of each language to its lint and duplication-check (kit K534) and name no removed file; red: make kit-check and make owner-validate failed, green after the change (T2.69).
 - make kit-sync removes the lint configurations that kit reads from its package since K514, and CHECK_TARGETS runs suppression-check; Red: make kit-check reported 15 findings on the stale copies (T2.68).
