@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 394fe455b34feae045b8c8b52fff31fdea5630d8e84769b55ed5431790b48847 -->
+<!-- source-sha256: 57335ebfee78dda15744d8119f3d145437530abfa470f95354fe7aa54d1ed299 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -87,4 +87,4 @@
 | T2.74 | K614: Makefile은 ../kit/scripts/kit/kit-bootstrap.mk를 include하고, make kit-sync가 kit-sync 사본을 지우며, config/php-lint는 없고, PRINCIPLES.md 등 4개는 kit 링크이며, 지워진 경로의 owner glob은 없다 | Makefile, config/owner-checks.json, PRINCIPLES.md, PRINCIPLES.ko.md, .editorconfig, .claude/settings.json, config/php-lint | `make kit-check` | [o] |
 | T2.76 | K614 커밋이 스테이징하지 않은 kit-sync 사본(scripts/kit/bootstrap, scripts/kit/kit-bootstrap.mk, config/php-lint)을 main에서 지운다 | the stale copies listed in the K614 layout | `make kit-check` | [o] |
 | T2.79 | workflow-rules reads kit's kit.mk from node_modules/@polyspec/kit/scripts/kit (kit K613) | tests/scripts/workflow-rules.test.mts | `node --test tests/scripts/workflow-rules.test.mts` | [ ] |
-| T2.80 | ordered-json gates.yml is byte-equal to template's (CI shape, with the sibling kit checkout) | .github/workflows/gates.yml | `cmp ../template/.github/workflows/gates.yml .github/workflows/gates.yml` | [ ] |
+| T2.80 | ordered-json gates.yml is byte-equal to template's (CI shape, with the sibling kit checkout) | .github/workflows/gates.yml | `cmp ../template/.github/workflows/gates.yml .github/workflows/gates.yml` | [~] |
