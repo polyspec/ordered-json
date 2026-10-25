@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 892617397b1e81b456c42fc7be0b612c3164b7b53c95dfc7d5d438d1c6680939 -->
+<!-- source-sha256: 2e1d93a7c0875c52ad52919cfb400600757f0d8eeccaedeeb2a2c1f401f13e9e -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.76: 행을 main 체크아웃에서 완료로 기록한다 (T2.76)
 - T2.76: 행을 완료로 기록한다. 착지한 변경은 이 커밋 앞의 커밋이다 (T2.76)
 - T2.74: K614 배치: kit-sync 사본을 지우고, 부트스트랩은 ../kit을 include하며, 공유 루트 파일은 ../kit 링크다 (T2.74)
 - T2.73: 행을 완료로 기록한다. 착지한 변경은 이 커밋 앞의 커밋이다 (T2.73)
