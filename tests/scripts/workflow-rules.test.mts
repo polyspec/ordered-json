@@ -164,7 +164,7 @@ test('the PHP and the Python of the checkout are linted in the full suite', () =
 
 test('each report is the directory that make ci-targets writes', () => {
   // The kit.mk of the installed package, the version that package-lock.json resolves.
-  assert.ok(readFileSync(path.join(ROOT, 'node_modules/@polyspec/kit/dist/kit.mk'), 'utf8').includes(`CI_REPORT ?= ${REPORT.replace(/\/$/, '')}\n`));
+  assert.ok(readFileSync(path.join(ROOT, 'node_modules/@polyspec/kit/scripts/kit/kit.mk'), 'utf8').includes(`CI_REPORT ?= ${REPORT.replace(/\/$/, '')}\n`));
 });
 
 test('a job without the report step fails', () => {

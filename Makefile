@@ -29,7 +29,7 @@ ONLINE := env -u CARGO_NET_OFFLINE -u GOPROXY -u npm_config_offline -u COMPOSER_
 unexport CARGO_TARGET_DIR
 
 # The shared targets of kit: scripts/kit/kit-bootstrap.mk, a copy that make kit-sync writes, includes the kit.mk of the
-# installed package @polyspec/kit (node_modules/@polyspec/kit/dist): the gates, the document, owner and CI report tools, the
+# sibling kit's scripts/kit: the gates, the document, owner and CI report tools, the
 # toolchains, the layout check, the release steps. They read the configuration in config/*.json. A new checkout runs
 # make install-tools TOOLS=npm and make install-packages first; until then no other target runs.
 include ../kit/scripts/kit/kit-bootstrap.mk
