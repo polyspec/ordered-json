@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 85ae433a5399e25c6f34b575ee3e586095bc04a90a108dbb89207d9917b25369 -->
+<!-- source-sha256: 52fb30185339a20780ce1c83ebd34580a256b06cc9e013c13448c17d194f77c9 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -83,3 +83,4 @@
 | T2.70 | packages/js/index.js: UTF-8 decode의 catch는 오류를 바인딩하고 디코더의 TypeError로 좁히며, 다른 오류는 다시 던진다 (K561) | packages/js/index.js | `make lint-ts` | [o] |
 | T2.71 | ParseError는 KINDS에 없는 메시지를 거부한다: 생성자는 빈 kind 대신 예외를 던진다 (감사, ParseError.php:29) | packages/php/src/ParseError.php, packages/php/tests/ValueApiTest.php | `packages/php/vendor/bin/phpunit --configuration packages/php/phpunit.xml --filter testParseErrorRefusesAnUnknownMessage packages/php/tests/ValueApiTest.php` | [o] |
 | T2.72 | make hooks가 PRINCIPLES.md가 명명하는 pre-merge-commit 훅을 쓰고, rules-check가 통과한다 | .githooks/pre-merge-commit | `make rules-check` | [o] |
+| T2.73 | make hooks가 쓰는 훅(K603의 pre-commit, prepare-commit-msg, reference-transaction)을 커밋해서 추적되는 훅이 kit과 같아진다 | .githooks/pre-commit, .githooks/prepare-commit-msg, .githooks/reference-transaction | `make hooks-check` | [ ] |
