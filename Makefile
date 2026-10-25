@@ -32,7 +32,7 @@ unexport CARGO_TARGET_DIR
 # installed package @polyspec/kit (node_modules/@polyspec/kit/dist): the gates, the document, owner and CI report tools, the
 # toolchains, the layout check, the release steps. They read the configuration in config/*.json. A new checkout runs
 # make install-tools TOOLS=npm and make install-packages first; until then no other target runs.
-include scripts/kit/kit-bootstrap.mk
+include ../kit/scripts/kit/kit-bootstrap.mk
 
 # The targets of the full suite that make check runs through the guard of full-run of @polyspec/kit and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.

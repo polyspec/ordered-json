@@ -5,6 +5,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.74: K614 layout: the kit-sync copies are removed, the bootstrap includes ../kit, the shared root files are links into ../kit (T2.74)
 - T2.73: the row is recorded as done; its landed change is the commit before this one (T2.73)
 - T2.73: the tracked hooks match kit: pre-commit without the gates of K603, prepare-commit-msg and reference-transaction are committed (T2.73)
 - T2.72: make hooks writes .githooks/pre-merge-commit, which PRINCIPLES.md names, so rules-check passes (T2.72)

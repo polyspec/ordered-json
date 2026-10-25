@@ -139,7 +139,6 @@
     },
     {
       "paths": [
-        "scripts/kit/**",
         ".github/workflows/release.yml",
         ".claude/settings.json",
         "PRINCIPLES.md",
@@ -148,7 +147,6 @@
         "config/pyproject.schema.json",
         "config/composer.schema.json",
         "config/cargo.schema.json",
-        "config/php-lint/**",
         "package.json",
         "package-lock.json",
         "config/*.json"
