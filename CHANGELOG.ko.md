@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 58d83805918aaf92e57547da7d846c0143bdc5ae84d85f1a2c15b2449969a45f -->
+<!-- source-sha256: 754e6e86cddb6d5bdb358a23ab96efd4816fbca695ff5d52ce99dba6fc5a5197 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.73: 행을 완료로 기록한다. 착지한 변경은 이 커밋 앞의 커밋이다 (T2.73)
 - T2.73: 추적되는 훅이 kit과 같다: K603에서 게이트를 뺀 pre-commit, prepare-commit-msg, reference-transaction을 커밋한다 (T2.73)
 - T2.72: make hooks가 PRINCIPLES.md가 명명하는 .githooks/pre-merge-commit을 쓰고, rules-check가 통과한다 (T2.72)
 - T2.71: ParseError는 KINDS에 없는 메시지를 빈 kind 대신 LogicException으로 거부한다 (T2.71)
