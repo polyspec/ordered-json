@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: fbb8df4923424a956f309a18525c043c6091a4e8f0f934179c276c29d7391059 -->
+<!-- source-sha256: 3b172577e8617f82e4c5beb70a52e73edf2a1ef84ba4ce7313f90294819b6395 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -80,3 +80,4 @@
 | T2.67 | 모든 다른 행이 닫힌 뒤 main의 최종 커밋에서 전체 테스트 실행(CI gates.yml)이 통과한다; 실행은 main의 최종 백업 push로 시작된다 | docs/plans/kit-standard/checklist.md, docs/plans/kit-standard/checklist.ko.md | `gh run view --exit-status $(gh run list --branch main --workflow gates.yml --limit 1 --json databaseId --jq '.[0].databaseId')` | [ ] |
 | T2.68 | kit-sync가 kit lint 설정 사본을 지우고(K514), CHECK_TARGETS가 kit-gates의 gate인 suppression-check를 실행한다. 원인: K514 이후 kit은 ruff.toml, phpcs.xml.dist, phpstan.dist.neon, .golangci.yml, clippy.toml, .oxlintrc.json, knip.json, config/api-extractor.kit.json을 자기 패키지에서 읽으므로 ordered-json의 사본은 낡았고, kit-check는 그것과 마지막 sync 뒤 바뀐 사본을 이름 붙인다. kit-check는 CHECK_TARGETS에 suppression-check가 없다고도 이름 붙인다. 인수 조건: make kit-sync를 실행해 낡은 사본이 사라지고, CHECK_TARGETS가 suppression-check를 실행하며, make kit-check와 lint target이 통과한다. red fixture: make kit-check가 지금 낡은 사본으로 실패한다. | `Makefile`, the copies of kit | `make kit-check lint-ts lint-python lint-php lint-go lint-rust` | [o] |
 | T2.69 | kit-sync가 T2.68 이후 kit에서 바뀐 사본을 가져오고, ordered-json의 owner 규칙은 lint가 kit-gates의 gate인 언어의 각 source 경로를 그 lint와 duplication-check로 보내며 T2.68이 지운 파일을 이름 붙이지 않는다(T2.68 후속). 원인: kit은 K532에서 scripts/kit/bootstrap/install-mise.mts를 바꾸었고, K534 이후 kit-check는 owner가 각 언어의 lint를 선택하는지 확인하는데 ordered-json의 규칙은 그렇지 않으며, 그 규칙은 T2.68이 지운 ruff.toml, clippy.toml 외 여섯 파일을 아직 이름 붙여 owner-validate가 거부한다. 인수 조건: make kit-check, make owner-validate와 lint가 통과한다. red fixture: 지금 make kit-check와 make owner-validate가 실패한다. | `config/owner-checks.json`, the copies of kit | `make kit-check owner-validate lint-ts lint-python lint-php lint-go lint-rust` | [o] |
+| T2.70 | packages/js/index.js: UTF-8 decode의 catch는 오류를 바인딩하고 디코더의 TypeError로 좁히며, 다른 오류는 다시 던진다 (K561) | packages/js/index.js | `make lint-ts` | [ ] |
