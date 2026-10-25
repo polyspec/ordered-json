@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 26954b0d37c3a0a17160c05232d2325e5b38eb506dc227218c089edf13578e5e -->
+<!-- source-sha256: 7335bdeef30d6fe381c84c42c46a66d2990caad0e5177c8fe6945a8c7a0ea1ad -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -84,3 +84,4 @@
 | T2.71 | ParseError는 KINDS에 없는 메시지를 거부한다: 생성자는 빈 kind 대신 예외를 던진다 (감사, ParseError.php:29) | packages/php/src/ParseError.php, packages/php/tests/ValueApiTest.php | `packages/php/vendor/bin/phpunit --configuration packages/php/phpunit.xml --filter testParseErrorRefusesAnUnknownMessage packages/php/tests/ValueApiTest.php` | [o] |
 | T2.72 | make hooks가 PRINCIPLES.md가 명명하는 pre-merge-commit 훅을 쓰고, rules-check가 통과한다 | .githooks/pre-merge-commit | `make rules-check` | [o] |
 | T2.73 | make hooks가 쓰는 훅(K603의 pre-commit, prepare-commit-msg, reference-transaction)을 커밋해서 추적되는 훅이 kit과 같아진다 | .githooks/pre-commit, .githooks/prepare-commit-msg, .githooks/reference-transaction | `make hooks-check` | [o] |
+| T2.74 | K614: Makefile은 ../kit/scripts/kit/kit-bootstrap.mk를 include하고, make kit-sync가 kit-sync 사본을 지우며, config/php-lint는 없고, PRINCIPLES.md 등 4개는 kit 링크이며, 지워진 경로의 owner glob은 없다 | Makefile, config/owner-checks.json, PRINCIPLES.md, PRINCIPLES.ko.md, .editorconfig, .claude/settings.json, config/php-lint | `make kit-check` | [ ] |
