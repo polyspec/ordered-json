@@ -353,7 +353,10 @@ export function parseBytes(bytes, options) {
   if (!(bytes instanceof Uint8Array)) throw new TypeError('Expected Uint8Array');
   let source;
   try { source = utf8.decode(bytes); }
-  catch { throw new ParseError('Invalid UTF-8', firstInvalidByte(bytes), 'byte'); }
+  catch (error) {
+    if (!(error instanceof TypeError)) throw error;
+    throw new ParseError('Invalid UTF-8', firstInvalidByte(bytes), 'byte');
+  }
   return parse(source, options);
 }
 
