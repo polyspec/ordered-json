@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 1b19485d557a1f6102e71d649a1fc483763829f5cda4a21ed631b925726b34a1 -->
+<!-- source-sha256: 7318ba21b66d6957eb33cdf918fcb6a44af1ebeddbf659ef40993410c4c8c046 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.72: make hooks가 PRINCIPLES.md가 명명하는 .githooks/pre-merge-commit을 쓰고, rules-check가 통과한다 (T2.72)
 - T2.71: ParseError는 KINDS에 없는 메시지를 빈 kind 대신 LogicException으로 거부한다 (T2.71)
 - T2.70: packages/js/index.js의 UTF-8 decode catch는 오류를 바인딩하고 디코더의 TypeError로 좁히며, 다른 오류는 다시 던진다 (K561) (T2.70)
 - make kit-sync가 install-mise.mts(kit K532)를 가져오고, owner 규칙이 각 언어의 source를 그 lint와 duplication-check로 보내며(kit K534) 지워진 파일을 이름 붙이지 않는다. red: make kit-check와 make owner-validate가 실패했고, 변경 뒤 green(T2.69).

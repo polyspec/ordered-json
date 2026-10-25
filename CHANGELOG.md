@@ -5,6 +5,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.72: make hooks writes .githooks/pre-merge-commit, which PRINCIPLES.md names, so rules-check passes (T2.72)
 - T2.71: ParseError refuses a message that KINDS does not hold, with a LogicException, instead of an empty kind (T2.71)
 - T2.70: the UTF-8 decode catch of packages/js/index.js binds the error and narrows it to the decoder TypeError, and rethrows any other error (K561) (T2.70)
 - make kit-sync brings install-mise.mts (kit K532), and the owner rules route the sources of each language to its lint and duplication-check (kit K534) and name no removed file; red: make kit-check and make owner-validate failed, green after the change (T2.69).

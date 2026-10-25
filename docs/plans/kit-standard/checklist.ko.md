@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: dcbcb74c852f4059c053d2558b79112045397982933bb75b517a1b9652765804 -->
+<!-- source-sha256: 85ae433a5399e25c6f34b575ee3e586095bc04a90a108dbb89207d9917b25369 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -82,4 +82,4 @@
 | T2.69 | kit-sync가 T2.68 이후 kit에서 바뀐 사본을 가져오고, ordered-json의 owner 규칙은 lint가 kit-gates의 gate인 언어의 각 source 경로를 그 lint와 duplication-check로 보내며 T2.68이 지운 파일을 이름 붙이지 않는다(T2.68 후속). 원인: kit은 K532에서 scripts/kit/bootstrap/install-mise.mts를 바꾸었고, K534 이후 kit-check는 owner가 각 언어의 lint를 선택하는지 확인하는데 ordered-json의 규칙은 그렇지 않으며, 그 규칙은 T2.68이 지운 ruff.toml, clippy.toml 외 여섯 파일을 아직 이름 붙여 owner-validate가 거부한다. 인수 조건: make kit-check, make owner-validate와 lint가 통과한다. red fixture: 지금 make kit-check와 make owner-validate가 실패한다. | `config/owner-checks.json`, the copies of kit | `make kit-check owner-validate lint-ts lint-python lint-php lint-go lint-rust` | [o] |
 | T2.70 | packages/js/index.js: UTF-8 decode의 catch는 오류를 바인딩하고 디코더의 TypeError로 좁히며, 다른 오류는 다시 던진다 (K561) | packages/js/index.js | `make lint-ts` | [o] |
 | T2.71 | ParseError는 KINDS에 없는 메시지를 거부한다: 생성자는 빈 kind 대신 예외를 던진다 (감사, ParseError.php:29) | packages/php/src/ParseError.php, packages/php/tests/ValueApiTest.php | `packages/php/vendor/bin/phpunit --configuration packages/php/phpunit.xml --filter testParseErrorRefusesAnUnknownMessage packages/php/tests/ValueApiTest.php` | [o] |
-| T2.72 | make hooks가 PRINCIPLES.md가 명명하는 pre-merge-commit 훅을 쓰고, rules-check가 통과한다 | .githooks/pre-merge-commit | `make rules-check` | [ ] |
+| T2.72 | make hooks가 PRINCIPLES.md가 명명하는 pre-merge-commit 훅을 쓰고, rules-check가 통과한다 | .githooks/pre-merge-commit | `make rules-check` | [o] |
