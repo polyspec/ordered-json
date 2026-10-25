@@ -5,6 +5,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.73: the tracked hooks match kit: pre-commit without the gates of K603, prepare-commit-msg and reference-transaction are committed (T2.73)
 - T2.72: make hooks writes .githooks/pre-merge-commit, which PRINCIPLES.md names, so rules-check passes (T2.72)
 - T2.71: ParseError refuses a message that KINDS does not hold, with a LogicException, instead of an empty kind (T2.71)
 - T2.70: the UTF-8 decode catch of packages/js/index.js binds the error and narrows it to the decoder TypeError, and rethrows any other error (K561) (T2.70)

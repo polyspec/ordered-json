@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 7318ba21b66d6957eb33cdf918fcb6a44af1ebeddbf659ef40993410c4c8c046 -->
+<!-- source-sha256: 58d83805918aaf92e57547da7d846c0143bdc5ae84d85f1a2c15b2449969a45f -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.73: 추적되는 훅이 kit과 같다: K603에서 게이트를 뺀 pre-commit, prepare-commit-msg, reference-transaction을 커밋한다 (T2.73)
 - T2.72: make hooks가 PRINCIPLES.md가 명명하는 .githooks/pre-merge-commit을 쓰고, rules-check가 통과한다 (T2.72)
 - T2.71: ParseError는 KINDS에 없는 메시지를 빈 kind 대신 LogicException으로 거부한다 (T2.71)
 - T2.70: packages/js/index.js의 UTF-8 decode catch는 오류를 바인딩하고 디코더의 TypeError로 좁히며, 다른 오류는 다시 던진다 (K561) (T2.70)
