@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 04625e996940a84b0cea309437bce1f620767e3a5de1d70d22f4a33ec4e3ad63 -->
+<!-- source-sha256: bae00644f74a2b0bd3b3965d869cf80c5d5e9fe9ebe4ca2909dcf5c7a5537b34 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- 조건부 철회한 T2.80의 CI 작업을 현재 실행 계획에 따라 재검토한다. Kit K614-1, K614-1-1 및 K614-1-2 통합을 명시적으로 추적하고 artifact consumer proof를 유지하며 유휴 benchmark와 최종 hosted 증거 조건을 문서화한다 (T2.80-1).
 
 - 릴리스 준비 단계에서 T2.66을 재검토한다. npm tarball consumer를 유지하고 이를 개발 소스로 대체하라는 요구는 철회한다. Artifact 설치는 배포 절차와 kit K438이 요구하는 consumer proof이며 소스 link는 배포 tarball을 검증하지 않는다. Consumer manifest와 lock은 이미 0.0.10을 가리킨다 (T2.66).
 

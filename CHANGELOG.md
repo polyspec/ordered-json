@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Reconsider the conditionally withdrawn CI work in T2.80 under the current execution plan. Track integration of kit K614-1, K614-1-1 and K614-1-2 explicitly, retain artifact consumer proofs, and document the idle benchmark and final hosted evidence conditions (T2.80-1).
+
 - Reconsider T2.66 for prerelease: retain the npm tarball consumer and retire the request to replace it with development sources. The artifact install is the consumer proof required by the distribution procedure and kit K438; a source link would not verify the distributed tarball. The consumer manifest and lock already name 0.0.10 (T2.66).
 
 - Reconsider T2.65 for prerelease: retain the Composer archive consumer and retire the request to replace it with development sources. The artifact install is the consumer proof required by the distribution procedure and kit K438; a source install would not verify the distributed ZIP. The consumer manifest and lock already name 0.0.10 (T2.65).
