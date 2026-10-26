@@ -1,5 +1,5 @@
 <!-- doc-id: plan-kit-standard -->
-<!-- source-sha256: dff20a061f3180b6381214bbc3b2c79ba911657ff0a0be30ec350cf6e01b2344 -->
+<!-- source-sha256: 09248d4f3e663056341709a4c3beb151ef327f39192afc689dcc1a172cad890d -->
 # kit 표준
 
 [English](plan.md)
@@ -38,3 +38,7 @@ Patch set의 TypeScript 컴파일과 문서 검사가 통과한다. 이는 로�
 ## Adoption of kit 0.0.56
 
 공개된 provider는 설치 패키지 bootstrap과 canonical workflow를 제공한다. T2.80-1은 native npm lock으로 정확한 archive와 integrity를 반영하고 선언된 사본을 sync하며 소비자 Makefile과 저장소 소유 CI를 설치된 bootstrap으로 옮긴다. CI는 첫 make 명령 전에 잠긴 패키지를 설치하고 개발용 소스 link는 native npm 설치 상태로 유지한다. 소비자 installer는 오프라인 lint 전에 공개된 Rust catch-checker 의존성을 다운로드한다. 최종 aggregate 증거는 T2.67로, 유효한 benchmark는 T2.48로 유지한다.
+
+## Adoption of kit 0.0.57
+
+PHP extension parity 실행기는 기존 격리 Composer test autoloader를 사용하여 native 확장 인수를 유지하면서 PHP library source를 제외한다. 공용 수정 K677-2를 kit 0.0.57로 공개하고 T2.80-2로 반영한다. 릴리즈 commit에서 의존성 검토와 native consumer lock을 갱신하며 T2.67은 0.0.10 tag 게시 전 성공한 hosted 검사를 기록한다.

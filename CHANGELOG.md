@@ -6,6 +6,9 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+<a id="v0010"></a>
+## 0.0.10
+
 - Align the feature record with native Rust Value Serde integration and duplicate-key rejection in all six implementations. Keep the benchmark protocol as implemented while marking its verification pending reliable remeasurement under T2.48; timing data is unchanged (T1.60-2).
 
 - Reconsider the conditionally withdrawn CI work in T2.80 under the current execution plan. Track integration of kit K614-1, K614-1-1 and K614-1-2 explicitly, retain artifact consumer proofs, and document the idle benchmark and final hosted evidence conditions (T2.80-1).
@@ -23,9 +26,6 @@
 - The completed CI bootstrap repair passes all 18 owning workflow unit tests and TypeScript compilation (T1.60-1).
 
 - Restore the sibling kit checkout and installation before every project make target in the repository-owned CI and push-gate jobs (T1.60-1). Run commands in the project folder, resolve setup and artifact paths from the workflow workspace, and include suppression-check in the declared CI checks. The workflow unit tests cover the checkout and bootstrap order.
-
-<a id="v0010"></a>
-## 0.0.10
 
 - Prepare release 0.0.10 in every package manifest and regenerate the npm and Composer consumer locks (T1.60). Update the locked fast-uri to 3.1.9 and markdown-it to 14.3.3 to resolve three security advisories, remove the stale sprintf-js advisory exception, and align the Python build backend and its verified wheel digest at setuptools 84.2.1. The dependency review records no known advisories; the dependency policy and version checks pass, the Python wheel builds offline, and the JavaScript and Python public API unit tests pass.
 - T2.79: the row is recorded as done; its change is on main (f343462) (T2.79)
@@ -125,6 +125,8 @@
 - The native ParseError constructor now rejects unknown messages with LogicException, matching PHP, including long messages and known messages with embedded NUL bytes. The constructor regression runs against both backends. (T2.71-1)
 
 - Wrapped the constructor regression assertion to satisfy the PHP lint line-length rule. (T2.71-1-1)
+
+- Adopted kit 0.0.57 so PHP extension parity uses an isolated Composer test autoloader without loading the PHP implementation twice; refreshed dependency review and native consumer locks for 0.0.10. (T2.80-2)
 
 ### npm (packages/js)
 

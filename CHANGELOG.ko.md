@@ -1,11 +1,14 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 935598093227f4b207c0d6334f90aa8cfeed9e8f234d7112ed79feea22a8897c -->
+<!-- source-sha256: f02411a9ed3a509830a79ecee78eee22d3f8de4a563ae0ff0d3cbd8592219668 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+<a id="v0010"></a>
+## 0.0.10
 
 - 기능 기록을 Rust Value의 native Serde 통합 및 여섯 구현 모두의 중복 키 거부와 맞춘다. Benchmark 프로토콜은 구현된 상태로 유지하되 T2.48의 신뢰할 수 있는 재측정 전까지 검증을 미확인으로 기록하며 timing data는 바꾸지 않는다 (T1.60-2).
 
@@ -24,9 +27,6 @@
 - 완료한 CI bootstrap 수정이 소유 workflow unit test 18개와 TypeScript 컴파일을 통과한다 (T1.60-1).
 
 - 저장소가 소유한 CI 및 push-gate job에서 모든 프로젝트 make target보다 먼저 형제 kit을 checkout하고 설치한다 (T1.60-1). 프로젝트 폴더에서 명령을 실행하고 workflow workspace 기준으로 setup 및 artifact 경로를 해석하며 선언된 CI 검사에 suppression-check를 포함한다. Workflow unit test가 checkout 및 bootstrap 순서를 검사한다.
-
-<a id="v0010"></a>
-## 0.0.10
 
 - 모든 패키지 manifest에 릴리스 0.0.10을 준비하고 npm 및 Composer consumer lock을 다시 생성한다 (T1.60). 잠긴 fast-uri를 3.1.9, markdown-it을 14.3.3으로 갱신하여 보안 권고 세 건을 해결하고, 오래된 sprintf-js 보안 예외를 제거하며, Python build backend와 검증된 wheel digest를 setuptools 84.2.1로 맞춘다. dependency review에는 알려진 보안 권고가 없으며, dependency policy와 버전 검사가 통과하고, Python wheel이 오프라인으로 빌드되며, JavaScript 및 Python public API unit test가 통과한다.
 - T2.79: 행을 완료로 기록한다. 변경은 main의 f343462에 있다 (T2.79)
@@ -126,6 +126,8 @@
 - native ParseError 생성자가 PHP와 같이 알 수 없는 메시지를 LogicException으로 거부합니다. 긴 메시지와 알려진 메시지에 NUL byte를 붙인 경우도 포함하며 생성자 회귀 테스트를 두 backend에 실행합니다. (T2.71-1)
 
 - PHP lint 줄 길이 규칙에 맞춰 생성자 회귀 테스트 assertion을 줄바꿈했습니다. (T2.71-1-1)
+
+- PHP 구현을 중복 로드하지 않는 격리 Composer test autoloader로 확장 parity를 실행하도록 kit 0.0.57을 반영하고 0.0.10 의존성 검토와 native consumer lock을 갱신했습니다. (T2.80-2)
 
 ### npm (packages/js)
 

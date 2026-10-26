@@ -37,3 +37,7 @@ TypeScript compilation and document checks pass on the patch set. These are loca
 ## Adoption of kit 0.0.56
 
 The published provider supplies an installed-package bootstrap and canonical workflows. T2.80-1 adopts its exact archive and integrity through the native npm lock, syncs its declared copies, and moves the consumer Makefile and repository-owned CI to the installed bootstrap. CI installs the locked package before its first make command; development source links remain native npm state. The consumer installer fetches the published Rust catch-checker dependencies before offline linting. Final aggregate evidence remains T2.67, and a valid benchmark remains T2.48.
+
+## Adoption of kit 0.0.57
+
+The PHP extension parity runner uses the existing isolated Composer test autoloader, preserving native extension arguments while excluding the PHP library sources. The shared correction K677-2 is released through kit 0.0.57 and adopted under T2.80-2. The release commit refreshes dependency review and native consumer locks; T2.67 records the successful hosted checks before the 0.0.10 tag is published.
