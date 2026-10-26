@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: f7ddf77f01cb91a4d1b9978b7c694677de06d48845f04e043f9c778500895eca -->
+<!-- source-sha256: 04625e996940a84b0cea309437bce1f620767e3a5de1d70d22f4a33ec4e3ad63 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- 릴리스 준비 단계에서 T2.66을 재검토한다. npm tarball consumer를 유지하고 이를 개발 소스로 대체하라는 요구는 철회한다. Artifact 설치는 배포 절차와 kit K438이 요구하는 consumer proof이며 소스 link는 배포 tarball을 검증하지 않는다. Consumer manifest와 lock은 이미 0.0.10을 가리킨다 (T2.66).
 
 - 릴리스 준비 단계에서 T2.65를 재검토한다. Composer archive consumer를 유지하고 이를 개발 소스로 대체하라는 요구는 철회한다. Artifact 설치는 배포 절차와 kit K438이 요구하는 consumer proof이며 소스 설치는 배포 ZIP을 검증하지 않는다. Consumer manifest와 lock은 이미 0.0.10을 가리킨다 (T2.65).
 

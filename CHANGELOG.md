@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Reconsider T2.66 for prerelease: retain the npm tarball consumer and retire the request to replace it with development sources. The artifact install is the consumer proof required by the distribution procedure and kit K438; a source link would not verify the distributed tarball. The consumer manifest and lock already name 0.0.10 (T2.66).
+
 - Reconsider T2.65 for prerelease: retain the Composer archive consumer and retire the request to replace it with development sources. The artifact install is the consumer proof required by the distribution procedure and kit K438; a source install would not verify the distributed ZIP. The consumer manifest and lock already name 0.0.10 (T2.65).
 
 - Reconcile the workflow report path record with the sibling kit.mk used by the Makefile and implemented in T1.60-1; all 20 owning workflow unit tests pass (T2.79).
