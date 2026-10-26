@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: ae14f14cd9d8df524b084e38caeb9233cb04511618676a47002acd5cd6c35c38 -->
+<!-- source-sha256: 406b9496c1fbcc69494c149167d40db0386b83cd4cd025b486bcc7c97247b412 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -83,7 +83,7 @@
 | T2.70 | packages/js/index.js: UTF-8 decode의 catch는 오류를 바인딩하고 디코더의 TypeError로 좁히며, 다른 오류는 다시 던진다 (K561) | packages/js/index.js | `make lint-ts` | [o] |
 | T2.71 | ParseError는 KINDS에 없는 메시지를 거부한다: 생성자는 빈 kind 대신 예외를 던진다 (감사, ParseError.php:29) | packages/php/src/ParseError.php, packages/php/tests/ValueApiTest.php | `packages/php/vendor/bin/phpunit --configuration packages/php/phpunit.xml --filter testParseErrorRefusesAnUnknownMessage packages/php/tests/ValueApiTest.php` | [o] |
 | T2.71-1 | native ParseError 생성자가 PHP 구현처럼 알 수 없는 메시지를 거부하도록 수정하고 확장을 재빌드하여 해당 생성자 테스트를 실행한다. | packages/php-ext/src/value.c, packages/php/tests/ValueApiTest.php, docs/operations/api.md(.ko), CHANGELOG.md(.ko) | `make test-php-ext CASES=testParseErrorRefusesAnUnknownMessage` | [o] |
-| T2.71-1-1 | native 생성자 회귀 테스트의 assertion을 줄바꿈하여 PHP 줄 길이 제한을 충족한다. | packages/php/tests/ValueApiTest.php, CHANGELOG.md(.ko) | `packages/php/vendor/bin/phpunit --configuration packages/php/phpunit.xml --filter testParseErrorRefusesAnUnknownMessage packages/php/tests/ValueApiTest.php` | [ ] |
+| T2.71-1-1 | native 생성자 회귀 테스트의 assertion을 줄바꿈하여 PHP 줄 길이 제한을 충족한다. | packages/php/tests/ValueApiTest.php, CHANGELOG.md(.ko) | `packages/php/vendor/bin/phpunit --configuration packages/php/phpunit.xml --filter testParseErrorRefusesAnUnknownMessage packages/php/tests/ValueApiTest.php` | [o] |
 | T2.72 | make hooks가 PRINCIPLES.md가 명명하는 pre-merge-commit 훅을 쓰고, rules-check가 통과한다 | .githooks/pre-merge-commit | `make rules-check` | [o] |
 | T2.73 | make hooks가 쓰는 훅(K603의 pre-commit, prepare-commit-msg, reference-transaction)을 커밋해서 추적되는 훅이 kit과 같아진다 | .githooks/pre-commit, .githooks/prepare-commit-msg, .githooks/reference-transaction | `make hooks-check` | [o] |
 | T2.74 | K614: Makefile은 ../kit/scripts/kit/kit-bootstrap.mk를 include하고, make kit-sync가 kit-sync 사본을 지우며, config/php-lint는 없고, PRINCIPLES.md 등 4개는 kit 링크이며, 지워진 경로의 owner glob은 없다 | Makefile, config/owner-checks.json, PRINCIPLES.md, PRINCIPLES.ko.md, .editorconfig, .claude/settings.json, config/php-lint | `make kit-check` | [o] |

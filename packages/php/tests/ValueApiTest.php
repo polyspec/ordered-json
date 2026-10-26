@@ -464,7 +464,11 @@ final class ValueApiTest extends TestCase
     public function testParseErrorRefusesAnUnknownMessage(): void
     {
         foreach (['no such message', str_repeat('x', 80), "Expected JSON value\0ignored"] as $message) {
-            self::expectThrown(LogicException::class, 'ParseError has no kind', static fn() => new ParseError($message, 0));
+            self::expectThrown(
+                LogicException::class,
+                'ParseError has no kind',
+                static fn() => new ParseError($message, 0),
+            );
         }
     }
 }

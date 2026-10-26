@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 38bb7bd47296119e159fa976c19c2d253dfddd3b3b644c6e1f05f80eabcb2e14 -->
+<!-- source-sha256: 935598093227f4b207c0d6334f90aa8cfeed9e8f234d7112ed79feea22a8897c -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -124,6 +124,8 @@
 - 릴리즈 전 의존성 검토가 보고한 최신 안정 버전에 맞춰 ruff 도구를 0.17.2로 갱신하고 native toolchain lock 명령으로 플랫폼별 digest를 다시 생성했습니다. (T2.81)
 
 - native ParseError 생성자가 PHP와 같이 알 수 없는 메시지를 LogicException으로 거부합니다. 긴 메시지와 알려진 메시지에 NUL byte를 붙인 경우도 포함하며 생성자 회귀 테스트를 두 backend에 실행합니다. (T2.71-1)
+
+- PHP lint 줄 길이 규칙에 맞춰 생성자 회귀 테스트 assertion을 줄바꿈했습니다. (T2.71-1-1)
 
 ### npm (packages/js)
 
