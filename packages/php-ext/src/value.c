@@ -137,6 +137,10 @@ ZEND_METHOD(Polyspec_OrderedJson_ParseError, __construct) {
         Z_PARAM_STR(message)
         Z_PARAM_LONG(offset)
     ZEND_PARSE_PARAMETERS_END();
+    if (strlen(ZSTR_VAL(message)) != ZSTR_LEN(message) || oj_kind(ZSTR_VAL(message))[0] == '\0') {
+        zend_throw_exception_ex(spl_ce_LogicException, 0, "ParseError has no kind for the message \"%s\"", ZSTR_VAL(message));
+        RETURN_THROWS();
+    }
     oj_fill_error(Z_OBJ_P(ZEND_THIS), ZSTR_VAL(message), ZSTR_LEN(message), offset);
 }
 

@@ -122,6 +122,8 @@
 
 - Updated the ruff tool pin to 0.17.2 after the prerelease dependency review reported the newer stable release, and regenerated the platform digests with the native toolchain lock command. (T2.81)
 
+- The native ParseError constructor now rejects unknown messages with LogicException, matching PHP, including long messages and known messages with embedded NUL bytes. The constructor regression runs against both backends. (T2.71-1)
+
 ### npm (packages/js)
 
 - Text input with an unpaired surrogate is rejected with `unescaped_lone_surrogate` at the offset of the surrogate, before the grammar is read; it named the unit after the surrogate, and a surrogate after the root was `trailing_input` (T1.39).

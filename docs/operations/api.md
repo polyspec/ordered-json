@@ -91,4 +91,6 @@ The PHP library is `polyspec/ordered-json`. Its public symbols are the class `Po
 
 The extension `polyspec_ordered_json`, the PIE package `polyspec/ordered-json-php-ext`, implements the library in C and registers those classes, functions and the constant under the same names and signatures. A process loads the library or the extension, never both (the library loads its sources unconditionally and would redeclare the functions), so one test suite runs against the pure PHP implementation and, with none of the library's sources, against the extension, and the results, errors and offsets are the same. The extension reports the version of its package, `composer.json` of `packages/php-ext`.
 
+The ParseError constructor accepts only the parser messages mapped to the shared rejection kinds. An unknown message raises LogicException in both PHP backends, including a message with a known prefix followed by a NUL byte.
+
 Native builds must match the PHP version, platform, and thread-safety configuration. See [native installation](installation.md#native-php).

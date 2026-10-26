@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 8b65afefe08188c175d3f506ab3005ec54cb50e0e41292cc45f99c10a62adcf5 -->
+<!-- source-sha256: 7acc4aa9bb9dab4dc38b2ffaf909d2c4376b687c64dc4406ac2c6b746d832153 -->
 # API 계약
 
 [English](api.md)
@@ -91,5 +91,7 @@ JavaScript는 기존 UTF-16 텍스트로 문자열을 생성할 수 있습니다
 PHP 라이브러리는 `polyspec/ordered-json`입니다. 공개 symbol은 class `Polyspec\OrderedJson\Value`, 예외 `Polyspec\OrderedJson\ParseError`, 함수 `Polyspec\OrderedJson\parse`와 `Polyspec\OrderedJson\stringify`, 상수 `Polyspec\OrderedJson\MAX_DEPTH`이며 라이브러리의 나머지는 이들에 대해 비공개입니다.
 
 PIE package `polyspec/ordered-json-php-ext`인 확장 `polyspec_ordered_json`은 라이브러리를 C로 구현하고 그 class, 함수, 상수를 같은 이름과 signature로 등록합니다. 프로세스는 라이브러리나 확장 중 하나만 로드하며(라이브러리는 source를 무조건 올리므로 함수를 다시 선언하게 됩니다), 하나의 test suite가 순수 PHP 구현과 라이브러리 source 없이 확장에 대해 실행되며 결과, 오류, offset은 같습니다. 확장은 자기 package의 version, 곧 `packages/php-ext`의 `composer.json` version을 보고합니다.
+
+ParseError 생성자는 공통 rejection kind에 대응하는 parser 메시지만 받습니다. 알 수 없는 메시지는 두 PHP backend 모두 LogicException으로 거부하며 알려진 메시지 뒤에 NUL byte를 붙인 경우도 포함합니다.
 
 네이티브 빌드는 PHP 버전, 플랫폼, 스레드 안전 설정과 일치해야 합니다. [네이티브 설치](installation.ko.md#native-php)를 확인합니다.

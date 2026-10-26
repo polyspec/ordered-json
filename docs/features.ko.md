@@ -1,5 +1,5 @@
 <!-- doc-id: features -->
-<!-- source-sha256: c31a91fb8abc0bd3b97456611275a861f8f4aa5e9f186f6f862771596713d911 -->
+<!-- source-sha256: 6cefc1cf26e5f41c1dea2fb04a5e19450a204bfcae0303c3fe6ef26025d35eff -->
 # 기능 상태
 
 [English](features.md)
@@ -19,7 +19,7 @@
 | F-CONSTRUCT | 순서 있는 연관배열과 Value 객체 배열로 생성 | implemented | shared-suite | [결과](operations/validation.ko.md#records) | source-only | [생성](spec/json-contract.ko.md#construction) |
 | F-RUST-SERDE | Rust Value의 native Serde 직렬화·역직렬화 | implemented | package-tests | [결과](operations/validation.ko.md#records) | source-only | [바인딩](operations/api.ko.md#bindings) |
 | F-STRICT-KEYS | 모든 구현에서 해석된 객체 키의 반복을 거부하는 파싱 | implemented | package-tests | [결과](operations/validation.ko.md#records) | source-only | [바인딩](operations/api.ko.md#bindings) |
-| F-PHP-NATIVE | 공통 PHP API를 사용하는 PHP 확장 파서와 직렬화 | implemented | shared-suite | [결과](operations/validation.ko.md#records) | source-only | [PHP](operations/api.ko.md#php) |
+| F-PHP-NATIVE | 공통 PHP API와 ParseError 메시지 검증을 제공하는 PHP 확장 파서와 직렬화 | implemented | shared-suite | [결과](operations/validation.ko.md#records) | source-only | [PHP](operations/api.ko.md#php) |
 | F-DOCS | 영한 문서, 링크·상태 검사, 검증 최신 여부 | implemented | docs-tests | [결과](operations/validation.ko.md#records) | source-only | [절차](operations/documentation-plan.ko.md#checks) |
 | F-REPOS | 독립적으로 빌드할 수 있는 구현 패키지와 공통 적합성을 갖춘 단일 저장소 | implemented | shared-suite | [결과](operations/validation.ko.md#records) | source-only | [저장소](operations/repositories.ko.md) |
 | F-BENCHMARK | 저장소 내부의 재현 가능한 벤치마크 프로토콜과 커밋된 결과 | implemented | not-verified | [재측정 조건](plans/kit-standard/plan.ko.md#prerelease-reconsideration) | source-only | [벤치마크](../benchmarks/README.ko.md) |

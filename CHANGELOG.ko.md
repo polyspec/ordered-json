@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 1b8f24c7125d79f933e48d98986c6dce30cc438e435e718cca0c3c8add071515 -->
+<!-- source-sha256: 38bb7bd47296119e159fa976c19c2d253dfddd3b3b644c6e1f05f80eabcb2e14 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -122,6 +122,8 @@
 - 공개된 kit 0.0.56과 canonical 사본을 반영했습니다. CI는 형제 checkout 없이 잠긴 설치 패키지를 bootstrap하고 설치 단계에서 오프라인 lint에 필요한 Rust checker 의존성을 다운로드합니다. native 개발용 소스 link는 계속 사용할 수 있습니다. (T2.80-1)
 
 - 릴리즈 전 의존성 검토가 보고한 최신 안정 버전에 맞춰 ruff 도구를 0.17.2로 갱신하고 native toolchain lock 명령으로 플랫폼별 digest를 다시 생성했습니다. (T2.81)
+
+- native ParseError 생성자가 PHP와 같이 알 수 없는 메시지를 LogicException으로 거부합니다. 긴 메시지와 알려진 메시지에 NUL byte를 붙인 경우도 포함하며 생성자 회귀 테스트를 두 backend에 실행합니다. (T2.71-1)
 
 ### npm (packages/js)
 
