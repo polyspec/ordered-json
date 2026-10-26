@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: b342c1249dd7b7116c28708daf0d701f19c57c8d5c6182194262f51e35f07331 -->
+<!-- source-sha256: 5943521c2c433d8002f98d175f2780afda856faa3bb6dfe60b53cd41d7f1adeb -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- docs gate 전에 Git hook 설정과 workspace link를 준비하고 오프라인 suite lint 전에 형제 Rust checker crate를 다운로드한다 (T1.60-1-2). 새 setup 순서 회귀 테스트는 이전 workflow에서 실패하고 설치 단계를 추가한 뒤 통과한다.
 
 - CI가 형제 Go symbol extractor를 빌드할 수 있도록 Go toolchain과 module을 1.27.3으로 맞추고 네 플랫폼의 toolchain lock을 다시 생성하며 검사 전에 형제 kit을 빌드하고 native npm 설치로 연결한다 (T1.60-1-1). 소유 workflow 테스트는 더 오래된 compiler를 거부하며 19개 case가 모두 통과하고 Go symbol extractor 설치가 성공한다.
 

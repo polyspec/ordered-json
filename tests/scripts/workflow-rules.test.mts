@@ -305,3 +305,17 @@ test('the CI Go toolchain can build the sibling Go symbol extractor', () => {
   const required = known(/^go ([0-9.]+)$/m.exec(readFileSync(path.join(ROOT, '../kit/scripts/kit/symbols/go/go.mod'), 'utf8'))?.[1], 'the extractor Go requirement');
   assert.ok(declared.localeCompare(required, 'en', { numeric: true }) >= 0, `Go ${declared} cannot build the extractor requiring ${required}`);
 });
+
+
+test('CI prepares hook state, workspace links and shared Rust checker crates before checks', () => {
+  const jobs = workflow(read('ci.yml')).jobs;
+  const docs = runs(known(jobs.docs, 'the docs job'));
+  const docsCheck = docs.findIndex(command => command.startsWith('make ci-targets '));
+  for (const setup of ['make hooks', 'make link']) {
+    const index = docs.indexOf(setup);
+    assert.ok(index > docs.indexOf('make install-tools') && index < docsCheck, `${setup} runs after tool installation and before docs checks`);
+  }
+  const suite = runs(known(jobs.suite, 'the suite job'));
+  const downloads = suite.indexOf('make -C ../kit cargo-downloads-fetch');
+  assert.ok(downloads > suite.indexOf('make install') && downloads < suite.findIndex(command => command.startsWith('make ci-targets ')), 'shared Rust checker crates are downloaded before offline linting');
+});

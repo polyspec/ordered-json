@@ -81,6 +81,12 @@ jobs:
       - name: make install-tools
         if: ${{ !cancelled() }}
         run: make install-tools
+      - name: prepare Git hooks
+        if: ${{ !cancelled() }}
+        run: make hooks
+      - name: prepare workspace links
+        if: ${{ !cancelled() }}
+        run: make link
       - name: make ci-targets
         if: ${{ !cancelled() }}
         run: make ci-targets TARGETS="kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check ordered-json-test-scripts typecheck lint-ts lint-python"
@@ -144,6 +150,9 @@ jobs:
       - name: make install
         if: ${{ !cancelled() }}
         run: make install
+      - name: download shared Rust checker crates
+        if: ${{ !cancelled() }}
+        run: make -C ../kit cargo-downloads-fetch
       - name: make ci-targets
         if: ${{ !cancelled() }}
         env:

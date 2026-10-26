@@ -95,6 +95,9 @@ The last job of `ci.yml`, `ci-passed`, is the check of the workflow that the rel
 
 Each job of the repository-owned CI and push-gate workflows checks out ordered-json and its sibling kit in separate folders, installs and builds the sibling kit before any project make target, then links it through native npm installation, and runs commands with ordered-json as the working directory. Setup actions read version files under ordered-json, and artifact uploads read ordered-json/var/report/ci-targets/. The sibling checkout is required by the Makefile include; installing only the archived npm package does not provide it.
 
+
+The docs job prepares the Git hook configuration and workspace links after tool installation, before hooks-check and link-state-check. The suite job downloads the sibling kit Rust checker crates during installation, before offline linting. Downloads remain installation steps; no check enables network access.
+
 <a id="publish"></a>
 ## Publishing main
 
