@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Reconcile the workflow report path record with the sibling kit.mk used by the Makefile and implemented in T1.60-1; all 20 owning workflow unit tests pass (T2.79).
+
 - Prepare Git hook configuration and workspace links before docs gates, and fetch the sibling Rust checker crates before offline suite linting (T1.60-1-2). The new setup-order regression fails on the previous workflow and passes after the installation steps are added.
 
 - Align the Go toolchain and module at 1.27.3 so CI can build the sibling Go symbol extractor, regenerate the four-platform toolchain lock, and build and link sibling kit with native npm installation before checks (T1.60-1-1). The owning workflow tests reject an older compiler; all 19 cases pass, and the Go symbol extractor installs successfully.

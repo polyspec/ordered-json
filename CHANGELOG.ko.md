@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 5943521c2c433d8002f98d175f2780afda856faa3bb6dfe60b53cd41d7f1adeb -->
+<!-- source-sha256: 7bb48d3185c529190ee194c815a8f437b7ce9f09fca2b4706f49745bf5cb50dc -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- Workflow report 경로 기록을 Makefile이 사용하는 형제 kit.mk와 T1.60-1에서 반영한 구현에 맞춘다. 소유 workflow unit test 20개가 모두 통과한다 (T2.79).
 
 - docs gate 전에 Git hook 설정과 workspace link를 준비하고 오프라인 suite lint 전에 형제 Rust checker crate를 다운로드한다 (T1.60-1-2). 새 setup 순서 회귀 테스트는 이전 workflow에서 실패하고 설치 단계를 추가한 뒤 통과한다.
 
