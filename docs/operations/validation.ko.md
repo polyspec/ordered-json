@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: c34b953247bf7072a3359d948b21688d6fb973b06bc0176247e244418493a75d -->
+<!-- source-sha256: dd1fc1a685268f942802c5239fa6acaa5dc2a7b3ded0a07632bcdaa88963f0ec -->
 # 검증
 
 [English](validation.md)
@@ -94,7 +94,7 @@ kit의 target은 설치된 package `@polyspec/kit`에서 오므로 모든 job은
 
 `ci.yml`의 마지막 job `ci-passed`는 release workflow가 tag된 commit에 요구하는 이 workflow의 check입니다. workflow의 다른 모든 job을 need로 가지고, 그중 하나가 실패하거나 skip되거나 취소되어도 그 모든 job 뒤에 실행되며(`if: ${{ always() }}`), `make ci-passed RESULTS='${{ toJSON(needs) }}'`를 실행합니다. `@polyspec/kit`의 ci-passed는 need로 가진 모든 job의 결과를 출력하고, 하나라도 `success`가 아니면 실패합니다. `ci.yml`에 추가한 job은 `needs`에 넣으므로 필수 check가 그 job을 포함합니다. `tests/scripts/workflow-rules.test.mts`는 `ci-passed`가 없거나, 마지막 job이 아니거나, `if: ${{ always() }}`가 없거나, 다른 모든 job을 need로 가지지 않거나, 다른 runner에서 실행되거나, 다른 step을 실행하면 실패합니다.
 
-저장소가 소유한 CI 및 push-gate workflow의 각 job은 ordered-json과 형제 kit을 별도 폴더에 checkout하고 프로젝트 make target보다 먼저 형제 kit을 설치하며 ordered-json을 working directory로 명령을 실행한다. Setup action은 ordered-json 아래의 버전 파일을 읽고 artifact upload는 ordered-json/var/report/ci-targets/를 읽는다. 형제 checkout은 Makefile include에 필요하며 archive된 npm 패키지만 설치해서는 제공되지 않는다.
+저장소가 소유한 CI 및 push-gate workflow의 각 job은 ordered-json과 형제 kit을 별도 폴더에 checkout하고 프로젝트 make target보다 먼저 형제 kit을 설치하고 빌드한 뒤 native npm 설치로 연결하며 ordered-json을 working directory로 명령을 실행한다. Setup action은 ordered-json 아래의 버전 파일을 읽고 artifact upload는 ordered-json/var/report/ci-targets/를 읽는다. 형제 checkout은 Makefile include에 필요하며 archive된 npm 패키지만 설치해서는 제공되지 않는다.
 
 <a id="publish"></a>
 ## main 게시

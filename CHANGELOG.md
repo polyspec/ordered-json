@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Align the Go toolchain and module at 1.27.3 so CI can build the sibling Go symbol extractor, regenerate the four-platform toolchain lock, and build and link sibling kit with native npm installation before checks (T1.60-1-1). The owning workflow tests reject an older compiler; all 19 cases pass, and the Go symbol extractor installs successfully.
+
 - The completed CI bootstrap repair passes all 18 owning workflow unit tests and TypeScript compilation (T1.60-1).
 
 - Restore the sibling kit checkout and installation before every project make target in the repository-owned CI and push-gate jobs (T1.60-1). Run commands in the project folder, resolve setup and artifact paths from the workflow workspace, and include suppression-check in the declared CI checks. The workflow unit tests cover the checkout and bootstrap order.

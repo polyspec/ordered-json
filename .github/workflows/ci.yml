@@ -68,12 +68,15 @@ jobs:
       - name: install sibling kit packages
         if: ${{ !cancelled() }}
         run: make -C ../kit install-packages
+      - name: build sibling kit
+        if: ${{ !cancelled() }}
+        run: make -C ../kit build
       - name: make install-tools TOOLS=npm
         if: ${{ !cancelled() }}
         run: make install-tools TOOLS=npm
-      - name: make install-packages
+      - name: link project npm packages
         if: ${{ !cancelled() }}
-        run: make install-packages
+        run: make npm-install DIR=.
       # The tools of mise.lock: alint, which make layout-check runs, ruff and vulture, which make lint-python runs, and Composer.
       - name: make install-tools
         if: ${{ !cancelled() }}
@@ -126,12 +129,15 @@ jobs:
       - name: install sibling kit packages
         if: ${{ !cancelled() }}
         run: make -C ../kit install-packages
+      - name: build sibling kit
+        if: ${{ !cancelled() }}
+        run: make -C ../kit build
       - name: make install-tools TOOLS=npm
         if: ${{ !cancelled() }}
         run: make install-tools TOOLS=npm
-      - name: make install-packages
+      - name: link project npm packages
         if: ${{ !cancelled() }}
-        run: make install-packages
+        run: make npm-install DIR=.
       # The tools of mise.lock (Go, Python, Composer, cargo-audit and the rest) with the phpcs and PHPStan of config/php-lint, the
       # Rust toolchain of rust-toolchain.toml, the crates of packages/rust/Cargo.lock, the Composer projects of the root and the
       # PHP packages (the PIE PHAR and the supplementary suite are tools of mise.lock).
@@ -181,9 +187,11 @@ jobs:
         run: make -C ../kit install-tools TOOLS=npm
       - name: install sibling kit packages
         run: make -C ../kit install-packages
+      - name: build sibling kit
+        run: make -C ../kit build
       - name: make install-tools TOOLS=npm
         run: make install-tools TOOLS=npm
-      - name: make install-packages
-        run: make install-packages
+      - name: link project npm packages
+        run: make npm-install DIR=.
       - name: make ci-passed
         run: make ci-passed RESULTS='${{ toJSON(needs) }}'

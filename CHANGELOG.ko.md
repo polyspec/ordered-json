@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 5a1d355b77a19220a8fb4b85f059ffb9d89f0f5d9d32775737745f89bdf9e9c2 -->
+<!-- source-sha256: b342c1249dd7b7116c28708daf0d701f19c57c8d5c6182194262f51e35f07331 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- CI가 형제 Go symbol extractor를 빌드할 수 있도록 Go toolchain과 module을 1.27.3으로 맞추고 네 플랫폼의 toolchain lock을 다시 생성하며 검사 전에 형제 kit을 빌드하고 native npm 설치로 연결한다 (T1.60-1-1). 소유 workflow 테스트는 더 오래된 compiler를 거부하며 19개 case가 모두 통과하고 Go symbol extractor 설치가 성공한다.
 
 - 완료한 CI bootstrap 수정이 소유 workflow unit test 18개와 TypeScript 컴파일을 통과한다 (T1.60-1).
 

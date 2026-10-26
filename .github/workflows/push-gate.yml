@@ -60,12 +60,15 @@ jobs:
       - name: install sibling kit packages
         if: ${{ !cancelled() }}
         run: make -C ../kit install-packages
+      - name: build sibling kit
+        if: ${{ !cancelled() }}
+        run: make -C ../kit build
       - name: make install-tools TOOLS=npm
         if: ${{ !cancelled() }}
         run: make install-tools TOOLS=npm
-      - name: make install-packages
+      - name: link project npm packages
         if: ${{ !cancelled() }}
-        run: make install-packages
+        run: make npm-install DIR=.
       - name: make install-tools
         if: ${{ !cancelled() }}
         run: make install-tools

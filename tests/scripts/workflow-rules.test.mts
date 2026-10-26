@@ -34,7 +34,7 @@ const CHECK_WORKFLOWS = ['ci.yml', 'push-gate.yml'];
 // A step runs one make target: its arguments hold no shell syntax except a ${{ }} expression and, at the end, make variables
 // that take an environment variable of the job by name (TAG="$TAG").
 const MAKE_STEP = /^make [^|;&`$()]*(\$\{\{[^}]*\}\}[^|;&`$()]*)*( [A-Z][A-Z_]*="\$[A-Z][A-Z_]*")*$/;
-const BOOTSTRAP_STEPS = ['make -C ../kit install-tools TOOLS=npm', 'make -C ../kit install-packages', 'make install-tools TOOLS=npm', 'make install-packages'];
+const BOOTSTRAP_STEPS = ['make -C ../kit install-tools TOOLS=npm', 'make -C ../kit install-packages', 'make -C ../kit build', 'make install-tools TOOLS=npm', 'make npm-install DIR=.'];
 // The steps of release.yml in their order, the copy of workflows/release.yml of @polyspec/kit, which checks the configuration
 // with make kit-check before any release step (kit K193).
 const RELEASE_STEPS = [...BOOTSTRAP_STEPS, 'make kit-check', 'make release-prepare', 'make release-tools', 'make release-tools-path', 'make release-verify', 'make release-versions', 'make release-assets', 'make release-publish', 'make release-proof TAG="$TAG"', 'make release-undraft TAG="$TAG"'];
@@ -205,7 +205,7 @@ test('setup-node disables its cache', () => {
 
 test('a job that does not install the kit package first fails', () => {
   for (const name of CHECK_WORKFLOWS) {
-    assert.ok(anyIncludes(violations(name, changed(read(name), 'run: make install-packages\n', 'run: make toolchain-check\n')), 'the make targets of kit exist only after @polyspec/kit is installed'), name);
+    assert.ok(anyIncludes(violations(name, changed(read(name), 'run: make npm-install DIR=.\n', 'run: make toolchain-check\n')), 'the make targets of kit exist only after @polyspec/kit is installed'), name);
   }
 });
 
@@ -289,7 +289,7 @@ test('each check job prepares the sibling kit before project make targets', () =
       const steps = job.steps ?? [];
       const project = steps.findIndex(step => step.uses?.startsWith('actions/checkout@') && step.with?.path === 'ordered-json' && step.with.repository === undefined);
       const kit = steps.findIndex(step => step.uses?.startsWith('actions/checkout@') && step.with?.repository === 'polyspec/kit' && step.with.path === 'kit');
-      const installKit = steps.findIndex(step => step.run === 'make -C ../kit install-packages');
+      const installKit = steps.findIndex(step => step.run === 'make -C ../kit build');
       const firstProjectMake = steps.findIndex(step => step.run?.startsWith('make ') && !step.run.startsWith('make -C ../kit '));
       assert.equal(job.defaults?.run?.['working-directory'], PROJECT, `${name}: ${jobName} runs make in the project folder`);
       assert.ok(project >= 0, `${name}: ${jobName} checks out the project in ordered-json`);
@@ -297,4 +297,11 @@ test('each check job prepares the sibling kit before project make targets', () =
       assert.ok(installKit > kit && firstProjectMake > installKit, `${name}: ${jobName} installs kit before project make targets`);
     }
   }
+});
+
+
+test('the CI Go toolchain can build the sibling Go symbol extractor', () => {
+  const declared = known(/^go = "([0-9.]+)"$/m.exec(readFileSync(path.join(ROOT, 'mise.toml'), 'utf8'))?.[1], 'the Go toolchain');
+  const required = known(/^go ([0-9.]+)$/m.exec(readFileSync(path.join(ROOT, '../kit/scripts/kit/symbols/go/go.mod'), 'utf8'))?.[1], 'the extractor Go requirement');
+  assert.ok(declared.localeCompare(required, 'en', { numeric: true }) >= 0, `Go ${declared} cannot build the extractor requiring ${required}`);
 });
