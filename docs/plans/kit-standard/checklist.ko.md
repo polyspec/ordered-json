@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 7b136b9280eeae15c64a802706f59746901da8d651a477119301185a93239337 -->
+<!-- source-sha256: 957420caec6ce6689ef239584c577776fd63d3ef92286d4ca1ae28fc1bd972c9 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -88,3 +88,4 @@
 | T2.76 | K614 커밋이 스테이징하지 않은 kit-sync 사본(scripts/kit/bootstrap, scripts/kit/kit-bootstrap.mk, config/php-lint)을 main에서 지운다 | the stale copies listed in the K614 layout | `make kit-check` | [o] |
 | T2.79 | Workflow report 테스트가 npm에 소스 파일 없는 packed kit이 설치된 경우에도 Makefile이 include하는 형제 kit.mk를 읽으며 소유 workflow 테스트가 통과한다. | tests/scripts/workflow-rules.test.mts | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [o] |
 | T2.80 | ordered-json gates.yml is byte-equal to template's (CI shape, with the sibling kit checkout) | .github/workflows/gates.yml | `cmp ../template/.github/workflows/gates.yml .github/workflows/gates.yml` | [-] 원인: 사용자의 판단: 적절한 계획 없이 CI를 돌리지 않는다. 이 CI 수정은 철회한다 |
+| T2.80-1 | 실행 계획에 따라 조건부 철회한 CI 수정을 재검토한다: 테스트한 공용 kit bootstrap, PHP tokenizer 및 Rust checker 설치 수정을 해당 kit 항목이 통합된 뒤 반영하고 T2.67의 최종 CI 증거를 확보한다. | docs/plans/kit-standard/plan.md(.ko), .github/workflows/gates.yml, .github/workflows/release.yml | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [ ] |
