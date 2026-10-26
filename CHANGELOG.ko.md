@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: bae00644f74a2b0bd3b3965d869cf80c5d5e9fe9ebe4ca2909dcf5c7a5537b34 -->
+<!-- source-sha256: 04b2d87ea0548a5b9b7ec4e15352ec72c837def5141073b43effa5711fdfc265 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- 기능 기록을 Rust Value의 native Serde 통합 및 여섯 구현 모두의 중복 키 거부와 맞춘다. Benchmark 프로토콜은 구현된 상태로 유지하되 T2.48의 신뢰할 수 있는 재측정 전까지 검증을 미확인으로 기록하며 timing data는 바꾸지 않는다 (T1.60-2).
 
 - 조건부 철회한 T2.80의 CI 작업을 현재 실행 계획에 따라 재검토한다. Kit K614-1, K614-1-1 및 K614-1-2 통합을 명시적으로 추적하고 artifact consumer proof를 유지하며 유휴 benchmark와 최종 hosted 증거 조건을 문서화한다 (T2.80-1).
 

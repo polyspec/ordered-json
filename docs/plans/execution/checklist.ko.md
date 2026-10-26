@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: bedfc7166f1174d4895b2b7b9b9b7b7668faf104d6c22ee051f530401792de1d -->
+<!-- source-sha256: a720d0a2a25e46494cccdfaba042c6354e6e6371e911a671ee9edbf57590747e -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
@@ -112,4 +112,4 @@
 | T1.60-1 | 릴리스 0.0.10 전에 hosted CI bootstrap을 수정한다: 프로젝트 make target보다 먼저 형제 kit을 checkout하고 설치하며 모든 검사 target과 report를 유지하고 checkout 및 setup 순서를 테스트한다. | .github/workflows/ci.yml, .github/workflows/push-gate.yml, tests/scripts/workflow-rules.test.mts, docs/plans/execution/plan.md(.ko), docs/operations/validation.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [o] |
 | T1.60-1-1 | CI Go toolchain을 형제 symbol extractor와 맞추고 검사 전에 설치된 kit 소스를 연결하여 job이 Makefile이 include하는 도구를 사용하게 한다. Toolchain lock과 dependency review를 다시 생성한다. | mise.toml, mise.lock, packages/go/go.mod, .github/workflows/ci.yml, .github/workflows/push-gate.yml, tests/scripts/workflow-rules.test.mts, config/dependency-review.json | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [o] |
 | T1.60-1-2 | 문서 gate 전에 Git hook과 workspace link를 준비하고 오프라인 suite lint 전에 설치 단계에서 형제 Rust checker crate를 다운로드한다. 모든 검사를 유지한다. | .github/workflows/ci.yml, tests/scripts/workflow-rules.test.mts, docs/operations/validation.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [o] |
-| T1.60-2 | 릴리스 준비 기능 설명을 Rust native Serde 통합 및 모든 구현의 중복 키 거부와 맞춘다. Timing data를 편집하지 않고 신뢰할 수 있는 T2.48 측정 전까지 benchmark 검증을 미확인으로 기록한다. | docs/features.md(.ko), CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/evidence.test.mts` | [ ] |
+| T1.60-2 | 릴리스 준비 기능 설명을 Rust native Serde 통합 및 모든 구현의 중복 키 거부와 맞춘다. Timing data를 편집하지 않고 신뢰할 수 있는 T2.48 측정 전까지 benchmark 검증을 미확인으로 기록한다. | docs/features.md(.ko), CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/evidence.test.mts` | [o] |
