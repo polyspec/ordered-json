@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 7c3518b4dd6dfb94796d0dc9feebf3e113ed6831eaad1cbf34d0c53dc3de5f8c -->
+<!-- source-sha256: fd5480995043f2933033bcb15602179900ace07ccaf3120c3c6532ef2370adad -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -93,3 +93,4 @@
 | T2.80-1 | 공개된 kit 0.0.56과 설치 패키지 bootstrap 및 canonical workflow를 반영하고 native 개발용 소스 link를 유지한다. 최종 hosted CI 증거는 T2.67에서 별도로 추적한다. | docs/plans/kit-standard/plan.md(.ko), .github/workflows/gates.yml, .github/workflows/release.yml | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [o] |
 | T2.80-2 | 격리 PHP extension parity autoloader를 포함한 공개 kit 0.0.57을 반영하고 ordered-json 0.0.10 릴리즈 준비 기록을 갱신한다. 최종 hosted 증거는 T2.67로 추적한다. | package.json, package-lock.json, config/dependency-review.json, canonical kit copies, native consumer locks, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [o] |
 | T2.81 | 릴리즈 전 의존성 검토가 보고한 안정 버전 ruff 0.17.2로 갱신하고 toolchain lock을 다시 생성한다. | mise.toml, mise.lock, config/dependency-review.json, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/environment.test.mts` | [o] |
+| T2.82 | 기존 callback API 매핑과 함께 Python JSONEncoder를 포함한 공개 host 직렬화 receiver type을 선언하여 R11이 공개 class를 포함하도록 한다. | config/parity.json, docs/operations/api.md(.ko), CHANGELOG.md(.ko) | `packages/python/.venv/bin/python -m unittest discover -s packages/python/tests -p test_api.py -k host_serialization` | [ ] |
