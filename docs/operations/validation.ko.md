@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 65f1e69f92d43e4ac1c69f218121fed8c68277fca8b11e82c6ab445518a514e8 -->
+<!-- source-sha256: c34b953247bf7072a3359d948b21688d6fb973b06bc0176247e244418493a75d -->
 # 검증
 
 [English](validation.md)
@@ -93,6 +93,8 @@ make ci-targets TARGETS="kit-check layout-check hooks-check owner-validate relea
 kit의 target은 설치된 package `@polyspec/kit`에서 오므로 모든 job은 먼저 `make install-tools TOOLS=npm`과 `make install-packages`를 실행합니다. job `suite`는 고정 파일에서 Node.js와 PHP를 설치하고, Go와 Python을 포함한 `mise.lock`의 도구, `config/php-lint`의 phpcs와 PHPStan, 루트와 PHP 패키지의 Composer project를 설치하는 `make install`을 실행한 뒤 target `toolchain-check`, `cargo-downloads-check`, `verify-all`, `parity-check`, `lint-rust`, `lint-go`, `lint-php`, `pie-check`를 실행합니다. `make pie-check`는 PIE 기록을, `make verify-all`은 통합 기록을 쓰고 그 근거 검사가 두 기록을 검사합니다. job `docs`는 Node.js, PHP와 Composer, alint를 포함한 `mise.lock`의 도구를 설치하고 `kit-check`, `layout-check`, `hooks-check`, `owner-validate`, `release-coverage`, `release-config-check`, `dependency-policy-check`, `dependency-policy-mutation-check`, `parity-declarations-check`, `ordered-json-test-scripts`, `typecheck`, `config/knip-entries.json`의 entry로 kit의 oxlint와 knip을 실행하는 `lint-ts`, 그리고 kit의 ruff와 vulture를 실행하는 `lint-python`을 실행합니다. `push-gate.yml`의 job `push-gate`는 `push-gate-commit`, `docs-check`, `evidence-check`, `commits-check`를 실행합니다. Makefile의 `CHECK_TARGETS`, 곧 `make check`의 전체 suite의 모든 target은 `ci.yml`과 `push-gate.yml`의 job 하나에서만 실행됩니다. 모든 step은 make target을 실행하고 실패한 step 뒤에도 실행됩니다(`if: !cancelled()`). `make ci-targets`(`@polyspec/kit`의 ci-targets)는 job의 모든 target을 끝까지 실행하고, 출력을 도착하는 대로 출력하며 `var/report/ci-targets/targets/<target>.log`에 쓰고, 각 target의 상태, 종료 상태, 시간을 `var/report/ci-targets/record.json`에 기록하며, 실패한 target마다 첫 실패 줄을 담은 `summary.md`를 쓰고 GitHub의 job summary에 덧붙입니다. step `report`는 실패 뒤에도 `var/report/ci-targets/`를 job의 artifact로 upload합니다. 어떤 step에도 시간 한도가 없습니다. job은 push gate처럼 `ubuntu-24.04`에서 실행하며, 기록은 실행한 PHP의 patch release를 적습니다.
 
 `ci.yml`의 마지막 job `ci-passed`는 release workflow가 tag된 commit에 요구하는 이 workflow의 check입니다. workflow의 다른 모든 job을 need로 가지고, 그중 하나가 실패하거나 skip되거나 취소되어도 그 모든 job 뒤에 실행되며(`if: ${{ always() }}`), `make ci-passed RESULTS='${{ toJSON(needs) }}'`를 실행합니다. `@polyspec/kit`의 ci-passed는 need로 가진 모든 job의 결과를 출력하고, 하나라도 `success`가 아니면 실패합니다. `ci.yml`에 추가한 job은 `needs`에 넣으므로 필수 check가 그 job을 포함합니다. `tests/scripts/workflow-rules.test.mts`는 `ci-passed`가 없거나, 마지막 job이 아니거나, `if: ${{ always() }}`가 없거나, 다른 모든 job을 need로 가지지 않거나, 다른 runner에서 실행되거나, 다른 step을 실행하면 실패합니다.
+
+저장소가 소유한 CI 및 push-gate workflow의 각 job은 ordered-json과 형제 kit을 별도 폴더에 checkout하고 프로젝트 make target보다 먼저 형제 kit을 설치하며 ordered-json을 working directory로 명령을 실행한다. Setup action은 ordered-json 아래의 버전 파일을 읽고 artifact upload는 ordered-json/var/report/ci-targets/를 읽는다. 형제 checkout은 Makefile include에 필요하며 archive된 npm 패키지만 설치해서는 제공되지 않는다.
 
 <a id="publish"></a>
 ## main 게시

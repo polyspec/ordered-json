@@ -6,6 +6,10 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- The completed CI bootstrap repair passes all 18 owning workflow unit tests and TypeScript compilation (T1.60-1).
+
+- Restore the sibling kit checkout and installation before every project make target in the repository-owned CI and push-gate jobs (T1.60-1). Run commands in the project folder, resolve setup and artifact paths from the workflow workspace, and include suppression-check in the declared CI checks. The workflow unit tests cover the checkout and bootstrap order.
+
 <a id="v0010"></a>
 ## 0.0.10
 

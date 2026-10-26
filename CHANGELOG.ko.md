@@ -1,11 +1,15 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: d21e5171835c48a956c8467e21c2e4205be86a427ce70b5648823b8b41a991e2 -->
+<!-- source-sha256: 5a1d355b77a19220a8fb4b85f059ffb9d89f0f5d9d32775737745f89bdf9e9c2 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- 완료한 CI bootstrap 수정이 소유 workflow unit test 18개와 TypeScript 컴파일을 통과한다 (T1.60-1).
+
+- 저장소가 소유한 CI 및 push-gate job에서 모든 프로젝트 make target보다 먼저 형제 kit을 checkout하고 설치한다 (T1.60-1). 프로젝트 폴더에서 명령을 실행하고 workflow workspace 기준으로 setup 및 artifact 경로를 해석하며 선언된 CI 검사에 suppression-check를 포함한다. Workflow unit test가 checkout 및 bootstrap 순서를 검사한다.
 
 <a id="v0010"></a>
 ## 0.0.10

@@ -93,6 +93,8 @@ Every job first runs `make install-tools TOOLS=npm` and `make install-packages`,
 
 The last job of `ci.yml`, `ci-passed`, is the check of the workflow that the release workflow requires on the tagged commit ([publishing main](#publish)). It needs every other job of the workflow, runs after each of them also when one failed, was skipped or was cancelled (`if: ${{ always() }}`), and runs `make ci-passed RESULTS='${{ toJSON(needs) }}'`: ci-passed of `@polyspec/kit` prints the result of every needed job and fails unless each one is `success`. A job added to `ci.yml` is listed in `needs`, so the required check covers it; `tests/scripts/workflow-rules.test.mts` fails when `ci-passed` is missing, is not the last job, lacks `if: ${{ always() }}`, does not need every other job, runs on another runner or runs another step.
 
+Each job of the repository-owned CI and push-gate workflows checks out ordered-json and its sibling kit in separate folders, installs the sibling kit before any project make target, and runs commands with ordered-json as the working directory. Setup actions read version files under ordered-json, and artifact uploads read ordered-json/var/report/ci-targets/. The sibling checkout is required by the Makefile include; installing only the archived npm package does not provide it.
+
 <a id="publish"></a>
 ## Publishing main
 

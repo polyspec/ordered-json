@@ -25,18 +25,41 @@ permissions:
 jobs:
   push-gate:
     runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ordered-json
     steps:
       # actions/checkout v7.0.1
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: ordered-json
+          fetch-depth: 0
+      - name: check out sibling kit
+        if: ${{ !cancelled() }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: polyspec/kit
+          path: kit
       # actions/setup-node v7.1.0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         if: ${{ !cancelled() }}
         with:
-          node-version-file: mise.toml
+          node-version-file: ordered-json/mise.toml
           package-manager-cache: false
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
+        if: ${{ !cancelled() }}
+        with:
+          php-version-file: ordered-json/.php-version
+          tools: none
+          coverage: none
       # The targets come from the installed package @polyspec/kit: npm first, then the packages of package-lock.json.
+      - name: install sibling kit npm
+        if: ${{ !cancelled() }}
+        run: make -C ../kit install-tools TOOLS=npm
+      - name: install sibling kit packages
+        if: ${{ !cancelled() }}
+        run: make -C ../kit install-packages
       - name: make install-tools TOOLS=npm
         if: ${{ !cancelled() }}
         run: make install-tools TOOLS=npm
@@ -55,5 +78,5 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: report-push-gate
-          path: var/report/ci-targets/
+          path: ordered-json/var/report/ci-targets/
           if-no-files-found: error
