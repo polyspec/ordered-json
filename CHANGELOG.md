@@ -118,6 +118,8 @@
 - T1.52: `make lint-php`, the phpcs and PHPStan of kit, runs in the full suite and in the suite job of CI; `make install-php` installs the root package into `vendor/`, whose autoloader PHPStan reads for the PHP of `benchmarks/`, and the PHP of the packages, the tests and the benchmarks follows PSR-12, the probe of the shared verifier reading its serializations from `Polyspec\OrderedJson\Tests\ProbeTree`.
 - T1.51: the shared tools are `@polyspec/kit` 0.0.48: the checkout runs the Node.js 26.12.0 of `mise.toml` from `var/tools`, `.node-version` is gone and every `engines.node` is `>=26.12.0` (kit K171); the workflows pin each action by its SHA with its version (kit K169); the scripts and tests read JSON through schemas and check the values that they read instead of asserting them (kit K155–K158).
 
+- Adopted published kit 0.0.56 and its canonical copies. CI bootstraps the locked installed package without a sibling checkout, and installation fetches Rust checker dependencies before offline linting; native development source links remain available. (T2.80-1)
+
 ### npm (packages/js)
 
 - Text input with an unpaired surrogate is rejected with `unescaped_lone_surrogate` at the offset of the surrogate, before the grammar is read; it named the unit after the surrogate, and a surrogate after the root was `trailing_input` (T1.39).

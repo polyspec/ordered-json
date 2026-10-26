@@ -1,5 +1,5 @@
 <!-- doc-id: plan-kit-standard -->
-<!-- source-sha256: 06eb99dfe4bf5fd4729faf2860440c050bd777ce47ff8b50ab243ab0310689e8 -->
+<!-- source-sha256: dff20a061f3180b6381214bbc3b2c79ba911657ff0a0be30ec350cf6e01b2344 -->
 # kit 표준
 
 [English](plan.md)
@@ -30,7 +30,11 @@ Patch set의 TypeScript 컴파일과 문서 검사가 통과한다. 이는 로�
 
 ### Steps before publication
 
-1. 진행 중인 kit 작업이 준비되면 kit 항목 세 개를 통합한다. Canonical gates 및 release workflow를 반영한다. 의존성 pin은 provider tag가 존재한 뒤에만 바꾼다.
+1. 공개된 kit 0.0.56과 canonical workflow를 반영한다. 설치 패키지 bootstrap이 준비했던 형제 checkout 우회책을 대체하며 기존 patch branch는 과거 준비 기록으로 유지한다.
 2. 패키지 manifest와 consumer manifest 및 lock은 요청한 버전으로 유지한다. Clean committed tree에서 preview archive를 빌드하고 manifest와 파일 목록을 확인한다. 게시 workflow는 tag에서 최종 asset을 다시 빌드한다.
 3. T2.48은 명시한 부하 조건에서 유효한 clean 측정으로만 완료한다. 검사를 맞추기 위해 timing data나 source state를 편집하지 않는다.
-4. 최종 revision의 성공한 hosted 증거를 얻고 그 증거로 T2.80-1과 T2.67을 완료한다. Tag 생성과 게시는 그 뒤 단계이며 로컬 준비의 증거가 아니다.
+4. 최종 revision의 성공한 hosted 증거를 얻고 그 증거로 T2.67을 완료한다. Tag 생성과 게시는 그 뒤 단계이며 로컬 준비의 증거가 아니다.
+
+## Adoption of kit 0.0.56
+
+공개된 provider는 설치 패키지 bootstrap과 canonical workflow를 제공한다. T2.80-1은 native npm lock으로 정확한 archive와 integrity를 반영하고 선언된 사본을 sync하며 소비자 Makefile과 저장소 소유 CI를 설치된 bootstrap으로 옮긴다. CI는 첫 make 명령 전에 잠긴 패키지를 설치하고 개발용 소스 link는 native npm 설치 상태로 유지한다. 소비자 installer는 오프라인 lint 전에 공개된 Rust catch-checker 의존성을 다운로드한다. 최종 aggregate 증거는 T2.67로, 유효한 benchmark는 T2.48로 유지한다.

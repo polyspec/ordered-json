@@ -92,7 +92,7 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
 <a id="tools"></a>
 ## Shared tools
 
-- Own: The tools that every polyspec repository shares are the package `@polyspec/kit`, a devDependency pinned in `package-lock.json`. The Makefile includes `scripts/kit/kit-bootstrap.mk`, which includes the `kit.mk` of the installed package. The files that `kit.copies` lists are copies that `make kit-sync` writes from the package. A copy is never edited, copied under another name or disabled here; a change is made in polyspec/kit and adopted by updating `@polyspec/kit`, then running `make install-packages` and `make kit-sync`.
+- Own: The tools that every polyspec repository shares are the package `@polyspec/kit`, a devDependency pinned in `package-lock.json`. The Makefile includes `node_modules/@polyspec/kit/scripts/kit/kit-bootstrap.mk`, which includes the `kit.mk` of the installed package. The files that `kit.copies` lists are copies that `make kit-sync` writes from the package. A copy is never edited, copied under another name or disabled here; a change is made in polyspec/kit and adopted by updating `@polyspec/kit`, then running `make install-packages` and `make kit-sync`.
   Enforced by: `make kit-check`
 - Own: This repository differs from the other polyspec repositories only in `config/*.json` (checklist, dependency policy and review, documents, owner checks, release and toolchain), in `config/layout.yml`, which extends `config/layout.kit.yml` with the folders of this repository, and in its product code: the packages in `packages/`, the verifier and the benchmarks.
   Enforced by: `make layout-check`

@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: e363d9215193a2e5ed4e248f7dd3a91e55555651ecf053fddc5b22529c34dea4 -->
+<!-- source-sha256: 54130cd46d871f78e154f251615edbdd70d8b086aba7b2934376fe90f9ddc9ff -->
 # Development procedure
 
 [English](AGENTS.md)
@@ -93,7 +93,7 @@
 <a id="tools"></a>
 ## Shared tools
 
-- Own: 모든 polyspec 저장소가 공유하는 도구는 `package-lock.json`에 고정된 devDependency 패키지 `@polyspec/kit`입니다. Makefile은 `scripts/kit/kit-bootstrap.mk`를 include하고, 이는 설치된 패키지의 `kit.mk`를 include합니다. `kit.copies`가 나열하는 파일은 `make kit-sync`가 패키지에서 쓰는 복사본입니다. 복사본은 편집하거나, 다른 이름으로 복사하거나, 이 저장소에서 끄지 않습니다. 변경은 polyspec/kit에서 하고, `@polyspec/kit`을 갱신한 뒤 `make install-packages`와 `make kit-sync`를 실행해 반영합니다.
+- Own: 모든 polyspec 저장소가 공유하는 도구는 `package-lock.json`에 고정된 devDependency 패키지 `@polyspec/kit`입니다. Makefile은 `node_modules/@polyspec/kit/scripts/kit/kit-bootstrap.mk`를 include하고, 이는 설치된 패키지의 `kit.mk`를 include합니다. `kit.copies`가 나열하는 파일은 `make kit-sync`가 패키지에서 쓰는 복사본입니다. 복사본은 편집하거나, 다른 이름으로 복사하거나, 이 저장소에서 끄지 않습니다. 변경은 polyspec/kit에서 하고, `@polyspec/kit`을 갱신한 뒤 `make install-packages`와 `make kit-sync`를 실행해 반영합니다.
   Enforced by: `make kit-check`
 - Own: 이 저장소는 다른 polyspec 저장소와 `config/*.json`(checklist, dependency policy와 review, documents, owner checks, release, toolchain), `config/layout.yml`(이 저장소의 폴더로 `config/layout.kit.yml`을 확장한 것), 그리고 제품 코드(`packages/`의 패키지, verifier, benchmark)에서만 다릅니다.
   Enforced by: `make layout-check`

@@ -5,6 +5,7 @@ PYTHON := $(CURDIR)/var/tools/mise/shims/python3
 # uv and Composer of mise.toml, by the absolute paths of their shims for the same reason.
 UV := $(CURDIR)/var/tools/mise/shims/uv
 COMPOSER := $(CURDIR)/var/tools/mise/shims/composer
+CARGO := $(shell command -v cargo)
 JSON_TEST_SUITE ?=
 
 # The tools of every run are the releases that the tracked declaration files name: npm in the packageManager of
@@ -28,11 +29,9 @@ ONLINE := env -u CARGO_NET_OFFLINE -u GOPROXY -u npm_config_offline -u COMPOSER_
 # another checkout would let it take binaries built from other sources as fresh.
 unexport CARGO_TARGET_DIR
 
-# The shared targets of kit: scripts/kit/kit-bootstrap.mk, a copy that make kit-sync writes, includes the kit.mk of the
-# sibling kit's scripts/kit: the gates, the document, owner and CI report tools, the
-# toolchains, the layout check, the release steps. They read the configuration in config/*.json. A new checkout runs
-# make install-tools TOOLS=npm and make install-packages first; until then no other target runs.
-include ../kit/scripts/kit/kit-bootstrap.mk
+# Shared targets come from the installed kit package. Its bootstrap supports both native npm source links and packed
+# installations. CI bootstraps the locked package before Make reads this include.
+include node_modules/@polyspec/kit/scripts/kit/kit-bootstrap.mk
 
 # The targets of the full suite that make check runs through the guard of full-run of @polyspec/kit and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
@@ -60,6 +59,7 @@ ordered-json-install: install-kit ordered-json-install-rust cargo-downloads-fetc
 
 ordered-json-install-rust:
 	$(ONLINE) rustup toolchain install --no-self-update
+	$(ONLINE) $(CARGO) fetch --locked --manifest-path node_modules/@polyspec/kit/scripts/kit/catch-check-rust/Cargo.toml
 
 # ordered-json-install-php installs the locked Composer packages of packages/php and packages/php-ext, PHPUnit among them, into their
 # vendor/, from which kit parity runs their tests (config/parity.json), and the root package, the published composer.json,

@@ -29,7 +29,11 @@ TypeScript compilation and document checks pass on the patch set. These are loca
 
 ### Steps before publication
 
-1. Integrate the three kit items when the active kit work is ready. Adopt the canonical gates and release workflows. A dependency pin changes only after the provider tag exists.
+1. Adopt published kit 0.0.56 and its canonical workflows. Its installed-package bootstrap supersedes the prepared sibling-checkout workaround; the old patch branch remains historical preparation.
 2. Keep the package manifests, consumer manifests and locks at the requested version. Build preview archives from a clean committed tree and inspect their manifests and file lists; the publishing workflow rebuilds the final assets from its tag.
 3. Complete T2.48 only with a valid clean measurement under its stated load condition. Never edit timing data or source state to satisfy the check.
-4. Obtain successful hosted evidence for the final revision, then complete T2.80-1 and T2.67 with that evidence. Creating tags and publishing are later steps, not evidence of local preparation.
+4. Obtain successful hosted evidence for the final revision, then complete T2.67 with that evidence. Creating tags and publishing are later steps, not evidence of local preparation.
+
+## Adoption of kit 0.0.56
+
+The published provider supplies an installed-package bootstrap and canonical workflows. T2.80-1 adopts its exact archive and integrity through the native npm lock, syncs its declared copies, and moves the consumer Makefile and repository-owned CI to the installed bootstrap. CI installs the locked package before its first make command; development source links remain native npm state. The consumer installer fetches the published Rust catch-checker dependencies before offline linting. Final aggregate evidence remains T2.67, and a valid benchmark remains T2.48.

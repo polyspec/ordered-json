@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 04b2d87ea0548a5b9b7ec4e15352ec72c837def5141073b43effa5711fdfc265 -->
+<!-- source-sha256: aec11d4a79608acb49af7afab586dae1370f688c4b2d3f0388f2d1ba71fa2e50 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -118,6 +118,8 @@
 - T1.53: kit의 ruff와 vulture인 `make lint-python`이 전체 suite와 CI의 docs job에서 실행됩니다. `scripts/comparison`의 비교 probe는 더 이상 `sys.path`를 바꾸지 않으며(S3), 그 환경은 `mise.toml`의 uv로 package를 설치하고 그 Python(`--python`)으로 probe를 실행합니다.
 - T1.52: kit의 phpcs와 PHPStan인 `make lint-php`가 전체 suite와 CI의 suite job에서 실행됩니다. `make install-php`는 루트 package를 `vendor/`에 설치하고 PHPStan은 그 autoloader로 `benchmarks/`의 PHP를 읽으며, 패키지·테스트·benchmark의 PHP는 PSR-12를 따르고, 공통 검증기의 probe는 직렬화를 `Polyspec\OrderedJson\Tests\ProbeTree`에서 읽습니다.
 - T1.51: 공유 도구는 `@polyspec/kit` 0.0.48입니다. checkout은 `mise.toml`의 Node.js 26.12.0을 `var/tools`에서 실행하고, `.node-version`은 없어졌으며 모든 `engines.node`는 `>=26.12.0`입니다(kit K171). workflow는 각 action을 SHA와 version으로 고정하고(kit K169), script와 test는 JSON을 schema로 읽고 읽은 값을 단언하지 않고 검사합니다(kit K155–K158).
+
+- 공개된 kit 0.0.56과 canonical 사본을 반영했습니다. CI는 형제 checkout 없이 잠긴 설치 패키지를 bootstrap하고 설치 단계에서 오프라인 lint에 필요한 Rust checker 의존성을 다운로드합니다. native 개발용 소스 link는 계속 사용할 수 있습니다. (T2.80-1)
 
 ### npm (packages/js)
 

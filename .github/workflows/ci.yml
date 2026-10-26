@@ -32,51 +32,36 @@ permissions:
 jobs:
   docs:
     runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: ordered-json
     steps:
       # actions/checkout v7.0.1
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          path: ordered-json
           fetch-depth: 0
-      - name: check out sibling kit
-        if: ${{ !cancelled() }}
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: polyspec/kit
-          path: kit
-      # actions/setup-node v7.1.0: the Node.js of mise.toml starts the bootstrap, which installs that release into var/tools
-      # with mise; the tools of @polyspec/kit run the node of var/tools. The pinned npm of var/tools installs the packages, so the cache of the packageManager of package.json, which setup-node enables by default, is off.
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         if: ${{ !cancelled() }}
         with:
-          node-version-file: ordered-json/mise.toml
+          node-version-file: mise.toml
           package-manager-cache: false
       # shivammathur/setup-php 2.40.0, the release that the release workflow of @polyspec/kit pins: PHP of .php-version; Composer,
       # which make dependency-policy-check reads the Composer manifests with, is a tool of mise.toml.
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
         if: ${{ !cancelled() }}
         with:
-          php-version-file: ordered-json/.php-version
+          php-version-file: .php-version
           tools: none
           coverage: none
-      - name: install sibling kit npm
+      - name: bootstrap the installed kit package
         if: ${{ !cancelled() }}
-        run: make -C ../kit install-tools TOOLS=npm
-      - name: install sibling kit packages
-        if: ${{ !cancelled() }}
-        run: make -C ../kit install-packages
-      - name: build sibling kit
-        if: ${{ !cancelled() }}
-        run: make -C ../kit build
+        run: |
+          if [ "$(node -p 'require("./package.json").name')" != '@polyspec/kit' ]; then
+            npm_config_cache="$PWD/var/bootstrap/npm-cache" npm exec --yes --package="$(node -p 'require("./package.json").packageManager.split("+")[0]')" -- npm ci --ignore-scripts --allow-remote=root
+          fi
       - name: make install-tools TOOLS=npm
         if: ${{ !cancelled() }}
         run: make install-tools TOOLS=npm
-      - name: link project npm packages
+      - name: make install-packages
         if: ${{ !cancelled() }}
-        run: make npm-install DIR=.
+        run: make install-packages
       # The tools of mise.lock: alint, which make layout-check runs, ruff and vulture, which make lint-python runs, and Composer.
       - name: make install-tools
         if: ${{ !cancelled() }}
@@ -84,9 +69,6 @@ jobs:
       - name: prepare Git hooks
         if: ${{ !cancelled() }}
         run: make hooks
-      - name: prepare workspace links
-        if: ${{ !cancelled() }}
-        run: make link
       - name: make ci-targets
         if: ${{ !cancelled() }}
         run: make ci-targets TARGETS="kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check ordered-json-test-scripts typecheck lint-ts lint-python"
@@ -96,63 +78,46 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: report-docs
-          path: ordered-json/var/report/ci-targets/
+          path: var/report/ci-targets/
           if-no-files-found: error
   suite:
     runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: ordered-json
     steps:
       # actions/checkout v7.0.1
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          path: ordered-json
           fetch-depth: 0
-      - name: check out sibling kit
-        if: ${{ !cancelled() }}
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: polyspec/kit
-          path: kit
-      # actions/setup-node v7.1.0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         if: ${{ !cancelled() }}
         with:
-          node-version-file: ordered-json/mise.toml
+          node-version-file: mise.toml
           package-manager-cache: false
       # shivammathur/setup-php 2.40.0, the release that the release workflow of @polyspec/kit pins: the latest patch release of
       # the minor release of .php-version, with phpize for the extension builds of the verification and PIE.
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
         if: ${{ !cancelled() }}
         with:
-          php-version-file: ordered-json/.php-version
+          php-version-file: .php-version
           tools: none
           coverage: none
-      - name: install sibling kit npm
+      - name: bootstrap the installed kit package
         if: ${{ !cancelled() }}
-        run: make -C ../kit install-tools TOOLS=npm
-      - name: install sibling kit packages
-        if: ${{ !cancelled() }}
-        run: make -C ../kit install-packages
-      - name: build sibling kit
-        if: ${{ !cancelled() }}
-        run: make -C ../kit build
+        run: |
+          if [ "$(node -p 'require("./package.json").name')" != '@polyspec/kit' ]; then
+            npm_config_cache="$PWD/var/bootstrap/npm-cache" npm exec --yes --package="$(node -p 'require("./package.json").packageManager.split("+")[0]')" -- npm ci --ignore-scripts --allow-remote=root
+          fi
       - name: make install-tools TOOLS=npm
         if: ${{ !cancelled() }}
         run: make install-tools TOOLS=npm
-      - name: link project npm packages
+      - name: make install-packages
         if: ${{ !cancelled() }}
-        run: make npm-install DIR=.
+        run: make install-packages
       # The tools of mise.lock (Go, Python, Composer, cargo-audit and the rest) with the phpcs and PHPStan of config/php-lint, the
       # Rust toolchain of rust-toolchain.toml, the crates of packages/rust/Cargo.lock, the Composer projects of the root and the
       # PHP packages (the PIE PHAR and the supplementary suite are tools of mise.lock).
       - name: make install
         if: ${{ !cancelled() }}
         run: make install
-      - name: download shared Rust checker crates
-        if: ${{ !cancelled() }}
-        run: make -C ../kit cargo-downloads-fetch
       - name: make ci-targets
         if: ${{ !cancelled() }}
         env:
@@ -164,7 +129,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: report-suite
-          path: ordered-json/var/report/ci-targets/
+          path: var/report/ci-targets/
           if-no-files-found: error
   # The check of this workflow that the release workflow requires on the tagged commit. It runs after every other job,
   # also after a failed, skipped or cancelled one (if: always()), and make ci-passed fails unless every job of needs has
@@ -173,34 +138,23 @@ jobs:
     if: ${{ always() }}
     needs: [docs, suite]
     runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: ordered-json
     steps:
       # actions/checkout v7.0.1
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          path: ordered-json
           fetch-depth: 0
-      - name: check out sibling kit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: polyspec/kit
-          path: kit
-      # actions/setup-node v7.1.0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
-          node-version-file: ordered-json/mise.toml
+          node-version-file: mise.toml
           package-manager-cache: false
-      - name: install sibling kit npm
-        run: make -C ../kit install-tools TOOLS=npm
-      - name: install sibling kit packages
-        run: make -C ../kit install-packages
-      - name: build sibling kit
-        run: make -C ../kit build
+      - name: bootstrap the installed kit package
+        run: |
+          if [ "$(node -p 'require("./package.json").name')" != '@polyspec/kit' ]; then
+            npm_config_cache="$PWD/var/bootstrap/npm-cache" npm exec --yes --package="$(node -p 'require("./package.json").packageManager.split("+")[0]')" -- npm ci --ignore-scripts --allow-remote=root
+          fi
       - name: make install-tools TOOLS=npm
         run: make install-tools TOOLS=npm
-      - name: link project npm packages
-        run: make npm-install DIR=.
+      - name: make install-packages
+        run: make install-packages
       - name: make ci-passed
         run: make ci-passed RESULTS='${{ toJSON(needs) }}'

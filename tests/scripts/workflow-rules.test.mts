@@ -10,16 +10,18 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
-import { parse } from 'yaml';
+import { parse, stringify } from 'yaml';
 import { checkJson, readJsonFile } from '../../scripts/json.mts';
 import { ROOT, trackedFiles } from '../../scripts/registry.mts';
 import { known } from './checkout.mts';
 
 const WORKFLOWS = path.join(ROOT, '.github/workflows');
 const REPORT = 'var/report/ci-targets/';
-const PROJECT = 'ordered-json';
-const UPLOAD_REPORT = `${PROJECT}/${REPORT}`;
+const UPLOAD_REPORT = REPORT;
+const KIT_ROOT = path.dirname(fileURLToPath(import.meta.resolve('@polyspec/kit/package.json')));
+const KIT_TOOLS = path.dirname(fileURLToPath(import.meta.resolve('@polyspec/kit/run-tests')));
 // The target of the jobs that is no part of the full suite: the gate that make check itself applies before it runs.
 const GATE_TARGETS = ['push-gate-commit'];
 const ALWAYS = '${{ !cancelled() }}';
@@ -34,7 +36,7 @@ const CHECK_WORKFLOWS = ['ci.yml', 'push-gate.yml'];
 // A step runs one make target: its arguments hold no shell syntax except a ${{ }} expression and, at the end, make variables
 // that take an environment variable of the job by name (TAG="$TAG").
 const MAKE_STEP = /^make [^|;&`$()]*(\$\{\{[^}]*\}\}[^|;&`$()]*)*( [A-Z][A-Z_]*="\$[A-Z][A-Z_]*")*$/;
-const BOOTSTRAP_STEPS = ['make -C ../kit install-tools TOOLS=npm', 'make -C ../kit install-packages', 'make -C ../kit build', 'make install-tools TOOLS=npm', 'make npm-install DIR=.'];
+const BOOTSTRAP_STEPS = ['make install-tools TOOLS=npm', 'make install-packages'];
 // The steps of release.yml in their order, the copy of workflows/release.yml of @polyspec/kit, which checks the configuration
 // with make kit-check before any release step (kit K193).
 const RELEASE_STEPS = [...BOOTSTRAP_STEPS, 'make kit-check', 'make release-prepare', 'make release-tools', 'make release-tools-path', 'make release-verify', 'make release-versions', 'make release-assets', 'make release-publish', 'make release-proof TAG="$TAG"', 'make release-undraft TAG="$TAG"'];
@@ -51,6 +53,7 @@ const workflow = (text: string): Workflow => {
   return checkJson<Workflow>(value, 'workflow.schema.json', 'the workflow');
 };
 const runs = (job: Job) => (job.steps ?? []).flatMap(step => (step.run === undefined ? [] : [step.run]));
+const PACKAGE_BOOTSTRAP = known(workflow(readFileSync(path.join(KIT_ROOT, 'workflows/gates.yml'), 'utf8')).jobs.gates?.steps?.find(step => step.name === 'bootstrap the installed kit package')?.run, 'the canonical installed-package bootstrap');
 
 /** Each broken rule of the job ci-passed of ci.yml. */
 function ciPassedViolations(name: string, jobs: Record<string, Job>): string[] {
@@ -63,7 +66,7 @@ function ciPassedViolations(name: string, jobs: Record<string, Job>): string[] {
   if (!isDeepStrictEqual([...(job.needs ?? [])].sort(), [...others].sort())) found.push(`${name}: the job ${CI_PASSED} needs ${JSON.stringify(job.needs ?? [])}, not every other job ${JSON.stringify(others)}`);
   const runners = [...new Set(others.map(other => known(jobs[other], `the job ${other}`)['runs-on']))];
   if (!isDeepStrictEqual([job['runs-on']], runners)) found.push(`${name}: the job ${CI_PASSED} runs on ${JSON.stringify(job['runs-on'])}, not on the runner of the other jobs ${JSON.stringify(runners)}`);
-  if (!isDeepStrictEqual(runs(job), [...BOOTSTRAP_STEPS, CI_PASSED_RUN]) || job.steps?.at(-1)?.run !== CI_PASSED_RUN) found.push(`${name}: the job ${CI_PASSED} runs ${JSON.stringify(runs(job))}, not ${JSON.stringify(BOOTSTRAP_STEPS)} and the last step ${CI_PASSED_RUN}`);
+  if (!isDeepStrictEqual(runs(job), [PACKAGE_BOOTSTRAP, ...BOOTSTRAP_STEPS, CI_PASSED_RUN]) || job.steps?.at(-1)?.run !== CI_PASSED_RUN) found.push(`${name}: the job ${CI_PASSED} runs ${JSON.stringify(runs(job))}, not ${JSON.stringify(BOOTSTRAP_STEPS)} and the last step ${CI_PASSED_RUN}`);
   return found;
 }
 
@@ -99,16 +102,17 @@ export function violations(name: string, text: string): string[] {
     if (CHECK_WORKFLOWS.includes(name) && !isDeepStrictEqual(makes.slice(0, BOOTSTRAP_STEPS.length), BOOTSTRAP_STEPS)) {
       found.push(`${name}: job ${job} runs ${JSON.stringify(makes.slice(0, BOOTSTRAP_STEPS.length))} first, not ${JSON.stringify(BOOTSTRAP_STEPS)}; the make targets of kit exist only after @polyspec/kit is installed`);
     }
+    if (CHECK_WORKFLOWS.includes(name) && runs(body)[0] !== PACKAGE_BOOTSTRAP) found.push(`${name}: job ${job} lacks the canonical locked-package bootstrap before make`);
     if (!steps.length) found.push(`${name}: job ${job} has no steps`);
     steps.forEach((step, index) => {
       const label = `${name}: job ${job} step ${index + 1} (${step.name ?? step.uses ?? step.run})`;
-      if (step.run !== undefined && !MAKE_STEP.test(step.run)) found.push(`${label} runs \`${step.run}\`; a step runs one make target, never a script or a tool directly`);
+      if (step.run !== undefined && !MAKE_STEP.test(step.run) && !(step.name === 'bootstrap the installed kit package' && step.run === PACKAGE_BOOTSTRAP)) found.push(`${label} runs \`${step.run}\`; a step runs one make target, never a script or a tool directly`);
       // mise installs every tool of mise.lock at once (make install-tools): TOOLS names only npm, the bootstrap.
       const tools = /^make install-tools TOOLS=(.+)$/.exec(step.run ?? '');
       if (tools && tools[1] !== 'npm') found.push(`${label} runs make install-tools TOOLS=${tools[1]}; make install-tools installs every tool of mise.lock, and TOOLS names only npm`);
       if (/^actions\/setup-(python|go)@/.test(step.uses ?? '')) found.push(`${label} installs a toolchain of mise.toml; make install-tools installs it`);
       // .php-version is the one declaration of the PHP of the checkout, which the release workflow of kit sets up (kit K193).
-      if (step.uses?.startsWith('shivammathur/setup-php@') && (step.with?.['php-version-file'] !== `${PROJECT}/.php-version` || step.with['php-version'] !== undefined)) found.push(`${label} does not read the PHP from php-version-file: ordered-json/.php-version alone`);
+      if (step.uses?.startsWith('shivammathur/setup-php@') && (step.with?.['php-version-file'] !== '.php-version' || step.with['php-version'] !== undefined)) found.push(`${label} does not read the PHP from php-version-file: .php-version alone`);
       // setup-node caches the dependencies of the packageManager by default with the npm of the machine; the npm of var/tools installs them.
       if (step.uses?.startsWith('actions/setup-node@') && step.with?.['package-manager-cache'] !== false) found.push(`${name}: job ${job} step ${index + 1} (setup-node) lacks package-manager-cache: false; the npm of var/tools installs the packages`);
     });
@@ -166,7 +170,7 @@ test('the PHP and the Python of the checkout are linted in the full suite', () =
 
 test('each report is the directory that make ci-targets writes', () => {
   // Read the sibling kit.mk that the Makefile includes, also when npm installs a packed kit without sources.
-  assert.ok(readFileSync(path.join(ROOT, '../kit/scripts/kit/kit.mk'), 'utf8').includes(`CI_REPORT ?= ${REPORT.replace(/\/$/, '')}\n`));
+  assert.ok(readFileSync(path.join(KIT_TOOLS, 'kit.mk'), 'utf8').includes(`CI_REPORT ?= ${REPORT.replace(/\/$/, '')}\n`));
 });
 
 test('a job without the report step fails', () => {
@@ -205,7 +209,7 @@ test('setup-node disables its cache', () => {
 
 test('a job that does not install the kit package first fails', () => {
   for (const name of CHECK_WORKFLOWS) {
-    assert.ok(anyIncludes(violations(name, changed(read(name), 'run: make npm-install DIR=.\n', 'run: make toolchain-check\n')), 'the make targets of kit exist only after @polyspec/kit is installed'), name);
+    assert.ok(anyIncludes(violations(name, changed(read(name), 'run: make install-packages\n', 'run: make toolchain-check\n')), 'the make targets of kit exist only after @polyspec/kit is installed'), name);
   }
 });
 
@@ -233,7 +237,7 @@ test('ci-passed is the last job and needs every other job', () => {
     'not always': [changed(text, '    if: ${{ always() }}\n', '    if: ${{ success() }}\n'), 'the job ci-passed has if: "${{ success() }}"'],
     'needs no job': [changed(text, '    needs: [docs, suite]\n', '    needs: []\n'), 'the job ci-passed needs [], not every other job'],
     'another runner': [changed(text, '    needs: [docs, suite]\n    runs-on: ubuntu-24.04\n', '    needs: [docs, suite]\n    runs-on: ubuntu-26.04\n'), 'the job ci-passed runs on "ubuntu-26.04", not on the runner of the other jobs'],
-    'another step': [changed(text, CI_PASSED_RUN, 'make ci-passed'), `the job ci-passed runs ${JSON.stringify([...BOOTSTRAP_STEPS, 'make ci-passed'])}, not`],
+    'another step': [changed(text, CI_PASSED_RUN, 'make ci-passed'), `the job ci-passed runs ${JSON.stringify([PACKAGE_BOOTSTRAP, ...BOOTSTRAP_STEPS, 'make ci-passed'])}, not`],
   };
   for (const [kind, [mutated, message]] of Object.entries(broken)) assert.ok(anyIncludes(violations('ci.yml', mutated), message), `${kind}: ${violations('ci.yml', mutated).join('\n')}`);
 });
@@ -278,44 +282,54 @@ test('every workflow runs on a fixed image with each action pinned to one commit
 test('.php-version declares the PHP minor release, and a setup-php step that names its PHP fails', () => {
   assert.match(readFileSync(path.join(ROOT, '.php-version'), 'utf8'), /^\d+\.\d+\n$/);
   for (const name of ['ci.yml']) {
-    assert.ok(anyIncludes(violations(name, changed(read(name), 'php-version-file: ordered-json/.php-version', "php-version: '8.4'")), 'does not read the PHP from php-version-file: ordered-json/.php-version alone'), name);
+    assert.ok(anyIncludes(violations(name, changed(read(name), 'php-version-file: .php-version', "php-version: '8.4'")), 'does not read the PHP from php-version-file: .php-version alone'), name);
   }
 });
 
 
-test('each check job prepares the sibling kit before project make targets', () => {
+test('each check job bootstraps its locked kit package without sibling checkouts', () => {
   for (const name of CHECK_WORKFLOWS) {
     for (const [jobName, job] of Object.entries(workflow(read(name)).jobs)) {
       const steps = job.steps ?? [];
-      const project = steps.findIndex(step => step.uses?.startsWith('actions/checkout@') && step.with?.path === 'ordered-json' && step.with.repository === undefined);
-      const kit = steps.findIndex(step => step.uses?.startsWith('actions/checkout@') && step.with?.repository === 'polyspec/kit' && step.with.path === 'kit');
-      const installKit = steps.findIndex(step => step.run === 'make -C ../kit build');
-      const firstProjectMake = steps.findIndex(step => step.run?.startsWith('make ') && !step.run.startsWith('make -C ../kit '));
-      assert.equal(job.defaults?.run?.['working-directory'], PROJECT, `${name}: ${jobName} runs make in the project folder`);
-      assert.ok(project >= 0, `${name}: ${jobName} checks out the project in ordered-json`);
-      assert.ok(kit > project, `${name}: ${jobName} checks out the sibling kit`);
-      assert.ok(installKit > kit && firstProjectMake > installKit, `${name}: ${jobName} installs kit before project make targets`);
+      const bootstrap = steps.findIndex(step => step.run === PACKAGE_BOOTSTRAP);
+      const firstMake = steps.findIndex(step => step.run?.startsWith('make '));
+      assert.ok(bootstrap >= 0 && firstMake > bootstrap, `${name}: ${jobName} installs the locked package before make`);
+      assert.ok(!steps.some(step => step.with?.repository === 'polyspec/kit'), `${name}: ${jobName} needs no sibling checkout`);
+      assert.ok(!runs(job).some(command => /make -C \.\.\/kit|make npm-install|make link$/.test(command)), `${name}: ${jobName} uses release installation`);
     }
   }
 });
 
-
-test('the CI Go toolchain can build the sibling Go symbol extractor', () => {
+test('the CI Go toolchain can build the installed Go symbol extractor', () => {
   const declared = known(/^go = "([0-9.]+)"$/m.exec(readFileSync(path.join(ROOT, 'mise.toml'), 'utf8'))?.[1], 'the Go toolchain');
-  const required = known(/^go ([0-9.]+)$/m.exec(readFileSync(path.join(ROOT, '../kit/scripts/kit/symbols/go/go.mod'), 'utf8'))?.[1], 'the extractor Go requirement');
+  const required = known(/^go ([0-9.]+)$/m.exec(readFileSync(path.join(KIT_TOOLS, 'symbols/go/go.mod'), 'utf8'))?.[1], 'the extractor Go requirement');
   assert.ok(declared.localeCompare(required, 'en', { numeric: true }) >= 0, `Go ${declared} cannot build the extractor requiring ${required}`);
 });
 
 
-test('CI prepares hook state, workspace links and shared Rust checker crates before checks', () => {
+test('CI prepares hook state and installs Rust tools before checks', () => {
   const jobs = workflow(read('ci.yml')).jobs;
   const docs = runs(known(jobs.docs, 'the docs job'));
   const docsCheck = docs.findIndex(command => command.startsWith('make ci-targets '));
-  for (const setup of ['make hooks', 'make link']) {
+  for (const setup of ['make hooks']) {
     const index = docs.indexOf(setup);
     assert.ok(index > docs.indexOf('make install-tools') && index < docsCheck, `${setup} runs after tool installation and before docs checks`);
   }
   const suite = runs(known(jobs.suite, 'the suite job'));
-  const downloads = suite.indexOf('make -C ../kit cargo-downloads-fetch');
-  assert.ok(downloads > suite.indexOf('make install') && downloads < suite.findIndex(command => command.startsWith('make ci-targets ')), 'shared Rust checker crates are downloaded before offline linting');
+  assert.ok(suite.indexOf('make install') < suite.findIndex(command => command.startsWith('make ci-targets ')), 'Rust tools are installed before offline linting');
+  assert.match(readFileSync(path.join(ROOT, 'Makefile'), 'utf8'), /fetch --locked --manifest-path node_modules\/@polyspec\/kit\/scripts\/kit\/catch-check-rust\/Cargo.toml/, 'installation fetches the published Rust checker dependencies');
+});
+
+
+test('a missing or altered locked-package bootstrap fails', () => {
+  for (const altered of [false, true]) {
+    const parsed = workflow(read('ci.yml'));
+    const job = known(parsed.jobs.docs, 'the docs job');
+    const steps = known(job.steps, 'the docs steps');
+    if (altered) {
+      const step = known(steps.find(step => step.name === 'bootstrap the installed kit package'), 'the bootstrap step');
+      step.run = 'npm ci';
+    } else job.steps = steps.filter(step => step.name !== 'bootstrap the installed kit package');
+    assert.ok(anyIncludes(violations('ci.yml', stringify(parsed)), 'lacks the canonical locked-package bootstrap'), String(altered));
+  }
 });
