@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 7bb48d3185c529190ee194c815a8f437b7ce9f09fca2b4706f49745bf5cb50dc -->
+<!-- source-sha256: f7ddf77f01cb91a4d1b9978b7c694677de06d48845f04e043f9c778500895eca -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- 릴리스 준비 단계에서 T2.65를 재검토한다. Composer archive consumer를 유지하고 이를 개발 소스로 대체하라는 요구는 철회한다. Artifact 설치는 배포 절차와 kit K438이 요구하는 consumer proof이며 소스 설치는 배포 ZIP을 검증하지 않는다. Consumer manifest와 lock은 이미 0.0.10을 가리킨다 (T2.65).
 
 - Workflow report 경로 기록을 Makefile이 사용하는 형제 kit.mk와 T1.60-1에서 반영한 구현에 맞춘다. 소유 workflow unit test 20개가 모두 통과한다 (T2.79).
 
