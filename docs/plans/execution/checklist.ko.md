@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: 781d0ee569e3b3aa558eff73f9d1a5d6b7b9781e66c626148cee6fb541246fed -->
+<!-- source-sha256: 5725f5935a6e83efcfb41031ea4d1fae934600ec0aea67c3cfc48f58cad301ea -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
@@ -110,3 +110,4 @@
 | T1.59 | changelog가 외부 구현과의 비교를 이름으로 설명하지 않는다 (K431, P19). | CHANGELOG.md and CHANGELOG.ko.md: the entries of the build run directory name no comparison against an external implementation; the comparison verdict is stated generically | `make text-absent FILE=CHANGELOG.md TEXT="modules used fixed paths under"` and `make text-absent FILE=CHANGELOG.md TEXT="The comparison streams the"` and `make text-absent FILE=CHANGELOG.md TEXT="comparison compiles its"` and `make text-absent FILE=CHANGELOG.ko.md TEXT="45 s"` | [o] |
 | T1.60 | 릴리스 0.0.10을 준비한다: 모든 릴리스 manifest의 버전을 갱신하고 패키지 및 consumer lock과 dependency review를 갱신하며 릴리스 changelog를 기록한다. | release manifests, package locks, consumer locks, dependency review, CHANGELOG.md(.ko) | `make release-versions TAG=v0.0.10`; `make dependency-policy-check`; `var/tools/bin/node --test --test-name-pattern public packages/js/tests/api.test.mjs`; `make test-python CASES=public_api` | [o] |
 | T1.60-1 | 릴리스 0.0.10 전에 hosted CI bootstrap을 수정한다: 프로젝트 make target보다 먼저 형제 kit을 checkout하고 설치하며 모든 검사 target과 report를 유지하고 checkout 및 setup 순서를 테스트한다. | .github/workflows/ci.yml, .github/workflows/push-gate.yml, tests/scripts/workflow-rules.test.mts, docs/plans/execution/plan.md(.ko), docs/operations/validation.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [o] |
+| T1.60-1-1 | CI Go toolchain을 형제 symbol extractor와 맞추고 검사 전에 설치된 kit 소스를 연결하여 job이 Makefile이 include하는 도구를 사용하게 한다. Toolchain lock과 dependency review를 다시 생성한다. | mise.toml, mise.lock, packages/go/go.mod, .github/workflows/ci.yml, .github/workflows/push-gate.yml, tests/scripts/workflow-rules.test.mts, config/dependency-review.json | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [ ] |
