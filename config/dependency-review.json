@@ -1,35 +1,26 @@
 {
   "schema": 1,
   "comment": "Written by make dependency-review RECORD=1 (scripts/kit/dependency-review.mts) from the registries; make dependency-policy-check compares the checkout with it without a network.",
-  "reviewed": "2026-10-20T06:25:05.849Z",
+  "reviewed": "2026-10-26T08:11:09.836Z",
   "locks": [
     {
       "lock": "package-lock.json",
-      "sha256": "55780f5c2c60c597021e44976f71c2b881f6c21528939f11c4516fceb476a574",
-      "advisories": [
-        {
-          "package": "sprintf-js",
-          "version": "1.0.3",
-          "id": "1241202",
-          "severity": "moderate",
-          "title": "sprintf-js vulnerable to denial of service through unbounded precision specifiers",
-          "url": "https://github.com/advisories/GHSA-hp3w-g68c-fv3c"
-        }
-      ]
+      "sha256": "baab70942f79f56b8ca3f19ccbd1262bd1fef70cbf81d85aaae2ed66b5842724",
+      "advisories": []
     },
     {
       "lock": "composer.lock",
-      "sha256": "6c0e6a412f7a43a471f67463827ed5e42a928f38491651b38397427a38f518a1",
+      "sha256": "419482896ed1ade45ef343266a8241f70d5cecb6866fb700edfac9bda8268c2d",
       "advisories": []
     },
     {
       "lock": "packages/php/composer.lock",
-      "sha256": "c983715bcfe31da99e9fe2eeed7c97555dd0edb186f90b242a3a91780fcd2fb4",
+      "sha256": "97b2da726d6e4b19fb2079ba073b14e7f39f097b004d8eb1d1885a998ff59362",
       "advisories": []
     },
     {
       "lock": "packages/php-ext/composer.lock",
-      "sha256": "e1349e9561cb0707b9fbbe2065fe098de224cdd64ecad8197d6d8023c4176e73",
+      "sha256": "015fab3478d698615bff625e3a0431bd025c79d7cedf3ac242827f0444eafd4e",
       "advisories": []
     },
     {
@@ -39,7 +30,7 @@
     },
     {
       "lock": "packages/rust/Cargo.lock",
-      "sha256": "917430b9e2fd32c285edecfa43c9e68db22ada9b69d4e03e2b46bc2e899c144b",
+      "sha256": "eac97c762a4ffb4287ef4ea45646ba21941e6261b3af8f94fed9540bf0816fe0",
       "advisories": []
     }
   ],
@@ -132,15 +123,15 @@
       "ecosystem": "pypi",
       "manifest": "packages/python/pyproject.toml",
       "package": "setuptools",
-      "version": "84.2.0",
-      "latest": "84.2.0"
+      "version": "84.2.1",
+      "latest": "84.2.1"
     },
     {
       "ecosystem": "pypi",
       "manifest": "mise.toml",
       "package": "ruff",
       "version": "0.17.1",
-      "latest": "0.17.1"
+      "latest": "0.17.2"
     }
   ],
   "vcs": []

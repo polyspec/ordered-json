@@ -4,26 +4,26 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c269acdf3cfafdc91e6ac8f25a38dfa5",
+    "content-hash": "eb7616dd29b83f0209242b07d88ccd7a",
     "packages": [
         {
             "name": "polyspec/ordered-json",
-            "version": "0.0.9",
+            "version": "0.0.10",
             "dist": {
                 "type": "zip",
-                "url": "artifacts/polyspec-ordered-json-php-0.0.9.zip",
+                "url": "artifacts/polyspec-ordered-json-php-0.0.10.zip",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-pcre": "*",
-                "php": ">=8.5"
+                "php": ">=8.4"
             },
             "require-dev": {
-                "phpunit/phpunit": "13.4.2"
+                "phpunit/phpunit": "13.4.3"
             },
             "suggest": {
-                "ext-ordered_json": "Native backend from the polyspec/ordered-json-extension PIE package"
+                "ext-polyspec_ordered_json": "Native backend from the polyspec/ordered-json-php-ext PIE package"
             },
             "type": "library",
             "autoload": {
@@ -52,11 +52,11 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=8.5"
+        "php": ">=8.4"
     },
     "platform-dev": {},
     "platform-overrides": {
-        "php": "8.5"
+        "php": "8.4.1"
     },
     "plugin-api-version": "2.9.0"
 }

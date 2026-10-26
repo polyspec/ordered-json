@@ -6,6 +6,6 @@
     "node": ">=26.12.0"
   },
   "dependencies": {
-    "@polyspec/ordered-json": "file:polyspec-ordered-json-npm-0.0.9.tgz"
+    "@polyspec/ordered-json": "file:polyspec-ordered-json-npm-0.0.10.tgz"
   }
 }

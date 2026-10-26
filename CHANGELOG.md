@@ -5,6 +5,11 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+
+<a id="v0010"></a>
+## 0.0.10
+
+- Prepare release 0.0.10 in every package manifest and regenerate the npm and Composer consumer locks (T1.60). Update the locked fast-uri to 3.1.9 and markdown-it to 14.3.3 to resolve three security advisories, remove the stale sprintf-js advisory exception, and align the Python build backend and its verified wheel digest at setuptools 84.2.1. The dependency review records no known advisories; the dependency policy and version checks pass, the Python wheel builds offline, and the JavaScript and Python public API unit tests pass.
 - T2.79: the row is recorded as done; its change is on main (f343462) (T2.79)
 - T2.76: the row is recorded as done; its deletion landed as a refactor on main (T2.76)
 - T2.76: the row is recorded as done in the main checkout (T2.76)

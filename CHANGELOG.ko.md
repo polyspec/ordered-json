@@ -1,11 +1,16 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 38491ed206c2c8659ceade23e29d70081fd94e032e511cd787e0a0f5addf235a -->
+<!-- source-sha256: d21e5171835c48a956c8467e21c2e4205be86a427ce70b5648823b8b41a991e2 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+<a id="v0010"></a>
+## 0.0.10
+
+- 모든 패키지 manifest에 릴리스 0.0.10을 준비하고 npm 및 Composer consumer lock을 다시 생성한다 (T1.60). 잠긴 fast-uri를 3.1.9, markdown-it을 14.3.3으로 갱신하여 보안 권고 세 건을 해결하고, 오래된 sprintf-js 보안 예외를 제거하며, Python build backend와 검증된 wheel digest를 setuptools 84.2.1로 맞춘다. dependency review에는 알려진 보안 권고가 없으며, dependency policy와 버전 검사가 통과하고, Python wheel이 오프라인으로 빌드되며, JavaScript 및 Python public API unit test가 통과한다.
 - T2.79: 행을 완료로 기록한다. 변경은 main의 f343462에 있다 (T2.79)
 - T2.76: 행을 완료로 기록한다. 삭제는 main에 refactor로 착지했다 (T2.76)
 - T2.76: 행을 main 체크아웃에서 완료로 기록한다 (T2.76)
