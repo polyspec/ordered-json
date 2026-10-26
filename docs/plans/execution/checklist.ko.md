@@ -1,5 +1,5 @@
 <!-- doc-id: execution-checklist -->
-<!-- source-sha256: eb8e82ad3eb971b70ea87e5468c27069a59e37ce6de40456b1f17372478ba5a8 -->
+<!-- source-sha256: 7714e0c77cb4d565e2b11d566de3d12d3dae4a9c7c8d4823878e237efb03f115 -->
 # 실행 체크리스트
 
 ## Wave 1 — 전체 suite를 실행하는 hosted CI
@@ -108,3 +108,4 @@
 | T1.57 | kit 0.0.53으로 옮깁니다(release-proof가 draft URL을 비교하는 대신 release가 각 sibling wheel을 나열하는지 검사하는 kit K195). 게시된 파일의 integrity로 pin하며, `make kit-sync`는 복사한 파일을 바꾸지 않고 옮길 것은 없습니다. `make dependency-review RECORD=1`의 검토가 새 lock을 기록합니다. | `make kit-check`, `make toolchain-check`, `make layout-check`, `make dependency-policy-check` |  | [o] |
 | T1.58 | kit의 local link를 가리킵니다(kit K198). AGENTS의 의존성 절은 polyspec 버전이 0.0.x인 동안 개발 checkout이 kit `docs/plans/local-links.md`가 설명하는 대로 설치된 polyspec package를 그 source에 link하며 link는 commit하지 않는다고 한 문장으로 적고, 규칙 자체는 kit에 둡니다. | `AGENTS.md`, `AGENTS.ko.md`, `CHANGELOG.md`, `CHANGELOG.ko.md` | `make documents-check` | [o] |
 | T1.59 | changelog가 외부 구현과의 비교를 이름으로 설명하지 않는다 (K431, P19). | CHANGELOG.md and CHANGELOG.ko.md: the entries of the build run directory name no comparison against an external implementation; the comparison verdict is stated generically | `make text-absent FILE=CHANGELOG.md TEXT="modules used fixed paths under"` and `make text-absent FILE=CHANGELOG.md TEXT="The comparison streams the"` and `make text-absent FILE=CHANGELOG.md TEXT="comparison compiles its"` and `make text-absent FILE=CHANGELOG.ko.md TEXT="45 s"` | [o] |
+| T1.60 | 릴리스 0.0.10을 준비한다: 모든 릴리스 manifest의 버전을 갱신하고 패키지 및 consumer lock과 dependency review를 갱신하며 릴리스 changelog를 기록한다. | release manifests, package locks, consumer locks, dependency review, CHANGELOG.md(.ko) | `make release-versions TAG=v0.0.10` | [ ] |
