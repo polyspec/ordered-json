@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: f02411a9ed3a509830a79ecee78eee22d3f8de4a563ae0ff0d3cbd8592219668 -->
+<!-- source-sha256: 3ea0762d74f93c055e0dc330224f4a75ab10f69d5f1c743a98abba587285690a -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -9,6 +9,8 @@
 
 <a id="v0010"></a>
 ## 0.0.10
+
+- kit 0.0.58의 다중 심벌 binding으로 기존 host 직렬화 API 단위에 Python 공개 JSONEncoder class와 default callback을 함께 선언합니다. 선언한 모든 심벌을 검사하고 모든 공개 심벌의 coverage를 유지합니다. (T2.82)
 
 - 기능 기록을 Rust Value의 native Serde 통합 및 여섯 구현 모두의 중복 키 거부와 맞춘다. Benchmark 프로토콜은 구현된 상태로 유지하되 T2.48의 신뢰할 수 있는 재측정 전까지 검증을 미확인으로 기록하며 timing data는 바꾸지 않는다 (T1.60-2).
 

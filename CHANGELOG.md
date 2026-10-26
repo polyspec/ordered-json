@@ -9,6 +9,8 @@
 <a id="v0010"></a>
 ## 0.0.10
 
+- Declare the public Python JSONEncoder class and its default callback together in the existing host serialization API unit through kit 0.0.58 multi-symbol bindings. Every declared symbol is checked and every public symbol remains covered. (T2.82)
+
 - Align the feature record with native Rust Value Serde integration and duplicate-key rejection in all six implementations. Keep the benchmark protocol as implemented while marking its verification pending reliable remeasurement under T2.48; timing data is unchanged (T1.60-2).
 
 - Reconsider the conditionally withdrawn CI work in T2.80 under the current execution plan. Track integration of kit K614-1, K614-1-1 and K614-1-2 explicitly, retain artifact consumer proofs, and document the idle benchmark and final hosted evidence conditions (T2.80-1).

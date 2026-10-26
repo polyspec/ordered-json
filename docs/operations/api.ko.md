@@ -1,5 +1,5 @@
 <!-- doc-id: api -->
-<!-- source-sha256: 7acc4aa9bb9dab4dc38b2ffaf909d2c4376b687c64dc4406ac2c6b746d832153 -->
+<!-- source-sha256: b0b58925fb1bc1b9689d51055c0dec2291df0243b71eac4f1624db45c12846c7 -->
 # API 계약
 
 [English](api.md)
@@ -43,6 +43,8 @@ Python 바인딩은 `parse(source, options)`와 `parse_bytes(data, options)`의 
 문자열 접근은 surrogate pair를 한 문자로 반환합니다. 이스케이프된 짝 없는 surrogate는 대체되지 않습니다: 문자열 값은 라이브러리의 형태로 이를 유지하며, JavaScript와 Python에서는 host 문자열의 단독 surrogate로, Go, PHP, Rust에서는 WTF-8 바이트로 유지하며, Rust의 `String`이 이를 담을 수 없으므로 Rust의 `string_value()`가 그 바이트(`Vec<u8>`, 짝 없는 surrogate가 없으면 유효한 UTF-8)를 반환합니다. 텍스트 입력의 짝 없는 surrogate 원문은 UTF-8 인코딩이 없으므로 Rust, Go, PHP는 그 WTF-8 바이트를 문법을 읽기 전에 `invalid UTF-8`로 거부하고 JavaScript와 Python은 `unescaped_lone_surrogate`로 거부합니다.
 
 각 언어의 표준 JSON 인터페이스는 JavaScript의 `Value.toJSON`, PHP의 `Value::jsonSerialize`, Python의 `ordered_json.JSONEncoder`, Go의 `Value.MarshalJSON`, Rust의 Serde trait입니다. JavaScript, PHP, Python은 native 구조가 값을 담고 있어도 값을 거부하며 `stringify`를 가리키는 메시지를 냅니다. Python은 호출자가 `json.dumps`의 `cls`로 넘기는 `JSONEncoder.default`로 거부하고, 그것 없이 `json.dumps`는 자체 `TypeError`로 거부합니다. Go와 Rust는 native 구조 안에서도 값의 compact contract bytes를 씁니다.
+
+Python의 공개 adapter class `JSONEncoder`와 `default` callback은 이 host 직렬화 API에 속하며 API 목록에 둘 다 선언합니다.
 
 통합은 생태계의 표준 인터페이스이며 라이브러리의 인코더가 아닙니다: Go `Value`는 `json.Marshaler`(`MarshalJSON`이 값의 compact 텍스트를 씀)와 `json.Unmarshaler`(`UnmarshalJSON`이 라이브러리 parser로 문서를 파싱해 순서, 숫자 token, 짝 없는 surrogate를 유지하고 잘못된 JSON을 거부함)를 구현하고, Rust `Value`는 Serde `Serialize`와 `Deserialize`를 구현하므로 `encoding/json`과 `serde_json`이 값을 담은 모든 native 구조를 contract bytes로 인코딩하고 디코딩합니다. 그 밖의 native 구조는 host 라이브러리가 자체 규칙으로 인코딩합니다.
 

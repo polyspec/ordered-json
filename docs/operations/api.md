@@ -43,6 +43,8 @@ String access returns a surrogate pair as one character. An escaped unpaired sur
 
 The standard JSON interface of each language is `Value.toJSON` of JavaScript, `Value::jsonSerialize` of PHP, `ordered_json.JSONEncoder` of Python, `Value.MarshalJSON` of Go and the Serde traits of Rust. JavaScript, PHP and Python refuse a value, also when a native structure holds it, with a message that points to `stringify`; Python refuses through `JSONEncoder.default`, which a caller passes as `cls` to `json.dumps`, and `json.dumps` without it refuses with its own `TypeError`. Go and Rust write the compact contract bytes of a value, also inside a native structure.
 
+The public Python adapter class `JSONEncoder` and its `default` callback belong to this host serialization API and are both declared in its API inventory.
+
 The integration is the standard interface of the ecosystem, never an encoder of the library: Go `Value` implements `json.Marshaler` (`MarshalJSON` writes the compact text of the value) and `json.Unmarshaler` (`UnmarshalJSON` parses the document with the library parser and keeps its order, number tokens and unpaired surrogates, and rejects invalid JSON), and Rust `Value` implements Serde `Serialize` and `Deserialize`, so `encoding/json` and `serde_json` encode and decode any native structure that holds values with their contract bytes. A native structure is otherwise encoded by the host library, whose rules are its own.
 
 <a id="objects"></a>

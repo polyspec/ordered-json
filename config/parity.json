@@ -2548,7 +2548,10 @@
         },
         {
           "implementation": "python",
-          "symbol": "ordered_json.JSONEncoder.default"
+          "symbols": [
+            "ordered_json.JSONEncoder",
+            "ordered_json.JSONEncoder.default"
+          ]
         }
       ]
     },
