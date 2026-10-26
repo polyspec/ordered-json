@@ -120,6 +120,8 @@
 
 - Adopted published kit 0.0.56 and its canonical copies. CI bootstraps the locked installed package without a sibling checkout, and installation fetches Rust checker dependencies before offline linting; native development source links remain available. (T2.80-1)
 
+- Updated the ruff tool pin to 0.17.2 after the prerelease dependency review reported the newer stable release, and regenerated the platform digests with the native toolchain lock command. (T2.81)
+
 ### npm (packages/js)
 
 - Text input with an unpaired surrogate is rejected with `unescaped_lone_surrogate` at the offset of the surrogate, before the grammar is read; it named the unit after the surrogate, and a surrogate after the root was `trailing_input` (T1.39).

@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 3fb6f2a6a629bac1231e13891abb781b118330707815125d486df563d94de0cd -->
+<!-- source-sha256: 764a8977ba7a1caf47d86eaf458d500c2427a4d68f9c64da7f6597b957d281fc -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -89,4 +89,4 @@
 | T2.79 | Workflow report 테스트가 npm에 소스 파일 없는 packed kit이 설치된 경우에도 Makefile이 include하는 형제 kit.mk를 읽으며 소유 workflow 테스트가 통과한다. | tests/scripts/workflow-rules.test.mts | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [o] |
 | T2.80 | ordered-json gates.yml is byte-equal to template's (CI shape, with the sibling kit checkout) | .github/workflows/gates.yml | `cmp ../template/.github/workflows/gates.yml .github/workflows/gates.yml` | [-] 원인: 사용자의 판단: 적절한 계획 없이 CI를 돌리지 않는다. 이 CI 수정은 철회한다 |
 | T2.80-1 | 공개된 kit 0.0.56과 설치 패키지 bootstrap 및 canonical workflow를 반영하고 native 개발용 소스 link를 유지한다. 최종 hosted CI 증거는 T2.67에서 별도로 추적한다. | docs/plans/kit-standard/plan.md(.ko), .github/workflows/gates.yml, .github/workflows/release.yml | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [o] |
-| T2.81 | 릴리즈 전 의존성 검토가 보고한 안정 버전 ruff 0.17.2로 갱신하고 toolchain lock을 다시 생성한다. | mise.toml, mise.lock, config/dependency-review.json, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/environment.test.mts` | [ ] |
+| T2.81 | 릴리즈 전 의존성 검토가 보고한 안정 버전 ruff 0.17.2로 갱신하고 toolchain lock을 다시 생성한다. | mise.toml, mise.lock, config/dependency-review.json, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/environment.test.mts` | [o] |

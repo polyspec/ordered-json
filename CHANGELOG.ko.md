@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: aec11d4a79608acb49af7afab586dae1370f688c4b2d3f0388f2d1ba71fa2e50 -->
+<!-- source-sha256: 1b8f24c7125d79f933e48d98986c6dce30cc438e435e718cca0c3c8add071515 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -120,6 +120,8 @@
 - T1.51: 공유 도구는 `@polyspec/kit` 0.0.48입니다. checkout은 `mise.toml`의 Node.js 26.12.0을 `var/tools`에서 실행하고, `.node-version`은 없어졌으며 모든 `engines.node`는 `>=26.12.0`입니다(kit K171). workflow는 각 action을 SHA와 version으로 고정하고(kit K169), script와 test는 JSON을 schema로 읽고 읽은 값을 단언하지 않고 검사합니다(kit K155–K158).
 
 - 공개된 kit 0.0.56과 canonical 사본을 반영했습니다. CI는 형제 checkout 없이 잠긴 설치 패키지를 bootstrap하고 설치 단계에서 오프라인 lint에 필요한 Rust checker 의존성을 다운로드합니다. native 개발용 소스 link는 계속 사용할 수 있습니다. (T2.80-1)
+
+- 릴리즈 전 의존성 검토가 보고한 최신 안정 버전에 맞춰 ruff 도구를 0.17.2로 갱신하고 native toolchain lock 명령으로 플랫폼별 digest를 다시 생성했습니다. (T2.81)
 
 ### npm (packages/js)
 
