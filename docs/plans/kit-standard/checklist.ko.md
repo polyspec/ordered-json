@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: c6c6b662a10311d13344ad4d6fe747e9b24f196370864ebc317f1e7df76daa4a -->
+<!-- source-sha256: 6cfa2628af4b7544cee5789354618828fbc6b1d2e5d44ca0fb5348d847982f1a -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -95,3 +95,4 @@
 | T2.81 | 릴리즈 전 의존성 검토가 보고한 안정 버전 ruff 0.17.2로 갱신하고 toolchain lock을 다시 생성한다. | mise.toml, mise.lock, config/dependency-review.json, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/environment.test.mts` | [o] |
 | T2.82 | kit의 하위 호환 다중 심벌 API binding 모델을 반영하고 기존 host 직렬화 API 단위에 Python JSONEncoder와 default callback을 함께 선언하며 R1과 R11 검증을 유지한다. | package.json, package-lock.json, config/dependency-review.json, config/parity.json, docs/operations/api.md(.ko), CHANGELOG.md(.ko) | `packages/python/.venv/bin/python -m unittest discover -s packages/python/tests -p test_api.py -k host_serialization` | [o] |
 | T2.83 | 언어별 native 검사를 병렬 job으로 실행하고 언어 간 contract 및 parity 검증을 ci-passed가 요구하는 독립 job으로 유지한다. | .github/workflows/ci.yml, Makefile, tests/scripts/workflow-rules.test.mts, docs/operations/validation.md(.ko), CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [ ] |
+| T2.83-1 | 병렬 CI 적용 전에 Kit 0.0.61을 채택하고 native dependency review로 취약한 PHPUnit 개발 의존성을 갱신한다. | package.json, package-lock.json, packages/php/composer.json, packages/php/composer.lock, config/dependency-review.json, canonical kit copies, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [ ] |
