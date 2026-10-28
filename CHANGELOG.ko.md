@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 3ea0762d74f93c055e0dc330224f4a75ab10f69d5f1c743a98abba587285690a -->
+<!-- source-sha256: 17281fe47245b05a0b545a6e27983a0cd92ba54978db6b00fe14d2b41c5aa0ad -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- 선택적 locked tool 설치를 지원하는 공개 Kit 0.0.61을 채택하고 PHPT coverage 임시 directory 보안 권고를 제거하도록 PHPUnit을 13.4.5로 갱신한다(T2.83-1).
 
 <a id="v0010"></a>
 ## 0.0.10

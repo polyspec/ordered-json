@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "comment": "Written by make dependency-review RECORD=1 (scripts/kit/dependency-review.mts) from the registries; make dependency-policy-check compares the checkout with it without a network.",
-  "reviewed": "2026-10-26T23:28:59.774Z",
+  "reviewed": "2026-10-28T12:05:29.717Z",
   "locks": [
     {
       "lock": "package-lock.json",
-      "sha256": "8c6ff5587309d10495ca3d6d9c2a74dc6385c72ac7dbbe5ec1abced375e39846",
+      "sha256": "af3a97eb605d77dbdd510f9c17f9965f2c7c0c5a2b432701f8debf1c4f4437d1",
       "advisories": []
     },
     {
@@ -15,7 +15,7 @@
     },
     {
       "lock": "packages/php/composer.lock",
-      "sha256": "97b2da726d6e4b19fb2079ba073b14e7f39f097b004d8eb1d1885a998ff59362",
+      "sha256": "699dec4fdf762f1dd7f62f38af0517e0cec6cbd48c9d3633bc3bda095900a206",
       "advisories": []
     },
     {
@@ -116,8 +116,8 @@
       "ecosystem": "composer",
       "manifest": "packages/php/composer.json",
       "package": "phpunit/phpunit",
-      "version": "13.4.3",
-      "latest": "13.4.3"
+      "version": "13.4.5",
+      "latest": "13.4.5"
     },
     {
       "ecosystem": "pypi",
@@ -131,7 +131,7 @@
       "manifest": "mise.toml",
       "package": "ruff",
       "version": "0.17.2",
-      "latest": "0.17.2"
+      "latest": "0.17.3"
     }
   ],
   "vcs": []

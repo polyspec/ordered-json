@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Adopt public Kit 0.0.61 with selected locked tool installation and update PHPUnit to 13.4.5 to remove the PHPT coverage temporary-directory advisory (T2.83-1).
+
 <a id="v0010"></a>
 ## 0.0.10
 
