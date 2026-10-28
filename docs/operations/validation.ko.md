@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 51a65489a4d92fcc0c9a1954e9e5a107beb70b4b1476b6be7b965795282d5641 -->
+<!-- source-sha256: 711c76bb7f5f5381780e82106e3a53e229c7656ccd9b78af65892b54d337e5e2 -->
 # 검증
 
 [English](validation.md)
@@ -86,7 +86,7 @@ PIE 기록 `var/records/pie-verification.json`은 PIE 버전과 PHAR 해시, 실
 | `parity` | `toolchain-check cargo-downloads-check test-markers-check release-config-check verify-all parity-check` |
 | `js` | `test-js` |
 | `rust` | `test-rust lint-rust` |
-| `go` | `ordered-json-go-test lint-go` |
+| `go` | `test-go lint-go` |
 | `php` | `test-php lint-php` |
 | `php-ext` | `lint-php-ext test-php-ext pie-check` |
 | `python` | `test-python lint-python` |

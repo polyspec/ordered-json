@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 6bb5880b2299f5fa604fb5e17c7fc0ccdb5bdfe0b4dc2fd1adea646785049010 -->
+<!-- source-sha256: 0d8debe8a587e92a82da16af42e8bc1e16fc27d76bd8b90e65f1971fb9e6519e -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- 앱별 Go package 선택을 제거하고 수정하지 않은 Kit test-go target을 복원한다. 다음 release는 Kit issue #5의 공통 실행기 수정과 전체 CI 성공을 요구한다(T2.83-3-2).
 
 <a id="v0011"></a>
 ## 0.0.11

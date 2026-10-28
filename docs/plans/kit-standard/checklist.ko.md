@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 4f4db438f0b5e607334227608513cc55aa15636034c08a8ee627ea31c05a3546 -->
+<!-- source-sha256: d352ddc6d3d093890102e715dbe6cfcb5aa9e4132f81ab83f7df0990fc7f77af -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -99,6 +99,6 @@
 | T2.83-2 | 독립 PHP lint job에 선언된 PHP symbol parser를 준비하고 검사 전에 설치하도록 검증한다. | .github/workflows/ci.yml, tests/scripts/workflow-rules.test.mts, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [o] |
 | T2.83-3 | helper command 빌드를 유지하고 추적된 Go test coverage를 검증하면서 선언된 library package의 모든 native Go test를 실행한다. | Makefile, .github/workflows/ci.yml, tests/scripts/workflow-rules.test.mts, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [o] |
 | T2.83-3-1 | 고정된 executable의 명령 위치와 native runner의 selector 인자를 구분하고 push 전에 workflow 및 environment owner test 전체를 검증한다. | tests/scripts/environment.test.mts, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [o] |
-| T2.83-3-2 | 앱별 Go test 선택을 제거하고 다음 release 전에 수정하지 않은 Kit test-go 명령을 요구한다. | Makefile, .github/workflows/ci.yml, tests/scripts/workflow-rules.test.mts, docs/operations/validation.md(.ko), CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [ ] |
+| T2.83-3-2 | 앱별 Go test 선택을 제거하고 다음 release 전에 수정하지 않은 Kit test-go 명령을 요구한다. | Makefile, .github/workflows/ci.yml, tests/scripts/workflow-rules.test.mts, docs/operations/validation.md(.ko), CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [o] |
 | T2.83-4 | 필요한 모든 runtime을 준비하는 독립 parity job에서 언어 간 test marker와 release metadata 검사를 실행한다. | .github/workflows/ci.yml, tests/scripts/workflow-rules.test.mts, docs/operations/validation.md(.ko), CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [o] |
 | T2.84 | main CI 통과 뒤 공개할 OrderedJSON 0.0.11의 release manifest, native candidate asset, consumer lock, dependency review를 준비한다. | release manifests, native lock files, config/dependency-review.json, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/environment.test.mts` | [o] |

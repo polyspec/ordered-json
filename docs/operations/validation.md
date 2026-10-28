@@ -85,7 +85,7 @@ The PIE record `var/records/pie-verification.json` records the PIE version and P
 | `parity` | `toolchain-check cargo-downloads-check test-markers-check release-config-check verify-all parity-check` |
 | `js` | `test-js` |
 | `rust` | `test-rust lint-rust` |
-| `go` | `ordered-json-go-test lint-go` |
+| `go` | `test-go lint-go` |
 | `php` | `test-php lint-php` |
 | `php-ext` | `lint-php-ext test-php-ext pie-check` |
 | `python` | `test-python lint-python` |

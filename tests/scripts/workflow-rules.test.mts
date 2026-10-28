@@ -143,7 +143,7 @@ const changed = (text: string, from: string | RegExp, to: string) => {
 const LANGUAGE_TARGETS: Record<string, string[]> = {
   js: ['test-js'],
   rust: ['test-rust', 'lint-rust'],
-  go: ['ordered-json-go-test', 'lint-go'],
+  go: ['test-go', 'lint-go'],
   php: ['test-php', 'lint-php'],
   'php-ext': ['lint-php-ext', 'test-php-ext', 'pie-check'],
   python: ['test-python', 'lint-python'],
@@ -205,12 +205,15 @@ test('T2.83-2: PHP lint owns its parser setup and cannot defer it until after ch
   }
 });
 
-test('T2.83-3: the Go unit command covers every tracked test package and helpers still build', () => {
-  const packages = [...new Set(trackedFiles(ROOT).filter(file => file.startsWith('packages/go/') && file.endsWith('_test.go')).map(file => path.posix.dirname(file)))].sort();
-  assert.deepEqual(packages, ['packages/go'], 'extend the native unit package selection when a test package is added');
+test('T2.83-3-2: Go CI uses the unmodified Kit target without an application runner or package selector', () => {
   const makefile = readFileSync(path.join(ROOT, 'Makefile'), 'utf8');
-  assert.match(makefile, /ordered-json-go-test:\n\t\$\(NODE\) \$\(KIT\)\/run-tests\.\$\(KIT_EXT\) go --cwd packages\/go -- .* \./);
-  assert.ok(runs(known(workflow(read('ci.yml')).jobs.go, 'the go job')).includes('make build-go'));
+  assert.doesNotMatch(makefile, /^test-go:/m, 'the application cannot replace the Kit recipe');
+  assert.match(makefile, /^ordered-json-go-test: test-go$/m, 'the legacy alias delegates to Kit');
+  assert.doesNotMatch(makefile, /run-tests\.\$\(KIT_EXT\) go/, 'no application-local Go runner');
+  const job = known(workflow(read('ci.yml')).jobs.go, 'the Go job');
+  assert.ok(runs(job).includes('make ci-targets TARGETS="test-go lint-go"'));
+  assert.equal(job.env?.CASES, undefined, 'the native suite is not narrowed');
+  for (const step of job.steps ?? []) assert.equal(step.env?.CASES, undefined, 'no step narrows the native suite');
 });
 
 test('every workflow follows the rules', () => {

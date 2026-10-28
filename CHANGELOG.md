@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- Remove application-local Go package selection and restore the unmodified Kit test-go target. The next release requires the shared runner fix in Kit issue #5 and successful complete CI (T2.83-3-2).
+
 <a id="v0011"></a>
 ## 0.0.11
 

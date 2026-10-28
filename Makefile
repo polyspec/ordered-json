@@ -35,7 +35,7 @@ include node_modules/@polyspec/kit/scripts/kit/kit-bootstrap.mk
 
 # The targets of the full suite that make check runs through the guard of full-run of @polyspec/kit and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
-CHECK_TARGETS := kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check docs-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-php-ext test-php-ext lint-python pie-check ordered-json-test-scripts typecheck lint-ts test-js test-rust ordered-json-go-test test-php test-python
+CHECK_TARGETS := kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check docs-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-php-ext test-php-ext lint-python pie-check ordered-json-test-scripts typecheck lint-ts test-js test-rust test-go test-php test-python
 
 .PHONY: check ordered-json-test-scripts typecheck ordered-json-install-php ordered-json-install-python verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
 	benchmark benchmark-check python-parse-budget release-config-check install ordered-json-install ordered-json-install-rust \
@@ -138,8 +138,7 @@ ordered-json-js-check: verify-js
 ordered-json-js-test: ordered-json-js-check
 
 ordered-json-go-check: verify-go
-ordered-json-go-test:
-	$(NODE) $(KIT)/run-tests.$(KIT_EXT) go --cwd packages/go -- $(if $(CASES),-run "$(CASES)") .
+ordered-json-go-test: test-go
 
 ordered-json-php-check: verify-php
 ordered-json-php-test: ordered-json-php-check

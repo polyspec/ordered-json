@@ -271,7 +271,7 @@ jobs:
         if: ${{ !cancelled() }}
         env:
           JSON_TEST_SUITE: var/tools/mise/installs/http-jsontestsuite/latest
-        run: make ci-targets TARGETS="ordered-json-go-test lint-go"
+        run: make ci-targets TARGETS="test-go lint-go"
       # actions/upload-artifact v7.0.1
       - name: report
         if: ${{ !cancelled() }}
