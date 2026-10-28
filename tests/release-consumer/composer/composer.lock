@@ -4,14 +4,14 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eb7616dd29b83f0209242b07d88ccd7a",
+    "content-hash": "41a87085916e5f5b3e5d9a316fa52c9b",
     "packages": [
         {
             "name": "polyspec/ordered-json",
-            "version": "0.0.10",
+            "version": "0.0.11",
             "dist": {
                 "type": "zip",
-                "url": "artifacts/polyspec-ordered-json-php-0.0.10.zip",
+                "url": "artifacts/polyspec-ordered-json-php-0.0.11.zip",
                 "shasum": ""
             },
             "require": {
@@ -20,7 +20,7 @@
                 "php": ">=8.4"
             },
             "require-dev": {
-                "phpunit/phpunit": "13.4.3"
+                "phpunit/phpunit": "13.4.5"
             },
             "suggest": {
                 "ext-polyspec_ordered_json": "Native backend from the polyspec/ordered-json-php-ext PIE package"

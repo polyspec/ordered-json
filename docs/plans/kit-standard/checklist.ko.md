@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 98cbda2aba587a3a4976e440ef071d7099ce03804c9663c92b2cdb55d2cab784 -->
+<!-- source-sha256: b2646b5651a4318373d8df9fd3b163534ce0e175796e1fa9273a0462f5a1398e -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -96,4 +96,4 @@
 | T2.82 | kit의 하위 호환 다중 심벌 API binding 모델을 반영하고 기존 host 직렬화 API 단위에 Python JSONEncoder와 default callback을 함께 선언하며 R1과 R11 검증을 유지한다. | package.json, package-lock.json, config/dependency-review.json, config/parity.json, docs/operations/api.md(.ko), CHANGELOG.md(.ko) | `packages/python/.venv/bin/python -m unittest discover -s packages/python/tests -p test_api.py -k host_serialization` | [o] |
 | T2.83 | 언어별 native 검사를 병렬 job으로 실행하고 언어 간 contract 및 parity 검증을 ci-passed가 요구하는 독립 job으로 유지한다. | .github/workflows/ci.yml, .github/workflows/push-gate.yml, Makefile, tests/scripts/workflow-rules.test.mts, tests/scripts/environment.test.mts, docs/operations/validation.md(.ko), CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [o] |
 | T2.83-1 | 병렬 CI 적용 전에 Kit 0.0.61을 채택하고 native dependency review로 취약한 PHPUnit 개발 의존성을 갱신한다. | package.json, package-lock.json, packages/php/composer.json, packages/php/composer.lock, config/dependency-review.json, canonical kit copies, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [o] |
-| T2.84 | native candidate asset, consumer lock, dependency review로 OrderedJSON 0.0.11을 준비하고 독립 language job과 언어 간 parity가 main에서 통과한 뒤 공개한다. | release manifests, native lock files, config/dependency-review.json, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/environment.test.mts` | [ ] |
+| T2.84 | main CI 통과 뒤 공개할 OrderedJSON 0.0.11의 release manifest, native candidate asset, consumer lock, dependency review를 준비한다. | release manifests, native lock files, config/dependency-review.json, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/environment.test.mts` | [o] |

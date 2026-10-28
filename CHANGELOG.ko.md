@@ -1,11 +1,16 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 8d6c70a4572d6e450e03d6eead14116ce95b9846efaebb8725fe5574bfa5ef4a -->
+<!-- source-sha256: 6055311712e58bb3305055e77b32c63cbc4f48f475c8a35787a4a79d78ee460f -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+<a id="v0011"></a>
+## 0.0.11
+
+- Kit 0.0.61, 독립 language CI와 native release consumer lock으로 OrderedJSON 0.0.11을 준비한다(T2.84).
 
 - 선택적 locked tool 설치를 지원하는 공개 Kit 0.0.61을 채택하고 PHPT coverage 임시 directory 보안 권고를 제거하도록 PHPUnit을 13.4.5로 갱신한다(T2.83-1).
 
