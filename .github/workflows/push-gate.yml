@@ -57,7 +57,7 @@ jobs:
         run: make install-packages
       - name: make install-tools
         if: ${{ !cancelled() }}
-        run: make install-tools
+        run: make install-tools TOOLS="php composer"
       - name: make ci-targets
         if: ${{ !cancelled() }}
         run: make ci-targets TARGETS="push-gate-commit docs-check evidence-check commits-check"

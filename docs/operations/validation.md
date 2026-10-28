@@ -78,25 +78,38 @@ The PIE record `var/records/pie-verification.json` records the PIE version and P
 <a id="ci"></a>
 ## Hosted CI
 
-`.github/workflows/ci.yml` runs the full suite on every pull request, every push to `main` and every manual run (`workflow_dispatch`), in the jobs `docs` and `suite`. `.github/workflows/push-gate.yml` runs on every push to a branch and every pull request, and not on the push of a tag, which would run the check again on the commit that the release verifies, `.github/workflows/release.yml` runs only on the push of a tag `v*` or `**/v*` ([tag releases](distribution.md#tag-release)), and no other workflow exists:
+`.github/workflows/ci.yml` runs on every pull request, push to `main` and manual dispatch. Six language jobs run their native package tests and applicable lints in parallel. The independent `parity` job installs and builds every implementation, checks the shared cases with `verify-all` and validates all declared units and public symbols with `parity-check`. It waits for no language job; a failed language job does not cancel it. PHP extension artifact proof remains in `php-ext`. Each job owns a distinct report artifact.
+
+| Job | Targets |
+| --- | --- |
+| `parity` | `toolchain-check cargo-downloads-check verify-all parity-check` |
+| `js` | `test-js` |
+| `rust` | `test-rust lint-rust` |
+| `go` | `test-go lint-go` |
+| `php` | `test-php lint-php` |
+| `php-ext` | `lint-php-ext test-php-ext pie-check` |
+| `python` | `test-python lint-python` |
 
 ~~~sh
 make install-tools TOOLS=npm
 make install-packages
-make install
-make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php pie-check" JSON_TEST_SUITE=.cache/JSONTestSuite
-make install-tools
-make ci-targets TARGETS="kit-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check ordered-json-test-scripts typecheck lint-ts lint-python"
+make install-tools TOOLS="go rust php composer python uv"
+make kit-install-symbols EXTRACTORS="go php"
+make kit-install-php-arginfo
+make ordered-json-install-parity
+make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all parity-check"
 ~~~
 
-After the native locked-package bootstrap, every job runs `make install-tools TOOLS=npm` and `make install-packages`, because the targets of kit come from the installed package `@polyspec/kit`. The job `suite` installs Node.js and PHP from the pin files, runs `make install`, which installs the tools of `mise.lock`, Go and Python among them, the phpcs and PHPStan of `config/php-lint` and the Composer projects of the root and the PHP packages, and runs the targets `toolchain-check`, `cargo-downloads-check`, `verify-all`, `parity-check`, `lint-rust`, `lint-go`, `lint-php` and `pie-check`: `make pie-check` writes the PIE record, `make verify-all` writes the aggregate record and its evidence check checks both. The job `docs` installs Node.js, PHP and the tools of `mise.lock`, Composer and alint among them, and runs `kit-check`, `layout-check`, `hooks-check`, `owner-validate`, `release-coverage`, `release-config-check`, `dependency-policy-check`, `dependency-policy-mutation-check`, `parity-declarations-check`, `ordered-json-test-scripts`, `typecheck`, `lint-ts`, the oxlint and knip of kit with the entries of `config/knip-entries.json`, and `lint-python`, the ruff and vulture of kit; the job `push-gate` of `push-gate.yml` runs `push-gate-commit`, `docs-check`, `evidence-check` and `commits-check`. Every target of `CHECK_TARGETS` in the Makefile, the full suite of `make check`, runs in exactly one job of `ci.yml` and `push-gate.yml`. Every step runs a make target and runs after a failed step (`if: !cancelled()`); `make ci-targets` (ci-targets of `@polyspec/kit`) runs every target of the job to its end, prints its output as it arrives, writes it to `var/report/ci-targets/targets/<target>.log` and records the status, the exit status and the time of each target in `var/report/ci-targets/record.json`, and writes `summary.md` with the first failure lines of each failed target, which it appends to the job summary of GitHub. The step `report` uploads `var/report/ci-targets/` as the artifact of the job, also after a failure. No step has a time limit. The jobs run on `ubuntu-24.04`, as the push gate does; the records name the PHP patch release that ran.
+After the canonical locked-package bootstrap, every job installs the pinned npm and locked packages. Each language job requests its tools through Kit `make install-tools TOOLS="..."` and reuses the product package installers for locked Rust, Composer and Python dependencies. The parity job prepares all comparison environments in its own checkout through those same package installers. Kit 0.0.61 provides selected installation. Parity explicitly installs its Go/PHP symbol extractors and PHP arginfo through Kit targets, while the extension job installs only PHP arginfo. Locked PIE and supplementary input downloads use native mise through product install targets. No custom tool installer is maintained here and no speedup is claimed before measurement. The `docs` job runs the repository checks and TypeScript lint with `make install-tools`, and prepares Git hooks. The push gate retains `push-gate-commit`, `docs-check`, `evidence-check` and `commits-check`. Release and gates workflows remain managed by kit.
+
+Every target of `CHECK_TARGETS` runs in exactly one job of `ci.yml` and `push-gate.yml`; native tests within parity remain the declared cross-language coverage. Every check step runs after failure under `if: !cancelled()`. `make ci-targets` runs each target to completion and records its status, exit code, time and output in `var/report/ci-targets/`. The report is uploaded even after failure. Each job runs on `ubuntu-24.04`, uses the locked toolchains and records the actual PHP patch release. No whole-job deadline is imposed.
 
 The last job of `ci.yml`, `ci-passed`, is the check of the workflow that the release workflow requires on the tagged commit ([publishing main](#publish)). It needs every other job of the workflow, runs after each of them also when one failed, was skipped or was cancelled (`if: ${{ always() }}`), and runs `make ci-passed RESULTS='${{ toJSON(needs) }}'`: ci-passed of `@polyspec/kit` prints the result of every needed job and fails unless each one is `success`. A job added to `ci.yml` is listed in `needs`, so the required check covers it; `tests/scripts/workflow-rules.test.mts` fails when `ci-passed` is missing, is not the last job, lacks `if: ${{ always() }}`, does not need every other job, runs on another runner or runs another step.
 
 Each job of the repository-owned CI and push-gate workflows checks out this repository at the workspace root. Before its first make command, the canonical bootstrap installs the locked kit package with the npm version declared in packageManager. The Makefile includes the installed package bootstrap; no sibling checkout is required. Development source links remain optional native package-manager state.
 
 
-The docs job prepares Git hooks after tool installation. The suite installer fetches the installed kit Rust checker crates before offline linting. Downloads remain installation steps; no check enables network access.
+The docs job prepares Git hooks after tool installation. The language and parity installers fetch the installed kit Rust checker crates before offline linting. Downloads remain installation steps; no check enables network access.
 
 <a id="publish"></a>
 ## Publishing main

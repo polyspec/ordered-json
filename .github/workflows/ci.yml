@@ -12,6 +12,7 @@
 # have their own deadline. The runner image is ubuntu-24.04. Each action is pinned to the commit of a release; PHP comes
 # from the minor release of .php-version, and the records name the patch release that ran. Go, Python, Composer, alint
 # and the other tools of mise.toml are installed by make install-tools at the digests of mise.lock.
+# Language jobs and cross-language parity start independently; ci-passed requires all of them.
 name: ci
 
 on:
@@ -20,7 +21,7 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Runners are few: a new push to a pull request cancels the run of its previous push. A push to main has a ref of its
+# Runs on the same pull request are superseded: a new push to a pull request cancels the run of its previous push. A push to main has a ref of its
 # own, and its run is never cancelled.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -62,16 +63,16 @@ jobs:
       - name: make install-packages
         if: ${{ !cancelled() }}
         run: make install-packages
-      # The tools of mise.lock: alint, which make layout-check runs, ruff and vulture, which make lint-python runs, and Composer.
-      - name: make install-tools
+      # Repository tool tests read Go metadata; layout needs alint and dependency policy needs Composer.
+      - name: install repository check tools
         if: ${{ !cancelled() }}
-        run: make install-tools
+        run: make install-tools TOOLS="go php composer alint"
       - name: prepare Git hooks
         if: ${{ !cancelled() }}
         run: make hooks
       - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci-targets TARGETS="kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check ordered-json-test-scripts typecheck lint-ts lint-python"
+        run: make ci-targets TARGETS="kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check ordered-json-test-scripts typecheck lint-ts"
       # actions/upload-artifact v7.0.1: the report of this job, var/report/ci-targets.
       - name: report
         if: ${{ !cancelled() }}
@@ -80,7 +81,7 @@ jobs:
           name: report-docs
           path: var/report/ci-targets/
           if-no-files-found: error
-  suite:
+  parity:
     runs-on: ubuntu-24.04
     steps:
       # actions/checkout v7.0.1
@@ -115,20 +116,335 @@ jobs:
       # The tools of mise.lock (Go, Python, Composer, cargo-audit and the rest) with the phpcs and PHPStan of config/php-lint, the
       # Rust toolchain of rust-toolchain.toml, the crates of packages/rust/Cargo.lock, the Composer projects of the root and the
       # PHP packages (the PIE PHAR and the supplementary suite are tools of mise.lock).
-      - name: make install
+      - name: install parity tools
         if: ${{ !cancelled() }}
-        run: make install
+        run: make install-tools TOOLS="go rust php composer python uv"
+      - name: install parity extractors
+        if: ${{ !cancelled() }}
+        run: make kit-install-symbols EXTRACTORS="go php"
+      - name: install parity PHP generator
+        if: ${{ !cancelled() }}
+        run: make kit-install-php-arginfo
+      - name: install parity packages
+        if: ${{ !cancelled() }}
+        run: make ordered-json-install-parity
       - name: make ci-targets
         if: ${{ !cancelled() }}
         env:
           JSON_TEST_SUITE: var/tools/mise/installs/http-jsontestsuite/latest
-        run: make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-php-ext test-php-ext pie-check"
+          TOOLS: node npm mise go rust php composer python uv
+        run: make ci-targets TARGETS="toolchain-check cargo-downloads-check verify-all parity-check"
       # actions/upload-artifact v7.0.1
       - name: report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: report-suite
+          name: report-parity
+          path: var/report/ci-targets/
+          if-no-files-found: error
+  js:
+    runs-on: ubuntu-24.04
+    steps:
+      # actions/checkout v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        if: ${{ !cancelled() }}
+        with:
+          node-version-file: mise.toml
+          package-manager-cache: false
+      - name: bootstrap the installed kit package
+        if: ${{ !cancelled() }}
+        run: |
+          if [ "$(node -p 'require("./package.json").name')" != '@polyspec/kit' ]; then
+            npm_config_cache="$PWD/var/bootstrap/npm-cache" npm exec --yes --package="$(node -p 'require("./package.json").packageManager.split("+")[0]')" -- npm ci --ignore-scripts --allow-remote=root
+          fi
+      - name: make install-tools TOOLS=npm
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS=npm
+      - name: make install-packages
+        if: ${{ !cancelled() }}
+        run: make install-packages
+      # The tools of mise.lock (Go, Python, Composer, cargo-audit and the rest) with the phpcs and PHPStan of config/php-lint, the
+      # Rust toolchain of rust-toolchain.toml, the crates of packages/rust/Cargo.lock, the Composer projects of the root and the
+      # PHP packages (the PIE PHAR and the supplementary suite are tools of mise.lock).
+      - name: build js
+        if: ${{ !cancelled() }}
+        run: make build-js
+      - name: make ci-targets
+        if: ${{ !cancelled() }}
+        env:
+          JSON_TEST_SUITE: var/tools/mise/installs/http-jsontestsuite/latest
+        run: make ci-targets TARGETS="test-js"
+      # actions/upload-artifact v7.0.1
+      - name: report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: report-js
+          path: var/report/ci-targets/
+          if-no-files-found: error
+  rust:
+    runs-on: ubuntu-24.04
+    steps:
+      # actions/checkout v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        if: ${{ !cancelled() }}
+        with:
+          node-version-file: mise.toml
+          package-manager-cache: false
+      - name: bootstrap the installed kit package
+        if: ${{ !cancelled() }}
+        run: |
+          if [ "$(node -p 'require("./package.json").name')" != '@polyspec/kit' ]; then
+            npm_config_cache="$PWD/var/bootstrap/npm-cache" npm exec --yes --package="$(node -p 'require("./package.json").packageManager.split("+")[0]')" -- npm ci --ignore-scripts --allow-remote=root
+          fi
+      - name: make install-tools TOOLS=npm
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS=npm
+      - name: make install-packages
+        if: ${{ !cancelled() }}
+        run: make install-packages
+      # The tools of mise.lock (Go, Python, Composer, cargo-audit and the rest) with the phpcs and PHPStan of config/php-lint, the
+      # Rust toolchain of rust-toolchain.toml, the crates of packages/rust/Cargo.lock, the Composer projects of the root and the
+      # PHP packages (the PIE PHAR and the supplementary suite are tools of mise.lock).
+      - name: install rust tools
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS="rust"
+      - name: install rust packages
+        if: ${{ !cancelled() }}
+        run: make ordered-json-install-rust-packages
+      - name: build rust
+        if: ${{ !cancelled() }}
+        run: make build-rust
+      - name: make ci-targets
+        if: ${{ !cancelled() }}
+        env:
+          JSON_TEST_SUITE: var/tools/mise/installs/http-jsontestsuite/latest
+        run: make ci-targets TARGETS="test-rust lint-rust"
+      # actions/upload-artifact v7.0.1
+      - name: report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: report-rust
+          path: var/report/ci-targets/
+          if-no-files-found: error
+  go:
+    runs-on: ubuntu-24.04
+    steps:
+      # actions/checkout v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        if: ${{ !cancelled() }}
+        with:
+          node-version-file: mise.toml
+          package-manager-cache: false
+      - name: bootstrap the installed kit package
+        if: ${{ !cancelled() }}
+        run: |
+          if [ "$(node -p 'require("./package.json").name')" != '@polyspec/kit' ]; then
+            npm_config_cache="$PWD/var/bootstrap/npm-cache" npm exec --yes --package="$(node -p 'require("./package.json").packageManager.split("+")[0]')" -- npm ci --ignore-scripts --allow-remote=root
+          fi
+      - name: make install-tools TOOLS=npm
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS=npm
+      - name: make install-packages
+        if: ${{ !cancelled() }}
+        run: make install-packages
+      # The tools of mise.lock (Go, Python, Composer, cargo-audit and the rest) with the phpcs and PHPStan of config/php-lint, the
+      # Rust toolchain of rust-toolchain.toml, the crates of packages/rust/Cargo.lock, the Composer projects of the root and the
+      # PHP packages (the PIE PHAR and the supplementary suite are tools of mise.lock).
+      - name: install go tools
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS="go golangciLint deadcode"
+      - name: build go
+        if: ${{ !cancelled() }}
+        run: make build-go
+      - name: make ci-targets
+        if: ${{ !cancelled() }}
+        env:
+          JSON_TEST_SUITE: var/tools/mise/installs/http-jsontestsuite/latest
+        run: make ci-targets TARGETS="test-go lint-go"
+      # actions/upload-artifact v7.0.1
+      - name: report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: report-go
+          path: var/report/ci-targets/
+          if-no-files-found: error
+  php:
+    runs-on: ubuntu-24.04
+    steps:
+      # actions/checkout v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        if: ${{ !cancelled() }}
+        with:
+          node-version-file: mise.toml
+          package-manager-cache: false
+      # shivammathur/setup-php 2.40.0, the release that the release workflow of @polyspec/kit pins: the latest patch release of
+      # the minor release of .php-version, with phpize for the extension builds of the verification and PIE.
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
+        if: ${{ !cancelled() }}
+        with:
+          php-version-file: .php-version
+          tools: none
+          coverage: none
+      - name: bootstrap the installed kit package
+        if: ${{ !cancelled() }}
+        run: |
+          if [ "$(node -p 'require("./package.json").name')" != '@polyspec/kit' ]; then
+            npm_config_cache="$PWD/var/bootstrap/npm-cache" npm exec --yes --package="$(node -p 'require("./package.json").packageManager.split("+")[0]')" -- npm ci --ignore-scripts --allow-remote=root
+          fi
+      - name: make install-tools TOOLS=npm
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS=npm
+      - name: make install-packages
+        if: ${{ !cancelled() }}
+        run: make install-packages
+      # The tools of mise.lock (Go, Python, Composer, cargo-audit and the rest) with the phpcs and PHPStan of config/php-lint, the
+      # Rust toolchain of rust-toolchain.toml, the crates of packages/rust/Cargo.lock, the Composer projects of the root and the
+      # PHP packages (the PIE PHAR and the supplementary suite are tools of mise.lock).
+      - name: install php tools
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS="php composer phpcs phpstan"
+      - name: install php packages
+        if: ${{ !cancelled() }}
+        run: make ordered-json-install-php
+      - name: build php
+        if: ${{ !cancelled() }}
+        run: make build-php
+      - name: make ci-targets
+        if: ${{ !cancelled() }}
+        env:
+          JSON_TEST_SUITE: var/tools/mise/installs/http-jsontestsuite/latest
+        run: make ci-targets TARGETS="test-php lint-php"
+      # actions/upload-artifact v7.0.1
+      - name: report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: report-php
+          path: var/report/ci-targets/
+          if-no-files-found: error
+  php-ext:
+    runs-on: ubuntu-24.04
+    steps:
+      # actions/checkout v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        if: ${{ !cancelled() }}
+        with:
+          node-version-file: mise.toml
+          package-manager-cache: false
+      # shivammathur/setup-php 2.40.0, the release that the release workflow of @polyspec/kit pins: the latest patch release of
+      # the minor release of .php-version, with phpize for the extension builds of the verification and PIE.
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
+        if: ${{ !cancelled() }}
+        with:
+          php-version-file: .php-version
+          tools: none
+          coverage: none
+      - name: bootstrap the installed kit package
+        if: ${{ !cancelled() }}
+        run: |
+          if [ "$(node -p 'require("./package.json").name')" != '@polyspec/kit' ]; then
+            npm_config_cache="$PWD/var/bootstrap/npm-cache" npm exec --yes --package="$(node -p 'require("./package.json").packageManager.split("+")[0]')" -- npm ci --ignore-scripts --allow-remote=root
+          fi
+      - name: make install-tools TOOLS=npm
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS=npm
+      - name: make install-packages
+        if: ${{ !cancelled() }}
+        run: make install-packages
+      # The tools of mise.lock (Go, Python, Composer, cargo-audit and the rest) with the phpcs and PHPStan of config/php-lint, the
+      # Rust toolchain of rust-toolchain.toml, the crates of packages/rust/Cargo.lock, the Composer projects of the root and the
+      # PHP packages (the PIE PHAR and the supplementary suite are tools of mise.lock).
+      - name: install php-ext tools
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS="php composer"
+      - name: install php-ext generator
+        if: ${{ !cancelled() }}
+        run: make kit-install-php-arginfo
+      - name: install PIE inputs
+        if: ${{ !cancelled() }}
+        run: make ordered-json-install-pie
+      - name: install php-ext packages
+        if: ${{ !cancelled() }}
+        run: make ordered-json-install-php
+      - name: make ci-targets
+        if: ${{ !cancelled() }}
+        env:
+          JSON_TEST_SUITE: var/tools/mise/installs/http-jsontestsuite/latest
+          TOOLS: node npm mise php composer
+        run: make ci-targets TARGETS="lint-php-ext test-php-ext pie-check"
+      # actions/upload-artifact v7.0.1
+      - name: report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: report-php-ext
+          path: var/report/ci-targets/
+          if-no-files-found: error
+  python:
+    runs-on: ubuntu-24.04
+    steps:
+      # actions/checkout v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        if: ${{ !cancelled() }}
+        with:
+          node-version-file: mise.toml
+          package-manager-cache: false
+      - name: bootstrap the installed kit package
+        if: ${{ !cancelled() }}
+        run: |
+          if [ "$(node -p 'require("./package.json").name')" != '@polyspec/kit' ]; then
+            npm_config_cache="$PWD/var/bootstrap/npm-cache" npm exec --yes --package="$(node -p 'require("./package.json").packageManager.split("+")[0]')" -- npm ci --ignore-scripts --allow-remote=root
+          fi
+      - name: make install-tools TOOLS=npm
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS=npm
+      - name: make install-packages
+        if: ${{ !cancelled() }}
+        run: make install-packages
+      # The tools of mise.lock (Go, Python, Composer, cargo-audit and the rest) with the phpcs and PHPStan of config/php-lint, the
+      # Rust toolchain of rust-toolchain.toml, the crates of packages/rust/Cargo.lock, the Composer projects of the root and the
+      # PHP packages (the PIE PHAR and the supplementary suite are tools of mise.lock).
+      - name: install python tools
+        if: ${{ !cancelled() }}
+        run: make install-tools TOOLS="python uv ruff vulture"
+      - name: install python packages
+        if: ${{ !cancelled() }}
+        run: make ordered-json-install-python
+      - name: build python
+        if: ${{ !cancelled() }}
+        run: make build-python
+      - name: make ci-targets
+        if: ${{ !cancelled() }}
+        env:
+          JSON_TEST_SUITE: var/tools/mise/installs/http-jsontestsuite/latest
+        run: make ci-targets TARGETS="test-python lint-python"
+      # actions/upload-artifact v7.0.1
+      - name: report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: report-python
           path: var/report/ci-targets/
           if-no-files-found: error
   # The check of this workflow that the release workflow requires on the tagged commit. It runs after every other job,
@@ -136,7 +452,7 @@ jobs:
   # the result success, so a new job of this workflow is required once it is listed in needs.
   ci-passed:
     if: ${{ always() }}
-    needs: [docs, suite]
+    needs: [docs, parity, js, rust, go, php, php-ext, python]
     runs-on: ubuntu-24.04
     steps:
       # actions/checkout v7.0.1

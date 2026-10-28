@@ -8,6 +8,8 @@
 
 - Adopt public Kit 0.0.61 with selected locked tool installation and update PHPUnit to 13.4.5 to remove the PHPT coverage temporary-directory advisory (T2.83-1).
 
+- Run six native language check jobs in parallel and keep shared contract and parity verification in an independent job. Require every job in ci-passed and retain exact target coverage and distinct failure reports (T2.83).
+
 <a id="v0010"></a>
 ## 0.0.10
 

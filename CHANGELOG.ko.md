@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 17281fe47245b05a0b545a6e27983a0cd92ba54978db6b00fe14d2b41c5aa0ad -->
+<!-- source-sha256: 8d6c70a4572d6e450e03d6eead14116ce95b9846efaebb8725fe5574bfa5ef4a -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -8,6 +8,8 @@
 ## Unreleased
 
 - 선택적 locked tool 설치를 지원하는 공개 Kit 0.0.61을 채택하고 PHPT coverage 임시 directory 보안 권고를 제거하도록 PHPUnit을 13.4.5로 갱신한다(T2.83-1).
+
+- 여섯 native language 검사 job을 병렬 실행하고 shared contract와 parity 검증은 독립 job으로 유지한다. ci-passed가 모든 job을 요구하며 정확한 target coverage와 개별 실패 report를 유지한다(T2.83).
 
 <a id="v0010"></a>
 ## 0.0.10

@@ -59,7 +59,7 @@ test('every check runs offline and only make install downloads', () => {
   for (const [name, value] of Object.entries(OFFLINE)) assert.match(text, new RegExp(`^export ${name} := ${value}$`, 'm'));
   assert.match(text, new RegExp(`^ONLINE := env${Object.keys(OFFLINE).map(name => ` -u ${name}`).join('')}$`, 'm'));
   const downloading = [...recipes(text)].filter(([, rule]) => rule.recipe.some(line => line.includes('$(ONLINE)'))).map(([target]) => target).sort();
-  assert.deepEqual(downloading, ['ordered-json-install-php', 'ordered-json-install-python', 'ordered-json-install-rust']);
+  assert.deepEqual(downloading, ['ordered-json-install-php', 'ordered-json-install-pie', 'ordered-json-install-python', 'ordered-json-install-rust', 'ordered-json-install-suite']);
 });
 
 test('make install makes every download of the checks', () => {
@@ -74,7 +74,8 @@ test('a target that runs a tool depends on the toolchain and download checks', (
   for (const target of TOOL_TARGETS) {
     const { prerequisites } = known(table.get(target), `the target ${target}`);
     assert.ok(prerequisites.includes('toolchain-check'), target);
-    assert.ok(prerequisites.includes('cargo-downloads-check'), target);
+    if (target === 'pie-check') assert.ok(!prerequisites.includes('cargo-downloads-check'), 'PIE builds only PHP and needs no Rust cache');
+    else assert.ok(prerequisites.includes('cargo-downloads-check'), target);
   }
 });
 

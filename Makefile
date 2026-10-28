@@ -35,7 +35,7 @@ include node_modules/@polyspec/kit/scripts/kit/kit-bootstrap.mk
 
 # The targets of the full suite that make check runs through the guard of full-run of @polyspec/kit and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
-CHECK_TARGETS := kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check docs-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-php-ext test-php-ext lint-python pie-check ordered-json-test-scripts typecheck lint-ts
+CHECK_TARGETS := kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check docs-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-php-ext test-php-ext lint-python pie-check ordered-json-test-scripts typecheck lint-ts test-js test-rust test-go test-php test-python
 
 .PHONY: check ordered-json-test-scripts typecheck ordered-json-install-php ordered-json-install-python verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
 	benchmark benchmark-check python-parse-budget release-config-check install ordered-json-install ordered-json-install-rust \
@@ -77,6 +77,20 @@ ordered-json-install-python:
 	$(MAKE) --no-print-directory python-venv DIR=packages/python/.venv
 	$(ONLINE) $(UV) pip install --python packages/python/.venv/bin/python --link-mode copy --no-deps -e packages/python
 
+# Product dependency installs are reused by independent CI jobs after Kit prepares
+# only the requested toolchains. These targets install no other language's tools.
+.PHONY: ordered-json-install-rust-packages ordered-json-install-parity ordered-json-install-suite ordered-json-install-pie
+ordered-json-install-rust-packages: ordered-json-install-rust
+	$(MAKE) --no-print-directory cargo-downloads-fetch
+
+ordered-json-install-suite:
+	$(ONLINE) $(KIT_TOOLS)/bin/mise install --locked http:jsontestsuite
+
+ordered-json-install-pie: ordered-json-install-suite
+	$(ONLINE) $(KIT_TOOLS)/bin/mise install --locked http:pie
+
+ordered-json-install-parity: ordered-json-install-rust-packages ordered-json-install-php ordered-json-install-python ordered-json-install-suite
+
 # ordered-json-test-scripts runs the node:test tool tests of tests/scripts, or the files of TESTS, through run-tests of @polyspec/kit,
 # which gives each test its own deadline; typecheck checks the TypeScript of scripts/, tests/scripts/ and benchmarks/ with the tsc
 # of package.json (tsconfig.json), which Node runs by type stripping and so never checks itself.
@@ -108,7 +122,7 @@ release-config-check:
 
 # pie-check builds the extension with the PIE PHAR of mise.toml, verifies the module with the shared cases and writes
 # var/records/pie-verification.json (scripts/check-pie.mts).
-pie-check: toolchain-check cargo-downloads-check
+pie-check: toolchain-check
 	$(NODE) scripts/check-pie.mts$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
 
 benchmark: toolchain-check cargo-downloads-check

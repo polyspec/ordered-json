@@ -109,7 +109,7 @@ export function violations(name: string, text: string): string[] {
       if (step.run !== undefined && !MAKE_STEP.test(step.run) && !(step.name === 'bootstrap the installed kit package' && step.run === PACKAGE_BOOTSTRAP)) found.push(`${label} runs \`${step.run}\`; a step runs one make target, never a script or a tool directly`);
       // mise installs every tool of mise.lock at once (make install-tools): TOOLS names only npm, the bootstrap.
       const tools = /^make install-tools TOOLS=(.+)$/.exec(step.run ?? '');
-      if (tools && tools[1] !== 'npm') found.push(`${label} runs make install-tools TOOLS=${tools[1]}; make install-tools installs every tool of mise.lock, and TOOLS names only npm`);
+      if (tools && !/^npm$|^"[a-zA-Z][a-zA-Z0-9-]*( [a-zA-Z][a-zA-Z0-9-]*)*"$/.test(known(tools[1], 'TOOLS selectors'))) found.push(`${label} runs make install-tools TOOLS=${tools[1]}; TOOLS uses quoted selector names at the locked versions`);
       if (/^actions\/setup-(python|go)@/.test(step.uses ?? '')) found.push(`${label} installs a toolchain of mise.toml; make install-tools installs it`);
       // .php-version is the one declaration of the PHP of the checkout, which the release workflow of kit sets up (kit K193).
       if (step.uses?.startsWith('shivammathur/setup-php@') && (step.with?.['php-version-file'] !== '.php-version' || step.with['php-version'] !== undefined)) found.push(`${label} does not read the PHP from php-version-file: .php-version alone`);
@@ -138,6 +138,54 @@ const changed = (text: string, from: string | RegExp, to: string) => {
   assert.notEqual(result, text, `the mutation ${String(from)} changes nothing`);
   return result;
 };
+
+// Cross-language verification owns all implementations and starts independently of native jobs.
+const LANGUAGE_TARGETS: Record<string, string[]> = {
+  js: ['test-js'],
+  rust: ['test-rust', 'lint-rust'],
+  go: ['test-go', 'lint-go'],
+  php: ['test-php', 'lint-php'],
+  'php-ext': ['lint-php-ext', 'test-php-ext', 'pie-check'],
+  python: ['test-python', 'lint-python'],
+};
+function parallelViolations(parsed: Workflow): string[] {
+  const found: string[] = [];
+  const expected = { parity: ['toolchain-check', 'cargo-downloads-check', 'verify-all', 'parity-check'], ...LANGUAGE_TARGETS };
+  for (const [name, targets] of Object.entries(expected)) {
+    const job = parsed.jobs[name];
+    if (job === undefined) { found.push(`missing independent job ${name}`); continue; }
+    if ((job.needs?.length ?? 0) > 0) found.push(`${name} waits for another job`);
+    if (job.steps?.some(step => step.uses?.startsWith('actions/download-artifact@'))) found.push(`${name} consumes another job's output`);
+    const commands = runs(job);
+    if (!commands.includes(`make ci-targets TARGETS="${targets.join(' ')}"`)) found.push(`${name} does not own its checks`);
+    if (commands.includes('make install-tools')) found.push(`${name} installs unselected tools`);
+    if (commands.includes('make install')) found.push(`${name} installs every language through the aggregate installer`);
+    if (name !== 'js' && !commands.some(command => command === 'make install-tools' || command.startsWith('make install-tools TOOLS="'))) found.push(`${name} lacks its tool preparation`);
+    if (!['parity', 'php-ext'].includes(name) && !commands.includes(`make build-${name}`)) found.push(`${name} lacks its native build`);
+  }
+  return found;
+}
+
+test('T2.83: language checks and cross-language verification start independently', () => {
+  const parsed = workflow(read('ci.yml'));
+  assert.deepEqual(parallelViolations(parsed), []);
+  assert.deepEqual(ciPassedViolations('ci.yml', parsed.jobs), []);
+  const reports = Object.values(parsed.jobs).flatMap(job => (job.steps ?? []).filter(step => step.uses?.startsWith('actions/upload-artifact@')).map(step => step.with?.name));
+  assert.equal(reports.length, new Set(reports).size, 'parallel jobs upload distinct reports');
+});
+
+test('T2.83: serializing parity or a native job and moving shared verification are rejected', () => {
+  for (const [name, dependency] of [['parity', 'rust'], ['rust', 'parity']]) {
+    const parsed = workflow(read('ci.yml'));
+    known(parsed.jobs[known(name, 'job name')], 'the independent job').needs = [known(dependency, 'dependency')];
+    assert.ok(parallelViolations(parsed).includes(`${name} waits for another job`));
+  }
+  const parsed = workflow(read('ci.yml'));
+  const parity = known(parsed.jobs.parity, 'the parity job');
+  const step = known(parity.steps?.find(step => step.run?.startsWith('make ci-targets ')), 'the parity checks');
+  step.run = 'make ci-targets TARGETS="toolchain-check cargo-downloads-check parity-check"';
+  assert.ok(parallelViolations(parsed).includes('parity does not own its checks'));
+});
 
 test('every workflow follows the rules', () => {
   assert.deepEqual(names(), ['ci.yml', 'push-gate.yml']);
@@ -181,9 +229,10 @@ test('a job without the report step fails', () => {
   assert.ok(violations('ci.yml', changed(text, `          path: ${UPLOAD_REPORT}\n`, '          path: var/other/\n')).includes(message));
 });
 
-test('the tools of mise are installed by make install-tools alone', () => {
+test('selected tools keep locked selectors and reject floating versions', () => {
   const text = read('push-gate.yml');
-  assert.ok(anyIncludes(violations('push-gate.yml', changed(text, 'run: make install-tools\n', 'run: make install-tools TOOLS="uv python"\n')), 'TOOLS names only npm'));
+  assert.deepEqual(violations('push-gate.yml', changed(text, 'run: make install-tools TOOLS="php composer"\n', 'run: make install-tools TOOLS="uv python"\n')), []);
+  assert.ok(anyIncludes(violations('push-gate.yml', changed(text, 'run: make install-tools TOOLS="php composer"\n', 'run: make install-tools TOOLS="go@latest"\n')), 'TOOLS uses quoted selector names'));
   const setup = changed(text, '      - name: make install-tools TOOLS=npm\n', '      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1\n      - name: make install-tools TOOLS=npm\n');
   assert.ok(anyIncludes(violations('push-gate.yml', setup), 'installs a toolchain of mise.toml'));
 });
@@ -235,8 +284,8 @@ test('ci-passed is the last job and needs every other job', () => {
     missing: [`${head}\n`, 'the job ci-passed is missing'],
     'not last': [`${head.replace('\njobs:\n', `\njobs:\n  ci-passed:\n${tail.trimEnd()}\n`)}\n`, 'the job ci-passed is not the last job'],
     'not always': [changed(text, '    if: ${{ always() }}\n', '    if: ${{ success() }}\n'), 'the job ci-passed has if: "${{ success() }}"'],
-    'needs no job': [changed(text, '    needs: [docs, suite]\n', '    needs: []\n'), 'the job ci-passed needs [], not every other job'],
-    'another runner': [changed(text, '    needs: [docs, suite]\n    runs-on: ubuntu-24.04\n', '    needs: [docs, suite]\n    runs-on: ubuntu-26.04\n'), 'the job ci-passed runs on "ubuntu-26.04", not on the runner of the other jobs'],
+    'needs no job': [changed(text, '    needs: [docs, parity, js, rust, go, php, php-ext, python]\n', '    needs: []\n'), 'the job ci-passed needs [], not every other job'],
+    'another runner': [changed(text, '    needs: [docs, parity, js, rust, go, php, php-ext, python]\n    runs-on: ubuntu-24.04\n', '    needs: [docs, parity, js, rust, go, php, php-ext, python]\n    runs-on: ubuntu-26.04\n'), 'the job ci-passed runs on "ubuntu-26.04", not on the runner of the other jobs'],
     'another step': [changed(text, CI_PASSED_RUN, 'make ci-passed'), `the job ci-passed runs ${JSON.stringify([PACKAGE_BOOTSTRAP, ...BOOTSTRAP_STEPS, 'make ci-passed'])}, not`],
   };
   for (const [kind, [mutated, message]] of Object.entries(broken)) assert.ok(anyIncludes(violations('ci.yml', mutated), message), `${kind}: ${violations('ci.yml', mutated).join('\n')}`);
@@ -315,8 +364,8 @@ test('CI prepares hook state and installs Rust tools before checks', () => {
     const index = docs.indexOf(setup);
     assert.ok(index > docs.indexOf('make install-tools') && index < docsCheck, `${setup} runs after tool installation and before docs checks`);
   }
-  const suite = runs(known(jobs.suite, 'the suite job'));
-  assert.ok(suite.indexOf('make install') < suite.findIndex(command => command.startsWith('make ci-targets ')), 'Rust tools are installed before offline linting');
+  const suite = runs(known(jobs.rust, 'the rust job'));
+  assert.ok(suite.indexOf('make ordered-json-install-rust-packages') < suite.findIndex(command => command.startsWith('make ci-targets ')), 'Rust dependencies are installed before offline linting');
   assert.match(readFileSync(path.join(ROOT, 'Makefile'), 'utf8'), /fetch --locked --manifest-path node_modules\/@polyspec\/kit\/scripts\/kit\/catch-check-rust\/Cargo.toml/, 'installation fetches the published Rust checker dependencies');
 });
 
