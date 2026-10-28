@@ -98,14 +98,23 @@ test('the declarations name an exact release or a minor release', () => {
   assert.equal(goMod.Toolchain, undefined);
 });
 
+const BARE_TOOL_COMMAND = /(^|[;&|(])\s*(npm|npx|go|cargo|rustc)(\s|$)/;
+
 test('no recipe runs a pinned tool by name', () => {
   // GNU Make 3.81 looks a simple recipe command up on its own PATH, not on the exported one, so npm, go and cargo start from a
   // script or a shim path, and node, the release of mise.toml, starts by $(NODE) of kit.mk, its path in var/tools (kit K171).
   const lines = makefile().split('\n').filter(line => line.startsWith('\t')).map(line => line.trim().replace(/^[@-]*(\$\(ONLINE\) )?/, ''));
   assert.ok(lines.length);
   for (const command of lines) {
-    assert.doesNotMatch(command, /(^|[\s;&|(])(npm|npx|go|cargo|rustc)(\s|$)/, command);
+    assert.doesNotMatch(command, BARE_TOOL_COMMAND, command);
     assert.doesNotMatch(command, /(^|\$\$\()node\s/, command);
+  }
+});
+
+test('T2.83-3-1: native runner tool selectors are arguments and bare executable commands still fail', () => {
+  assert.doesNotMatch('$(NODE) $(KIT)/run-tests.$(KIT_EXT) go --cwd packages/go -- .', BARE_TOOL_COMMAND);
+  for (const command of ['go test .', 'npm ci', 'cargo test --locked', 'echo start; go test .', 'echo start | rustc --version', '$(go version)']) {
+    assert.match(command, BARE_TOOL_COMMAND, command);
   }
 });
 

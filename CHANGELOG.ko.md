@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: c18b0e4fe5e33d57489725af15a6cef3b89767025fc2b0abb27987b43ba7e993 -->
+<!-- source-sha256: 6bb5880b2299f5fa604fb5e17c7fc0ccdb5bdfe0b4dc2fd1adea646785049010 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -9,6 +9,8 @@
 
 <a id="v0011"></a>
 ## 0.0.11
+
+- native runner의 tool selector 인자는 허용하면서 shell 명령 위치의 고정 executable을 검사한다. 회귀 검증은 직접 호출과 연결된 bare executable 호출을 계속 거부한다(T2.83-3-1).
 
 - documentation job의 설치 범위를 넓히는 대신 Python과 Rust를 명시적으로 준비하는 parity에서 언어 간 test marker와 release metadata를 검사한다(T2.83-4).
 

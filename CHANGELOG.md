@@ -9,6 +9,8 @@
 <a id="v0011"></a>
 ## 0.0.11
 
+- Check pinned executables at shell command positions while allowing native runner tool selector arguments; regression cases retain rejection of direct and chained bare executable calls (T2.83-3-1).
+
 - Route cross-language test marker and release metadata checks to parity, where Python and Rust are explicitly prepared, instead of broadening the documentation job installation (T2.83-4).
 
 - Run native Go unit tests in the library package and keep helper command builds. Verify that every tracked Go test belongs to the selected package so new tests cannot be omitted (T2.83-3).
