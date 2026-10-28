@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 6055311712e58bb3305055e77b32c63cbc4f48f475c8a35787a4a79d78ee460f -->
+<!-- source-sha256: c32990a8fe23ad4b1997a87498c99b676b2e0f263b4ff75cce175976ff8cab24 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -9,6 +9,8 @@
 
 <a id="v0011"></a>
 ## 0.0.11
+
+- 독립 PHP job의 autoload lint 전에 잠긴 PHP symbol parser를 명시적으로 준비하고 native test와 lint 기준을 유지한다(T2.83-2).
 
 - Kit 0.0.61, 독립 language CI와 native release consumer lock으로 OrderedJSON 0.0.11을 준비한다(T2.84).
 

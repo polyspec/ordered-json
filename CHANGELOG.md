@@ -9,6 +9,8 @@
 <a id="v0011"></a>
 ## 0.0.11
 
+- Prepare the locked PHP symbol parser explicitly before PHP autoload lint in the independent PHP job; retain native tests and lint strictness (T2.83-2).
+
 - Prepare OrderedJSON 0.0.11 with Kit 0.0.61, independent language CI and native release consumer locks (T2.84).
 
 - Adopt public Kit 0.0.61 with selected locked tool installation and update PHPUnit to 13.4.5 to remove the PHPT coverage temporary-directory advisory (T2.83-1).

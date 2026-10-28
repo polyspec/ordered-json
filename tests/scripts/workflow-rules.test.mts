@@ -158,6 +158,12 @@ function parallelViolations(parsed: Workflow): string[] {
     if (job.steps?.some(step => step.uses?.startsWith('actions/download-artifact@'))) found.push(`${name} consumes another job's output`);
     const commands = runs(job);
     if (!commands.includes(`make ci-targets TARGETS="${targets.join(' ')}"`)) found.push(`${name} does not own its checks`);
+    if (name === 'php') {
+      const parser = commands.indexOf('make kit-install-symbols EXTRACTORS="php"');
+      const tools = commands.findIndex(command => command.startsWith('make install-tools TOOLS="php '));
+      const checks = commands.findIndex(command => command.startsWith('make ci-targets '));
+      if (parser <= tools || parser >= checks) found.push('php lacks its autoload parser before lint');
+    }
     if (commands.includes('make install-tools')) found.push(`${name} installs unselected tools`);
     if (commands.includes('make install')) found.push(`${name} installs every language through the aggregate installer`);
     if (name !== 'js' && !commands.some(command => command === 'make install-tools' || command.startsWith('make install-tools TOOLS="'))) found.push(`${name} lacks its tool preparation`);
@@ -185,6 +191,18 @@ test('T2.83: serializing parity or a native job and moving shared verification a
   const step = known(parity.steps?.find(step => step.run?.startsWith('make ci-targets ')), 'the parity checks');
   step.run = 'make ci-targets TARGETS="toolchain-check cargo-downloads-check parity-check"';
   assert.ok(parallelViolations(parsed).includes('parity does not own its checks'));
+});
+
+test('T2.83-2: PHP lint owns its parser setup and cannot defer it until after checks', () => {
+  for (const after of [false, true]) {
+    const parsed = workflow(read('ci.yml'));
+    const php = known(parsed.jobs.php, 'the php job');
+    const steps = known(php.steps, 'the php steps');
+    const parser = known(steps.find(step => step.run === 'make kit-install-symbols EXTRACTORS="php"'), 'the PHP parser preparation');
+    php.steps = steps.filter(step => step !== parser);
+    if (after) php.steps.push(parser);
+    assert.ok(parallelViolations(parsed).includes('php lacks its autoload parser before lint'), String(after));
+  }
 });
 
 test('every workflow follows the rules', () => {

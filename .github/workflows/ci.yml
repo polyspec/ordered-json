@@ -318,6 +318,9 @@ jobs:
       - name: install php tools
         if: ${{ !cancelled() }}
         run: make install-tools TOOLS="php composer phpcs phpstan"
+      - name: install PHP autoload parser
+        if: ${{ !cancelled() }}
+        run: make kit-install-symbols EXTRACTORS="php"
       - name: install php packages
         if: ${{ !cancelled() }}
         run: make ordered-json-install-php
