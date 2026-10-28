@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: c32990a8fe23ad4b1997a87498c99b676b2e0f263b4ff75cce175976ff8cab24 -->
+<!-- source-sha256: f9db29f660da844eaedb1797aada0921ca0101287316ae173625231a0708343e -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -9,6 +9,8 @@
 
 <a id="v0011"></a>
 ## 0.0.11
+
+- native Go unit test는 library package에서 실행하고 helper command 빌드는 유지한다. 모든 추적된 Go test가 선택한 package에 속하는지 검증해 새로운 test 누락을 방지한다(T2.83-3).
 
 - 독립 PHP job의 autoload lint 전에 잠긴 PHP symbol parser를 명시적으로 준비하고 native test와 lint 기준을 유지한다(T2.83-2).
 

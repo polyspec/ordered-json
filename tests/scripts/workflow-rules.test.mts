@@ -143,7 +143,7 @@ const changed = (text: string, from: string | RegExp, to: string) => {
 const LANGUAGE_TARGETS: Record<string, string[]> = {
   js: ['test-js'],
   rust: ['test-rust', 'lint-rust'],
-  go: ['test-go', 'lint-go'],
+  go: ['ordered-json-go-test', 'lint-go'],
   php: ['test-php', 'lint-php'],
   'php-ext': ['lint-php-ext', 'test-php-ext', 'pie-check'],
   python: ['test-python', 'lint-python'],
@@ -203,6 +203,14 @@ test('T2.83-2: PHP lint owns its parser setup and cannot defer it until after ch
     if (after) php.steps.push(parser);
     assert.ok(parallelViolations(parsed).includes('php lacks its autoload parser before lint'), String(after));
   }
+});
+
+test('T2.83-3: the Go unit command covers every tracked test package and helpers still build', () => {
+  const packages = [...new Set(trackedFiles(ROOT).filter(file => file.startsWith('packages/go/') && file.endsWith('_test.go')).map(file => path.posix.dirname(file)))].sort();
+  assert.deepEqual(packages, ['packages/go'], 'extend the native unit package selection when a test package is added');
+  const makefile = readFileSync(path.join(ROOT, 'Makefile'), 'utf8');
+  assert.match(makefile, /ordered-json-go-test:\n\t\$\(NODE\) \$\(KIT\)\/run-tests\.\$\(KIT_EXT\) go --cwd packages\/go -- .* \./);
+  assert.ok(runs(known(workflow(read('ci.yml')).jobs.go, 'the go job')).includes('make build-go'));
 });
 
 test('every workflow follows the rules', () => {

@@ -9,6 +9,8 @@
 <a id="v0011"></a>
 ## 0.0.11
 
+- Run native Go unit tests in the library package and keep helper command builds. Verify that every tracked Go test belongs to the selected package so new tests cannot be omitted (T2.83-3).
+
 - Prepare the locked PHP symbol parser explicitly before PHP autoload lint in the independent PHP job; retain native tests and lint strictness (T2.83-2).
 
 - Prepare OrderedJSON 0.0.11 with Kit 0.0.61, independent language CI and native release consumer locks (T2.84).
