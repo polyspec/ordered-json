@@ -53,7 +53,8 @@ const workflow = (text: string): Workflow => {
   return checkJson<Workflow>(value, 'workflow.schema.json', 'the workflow');
 };
 const runs = (job: Job) => (job.steps ?? []).flatMap(step => (step.run === undefined ? [] : [step.run]));
-const PACKAGE_BOOTSTRAP = known(workflow(readFileSync(path.join(KIT_ROOT, 'workflows/gates.yml'), 'utf8')).jobs.gates?.steps?.find(step => step.name === 'bootstrap the installed kit package')?.run, 'the canonical installed-package bootstrap');
+// Gate topology belongs to Kit; its single release job carries the same canonical bootstrap.
+const PACKAGE_BOOTSTRAP = known(workflow(readFileSync(path.join(KIT_ROOT, 'workflows/release.yml'), 'utf8')).jobs.release?.steps?.find(step => step.name === 'bootstrap the installed kit package')?.run, 'the canonical installed-package bootstrap');
 
 /** Each broken rule of the job ci-passed of ci.yml. */
 function ciPassedViolations(name: string, jobs: Record<string, Job>): string[] {

@@ -111,6 +111,9 @@ Each job of the repository-owned CI and push-gate workflows checks out this repo
 
 The docs job prepares Git hooks after tool installation. The language and parity installers fetch the installed kit Rust checker crates before offline linting. Downloads remain installation steps; no check enables network access.
 
+
+The Kit-managed provider gates read [config/ci.json](../../config/ci.json). The full parity path remains mandatory. Setup reuses Kit native runtime defaults, the repository Python editable installer for its PEP 751 lock model, and the pinned PHP arginfo installer. Shared metadata checks explicitly declare their Go, PHP and Python prerequisites. No application recipe replaces a Kit gate.
+
 <a id="publish"></a>
 ## Publishing main
 

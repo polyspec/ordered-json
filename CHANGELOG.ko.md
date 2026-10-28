@@ -1,11 +1,16 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 0d8debe8a587e92a82da16af42e8bc1e16fc27d76bd8b90e65f1971fb9e6519e -->
+<!-- source-sha256: 375d9fccc0f4b81e0bb3ee3e9ef7692677a4f8215a44cd54e9eff42e1858f7d5 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+<a id="v0012"></a>
+## 0.0.12
+
+- Go no-test-package 공통 수정을 포함한 공개 Kit 0.0.62와 canonical gate를 채택한다. 수정하지 않은 native test-go suite와 독립 언어 간 검증을 유지하고 native consumer lock 및 dependency review로 0.0.12를 준비한다(T2.85).
 
 - 앱별 Go package 선택을 제거하고 수정하지 않은 Kit test-go target을 복원한다. 다음 release는 Kit issue #5의 공통 실행기 수정과 전체 CI 성공을 요구한다(T2.83-3-2).
 

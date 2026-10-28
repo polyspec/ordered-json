@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "parityMode": "full",
+  "setup": {
+    "shared": [],
+    "parity": ["kit-install-php-arginfo"],
+    "runtimes": {
+      "go": [],
+      "php": [],
+      "php-ext": [],
+      "python": ["ordered-json-install-python"],
+      "rust": [],
+      "ts": []
+    }
+  },
+  "tools": {
+    "shared": ["go", "php", "composer", "python", "uv"]
+  }
+}

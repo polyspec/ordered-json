@@ -6,6 +6,11 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+<a id="v0012"></a>
+## 0.0.12
+
+- Adopt published Kit 0.0.62 with its shared Go no-test-package fix and canonical gates. Retain the unmodified native test-go suite and independent cross-language verification; prepare 0.0.12 with native consumer locks and dependency review (T2.85).
+
 - Remove application-local Go package selection and restore the unmodified Kit test-go target. The next release requires the shared runner fix in Kit issue #5 and successful complete CI (T2.83-3-2).
 
 <a id="v0011"></a>

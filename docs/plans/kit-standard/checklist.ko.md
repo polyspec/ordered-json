@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 7514f6c60f48ed776353b6d9f4fc26a4303a3018a43022712fee96823694f5be -->
+<!-- source-sha256: af4a7e45f44ddf0d5cb3c20248267561d5a161338e597380a19431c541ecd0e3 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -102,4 +102,4 @@
 | T2.83-3-2 | 앱별 Go test 선택을 제거하고 다음 release 전에 수정하지 않은 Kit test-go 명령을 요구한다. | Makefile, .github/workflows/ci.yml, tests/scripts/workflow-rules.test.mts, docs/operations/validation.md(.ko), CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [o] |
 | T2.83-4 | 필요한 모든 runtime을 준비하는 독립 parity job에서 언어 간 test marker와 release metadata 검사를 실행한다. | .github/workflows/ci.yml, tests/scripts/workflow-rules.test.mts, docs/operations/validation.md(.ko), CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts` | [o] |
 | T2.84 | main CI 통과 뒤 공개할 OrderedJSON 0.0.11의 release manifest, native candidate asset, consumer lock, dependency review를 준비한다. | release manifests, native lock files, config/dependency-review.json, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/environment.test.mts` | [o] |
-| T2.85 | issue #5를 수정한 공개 Kit release를 채택하고 main의 수정하지 않은 native language 검사와 독립 parity를 통과한 뒤 앱별 test 우회 없이 OrderedJSON 0.0.12를 공개한다. | Kit dependency and lock, canonical copies, release manifests, native consumer locks, dependency review, CI and publication evidence | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [ ] |
+| T2.85 | issue #5를 수정한 공개 Kit 0.0.62를 채택하고 수정하지 않은 native language CI, 독립 parity, consumer lock 및 release metadata로 OrderedJSON 0.0.12를 준비한다. | package manifests and locks, canonical gates workflow, tests/scripts/workflow-rules.test.mts, native consumer locks, dependency review, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [o] |

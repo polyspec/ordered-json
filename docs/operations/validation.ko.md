@@ -1,5 +1,5 @@
 <!-- doc-id: validation -->
-<!-- source-sha256: 711c76bb7f5f5381780e82106e3a53e229c7656ccd9b78af65892b54d337e5e2 -->
+<!-- source-sha256: 5a9478a2598ae93b3a4bee9fd68a7374ad09364a70ca2a5f17825f7d75915e03 -->
 # 검증
 
 [English](validation.md)
@@ -111,6 +111,9 @@ canonical locked-package bootstrap 뒤에 모든 job은 pin된 npm과 잠긴 pac
 
 
 docs job은 tool 설치 후 Git hook을 준비합니다. language와 parity installer는 오프라인 lint 전에 설치된 kit Rust checker crate를 다운로드합니다. 다운로드는 설치 단계로 유지하며 어떤 검사도 네트워크 접근을 활성화하지 않습니다.
+
+
+Kit가 관리하는 provider gate는 [config/ci.json](../../config/ci.json)을 읽습니다. 전체 parity 경로는 필수로 유지합니다. setup은 Kit의 native runtime 기본값, PEP 751 lock 모델을 위한 저장소 Python editable installer, pin된 PHP arginfo installer를 재사용합니다. shared metadata 검사는 Go, PHP, Python prerequisite를 명시합니다. 앱 recipe는 Kit gate를 대체하지 않습니다.
 
 <a id="publish"></a>
 ## main 게시
