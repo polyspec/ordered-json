@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: f9db29f660da844eaedb1797aada0921ca0101287316ae173625231a0708343e -->
+<!-- source-sha256: c18b0e4fe5e33d57489725af15a6cef3b89767025fc2b0abb27987b43ba7e993 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -9,6 +9,8 @@
 
 <a id="v0011"></a>
 ## 0.0.11
+
+- documentation job의 설치 범위를 넓히는 대신 Python과 Rust를 명시적으로 준비하는 parity에서 언어 간 test marker와 release metadata를 검사한다(T2.83-4).
 
 - native Go unit test는 library package에서 실행하고 helper command 빌드는 유지한다. 모든 추적된 Go test가 선택한 package에 속하는지 검증해 새로운 test 누락을 방지한다(T2.83-3).
 
