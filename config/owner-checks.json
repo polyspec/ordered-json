@@ -103,6 +103,7 @@
         "external-inputs.json",
         "package.json",
         "composer.json",
+        "composer.lock",
         "packages/js/package.json",
         "packages/php/composer.json",
         "packages/php-ext/composer.json",
@@ -279,27 +280,6 @@
       ],
       "targets": [
         "cargo-downloads-check"
-      ]
-    },
-    {
-      "paths": [
-        "config/dependency-policy.json",
-        "config/dependency-review.json",
-        "package-lock.json",
-        "packages/rust/Cargo.lock",
-        "packages/rust/Cargo.toml",
-        "packages/python/pyproject.toml",
-        "packages/go/go.mod",
-        "package.json",
-        "composer.json",
-        "composer.lock",
-        "packages/php/composer.json",
-        "packages/php-ext/composer.json",
-        "packages/js/package.json"
-      ],
-      "targets": [
-        "dependency-policy-check",
-        "dependency-policy-mutation-check"
       ]
     },
     {

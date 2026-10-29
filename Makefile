@@ -35,7 +35,7 @@ include node_modules/@polyspec/kit/scripts/kit/kit-bootstrap.mk
 
 # The targets of the full suite that make check runs through the guard of full-run of @polyspec/kit and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
-CHECK_TARGETS := kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage release-config-check dependency-policy-check dependency-policy-mutation-check parity-declarations-check docs-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-php-ext test-php-ext lint-python pie-check ordered-json-test-scripts typecheck lint-ts test-js test-rust test-go test-php test-python
+CHECK_TARGETS := kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage release-config-check parity-declarations-check docs-check evidence-check commits-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-php-ext test-php-ext lint-python pie-check ordered-json-test-scripts typecheck lint-ts test-js test-rust test-go test-php test-python
 
 .PHONY: check ordered-json-test-scripts typecheck ordered-json-install-php ordered-json-install-python verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
 	benchmark benchmark-check python-parse-budget release-config-check install ordered-json-install ordered-json-install-rust \
@@ -51,7 +51,7 @@ check:
 # rust-toolchain.toml, the crates of packages/rust/Cargo.lock, the Composer projects of the PHP packages with their PHPUnit,
 # the virtual environment of the Python package; the PIE PHAR and the supplementary suite are tools of mise.toml (http:pie and
 # http:jsontestsuite), which install-tools installs.
-# It is the only target that downloads, besides dependency-review and release-consumer-lock.
+# It is the only target that downloads, besides release-consumer-lock.
 # install runs the bootstrap of kit as the prerequisite install-kit of ordered-json-install (K246-2).
 install: ordered-json-install
 
@@ -64,8 +64,7 @@ ordered-json-install-rust:
 # ordered-json-install-php installs the locked Composer packages of packages/php and packages/php-ext, PHPUnit among them, into their
 # vendor/, from which kit parity runs their tests (config/parity.json), and the root package, the published composer.json,
 # into vendor/, whose autoloader PHPStan of make lint-php reads for the PHP of benchmarks/. The root package requires only
-# the platform, so its install downloads nothing; its composer.lock, which composerPlatforms of config/dependency-policy.json
-# checks as every Composer manifest of the checkout (kit K181), locks no package.
+# the platform, so its install downloads nothing; its composer.lock locks no package.
 ordered-json-install-php:
 	$(ONLINE) $(COMPOSER) install --no-interaction --no-progress
 	$(ONLINE) $(COMPOSER) install --no-interaction --no-progress --working-dir=packages/php

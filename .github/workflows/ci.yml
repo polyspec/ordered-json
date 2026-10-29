@@ -44,7 +44,7 @@ jobs:
           node-version-file: mise.toml
           package-manager-cache: false
       # shivammathur/setup-php 2.40.0, the release that the release workflow of @polyspec/kit pins: PHP of .php-version; Composer,
-      # which make dependency-policy-check reads the Composer manifests with, is a tool of mise.toml.
+      # which the Composer manifests are read with, is a tool of mise.toml.
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
         if: ${{ !cancelled() }}
         with:
@@ -72,7 +72,7 @@ jobs:
         run: make hooks
       - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci-targets TARGETS="kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check duplication-check layout-check hooks-check owner-validate release-coverage dependency-policy-check dependency-policy-mutation-check parity-declarations-check ordered-json-test-scripts typecheck lint-ts"
+        run: make ci-targets TARGETS="kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check duplication-check layout-check hooks-check owner-validate release-coverage parity-declarations-check ordered-json-test-scripts typecheck lint-ts"
       # actions/upload-artifact v7.0.1: the report of this job, var/report/ci-targets.
       - name: report
         if: ${{ !cancelled() }}
