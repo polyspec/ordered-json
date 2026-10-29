@@ -5,6 +5,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.92: kit K804, K805 and K798 are adopted: the pre-commit hook, the pre-push and pre-merge-commit hooks, commit-identity, commits-check, push-gate, the release consumers and proof and check-commit-records leave (T2.92)
 - T2.91: the kit copies that rules-check flagged are refreshed with make kit-sync (T2.91)
 
 - T2.89: the pythonBackend of the toolchain, which kit K788 deletes, is removed from config/toolchain.json (T2.89)

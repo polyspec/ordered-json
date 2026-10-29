@@ -20,7 +20,6 @@
       ],
       "targets": [
         "ordered-json-test-scripts",
-        "push-gate-commit",
         "docs-check",
         "evidence-check"
       ]
@@ -128,14 +127,12 @@
     {
       "paths": [
         ".githooks/pre-commit",
-        ".githooks/pre-push",
         "config/checklist.json",
         "config/owner-checks.json"
       ],
       "targets": [
         "hooks-check",
-        "owner-validate",
-        "push-gate-commit"
+        "owner-validate"
       ]
     },
     {
@@ -239,7 +236,6 @@
     {
       "paths": [
         "config/release.json",
-        "tests/release-consumer/**",
         "CHANGELOG.md",
         "CHANGELOG.ko.md"
       ],

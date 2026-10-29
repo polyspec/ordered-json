@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: c4f02fb6c3583bb4d35d7e7ce5612762034288aa833be67bca25242266de43f6 -->
+<!-- source-sha256: 8801261b81c8296f1af24de04f096e5be0292622d2332cf75809566904331c9b -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.92: kit K804, K805, K798을 채택한다: pre-commit hook, pre-push와 pre-merge-commit hook, commit-identity, commits-check, push-gate, release consumer와 proof, check-commit-records를 제거한다 (T2.92)
 - T2.91: rules-check가 지적한 kit 사본을 make kit-sync로 갱신한다 (T2.91)
 
 - T2.89: kit K788이 삭제하는 toolchain의 pythonBackend를 config/toolchain.json에서 제거한다 (T2.89)

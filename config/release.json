@@ -2,13 +2,33 @@
   "schema": 1,
   "repositoryUrl": "https://github.com/polyspec/ordered-json",
   "changelog": "CHANGELOG.md",
-  "changelogTranslations": ["CHANGELOG.ko.md"],
-  "checks": ["push-gate", "ci-passed"],
+  "changelogTranslations": [
+    "CHANGELOG.ko.md"
+  ],
+  "checks": [
+    "ci-passed"
+  ],
   "packages": [
-    { "kind": "npm", "directory": "packages/js", "name": "@polyspec/ordered-json" },
-    { "kind": "composer", "directory": "packages/php", "name": "polyspec/ordered-json" },
-    { "kind": "composer", "directory": "packages/php-ext", "name": "polyspec/ordered-json-php-ext" },
-    { "kind": "wheel", "directory": "packages/python", "name": "polyspec-ordered-json" }
+    {
+      "kind": "npm",
+      "directory": "packages/js",
+      "name": "@polyspec/ordered-json"
+    },
+    {
+      "kind": "composer",
+      "directory": "packages/php",
+      "name": "polyspec/ordered-json"
+    },
+    {
+      "kind": "composer",
+      "directory": "packages/php-ext",
+      "name": "polyspec/ordered-json-php-ext"
+    },
+    {
+      "kind": "wheel",
+      "directory": "packages/python",
+      "name": "polyspec-ordered-json"
+    }
   ],
   "manifests": {
     "package.json": "version",
@@ -19,49 +39,8 @@
     "packages/rust/Cargo.toml": "git-tag",
     "packages/python/pyproject.toml": "archive"
   },
-  "notReleased": {
-    "tests/release-consumer/npm/package.json": "the npm consumer project of the release archives",
-    "tests/release-consumer/composer/composer.json": "the Composer consumer project of the release archives"
-  },
+  "notReleased": {},
   "goModules": {
     "packages/go": "github.com/polyspec/ordered-json/packages/go"
-  },
-  "consumers": {
-    "npm": {
-      "directory": "tests/release-consumer/npm",
-      "smoke": {
-        "@polyspec/ordered-json": [
-          "node",
-          "--input-type=module",
-          "-e",
-          "import { parse, stringify } from '@polyspec/ordered-json'; if (stringify(parse('{\"b\":1,\"a\":2}')) !== '{\"b\":1,\"a\":2}') throw new Error('the member order is not kept');"
-        ]
-      }
-    },
-    "composer": {
-      "directory": "tests/release-consumer/composer",
-      "smoke": {
-        "polyspec/ordered-json": [
-          "php",
-          "-r",
-          "require 'vendor/autoload.php'; if (Polyspec\\OrderedJson\\stringify(Polyspec\\OrderedJson\\Value::parse('{\"b\":1,\"a\":2}')) !== '{\"b\":1,\"a\":2}') { exit(1); }"
-        ]
-      }
-    },
-    "wheel": {
-      "smoke": {
-        "polyspec-ordered-json": ["python", "-c", "import importlib.resources, polyspec.ordered_json; raise SystemExit(0 if importlib.resources.files('polyspec.ordered_json').joinpath('py.typed').is_file() else 'the wheel lacks the py.typed marker of polyspec.ordered_json')"]
-      },
-      "lock": { "polyspec-ordered-json": "packages/python/pylock.toml" }
-    }
-  },
-  "proof": {
-    "gitTag": {
-      "packages/rust/Cargo.toml": {
-        "kind": "rust",
-        "name": "polyspec-ordered-json",
-        "smoke": ["cargo", "check"]
-      }
-    }
   }
 }

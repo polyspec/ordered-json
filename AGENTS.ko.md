@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 7171c70e0116b8e0f55bfffd0db461f886c653de4926b8f6b2863c638bd7261e -->
+<!-- source-sha256: 642583e65e6273dfbd5b5b735ca57afc39a0c635e48088b088ce2cba69413bbf -->
 # Development procedure
 
 [English](AGENTS.md)
@@ -37,8 +37,8 @@
 
 - Own: [실행 체크리스트](docs/plans/execution/checklist.ko.md)는 검사, 도구, CI처럼 제품 기능이 아닌 이 저장소의 작업을 추적합니다. 각 작업은 ID `T<wave>.<task>`를 가진 행입니다. 새 문제는 새 작업을 받고, 완료된 작업과 관련된 문제는 다음 파생 ID(`T1.1-1`)를 가진 하위 항목을 받습니다.
   Enforced by: `make docs-check`
-- Own: push는 `[~]` 작업이 없을 때만 합니다. pre-push hook은 push되는 commit이나 working tree에 활성 작업이 있으면 push를 거부하고, 체크리스트를 읽을 수 없으면 거부합니다. `.github/workflows/push-gate.yml`의 push-gate job은 push된 commit에 같은 검사를 실행합니다. hook이 없는 checkout은 hook을 실행하지 않기 때문입니다.
-  Enforced by: `.githooks/pre-push`, `make ci-targets`
+- Own: push는 `[~]` 작업이 없을 때만 합니다.
+  Enforced by: none, 검토에서 판단합니다.
 - Own: `make check`의 guard는 `[~]` 작업이 있거나, 추적 변경이 commit되지 않았거나, 무시되지 않은 untracked 파일이 있으면 시작을 거부하며, commit된 tree의 각 전체 실행을 `var/full-run.json`에 기록합니다. 전체 실행은 commit된 tree만 검증합니다.
   Enforced by: `make check`
 
@@ -51,7 +51,7 @@
   Enforced by: `make ci-targets`
 - Own: 모든 추적 경로는 [config/owner-checks.json](config/owner-checks.json)의 규칙이 소유합니다. pre-commit hook은 `make owner-validate`를 실행하며, 이는 어떤 규칙도 맞지 않는 경로, 어떤 path도 맞지 않는 glob, 존재하지 않는 owner가 있으면 commit을 거부합니다. 새 파일은 같은 commit에서 매핑합니다.
   Enforced by: `.githooks/pre-commit`
-- Own: Makefile의 `CHECK_TARGETS`의 각 target은 `.github/workflows/ci.yml` 또는 `.github/workflows/push-gate.yml`의 정확히 한 job에서 `make ci-targets TARGETS="..."`로 실행되며, 이는 실패 뒤에도 끝까지 실행하고 각 job의 보고서를 업로드합니다.
+- Own: Makefile의 `CHECK_TARGETS`의 각 target은 `.github/workflows/ci.yml`의 정확히 한 job에서 `make ci-targets TARGETS="..."`로 실행되며, 이는 실패 뒤에도 끝까지 실행하고 각 job의 보고서를 업로드합니다.
   Enforced by: `make ordered-json-test-scripts`
 - Own: 각 언어의 lint가 통과합니다: `make lint-rust`(`-D warnings`의 clippy), `make lint-go`(`.golangci.yml`의 golangci-lint와 deadcode), `make lint-php`(`phpcs.xml.dist`의 phpcs와 PHPStan), `make lint-python`(`ruff.toml`의 ruff와 vulture).
   Enforced by: `make ci-targets`
@@ -84,11 +84,11 @@
 - Own: version-bump commit `Release X.Y.Z`는 저장소의 모든 manifest에 version을 설정하며, 이는 `make release-versions`가 검사합니다. 또 `make dependency-review RECORD=1`로 dependency review를 다시 기록하고, `make release-consumer-lock TAG=vX.Y.Z`로 consumer lock을 쓰며, 각 changelog의 `## Unreleased`를 `## X.Y.Z`로 바꿉니다.
   Enforced by: `make release-versions`
 - Own: Go tag `packages/go/vX.Y.Z`는 같은 commit에서 `vX.Y.Z`보다 먼저 push합니다. Go tag가 GitHub에 없이 `vX.Y.Z`만 push되면 release 검증이 실패합니다.
-  Enforced by: `make release-proof`
-- Own: tag push는 `.github/workflows/release.yml`을 실행합니다. 이 workflow는 tag된 commit이 `push-gate`와 `ci-passed`가 통과한 `main`에 있는지, 모든 manifest에 tag의 version이 있는지, `CHANGELOG.md`에 `## X.Y.Z` 절이 있는지 확인한 뒤 archive와 Python wheel을 빌드하고 GitHub Release를 만듭니다.
-  Enforced by: `make release-proof`
+  Enforced by: none, 검토에서 판단합니다.
+- Own: tag push는 `.github/workflows/release.yml`을 실행합니다. 이 workflow는 tag된 commit이 `ci-passed`가 통과한 `main`에 있는지, 모든 manifest에 tag의 version이 있는지, `CHANGELOG.md`에 `## X.Y.Z` 절이 있는지 확인한 뒤 archive와 Python wheel을 빌드하고 GitHub Release를 만듭니다.
+  Enforced by: none, 검토에서 판단합니다.
 - Own: 다른 저장소의 패키지를 고정하는 패키지는 GitHub에 실제로 존재하는 tag만 이름으로 적습니다. 고정은 그 tag를 push한 뒤에 씁니다.
-  Enforced by: `make release-proof`
+  Enforced by: none, 검토에서 판단합니다.
 
 <a id="tools"></a>
 ## Shared tools
@@ -134,7 +134,7 @@
 - Own: 문서의 정확성을 확인하려면 코드와 테스트를 검토합니다. 자동 링크, 개정, 상태 검사는 산문의 정확성을 증명하지 않습니다.
   Enforced by: none, 산문의 정확성은 어떤 도구도 판단할 수 없는 판단 사항입니다.
 - Own: Git 메시지는 사실에 맞고 간결하게 쓰며, 관계없는 변경은 따로 commit합니다.
-  Enforced by: `make commits-check`
+  Enforced by: none, 검토에서 판단합니다.
 
 <a id="package-npm"></a>
 ## 패키지 npm (packages/js)

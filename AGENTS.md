@@ -36,8 +36,8 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
 
 - Own: The [execution checklist](docs/plans/execution/checklist.md) tracks the tasks of this repository that are not product features, such as checks, tools and CI. Each task is a row with an ID `T<wave>.<task>`. A new problem gets a new task, and a problem related to a task that is done gets a sub-item with the next derived ID (`T1.1-1`).
   Enforced by: `make docs-check`
-- Own: A push happens only when no task is `[~]`. The pre-push hook refuses a push while a pushed commit or the working tree has an active task, and refuses when it cannot read the checklist. The push gate job of `.github/workflows/push-gate.yml` runs the same check on the pushed commit, because a checkout without the hook does not run it.
-  Enforced by: `.githooks/pre-push`, `make ci-targets`
+- Own: A push happens only when no task is `[~]`.
+  Enforced by: none, judged at review.
 - Own: The guard of `make check` refuses to start while a task is `[~]`, while tracked changes are uncommitted or while an untracked file is not ignored, and it records each full run of a committed tree in `var/full-run.json`. A full run verifies a committed tree only.
   Enforced by: `make check`
 
@@ -50,7 +50,7 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
   Enforced by: `make ci-targets`
 - Own: Every tracked path is owned by a rule of [config/owner-checks.json](config/owner-checks.json). The pre-commit hook runs `make owner-validate`, which refuses a commit while a path matches no rule, a glob matches no path or an owner does not exist. A new file is mapped in the same commit.
   Enforced by: `.githooks/pre-commit`
-- Own: Each target of `CHECK_TARGETS` in the Makefile runs in exactly one job of `.github/workflows/ci.yml` or `.github/workflows/push-gate.yml`, through `make ci-targets TARGETS="..."`, which runs past failures and uploads each job's report.
+- Own: Each target of `CHECK_TARGETS` in the Makefile runs in exactly one job of `.github/workflows/ci.yml`, through `make ci-targets TARGETS="..."`, which runs past failures and uploads each job's report.
   Enforced by: `make ordered-json-test-scripts`
 - Own: The lint of each language passes: `make lint-rust` (clippy with `-D warnings`), `make lint-go` (golangci-lint with `.golangci.yml`, and deadcode), `make lint-php` (phpcs with `phpcs.xml.dist`, and PHPStan) and `make lint-python` (ruff with `ruff.toml`, and vulture).
   Enforced by: `make ci-targets`
@@ -83,11 +83,11 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
 - Own: The version-bump commit `Release X.Y.Z` sets the version in every manifest of the repository, which `make release-versions` checks, records the dependency review again with `make dependency-review RECORD=1`, writes the consumer locks with `make release-consumer-lock TAG=vX.Y.Z` and renames `## Unreleased` of each changelog to `## X.Y.Z`.
   Enforced by: `make release-versions`
 - Own: The Go tag `packages/go/vX.Y.Z` is pushed before `vX.Y.Z`, on the same commit. A `vX.Y.Z` pushed without its Go tag on GitHub fails the verification of the release.
-  Enforced by: `make release-proof`
-- Own: The tag push runs `.github/workflows/release.yml`, which requires the tagged commit on `main` with `push-gate` and `ci-passed` passed, the version of the tag in every manifest and the section `## X.Y.Z` in `CHANGELOG.md`, then builds the archives and the Python wheel and creates the GitHub Release.
-  Enforced by: `make release-proof`
+  Enforced by: none, judged at review.
+- Own: The tag push runs `.github/workflows/release.yml`, which requires the tagged commit on `main` with `ci-passed` passed, the version of the tag in every manifest and the section `## X.Y.Z` in `CHANGELOG.md`, then builds the archives and the Python wheel and creates the GitHub Release.
+  Enforced by: none, judged at review.
 - Own: A package that pins a package of another repository names only a tag that exists on GitHub. The pin is written after that tag is pushed.
-  Enforced by: `make release-proof`
+  Enforced by: none, judged at review.
 
 <a id="tools"></a>
 ## Shared tools
@@ -133,7 +133,7 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
 - Own: Review code and tests to confirm the accuracy of a document. Automated link, revision and status checks do not establish the accuracy of prose.
   Enforced by: none, the accuracy of prose is a judgement that no tool makes.
 - Own: Git messages are factual and concise, and unrelated changes are committed separately.
-  Enforced by: `make commits-check`
+  Enforced by: none, judged at review.
 
 <a id="package-npm"></a>
 ## Package npm (packages/js)

@@ -23,16 +23,15 @@ const UPLOAD_REPORT = REPORT;
 const KIT_ROOT = path.dirname(fileURLToPath(import.meta.resolve('@polyspec/kit/package.json')));
 const KIT_TOOLS = path.dirname(fileURLToPath(import.meta.resolve('@polyspec/kit/run-tests')));
 // The target of the jobs that is no part of the full suite: the gate that make check itself applies before it runs.
-const GATE_TARGETS = ['push-gate-commit'];
+const GATE_TARGETS: string[] = [];
 const ALWAYS = '${{ !cancelled() }}';
 // The `on:` block of each workflow. In a tag filter * does not match /, so **/v* covers the tags of the Go modules.
 const TRIGGERS: Record<string, unknown> = {
   'ci.yml': { pull_request: null, push: { branches: ['main'] }, workflow_dispatch: null },
-  'push-gate.yml': { push: { branches: ['**'] }, pull_request: null },
   'release.yml': { push: { tags: ['v*', '**/v*'] } },
 };
 // The workflows whose checks the release workflow requires on the tagged commit; they run on every push.
-const CHECK_WORKFLOWS = ['ci.yml', 'push-gate.yml'];
+const CHECK_WORKFLOWS = ['ci.yml'];
 // A step runs one make target: its arguments hold no shell syntax except a ${{ }} expression and, at the end, make variables
 // that take an environment variable of the job by name (TAG="$TAG").
 const MAKE_STEP = /^make [^|;&`$()]*(\$\{\{[^}]*\}\}[^|;&`$()]*)*( [A-Z][A-Z_]*="\$[A-Z][A-Z_]*")*$/;
@@ -218,7 +217,7 @@ test('T2.83-3-2: Go CI uses the unmodified Kit target without an application run
 });
 
 test('every workflow follows the rules', () => {
-  assert.deepEqual(names(), ['ci.yml', 'push-gate.yml']);
+  assert.deepEqual(names(), ['ci.yml']);
   for (const name of names()) assert.deepEqual(violations(name, read(name)), [], name);
 });
 
@@ -260,18 +259,18 @@ test('a job without the report step fails', () => {
 });
 
 test('selected tools keep locked selectors and reject floating versions', () => {
-  const text = read('push-gate.yml');
-  assert.deepEqual(violations('push-gate.yml', changed(text, 'run: make install-tools TOOLS="php composer"\n', 'run: make install-tools TOOLS="uv python"\n')), []);
-  assert.ok(anyIncludes(violations('push-gate.yml', changed(text, 'run: make install-tools TOOLS="php composer"\n', 'run: make install-tools TOOLS="go@latest"\n')), 'TOOLS uses quoted selector names'));
+  const text = read('ci.yml');
+  assert.deepEqual(violations('ci.yml', changed(text, 'run: make install-tools TOOLS="php composer"\n', 'run: make install-tools TOOLS="uv python"\n')), []);
+  assert.ok(anyIncludes(violations('ci.yml', changed(text, 'run: make install-tools TOOLS="php composer"\n', 'run: make install-tools TOOLS="go@latest"\n')), 'TOOLS uses quoted selector names'));
   const setup = changed(text, '      - name: make install-tools TOOLS=npm\n', '      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1\n      - name: make install-tools TOOLS=npm\n');
-  assert.ok(anyIncludes(violations('push-gate.yml', setup), 'installs a toolchain of mise.toml'));
+  assert.ok(anyIncludes(violations('ci.yml', setup), 'installs a toolchain of mise.toml'));
 });
 
 test('a step that runs a script or a tool directly fails', () => {
-  const text = read('push-gate.yml');
+  const text = read('ci.yml');
   for (const command of ['node node_modules/@polyspec/kit/dist/push-gate.mjs commit "${{ github.sha }}"', 'cargo test', 'make check && cargo test', '|', 'make release-proof TAG="$(cat tag)"', 'make release-proof TAG="$TAG" && cargo test']) {
     const broken = changed(text, /run: make ci-targets .*/, `run: ${JSON.stringify(command)}`);
-    assert.ok(anyIncludes(violations('push-gate.yml', broken), 'a step runs one make target, never a script or a tool directly'), command);
+    assert.ok(anyIncludes(violations('ci.yml', broken), 'a step runs one make target, never a script or a tool directly'), command);
   }
 });
 
@@ -296,7 +295,6 @@ test('a new push cancels the previous run of ci only', () => {
   const text = read('ci.yml');
   assert.ok(anyIncludes(violations('ci.yml', changed(text, /\nconcurrency:\n(?: {2}.*\n)+/, '\n')), 'lacks concurrency'));
   assert.ok(anyIncludes(violations('ci.yml', changed(text, "cancel-in-progress: ${{ github.event_name == 'pull_request' }}", 'cancel-in-progress: true')), 'lacks concurrency'));
-  assert.ok(!read('push-gate.yml').includes('concurrency'), 'the push gate of every pushed commit runs to its end');
 });
 
 test('every check workflow runs on push and declares exactly its triggers', () => {

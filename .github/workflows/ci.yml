@@ -7,7 +7,7 @@
 # past failures and writes a report: the log of each target, a summary with the first failure lines of each failed
 # target, which is also the job summary, and the versions of the toolchains of the job. Every job uploads its report
 # under `!cancelled()`. Every target of CHECK_TARGETS, the full suite of `make check`, runs in exactly one job of
-# ci.yml and push-gate.yml (tests/scripts/workflow-rules.test.mts). No step or job has timeout-minutes: a build, an
+# ci.yml (tests/scripts/workflow-rules.test.mts). No step or job has timeout-minutes: a build, an
 # install or a whole suite is a long operation that the log shows line by line; only a test case and an adapter reply
 # have their own deadline. The runner image is ubuntu-24.04. Each action is pinned to the commit of a release; PHP comes
 # from the minor release of .php-version, and the records name the patch release that ran. Go, Python, Composer, alint
@@ -72,7 +72,7 @@ jobs:
         run: make hooks
       - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci-targets TARGETS="kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check duplication-check layout-check hooks-check owner-validate release-coverage parity-declarations-check ordered-json-test-scripts typecheck lint-ts"
+        run: make ci-targets TARGETS="kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check duplication-check layout-check hooks-check owner-validate release-coverage parity-declarations-check docs-check evidence-check ordered-json-test-scripts typecheck lint-ts"
       # actions/upload-artifact v7.0.1: the report of this job, var/report/ci-targets.
       - name: report
         if: ${{ !cancelled() }}
