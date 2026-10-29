@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 3284030faaaad26373624a73f67db8a80b06df570d778eb19f7f65bc0650806d -->
+<!-- source-sha256: 72931884208eab623c62c7e7c0c30a8351377914adb79f857f1b68024cc7f7cc -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -111,4 +111,4 @@
 | T2.89 | kit K788이 삭제하는 toolchain pythonBackend를 config/toolchain.json에서 제거한다 | config/toolchain.json | `make owner-validate` | [o] |
 | T2.90 | kit K801이 삭제한 main 쓰기 훅 .githooks/reference-transaction을 제거한다 | .githooks/reference-transaction | `make owner-validate` | [o] |
 | T2.91 | rules-check가 지적하는 kit 사본을 make kit-sync로 갱신한다 | PRINCIPLES.md AGENTS.md | `make rules-check` | [o] |
-| T2.92 | kit K804, K805, K798 채택: hook, push-gate, commits-check, release proof 제거 | .githooks/pre-commit .githooks/pre-merge-commit .githooks/pre-push config/commit-identity.json config/release.json config/checklist.json Makefile .github/workflows/push-gate.yml .github/workflows/ci.yml config/owner-checks.json AGENTS.md | `make owner-validate` | [~] |
+| T2.92 | kit K804, K805, K798 채택: hook, push-gate, commits-check, release proof 제거 | .githooks/pre-commit .githooks/pre-merge-commit .githooks/pre-push config/commit-identity.json config/release.json config/checklist.json Makefile .github/workflows/push-gate.yml .github/workflows/ci.yml config/owner-checks.json AGENTS.md | `make owner-validate` | [o] |
