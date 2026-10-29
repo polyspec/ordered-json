@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: b50a3b8b400ca961ddf0acfe7a1b83fbaf226d1bc432ac08b9be9eef79d589bd -->
+<!-- source-sha256: b784510d6b9ee214d55f0e4f4314fc92261d2cb4478de888998be65a8eca673d -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -115,3 +115,4 @@
 | T2.93 | 이 저장소에 kit 0.0.70 채택 | package.json package-lock.json config/checklist.json | `make kit-check` | [ ] |
 | T2.94 | 이 저장소에 kit 0.0.72 채택 | package.json package-lock.json .github/workflows/gates.yml config/checklist.json | `make kit-check` | [o] |
 | T2.95 | 이 저장소에 kit 0.0.73 채택 | package.json package-lock.json .github/workflows/gates.yml config/checklist.json | `make kit-check` | [o] |
+| T2.96 | 이 저장소에 kit 0.0.74 채택 | package.json package-lock.json Makefile .github/workflows/ci.yml config/ci.json config/*.json | `make kit-check` | [ ] |

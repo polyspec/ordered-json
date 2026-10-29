@@ -114,3 +114,4 @@
 | T2.93 | Adopt kit 0.0.70 in this repository | package.json package-lock.json config/checklist.json | `make kit-check` | [ ] |
 | T2.94 | Adopt kit 0.0.72 in this repository | package.json package-lock.json .github/workflows/gates.yml config/checklist.json | `make kit-check` | [o] |
 | T2.95 | Adopt kit 0.0.73 in this repository | package.json package-lock.json .github/workflows/gates.yml config/checklist.json | `make kit-check` | [o] |
+| T2.96 | Adopt kit 0.0.74 in this repository | package.json package-lock.json Makefile .github/workflows/ci.yml config/ci.json config/*.json | `make kit-check` | [ ] |
