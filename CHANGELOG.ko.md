@@ -6,6 +6,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.97: release-config-check를 제거한다. kit 0.0.73이 삭제한 release versions를 불렀고, kit의 tag workflow가 version을 검사한다 (T2.97)
 - T2.95: @polyspec/kit을 0.0.73 asset으로 고정하고 lock을 갱신한다 (kit K826, K827, K830) (T2.95)
 - T2.94: @polyspec/kit을 0.0.72 asset으로 고정하고 lock을 갱신하며, CI는 make link와 link-state-check를 실행하지 않는다 (T2.94)
 - T2.93: @polyspec/kit을 0.0.70 asset으로 고정하고 lock을 갱신하며, make kit-sync로 kit 사본을 갱신한다 (T2.93)

@@ -5,6 +5,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.97: release-config-check is removed: it called the release versions that kit 0.0.73 deleted (K812), and the tag workflow of kit checks the version (T2.97)
 - T2.95: @polyspec/kit is pinned to the 0.0.73 asset and the lock is updated (kit K826, K827, K830) (T2.95)
 - T2.94: @polyspec/kit is pinned to the 0.0.72 asset and the lock is updated; CI runs no make link or link-state-check (T2.94)
 - T2.93: @polyspec/kit is pinned to the 0.0.70 asset, the lock is updated, and the kit copies are refreshed with make kit-sync (T2.93)

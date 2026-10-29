@@ -133,7 +133,7 @@ jobs:
         env:
           JSON_TEST_SUITE: var/tools/mise/installs/http-jsontestsuite/latest
           TOOLS: node npm mise go rust php composer python uv
-        run: make ci-targets TARGETS="toolchain-check cargo-downloads-check test-markers-check release-config-check verify-all parity-check"
+        run: make ci-targets TARGETS="toolchain-check cargo-downloads-check test-markers-check verify-all parity-check"
       # actions/upload-artifact v7.0.1
       - name: report
         if: ${{ !cancelled() }}

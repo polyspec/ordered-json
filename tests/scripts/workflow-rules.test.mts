@@ -150,7 +150,7 @@ const LANGUAGE_TARGETS: Record<string, string[]> = {
 };
 function parallelViolations(parsed: Workflow): string[] {
   const found: string[] = [];
-  const expected = { parity: ['toolchain-check', 'cargo-downloads-check', 'test-markers-check', 'release-config-check', 'verify-all', 'parity-check'], ...LANGUAGE_TARGETS };
+  const expected = { parity: ['toolchain-check', 'cargo-downloads-check', 'test-markers-check', 'verify-all', 'parity-check'], ...LANGUAGE_TARGETS };
   for (const [name, targets] of Object.entries(expected)) {
     const job = parsed.jobs[name];
     if (job === undefined) { found.push(`missing independent job ${name}`); continue; }

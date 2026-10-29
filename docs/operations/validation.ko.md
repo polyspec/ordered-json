@@ -83,7 +83,7 @@ PIE 기록 `var/records/pie-verification.json`은 PIE 버전과 PHAR 해시, 실
 
 | Job | Targets |
 | --- | --- |
-| `parity` | `toolchain-check cargo-downloads-check test-markers-check release-config-check verify-all parity-check` |
+| `parity` | `toolchain-check cargo-downloads-check test-markers-check verify-all parity-check` |
 | `js` | `test-js` |
 | `rust` | `test-rust lint-rust` |
 | `go` | `test-go lint-go` |
@@ -98,7 +98,7 @@ make install-tools TOOLS="go rust php composer python uv"
 make kit-install-symbols EXTRACTORS="go php"
 make kit-install-php-arginfo
 make ordered-json-install-parity
-make ci-targets TARGETS="toolchain-check cargo-downloads-check test-markers-check release-config-check verify-all parity-check"
+make ci-targets TARGETS="toolchain-check cargo-downloads-check test-markers-check verify-all parity-check"
 ~~~
 
 canonical locked-package bootstrap 뒤에 모든 job은 pin된 npm과 잠긴 package를 설치합니다. 각 language job은 Kit `make install-tools TOOLS="..."`로 도구를 요청하고 잠긴 Rust, Composer, Python 의존성을 위해 product package installer를 재사용합니다. parity job은 같은 package installer로 자기 checkout에 비교에 필요한 전체 환경을 준비합니다. Kit 0.0.61이 선택 설치를 제공합니다. parity는 Kit target으로 Go/PHP symbol extractor와 PHP arginfo를 명시적으로 설치하고 extension job은 PHP arginfo만 설치합니다. 잠긴 PIE와 supplementary input은 product install target에서 native mise로 다운로드합니다. 여기서는 custom tool installer를 유지하지 않으며 측정 전 속도 향상을 주장하지 않습니다. `docs` job은 `make install-tools`로 repository 검사와 TypeScript lint를 실행하고 Git hook을 준비합니다. push gate는 `push-gate-commit`, `docs-check`, `evidence-check`, `commits-check`를 유지합니다. release와 gates workflow는 계속 kit가 관리합니다.

@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: a53615b82ddec3817e0f0121650f262d7cb335afbd710419085b982affabd312 -->
+<!-- source-sha256: 79395f6ac0f90ebb01aaa1dd0439e87dc870cf0201da3d2ae8b9ad87c8221121 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -116,4 +116,4 @@
 | T2.94 | 이 저장소에 kit 0.0.72 채택 | package.json package-lock.json .github/workflows/gates.yml config/checklist.json | `make kit-check` | [o] |
 | T2.95 | 이 저장소에 kit 0.0.73 채택 | package.json package-lock.json .github/workflows/gates.yml config/checklist.json | `make kit-check` | [o] |
 | T2.96 | 이 저장소에 kit 0.0.74 채택 | package.json package-lock.json Makefile .github/workflows/ci.yml config/ci.json config/*.json | `make kit-check` | [ ] |
-| T2.97 | kit이 삭제한 release versions를 부르는 release-config-check를 제거한다 | Makefile .github/workflows/ci.yml config/owner-checks.json tests/scripts/workflow-rules.test.mts docs/operations/validation.md docs/operations/validation.ko.md | `make kit-check` | [ ] |
+| T2.97 | kit이 삭제한 release versions를 부르는 release-config-check를 제거한다 | Makefile .github/workflows/ci.yml config/owner-checks.json tests/scripts/workflow-rules.test.mts docs/operations/validation.md docs/operations/validation.ko.md | `make kit-check` | [o] |

@@ -35,10 +35,10 @@ include node_modules/@polyspec/kit/scripts/kit/kit-bootstrap.mk
 
 # The targets of the full suite that make check runs through the guard of full-run of @polyspec/kit and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
-CHECK_TARGETS := kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage release-config-check parity-declarations-check docs-check evidence-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-php-ext test-php-ext lint-python pie-check ordered-json-test-scripts typecheck lint-ts test-js test-rust test-go test-php test-python
+CHECK_TARGETS := kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage parity-declarations-check docs-check evidence-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-php-ext test-php-ext lint-python pie-check ordered-json-test-scripts typecheck lint-ts test-js test-rust test-go test-php test-python
 
 .PHONY: check ordered-json-test-scripts typecheck ordered-json-install-php ordered-json-install-python verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
-	benchmark benchmark-check python-parse-budget release-config-check install ordered-json-install ordered-json-install-rust \
+	benchmark benchmark-check python-parse-budget install ordered-json-install ordered-json-install-rust \
 	ordered-json-js-check ordered-json-js-test ordered-json-go-check ordered-json-go-test ordered-json-php-check ordered-json-php-test \
 	ordered-json-php-ext-check ordered-json-php-ext-test ordered-json-python-check ordered-json-python-test ordered-json-rust-check ordered-json-rust-test
 
@@ -116,12 +116,6 @@ verify-js verify-rust verify-go verify-php verify-php-extension verify-python: t
 # JSON reports of docs/ (scripts/check-evidence.mts); verify-all runs it again with the verification records of the run.
 evidence-check:
 	$(NODE) scripts/check-evidence.mts
-
-# release-config-check runs the step versions of the release (release of @polyspec/kit, config/release.json) for the tag of the
-# version of the root package.json: every manifest of config/release.json declares that version, the module path of every Go
-# module is the declared one, and CHANGELOG.md and CHANGELOG.ko.md hold its section.
-release-config-check:
-	$(NODE) $(KIT)/release.$(KIT_EXT) versions "v$$($(NODE) -p "require('./package.json').version")"
 
 # pie-check builds the extension with the PIE PHAR of mise.toml, verifies the module with the shared cases and writes
 # var/records/pie-verification.json (scripts/check-pie.mts).

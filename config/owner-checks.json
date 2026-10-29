@@ -112,8 +112,7 @@
       ],
       "targets": [
         "ordered-json-test-scripts",
-        "release-coverage",
-        "release-config-check"
+        "release-coverage"
       ]
     },
     {
@@ -240,8 +239,7 @@
         "CHANGELOG.ko.md"
       ],
       "targets": [
-        "release-coverage",
-        "release-config-check"
+        "release-coverage"
       ]
     },
     {
