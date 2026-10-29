@@ -108,3 +108,4 @@
 | T2.87 | Remove the dependency-policy-check references deleted with kit K784 (CI targets, CHECK_TARGETS, owner-checks, dependency-policy.json, dependency-review.json) | ci.yml Makefile config/owner-checks.json config/toolchain.json config/dependency-policy.json config/dependency-review.json | `make owner-validate` | [o] |
 | T2.88 | Remove the wheel polyspec consumer, whose kit gate K789 deleted, from config/release.json | config/release.json | `make owner-validate` | [o] |
 | T2.89 | Remove the toolchain pythonBackend, which kit K788 deletes, from config/toolchain.json | config/toolchain.json | `make owner-validate` | [ ] |
+| T2.90 | Remove the .githooks/reference-transaction main writer hook that kit K801 deleted | .githooks/reference-transaction | `make owner-validate` | [ ] |
