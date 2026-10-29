@@ -109,4 +109,4 @@
 | T2.88 | Remove the wheel polyspec consumer, whose kit gate K789 deleted, from config/release.json | config/release.json | `make owner-validate` | [o] |
 | T2.89 | Remove the toolchain pythonBackend, which kit K788 deletes, from config/toolchain.json | config/toolchain.json | `make owner-validate` | [o] |
 | T2.90 | Remove the .githooks/reference-transaction main writer hook that kit K801 deleted | .githooks/reference-transaction | `make owner-validate` | [o] |
-| T2.91 | Refresh the kit copies that rules-check flags, with make kit-sync | PRINCIPLES.md AGENTS.md | `make rules-check` | [~] |
+| T2.91 | Refresh the kit copies that rules-check flags, with make kit-sync | PRINCIPLES.md AGENTS.md | `make rules-check` | [o] |

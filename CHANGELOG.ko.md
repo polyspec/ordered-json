@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 575bc759470ee671c76ac31633e04899cff3853852240024dbace5b69c2e278b -->
+<!-- source-sha256: c4f02fb6c3583bb4d35d7e7ce5612762034288aa833be67bca25242266de43f6 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.91: rules-check가 지적한 kit 사본을 make kit-sync로 갱신한다 (T2.91)
 
 - T2.89: kit K788이 삭제하는 toolchain의 pythonBackend를 config/toolchain.json에서 제거한다 (T2.89)
 - T2.90: kit K801이 삭제한 main 쓰기 훅을 제거한다 (T2.90)

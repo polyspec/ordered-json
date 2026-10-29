@@ -5,6 +5,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.91: the kit copies that rules-check flagged are refreshed with make kit-sync (T2.91)
 
 - T2.89: the pythonBackend of the toolchain, which kit K788 deletes, is removed from config/toolchain.json (T2.89)
 - T2.90: the main writer hook that kit K801 deleted is removed (T2.90)

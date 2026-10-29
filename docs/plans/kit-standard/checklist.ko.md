@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: ba16289916139a7c64e770c9c83464376c2257584438d576320ebc4bf8ee3736 -->
+<!-- source-sha256: aaf502f537abdc913307e4d7ffd6f2839a400d79b58802303c491fd667da5948 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -110,4 +110,4 @@
 | T2.88 | kit K789가 삭제한 wheel polyspec 소비자를 config/release.json에서 제거한다 | config/release.json | `make owner-validate` | [o] |
 | T2.89 | kit K788이 삭제하는 toolchain pythonBackend를 config/toolchain.json에서 제거한다 | config/toolchain.json | `make owner-validate` | [o] |
 | T2.90 | kit K801이 삭제한 main 쓰기 훅 .githooks/reference-transaction을 제거한다 | .githooks/reference-transaction | `make owner-validate` | [o] |
-| T2.91 | rules-check가 지적하는 kit 사본을 make kit-sync로 갱신한다 | PRINCIPLES.md AGENTS.md | `make rules-check` | [~] |
+| T2.91 | rules-check가 지적하는 kit 사본을 make kit-sync로 갱신한다 | PRINCIPLES.md AGENTS.md | `make rules-check` | [o] |
