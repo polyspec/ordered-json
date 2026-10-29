@@ -5,6 +5,9 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+
+## 0.0.13
+- T2.100: ordered-json 0.0.13 is released: the version of every manifest and lock of config/release.json is 0.0.13, and the changelogs name it (T2.100)
 - T2.99: @polyspec/kit is pinned to the 0.0.74 asset and the lock is updated (kit K873 among the release) (T2.99)
 - T2.98: the userland parse and stringify functions and MAX_DEPTH are guarded, so the loaded extension takes precedence and PHP starts with both the package and the extension (T2.98)
 - T2.97: release-config-check is removed: it called the release versions that kit 0.0.73 deleted (K812), and the tag workflow of kit checks the version (T2.97)
