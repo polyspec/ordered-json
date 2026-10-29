@@ -5,6 +5,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.88: the wheel polyspec consumer, whose kit gate K789 deleted, is removed from config/release.json (T2.88)
 - T2.87: the gate of dependency-policy-check is gone with kit K784, and the references and the config files that only it read are removed (T2.87)
 - T2.86: the shared workflows are the kit-sync copies (K671-2), and kit-check passes (T2.86)
 

@@ -106,5 +106,5 @@
 | T2.85-2 | Adopt a published Kit fix for issue #18 and require actual execution of the selected mandatory provider parity path plus all native CI before publishing OrderedJSON 0.0.12. | Kit dependency and lock, canonical gates, dependency review, complete native and provider CI, release proof | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [ ] |
 | T2.86 | Adopt kit-sync copies of the shared files (K671-2) and make kit-check green | .github/workflows | `make kit-check` | [o] |
 | T2.87 | Remove the dependency-policy-check references deleted with kit K784 (CI targets, CHECK_TARGETS, owner-checks, dependency-policy.json, dependency-review.json) | ci.yml Makefile config/owner-checks.json config/toolchain.json config/dependency-policy.json config/dependency-review.json | `make owner-validate` | [o] |
-| T2.88 | Remove the wheel polyspec consumer, whose kit gate K789 deleted, from config/release.json | config/release.json | `make owner-validate` | [ ] |
+| T2.88 | Remove the wheel polyspec consumer, whose kit gate K789 deleted, from config/release.json | config/release.json | `make owner-validate` | [o] |
 | T2.89 | Remove the toolchain pythonBackend, which kit K788 deletes, from config/toolchain.json | config/toolchain.json | `make owner-validate` | [ ] |

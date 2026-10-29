@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: e8587ec829e7c099d6f6a6c538d4664302e90e33dc617ed0a3a065cfc1ef52b8 -->
+<!-- source-sha256: dd97ab33a4da664d114612f9eb5c46fa698d44ce3140a7cb869cf2a81b6fa44f -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -107,5 +107,5 @@
 | T2.85-2 | issue #18의 공개 Kit 수정본을 채택하고 선택한 필수 provider parity 경로의 실제 실행과 전체 native CI를 확인한 뒤 OrderedJSON 0.0.12를 공개한다. | Kit dependency and lock, canonical gates, dependency review, complete native and provider CI, release proof | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [ ] |
 | T2.86 | kit-sync로 공유 파일 사본을 채택하고 kit-check를 통과시킨다 (K671-2) | .github/workflows | `make kit-check` | [o] |
 | T2.87 | kit K784이 삭제한 dependency-policy-check 참조(CI 대상, CHECK_TARGETS, owner-checks, dependency-policy.json, dependency-review.json)를 제거한다 | ci.yml Makefile config/owner-checks.json config/toolchain.json config/dependency-policy.json config/dependency-review.json | `make owner-validate` | [o] |
-| T2.88 | kit K789가 삭제한 wheel polyspec 소비자를 config/release.json에서 제거한다 | config/release.json | `make owner-validate` | [ ] |
+| T2.88 | kit K789가 삭제한 wheel polyspec 소비자를 config/release.json에서 제거한다 | config/release.json | `make owner-validate` | [o] |
 | T2.89 | kit K788이 삭제하는 toolchain pythonBackend를 config/toolchain.json에서 제거한다 | config/toolchain.json | `make owner-validate` | [ ] |
