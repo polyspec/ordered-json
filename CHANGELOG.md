@@ -5,12 +5,15 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- T2.89: the pythonBackend of the toolchain, which kit K788 deletes, is removed from config/toolchain.json (T2.89)
 - T2.90: the main writer hook that kit K801 deleted is removed (T2.90)
 - T2.88: the wheel polyspec consumer, whose kit gate K789 deleted, is removed from config/release.json (T2.88)
 - T2.87: the gate of dependency-policy-check is gone with kit K784, and the references and the config files that only it read are removed (T2.87)
 - T2.86: the shared workflows are the kit-sync copies (K671-2), and kit-check passes (T2.86)
 
 <a id="v0012"></a>
+
 ## 0.0.12
 
 - Adopt published Kit 0.0.63 with the shared Go no-test-package and clean-bootstrap fixes. Keep the unmodified native test-go suite, independent cross-language verification and canonical provider gates; prepare 0.0.12 with native consumer locks and dependency review (T2.85) (T2.85-1).

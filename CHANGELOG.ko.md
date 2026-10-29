@@ -1,17 +1,20 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 8d451b0b5b24f296eadd50509fff147a0fb34a47a774a30c16dc965bb5a61f41 -->
+<!-- source-sha256: 575bc759470ee671c76ac31633e04899cff3853852240024dbace5b69c2e278b -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+- T2.89: kit K788이 삭제하는 toolchain의 pythonBackend를 config/toolchain.json에서 제거한다 (T2.89)
 - T2.90: kit K801이 삭제한 main 쓰기 훅을 제거한다 (T2.90)
 - T2.88: kit K789가 삭제한 wheel polyspec 소비자를 config/release.json에서 제거한다 (T2.88)
 - T2.87: kit K784이 삭제한 dependency-policy-check 참조와 그 게이트만 읽던 설정 파일을 제거한다 (T2.87)
 - T2.86: 공유 워크플로는 kit-sync 사본이며 kit-check가 통과한다 (T2.86)
 
 <a id="v0012"></a>
+
 ## 0.0.12
 
 - Go no-test-package 및 clean bootstrap 공통 수정을 포함한 공개 Kit 0.0.63을 채택한다. 수정하지 않은 native test-go suite, 독립 언어 간 검증과 canonical provider gate를 유지하고 native consumer lock 및 dependency review로 0.0.12를 준비한다(T2.85) (T2.85-1).

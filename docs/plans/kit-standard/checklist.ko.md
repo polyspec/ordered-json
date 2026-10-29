@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 490b0d3e8b8379a37c2f6460243cc5ea80ac6d5e8ab6b6f744d47d041550689f -->
+<!-- source-sha256: 0c3f37ab187b9bed21c1451a0e80a4e7ea5e080d09e6cb5d6b4ce0cdd79b5327 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -108,5 +108,5 @@
 | T2.86 | kit-sync로 공유 파일 사본을 채택하고 kit-check를 통과시킨다 (K671-2) | .github/workflows | `make kit-check` | [o] |
 | T2.87 | kit K784이 삭제한 dependency-policy-check 참조(CI 대상, CHECK_TARGETS, owner-checks, dependency-policy.json, dependency-review.json)를 제거한다 | ci.yml Makefile config/owner-checks.json config/toolchain.json config/dependency-policy.json config/dependency-review.json | `make owner-validate` | [o] |
 | T2.88 | kit K789가 삭제한 wheel polyspec 소비자를 config/release.json에서 제거한다 | config/release.json | `make owner-validate` | [o] |
-| T2.89 | kit K788이 삭제하는 toolchain pythonBackend를 config/toolchain.json에서 제거한다 | config/toolchain.json | `make owner-validate` | [ ] |
+| T2.89 | kit K788이 삭제하는 toolchain pythonBackend를 config/toolchain.json에서 제거한다 | config/toolchain.json | `make owner-validate` | [o] |
 | T2.90 | kit K801이 삭제한 main 쓰기 훅 .githooks/reference-transaction을 제거한다 | .githooks/reference-transaction | `make owner-validate` | [o] |
