@@ -101,9 +101,9 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
 ## Dependencies
 
 - Own: A dependency is at the latest stable release that supports the declared runtime range, which is judged when it is chosen or updated. Dependencies are chosen and updated with `make dependency-review UPDATE=1`, and a changed manifest or lock is committed with the review record `config/dependency-review.json` that `make dependency-review RECORD=1` writes.
-  Enforced by: `make dependency-policy-check`
+  Enforced by: none, judged at review.
 - Own: An older release is pinned only by an exception of `config/dependency-policy.json` that names a reproducible reason, the condition that removes the pin and its verification commands. A lock with an advisory at its review fails the gate.
-  Enforced by: `make dependency-policy-check`
+  Enforced by: none, judged at review.
 - Own: While polyspec versions are 0.0.x, development checkouts link installed polyspec packages to their source as kit `docs/plans/local-links.md` describes. Links are never committed.
   Enforced by: none, a development link is kept out of Git by the ignored `node_modules/`, and no tool judges a development checkout.
 
@@ -113,7 +113,7 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
 - Own: The same tree gives the same result at any time and on any machine. Each rule of this list names how this repository meets the rule.
   Enforced by: none, whether a result depends on the machine is a judgement that no tool makes.
 - Own: A check makes no registry query whose result depends on time: no latest lookup, no `@latest`, no resolution of a version range and no query about outdated packages. Installing what a lock pins by exact version and integrity hash is allowed, as `npm ci` and `composer install` are. `make release-consumer` installs the release archives from the committed locks of `tests/release-consumer`, and `make release-consumer-lock` resolves those locks and is not a check.
-  Enforced by: `make dependency-policy-check`
+  Enforced by: none, judged at review.
 - Own: No command installs a tool on demand. Node.js, Rust, Go, Python, PHP and npm are pinned by tracked files: Go, Python, Composer and the other tools of `mise.toml` are exact releases locked by digests in `mise.lock`, and PHP is pinned by its minor release in `.php-version`, which `make toolchain-check` compares as major.minor. Every command except the consumer install runs cargo, go, npm and Composer offline, so a missing download fails with a message to run `make install`.
   Enforced by: `make toolchain-check`
 - Own: Only `make install-tools TOOLS=npm`, `make install-packages` and `make install` download. The first installs npm, the second the packages of `package-lock.json`, and `make install` the tools of `mise.lock`, the Rust toolchain, and the crates of `packages/rust/Cargo.lock`; the PIE PHAR and the supplementary suite are the tools `http:pie` and `http:jsontestsuite` of `mise.toml`.
@@ -169,7 +169,7 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
 ## Package php (packages/php)
 
 - Own: The Composer package is checked alone by `make ordered-json-php-check`, which runs `make verify-php`, and linted by `make lint-php` (phpcs and PHPStan). Its `composer.lock` is locked to the platform `8.4.1` and requires PHP `>=8.4`, and is re-locked with `composer update --lock` when its manifest changes.
-  Enforced by: `make dependency-policy-check`
+  Enforced by: none, judged at review.
 - Own: Its package tests are the PHPUnit tests of `packages/php/tests` that `make parity-check` runs with their declared units, installed by `make install`.
   Enforced by: `make parity-check`
 - Own: The changes of the package are listed in its section of [CHANGELOG.md](CHANGELOG.md).
@@ -181,7 +181,7 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
 - Own: The extension is checked alone by `make ordered-json-php-ext-check`, which runs `make verify-php-extension`. `make build-php-ext` of kit (S10) builds `var/php-ext/polyspec_ordered_json.so` from the stub and its tracked arginfo header (`make php-ext-arginfo` writes it), and `make verify-php-extension` and `make parity-check` load it.
   Enforced by: `make parity-check`
 - Own: Its `composer.lock` is locked to the platform `8.4.1` and requires PHP `>=8.4`, the same as the PHP package, and is re-locked with `composer update --lock` when its manifest changes.
-  Enforced by: `make dependency-policy-check`
+  Enforced by: none, judged at review.
 - Own: The changes of the extension are listed in its section of [CHANGELOG.md](CHANGELOG.md).
   Enforced by: `make docs-check`
 
