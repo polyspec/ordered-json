@@ -112,4 +112,4 @@
 | T2.91 | Refresh the kit copies that rules-check flags, with make kit-sync | PRINCIPLES.md AGENTS.md | `make rules-check` | [o] |
 | T2.92 | Adopt kit K804, K805 and K798: hooks, push-gate, commits-check, release proof | .githooks/pre-commit .githooks/pre-merge-commit .githooks/pre-push config/commit-identity.json config/release.json config/checklist.json Makefile .github/workflows/push-gate.yml .github/workflows/ci.yml config/owner-checks.json AGENTS.md | `make owner-validate` | [o] |
 | T2.93 | Adopt kit 0.0.70 in this repository | package.json package-lock.json config/checklist.json | `make kit-check` | [ ] |
-| T2.94 | Adopt kit 0.0.72 in this repository | package.json package-lock.json .github/workflows/gates.yml config/checklist.json | `make kit-check` | [ ] |
+| T2.94 | Adopt kit 0.0.72 in this repository | package.json package-lock.json .github/workflows/gates.yml config/checklist.json | `make kit-check` | [o] |
