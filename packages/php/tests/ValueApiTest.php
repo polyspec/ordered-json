@@ -57,10 +57,6 @@ final class ValueApiTest extends TestCase
     {
         self::expectThrown(\Error::class, '', static fn() => new Value());
         self::expectThrown(TypeError::class, '', static fn() => \Polyspec\OrderedJson\stringify(new \stdClass()));
-        if (\extension_loaded('polyspec_ordered_json')) {
-            self::assertTrue((new \ReflectionFunction('Polyspec\OrderedJson\parse'))->isInternal());
-            self::assertTrue((new \ReflectionFunction('Polyspec\OrderedJson\stringify'))->isInternal());
-        }
     }
 
     public function testReturnedCollectionsAreImmutable(): void

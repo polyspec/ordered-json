@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 7ab215dabdcd9c1494505dfd46d84c1668e1f5b74c7598a07b007944e347f93b -->
+<!-- source-sha256: c606693519eb841ea714d92bfbba805d324996c67631fadbb9cba9c1e7c5af90 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -9,6 +9,7 @@
 
 ## 0.0.13
 - T2.102: python 패리티 심볼을 extractor가 읽는 모듈 polyspec.ordered_json으로 적는다 (T2.102)
+- T2.101: PHP 값 테스트가 두 실행에서 같은 단언을 하며 extension에 따라 분기하지 않는다 (T2.101)
 - T2.100: ordered-json 0.0.13 릴리스: config/release.json의 모든 manifest와 lock의 버전이 0.0.13이며 changelog가 이를 기록한다 (T2.100)
 - T2.99: @polyspec/kit을 0.0.74 asset으로 고정하고 lock을 갱신한다 (kit K873 포함 릴리스) (T2.99)
 - T2.98: 사용자 측 parse, stringify 함수와 MAX_DEPTH를 가드하여, extension이 로드되면 extension이 우선하고 패키지와 extension을 함께 올려도 PHP가 시작한다 (T2.98)
