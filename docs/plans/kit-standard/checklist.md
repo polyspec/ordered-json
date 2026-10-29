@@ -120,4 +120,4 @@
 | T2.99 | Adopt kit 0.0.74 in this repository | package.json package-lock.json CHANGELOG.md CHANGELOG.ko.md | `make kit-check` | [o] |
 | T2.100 | Release ordered-json 0.0.13: bump the versions and the changelogs | package.json packages/js/package.json composer.json packages/php/composer.json packages/php-ext/composer.json packages/rust/Cargo.toml packages/python/pyproject.toml CHANGELOG.md CHANGELOG.ko.md | `make release-coverage` | [o] |
 | T2.101 | Remove the extension branch from the PHP value test | packages/php/tests/ValueApiTest.php CHANGELOG.md CHANGELOG.ko.md | `make divergence-check` | [ ] |
-| T2.102 | Name the python parity symbols by the module polyspec.ordered_json | config/parity.json | `make parity-declarations-check` | [ ] |
+| T2.102 | Name the python parity symbols by the module polyspec.ordered_json | config/parity.json | `make parity-declarations-check` | [o] |

@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: ed697b93d78d7f2c09de2751c9d1db76a448c6b90d7982125731835c42a33b2e -->
+<!-- source-sha256: 2cd621040adca311125d15751d2b763ea4ba19065c24f70d4f647d6865450e36 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -121,4 +121,4 @@
 | T2.99 | 이 저장소에 kit 0.0.74 채택 | package.json package-lock.json CHANGELOG.md CHANGELOG.ko.md | `make kit-check` | [o] |
 | T2.100 | ordered-json 0.0.13 릴리스: 버전과 changelog를 올린다 | package.json packages/js/package.json composer.json packages/php/composer.json packages/php-ext/composer.json packages/rust/Cargo.toml packages/python/pyproject.toml CHANGELOG.md CHANGELOG.ko.md | `make release-coverage` | [o] |
 | T2.101 | PHP 값 테스트에서 extension 분기를 제거한다 | packages/php/tests/ValueApiTest.php CHANGELOG.md CHANGELOG.ko.md | `make divergence-check` | [ ] |
-| T2.102 | python 패리티 심볼을 모듈 polyspec.ordered_json으로 적는다 | config/parity.json | `make parity-declarations-check` | [ ] |
+| T2.102 | python 패리티 심볼을 모듈 polyspec.ordered_json으로 적는다 | config/parity.json | `make parity-declarations-check` | [o] |
