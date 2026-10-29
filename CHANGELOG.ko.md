@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 4e00ac1eb9b7291134cd0153ad738cd8e01dcc588a81c60ed007b9f01ac4e20b -->
+<!-- source-sha256: 0f95d303ac1f7aba9cddd4bf1fdc9ba1438a735a976740d23ffc391440bdca88 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.86: 공유 워크플로는 kit-sync 사본이며 kit-check가 통과한다 (T2.86)
 
 <a id="v0012"></a>
 ## 0.0.12

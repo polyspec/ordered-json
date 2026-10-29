@@ -5,6 +5,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.86: the shared workflows are the kit-sync copies (K671-2), and kit-check passes (T2.86)
 
 <a id="v0012"></a>
 ## 0.0.12
