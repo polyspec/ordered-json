@@ -5,6 +5,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.98: the userland parse and stringify functions and MAX_DEPTH are guarded, so the loaded extension takes precedence and PHP starts with both the package and the extension (T2.98)
 - T2.97: release-config-check is removed: it called the release versions that kit 0.0.73 deleted (K812), and the tag workflow of kit checks the version (T2.97)
 - T2.95: @polyspec/kit is pinned to the 0.0.73 asset and the lock is updated (kit K826, K827, K830) (T2.95)
 - T2.94: @polyspec/kit is pinned to the 0.0.72 asset and the lock is updated; CI runs no make link or link-state-check (T2.94)
