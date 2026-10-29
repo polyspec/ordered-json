@@ -110,4 +110,4 @@
 | T2.89 | Remove the toolchain pythonBackend, which kit K788 deletes, from config/toolchain.json | config/toolchain.json | `make owner-validate` | [o] |
 | T2.90 | Remove the .githooks/reference-transaction main writer hook that kit K801 deleted | .githooks/reference-transaction | `make owner-validate` | [o] |
 | T2.91 | Refresh the kit copies that rules-check flags, with make kit-sync | PRINCIPLES.md AGENTS.md | `make rules-check` | [o] |
-| T2.92 | Adopt kit K804, K805 and K798: hooks, push-gate, commits-check, release proof | .githooks/pre-commit .githooks/pre-merge-commit .githooks/pre-push config/commit-identity.json config/release.json config/checklist.json Makefile .github/workflows/push-gate.yml .github/workflows/ci.yml config/owner-checks.json AGENTS.md | `make owner-validate` | [ ] |
+| T2.92 | Adopt kit K804, K805 and K798: hooks, push-gate, commits-check, release proof | .githooks/pre-commit .githooks/pre-merge-commit .githooks/pre-push config/commit-identity.json config/release.json config/checklist.json Makefile .github/workflows/push-gate.yml .github/workflows/ci.yml config/owner-checks.json AGENTS.md | `make owner-validate` | [~] |
