@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 9bf72d9423b922c9e5f280b286dd70b9a3b78cfef87fb978da55f40cf56dbceb -->
+<!-- source-sha256: 8d451b0b5b24f296eadd50509fff147a0fb34a47a774a30c16dc965bb5a61f41 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.90: kit K801이 삭제한 main 쓰기 훅을 제거한다 (T2.90)
 - T2.88: kit K789가 삭제한 wheel polyspec 소비자를 config/release.json에서 제거한다 (T2.88)
 - T2.87: kit K784이 삭제한 dependency-policy-check 참조와 그 게이트만 읽던 설정 파일을 제거한다 (T2.87)
 - T2.86: 공유 워크플로는 kit-sync 사본이며 kit-check가 통과한다 (T2.86)
