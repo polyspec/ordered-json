@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 72931884208eab623c62c7e7c0c30a8351377914adb79f857f1b68024cc7f7cc -->
+<!-- source-sha256: 3a297001586cb47f180147ddd9d1afa0155b912145649c04b545ce66c3dd92de -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -112,3 +112,4 @@
 | T2.90 | kit K801이 삭제한 main 쓰기 훅 .githooks/reference-transaction을 제거한다 | .githooks/reference-transaction | `make owner-validate` | [o] |
 | T2.91 | rules-check가 지적하는 kit 사본을 make kit-sync로 갱신한다 | PRINCIPLES.md AGENTS.md | `make rules-check` | [o] |
 | T2.92 | kit K804, K805, K798 채택: hook, push-gate, commits-check, release proof 제거 | .githooks/pre-commit .githooks/pre-merge-commit .githooks/pre-push config/commit-identity.json config/release.json config/checklist.json Makefile .github/workflows/push-gate.yml .github/workflows/ci.yml config/owner-checks.json AGENTS.md | `make owner-validate` | [o] |
+| T2.93 | 이 저장소에 kit 0.0.70 채택 | package.json package-lock.json config/checklist.json | `make kit-check` | [ ] |
