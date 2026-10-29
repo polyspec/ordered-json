@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 77388c0cc85f4a7e56e44b649e6eb591a1622dfbec7e57cc52538af1a83030cf -->
+<!-- source-sha256: 9809a127a578a71f2dd6dd673391320cdcf48db64849b2d149a90a7da697b4f9 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -106,4 +106,4 @@
 | T2.85-1 | issue #15를 수정한 공개 Kit 0.0.63을 채택하고 수정하지 않은 fresh checkout language/parity CI 및 OrderedJSON 0.0.12 공개 입력을 준비한다. | Kit dependency and lock, canonical copies, review record, complete hosted CI and release proof | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [o] |
 | T2.85-2 | issue #18의 공개 Kit 수정본을 채택하고 선택한 필수 provider parity 경로의 실제 실행과 전체 native CI를 확인한 뒤 OrderedJSON 0.0.12를 공개한다. | Kit dependency and lock, canonical gates, dependency review, complete native and provider CI, release proof | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [ ] |
 | T2.86 | kit-sync로 공유 파일 사본을 채택하고 kit-check를 통과시킨다 (K671-2) | .github/workflows | `make kit-check` | [o] |
-| T2.87 | kit K784이 삭제한 dependency-policy-check 참조(CI 대상, CHECK_TARGETS, owner-checks, dependency-policy.json, dependency-review.json)를 제거한다 | ci.yml Makefile config/owner-checks.json config/toolchain.json config/dependency-policy.json config/dependency-review.json | `make owner-validate` | [ ] |
+| T2.87 | kit K784이 삭제한 dependency-policy-check 참조(CI 대상, CHECK_TARGETS, owner-checks, dependency-policy.json, dependency-review.json)를 제거한다 | ci.yml Makefile config/owner-checks.json config/toolchain.json config/dependency-policy.json config/dependency-review.json | `make owner-validate` | [o] |

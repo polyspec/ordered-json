@@ -1,11 +1,12 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 0f95d303ac1f7aba9cddd4bf1fdc9ba1438a735a976740d23ffc391440bdca88 -->
+<!-- source-sha256: 6bdbd19f9eb4cd91629a78830b58d174a178b26c291cf30519cbb3734db9715c -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.87: kit K784이 삭제한 dependency-policy-check 참조와 그 게이트만 읽던 설정 파일을 제거한다 (T2.87)
 - T2.86: 공유 워크플로는 kit-sync 사본이며 kit-check가 통과한다 (T2.86)
 
 <a id="v0012"></a>
