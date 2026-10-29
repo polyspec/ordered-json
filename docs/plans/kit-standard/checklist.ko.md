@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: fe199277e3e123cc4f30cdb38fa3e5c8ab5ed31a5911759a46bcf2efa864eef3 -->
+<!-- source-sha256: ebc239163a61e061a89f79fe0b85a75cdc1aa59036ea20ede73d655a7e45d628 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -104,7 +104,7 @@
 | T2.84 | main CI 통과 뒤 공개할 OrderedJSON 0.0.11의 release manifest, native candidate asset, consumer lock, dependency review를 준비한다. | release manifests, native lock files, config/dependency-review.json, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/environment.test.mts` | [o] |
 | T2.85 | issue #5를 수정한 공개 Kit 0.0.62를 채택하고 수정하지 않은 native language CI, 독립 parity, consumer lock 및 release metadata로 OrderedJSON 0.0.12를 준비한다. | package manifests and locks, canonical gates workflow, tests/scripts/workflow-rules.test.mts, native consumer locks, dependency review, CHANGELOG.md(.ko) | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [o] |
 | T2.85-1 | issue #15를 수정한 공개 Kit 0.0.63을 채택하고 수정하지 않은 fresh checkout language/parity CI 및 OrderedJSON 0.0.12 공개 입력을 준비한다. | Kit dependency and lock, canonical copies, review record, complete hosted CI and release proof | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [o] |
-| T2.85-2 | issue #18의 공개 Kit 수정본을 채택하고 선택한 필수 provider parity 경로의 실제 실행과 전체 native CI를 확인한 뒤 OrderedJSON 0.0.12를 공개한다. | Kit dependency and lock, canonical gates, dependency review, complete native and provider CI, release proof | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts` | [ ] |
+| T2.85-2 | issue #18의 공개 Kit 수정본을 채택하고 선택한 필수 provider parity 경로의 실제 실행과 전체 native CI를 확인한 뒤 OrderedJSON 0.0.12를 공개한다. | Kit dependency and lock, canonical gates, dependency review, complete native and provider CI, release proof | `var/tools/bin/node --test tests/scripts/workflow-rules.test.mts tests/scripts/environment.test.mts`; the CI run of the release commit is green | [ ] |
 | T2.86 | kit-sync로 공유 파일 사본을 채택하고 kit-check를 통과시킨다 (K671-2) | .github/workflows | `make kit-check` | [o] |
 | T2.87 | kit K784이 삭제한 dependency-policy-check 참조(CI 대상, CHECK_TARGETS, owner-checks, dependency-policy.json, dependency-review.json)를 제거한다 | ci.yml Makefile config/owner-checks.json config/toolchain.json config/dependency-policy.json config/dependency-review.json | `make owner-validate` | [o] |
 | T2.88 | kit K789가 삭제한 wheel polyspec 소비자를 config/release.json에서 제거한다 | config/release.json | `make owner-validate` | [o] |
