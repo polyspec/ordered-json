@@ -115,3 +115,4 @@
 | T2.94 | Adopt kit 0.0.72 in this repository | package.json package-lock.json .github/workflows/gates.yml config/checklist.json | `make kit-check` | [o] |
 | T2.95 | Adopt kit 0.0.73 in this repository | package.json package-lock.json .github/workflows/gates.yml config/checklist.json | `make kit-check` | [o] |
 | T2.96 | Adopt kit 0.0.74 in this repository | package.json package-lock.json Makefile .github/workflows/ci.yml config/ci.json config/*.json | `make kit-check` | [ ] |
+| T2.97 | Remove release-config-check, which calls the removed kit release versions | Makefile .github/workflows/ci.yml config/owner-checks.json tests/scripts/workflow-rules.test.mts docs/operations/validation.md docs/operations/validation.ko.md | `make kit-check` | [ ] |
