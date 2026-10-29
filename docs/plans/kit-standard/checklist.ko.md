@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 2df21a8870a50aa4ef86bb2ce81a32cb70e18681f0305cc0b69ed9d53b904d65 -->
+<!-- source-sha256: 2370aa8610de474d5492bd3418928131d7545923fb823937c5da2ef37a4f7eea -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -120,3 +120,4 @@
 | T2.98 | php-extension binding이 userland parse 함수를 다시 선언하지 않게 한다 | packages/php/src/OrderedJson.php | `make ordered-json-php-test` | [o] |
 | T2.99 | 이 저장소에 kit 0.0.74 채택 | package.json package-lock.json CHANGELOG.md CHANGELOG.ko.md | `make kit-check` | [o] |
 | T2.100 | ordered-json 0.0.13 릴리스: 버전과 changelog를 올린다 | package.json packages/js/package.json composer.json packages/php/composer.json packages/php-ext/composer.json packages/rust/Cargo.toml packages/python/pyproject.toml CHANGELOG.md CHANGELOG.ko.md | `make release-coverage` | [o] |
+| T2.101 | PHP 값 테스트에서 extension 분기를 제거한다 | packages/php/tests/ValueApiTest.php CHANGELOG.md CHANGELOG.ko.md | `make divergence-check` | [ ] |
