@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 96cb2aa1d8e2cc309a84bffa013af02cf9874bf3e856cd54e019ab5c8bbe1103 -->
+<!-- source-sha256: 74447bcb688d7c8afc99b12ca498aef885708a44f9f769122525e11352fdb2d9 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -119,3 +119,4 @@
 | T2.97 | kit이 삭제한 release versions를 부르는 release-config-check를 제거한다 | Makefile .github/workflows/ci.yml config/owner-checks.json tests/scripts/workflow-rules.test.mts docs/operations/validation.md docs/operations/validation.ko.md | `make kit-check` | [o] |
 | T2.98 | php-extension binding이 userland parse 함수를 다시 선언하지 않게 한다 | packages/php/src/OrderedJson.php | `make ordered-json-php-test` | [o] |
 | T2.99 | 이 저장소에 kit 0.0.74 채택 | package.json package-lock.json CHANGELOG.md CHANGELOG.ko.md | `make kit-check` | [o] |
+| T2.100 | ordered-json 0.0.13 릴리스: 버전과 changelog를 올린다 | package.json packages/js/package.json composer.json packages/php/composer.json packages/php-ext/composer.json packages/rust/Cargo.toml packages/python/pyproject.toml CHANGELOG.md CHANGELOG.ko.md | `make release-coverage` | [ ] |
