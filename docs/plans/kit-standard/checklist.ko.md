@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 2db23dac11f45e87cf73f0db2d08529e568d0953857d6ea93460176e47972522 -->
+<!-- source-sha256: 96cb2aa1d8e2cc309a84bffa013af02cf9874bf3e856cd54e019ab5c8bbe1103 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -118,4 +118,4 @@
 | T2.96 | 이 저장소에 kit 0.0.74 채택 | package.json package-lock.json Makefile .github/workflows/ci.yml config/ci.json config/*.json | `make kit-check` | [ ] |
 | T2.97 | kit이 삭제한 release versions를 부르는 release-config-check를 제거한다 | Makefile .github/workflows/ci.yml config/owner-checks.json tests/scripts/workflow-rules.test.mts docs/operations/validation.md docs/operations/validation.ko.md | `make kit-check` | [o] |
 | T2.98 | php-extension binding이 userland parse 함수를 다시 선언하지 않게 한다 | packages/php/src/OrderedJson.php | `make ordered-json-php-test` | [o] |
-| T2.99 | 이 저장소에 kit 0.0.74 채택 | package.json package-lock.json CHANGELOG.md CHANGELOG.ko.md | `make kit-check` | [ ] |
+| T2.99 | 이 저장소에 kit 0.0.74 채택 | package.json package-lock.json CHANGELOG.md CHANGELOG.ko.md | `make kit-check` | [o] |

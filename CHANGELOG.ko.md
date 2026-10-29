@@ -6,6 +6,7 @@
 
 <a id="unreleased"></a>
 ## Unreleased
+- T2.99: @polyspec/kit을 0.0.74 asset으로 고정하고 lock을 갱신한다 (kit K873 포함 릴리스) (T2.99)
 - T2.98: 사용자 측 parse, stringify 함수와 MAX_DEPTH를 가드하여, extension이 로드되면 extension이 우선하고 패키지와 extension을 함께 올려도 PHP가 시작한다 (T2.98)
 - T2.97: release-config-check를 제거한다. kit 0.0.73이 삭제한 release versions를 불렀고, kit의 tag workflow가 version을 검사한다 (T2.97)
 - T2.95: @polyspec/kit을 0.0.73 asset으로 고정하고 lock을 갱신한다 (kit K826, K827, K830) (T2.95)
