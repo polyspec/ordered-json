@@ -7,6 +7,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T2.108: kit 0.0.77이 더 제공하지 않는 prepare-commit-msg 훅 파일을 제거한다 (K892) (T2.108)
 ## 0.0.13
 - T2.106: @polyspec/kit을 0.0.76 asset으로 고정하고 lock을 갱신한다 (kit K896, K897 포함 릴리스) (T2.106)
 - T2.105: docs 잡이 check 대상 전에 PHP 심볼 추출기를 설치하여 divergence-check가 충돌하지 않는다 (T2.105)
