@@ -122,3 +122,4 @@
 | T2.101 | Remove the extension branch from the PHP value test | packages/php/tests/ValueApiTest.php CHANGELOG.md CHANGELOG.ko.md | `make divergence-check` | [o] |
 | T2.102 | Name the python parity symbols by the module polyspec.ordered_json | config/parity.json | `make parity-declarations-check` | [o] |
 | T2.103 | Adopt kit 0.0.75 in this repository | package.json package-lock.json CHANGELOG.md CHANGELOG.ko.md | `make kit-check` | [o] |
+| T2.104 | Name the python JSONEncoder symbols by the module polyspec.ordered_json | config/parity.json CHANGELOG.md CHANGELOG.ko.md | `make parity-declarations-check` | [ ] |
