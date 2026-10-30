@@ -8,6 +8,7 @@
 
 - T2.108: the prepare-commit-msg hook file is removed, which kit 0.0.77 no longer serves (K892) (T2.108)
 ## 0.0.13
+- T2.107: @polyspec/kit is pinned to the 0.0.77 asset and the lock is updated; the links, the owner checks and the hook removal follow kit 0.0.77 (T2.107)
 - T2.106: @polyspec/kit is pinned to the 0.0.76 asset and the lock is updated (kit K896 and K897 among the release) (T2.106)
 - T2.105: the docs job installs the PHP symbol extractor before the check targets, so divergence-check does not crash (T2.105)
 - T2.104: the python JSONEncoder and JSONEncoder.default are named by the module polyspec.ordered_json, as T2.102 named the other python symbols (T2.104)

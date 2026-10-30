@@ -1,5 +1,5 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: c606693519eb841ea714d92bfbba805d324996c67631fadbb9cba9c1e7c5af90 -->
+<!-- source-sha256: e2bd01ba665590cbcc9490eed4d8a73ba42576938784ccfec5373b0e8398d205 -->
 # 변경 기록
 
 [English](CHANGELOG.md)
@@ -9,6 +9,7 @@
 
 - T2.108: kit 0.0.77이 더 제공하지 않는 prepare-commit-msg 훅 파일을 제거한다 (K892) (T2.108)
 ## 0.0.13
+- T2.107: @polyspec/kit을 0.0.77 asset으로 고정하고 lock을 갱신한다. 링크, owner 검사와 훅 제거는 kit 0.0.77을 따른다 (T2.107)
 - T2.106: @polyspec/kit을 0.0.76 asset으로 고정하고 lock을 갱신한다 (kit K896, K897 포함 릴리스) (T2.106)
 - T2.105: docs 잡이 check 대상 전에 PHP 심볼 추출기를 설치하여 divergence-check가 충돌하지 않는다 (T2.105)
 - T2.104: python JSONEncoder와 JSONEncoder.default를 모듈 polyspec.ordered_json으로 이름 짓는다 (T2.102와 같은 이름) (T2.104)

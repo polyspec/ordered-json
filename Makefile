@@ -6,6 +6,7 @@ PYTHON := $(CURDIR)/var/tools/mise/shims/python3
 UV := $(CURDIR)/var/tools/mise/shims/uv
 COMPOSER := $(CURDIR)/var/tools/mise/shims/composer
 CARGO := $(shell command -v cargo)
+GO := $(shell command -v go)
 JSON_TEST_SUITE ?=
 
 # The tools of every run are the releases that the tracked declaration files name: npm in the packageManager of
@@ -55,6 +56,15 @@ check:
 # install runs the bootstrap of kit as the prerequisite install-kit of ordered-json-install (K246-2).
 install: ordered-json-install
 
+# deps-<runtime> (K859): the locked install of each runtime, a thin call that ci-setup runs when the runtime list is empty.
+.PHONY: deps-node deps-go deps-rust deps-php deps-python
+deps-node:
+	$(MAKE) --no-print-directory install-packages
+deps-go:
+	$(ONLINE) $(GO) -C packages/go mod download
+deps-rust: ordered-json-install-rust
+deps-php: ordered-json-install-php
+deps-python: ordered-json-install-python
 ordered-json-install: install-kit ordered-json-install-rust cargo-downloads-fetch ordered-json-install-php ordered-json-install-python
 
 ordered-json-install-rust:

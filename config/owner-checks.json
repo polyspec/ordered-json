@@ -264,16 +264,7 @@
         "package.json"
       ],
       "targets": [
-        "ordered-json-test-scripts",
-        "toolchain-check"
-      ]
-    },
-    {
-      "paths": [
-        "packages/rust/Cargo.lock"
-      ],
-      "targets": [
-        "cargo-downloads-check"
+        "ordered-json-test-scripts"
       ]
     },
     {
