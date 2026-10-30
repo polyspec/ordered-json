@@ -8,6 +8,7 @@
 ## Unreleased
 
 ## 0.0.13
+- T2.106: @polyspec/kit을 0.0.76 asset으로 고정하고 lock을 갱신한다 (kit K896, K897 포함 릴리스) (T2.106)
 - T2.105: docs 잡이 check 대상 전에 PHP 심볼 추출기를 설치하여 divergence-check가 충돌하지 않는다 (T2.105)
 - T2.104: python JSONEncoder와 JSONEncoder.default를 모듈 polyspec.ordered_json으로 이름 짓는다 (T2.102와 같은 이름) (T2.104)
 - T2.103: @polyspec/kit을 0.0.75 asset으로 고정하고 lock을 갱신한다 (kit K883, K888 포함 릴리스) (T2.103)
