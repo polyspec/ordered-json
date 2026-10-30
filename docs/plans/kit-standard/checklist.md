@@ -123,4 +123,4 @@
 | T2.102 | Name the python parity symbols by the module polyspec.ordered_json | config/parity.json | `make parity-declarations-check` | [o] |
 | T2.103 | Adopt kit 0.0.75 in this repository | package.json package-lock.json CHANGELOG.md CHANGELOG.ko.md | `make kit-check` | [o] |
 | T2.104 | Name the python JSONEncoder symbols by the module polyspec.ordered_json | config/parity.json CHANGELOG.md CHANGELOG.ko.md | `make parity-declarations-check` | [o] |
-| T2.105 | Install the PHP symbol extractor in the docs job before the check targets | .github/workflows/ci.yml CHANGELOG.md CHANGELOG.ko.md | `make kit-install-symbols EXTRACTORS=php && make divergence-check` | [ ] |
+| T2.105 | Install the PHP symbol extractor in the docs job before the check targets | .github/workflows/ci.yml CHANGELOG.md CHANGELOG.ko.md | `make kit-install-symbols EXTRACTORS=php && make divergence-check` | [o] |

@@ -67,6 +67,9 @@ jobs:
       - name: install repository check tools
         if: ${{ !cancelled() }}
         run: make install-tools TOOLS="go php composer alint"
+      - name: install PHP symbol extractor
+        if: ${{ !cancelled() }}
+        run: make kit-install-symbols EXTRACTORS="php"
       - name: prepare Git hooks
         if: ${{ !cancelled() }}
         run: make hooks
