@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 8b4366fe97a6390d9b119f70b9639f0e7682ec074bbf7e0fadfa291344b31dac -->
+<!-- source-sha256: 291cc58012720db265a8b06fc26dc463b72a2a18695ff494acc3ead760cdcfef -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -125,3 +125,4 @@
 | T2.103 | 이 저장소에 kit 0.0.75 채택 | package.json package-lock.json CHANGELOG.md CHANGELOG.ko.md | `make kit-check` | [o] |
 | T2.104 | python JSONEncoder 심볼을 모듈 polyspec.ordered_json으로 이름 짓는다 | config/parity.json CHANGELOG.md CHANGELOG.ko.md | `make parity-declarations-check` | [o] |
 | T2.105 | docs 잡에서 check 대상 실행 전에 PHP 심볼 추출기를 설치한다 | .github/workflows/ci.yml CHANGELOG.md CHANGELOG.ko.md | `make kit-install-symbols EXTRACTORS=php && make divergence-check` | [o] |
+| T2.106 | 이 저장소에 kit 0.0.76 채택 | package.json package-lock.json CHANGELOG.md CHANGELOG.ko.md | `make kit-check` | [ ] |
