@@ -7,6 +7,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+## 0.0.14
+- T2.110: ordered-json 0.0.14 릴리스: config/release.json의 모든 manifest와 lock의 버전이 0.0.14이며 changelog가 이를 기록한다 (T2.110)
 - T2.108: kit 0.0.77이 더 제공하지 않는 prepare-commit-msg 훅 파일을 제거한다 (K892) (T2.108)
 ## 0.0.13
 - T2.109: kit 0.0.77이 제거한 검사 이름을 Makefile, ci.yml, 테스트와 문서에서 지웠다. deps-rust는 Cargo.lock의 crate를 받는다 (T2.109)

@@ -6,6 +6,8 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+## 0.0.14
+- T2.110: ordered-json 0.0.14 is released: the version of every manifest and lock of config/release.json is 0.0.14, and the changelogs name it (T2.110)
 - T2.108: the prepare-commit-msg hook file is removed, which kit 0.0.77 no longer serves (K892) (T2.108)
 ## 0.0.13
 - T2.109: the names of the checks that kit 0.0.77 removed are gone from Makefile, ci.yml, the tests and the docs; deps-rust fetches the crates of Cargo.lock (T2.109)
