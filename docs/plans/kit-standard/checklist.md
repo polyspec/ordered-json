@@ -125,4 +125,4 @@
 | T2.104 | Name the python JSONEncoder symbols by the module polyspec.ordered_json | config/parity.json CHANGELOG.md CHANGELOG.ko.md | `make parity-declarations-check` | [o] |
 | T2.105 | Install the PHP symbol extractor in the docs job before the check targets | .github/workflows/ci.yml CHANGELOG.md CHANGELOG.ko.md | `make kit-install-symbols EXTRACTORS=php && make divergence-check` | [o] |
 | T2.106 | Adopt kit 0.0.76 in this repository | package.json package-lock.json CHANGELOG.md CHANGELOG.ko.md | `make kit-check` | [o] |
-| T2.107 | Remove the prepare-commit-msg hook before kit K892 lands | .githooks/prepare-commit-msg CHANGELOG.md CHANGELOG.ko.md | `make kit-check` | [ ] |
+| T2.107 | Adopt kit 0.0.77: remove the prepare-commit-msg hook (K892), rename link-state-check to link-check in Makefile:38 and ci.yml:78 (K869), and link the root .links | .githooks/prepare-commit-msg Makefile .github/workflows/ci.yml .gitignore .links CHANGELOG.md CHANGELOG.ko.md | `make kit-check` | [ ] |
