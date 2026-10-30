@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: bfcea0cb7fecdaec5275bd22a23ec5e9bbed682b1a4d62dc17d37a89ed906e96 -->
+<!-- source-sha256: 779c1dc6e96f78dbc2411b543a4d0f487ff45c0ca47524da7ee0bed2946db14f -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -130,3 +130,4 @@
 | T2.108 | kit 0.0.77이 더 제공하지 않는 prepare-commit-msg 훅 파일을 제거한다 | .githooks/prepare-commit-msg | `test ! -e .githooks/prepare-commit-msg` | [o] |
 | T2.109 | kit 0.0.77이 제거한 검사 이름을 ordered-json에서 지운다 | Makefile .github/workflows/ci.yml tests/scripts/environment.test.mts tests/scripts/workflow-rules.test.mts AGENTS.md AGENTS.ko.md docs/operations CHANGELOG.md CHANGELOG.ko.md | `make -n verify-all && make -n pie-check && var/tools/bin/node --test tests/scripts/environment.test.mts tests/scripts/workflow-rules.test.mts && ! git grep -q -w -e link-state-check -e toolchain-check -e cargo-downloads-check -- Makefile AGENTS.md AGENTS.ko.md .github tests docs/operations` | [o] |
 | T2.110 | ordered-json 0.0.14 릴리스: 버전과 changelog를 올린다 | package.json packages/js/package.json composer.json packages/php/composer.json packages/php-ext/composer.json packages/rust/Cargo.toml packages/python/pyproject.toml CHANGELOG.md CHANGELOG.ko.md | `make release-coverage` | [o] |
+| T2.111 | .links 링크 선언을 로컬 exclude만이 아니라 .gitignore에서도 무시한다 | .gitignore CHANGELOG.md CHANGELOG.ko.md | `git check-ignore -q .links && grep -qx "/.links" .gitignore` | [ ] |
