@@ -6,6 +6,7 @@
 <a id="unreleased"></a>
 ## Unreleased
 
+- T2.111: .links, the link declaration of kit (K869), is ignored by .gitignore, not only by the local exclude (T2.111)
 ## 0.0.14
 - T2.110: ordered-json 0.0.14 is released: the version of every manifest and lock of config/release.json is 0.0.14, and the changelogs name it (T2.110)
 - T2.108: the prepare-commit-msg hook file is removed, which kit 0.0.77 no longer serves (K892) (T2.108)
