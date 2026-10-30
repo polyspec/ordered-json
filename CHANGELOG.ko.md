@@ -8,6 +8,7 @@
 ## Unreleased
 
 ## 0.0.13
+- T2.104: python JSONEncoder와 JSONEncoder.default를 모듈 polyspec.ordered_json으로 이름 짓는다 (T2.102와 같은 이름) (T2.104)
 - T2.103: @polyspec/kit을 0.0.75 asset으로 고정하고 lock을 갱신한다 (kit K883, K888 포함 릴리스) (T2.103)
 - T2.102: python 패리티 심볼을 extractor가 읽는 모듈 polyspec.ordered_json으로 적는다 (T2.102)
 - T2.101: PHP 값 테스트가 두 실행에서 같은 단언을 하며 extension에 따라 분기하지 않는다 (T2.101)

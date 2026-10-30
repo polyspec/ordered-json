@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: db081eb698b765332bace5bd3b5625e35828b91aa10059f4af388c6653a688ee -->
+<!-- source-sha256: 5e18301b3843dc7f46baeeac1493387738e6369a68794d55dfe382465155c883 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -123,4 +123,4 @@
 | T2.101 | PHP 값 테스트에서 extension 분기를 제거한다 | packages/php/tests/ValueApiTest.php CHANGELOG.md CHANGELOG.ko.md | `make divergence-check` | [o] |
 | T2.102 | python 패리티 심볼을 모듈 polyspec.ordered_json으로 적는다 | config/parity.json | `make parity-declarations-check` | [o] |
 | T2.103 | 이 저장소에 kit 0.0.75 채택 | package.json package-lock.json CHANGELOG.md CHANGELOG.ko.md | `make kit-check` | [o] |
-| T2.104 | python JSONEncoder 심볼을 모듈 polyspec.ordered_json으로 이름 짓는다 | config/parity.json CHANGELOG.md CHANGELOG.ko.md | `make parity-declarations-check` | [ ] |
+| T2.104 | python JSONEncoder 심볼을 모듈 polyspec.ordered_json으로 이름 짓는다 | config/parity.json CHANGELOG.md CHANGELOG.ko.md | `make parity-declarations-check` | [o] |

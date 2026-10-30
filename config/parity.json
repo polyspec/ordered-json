@@ -2549,8 +2549,8 @@
         {
           "implementation": "python",
           "symbols": [
-            "ordered_json.JSONEncoder",
-            "ordered_json.JSONEncoder.default"
+            "polyspec.ordered_json.JSONEncoder",
+            "polyspec.ordered_json.JSONEncoder.default"
           ]
         }
       ]
