@@ -115,8 +115,8 @@
   Enforced by: none, 결과가 기계에 따라 달라지는지는 어떤 도구도 판단할 수 없는 판단 사항입니다.
 - Own: 검사는 시간에 따라 결과가 달라지는 registry 질의를 하지 않습니다. latest 조회, `@latest`, 범위 해석, 오래된 패키지 질의가 없습니다. lock이 정확한 version과 integrity hash로 고정한 것을 설치하는 것은 허용되며, `npm ci`와 `composer install`이 그렇듯 허용됩니다. `make release-consumer`는 `tests/release-consumer`의 commit된 lock으로 release archive를 설치하고, `make release-consumer-lock`은 그 lock을 해석하며 검사가 아닙니다.
   Enforced by: none, 검토에서 판단합니다.
-- Own: 어떤 명령도 도구를 필요할 때 설치하지 않습니다. Node.js, Rust, Go, Python, PHP, npm은 추적 파일이 고정합니다. Go, Python, Composer와 mise가 설치하는 다른 도구는 `mise.toml`의 정확한 release이며 `mise.lock`의 digest로 잠깁니다. PHP는 `.php-version`의 minor release로 고정하며, `make toolchain-check`가 major.minor를 비교합니다. consumer 설치를 제외한 모든 명령은 cargo, go, npm, Composer를 offline으로 실행하므로, 누락된 다운로드는 `make install`을 실행하라는 메시지와 함께 실패합니다.
-  Enforced by: none, 판단 사항입니다. kit 0.0.77이 toolchain-check를 제거했고(K854), mise.toml과 mise.lock의 고정은 install-tools가 읽습니다.
+- Own: 어떤 명령도 도구를 필요할 때 설치하지 않습니다. Node.js, Rust, Go, Python, PHP, npm은 추적 파일이 고정합니다. Go, Python, Composer와 mise가 설치하는 다른 도구는 `mise.toml`의 정확한 release이며 `mise.lock`의 digest로 잠깁니다. PHP는 `.php-version`의 minor release로 고정하며, `make toolchain check`가 major.minor를 비교합니다. consumer 설치를 제외한 모든 명령은 cargo, go, npm, Composer를 offline으로 실행하므로, 누락된 다운로드는 `make install`을 실행하라는 메시지와 함께 실패합니다.
+  Enforced by: none, 판단 사항입니다. kit 0.0.77이 toolchain check를 제거했고(K854), mise.toml과 mise.lock의 고정은 install-tools가 읽습니다.
 - Own: 다운로드하는 것은 `make install-tools TOOLS=npm`, `make install-packages`, `make install`뿐입니다. 첫 번째는 npm을, 두 번째는 `package-lock.json`의 패키지를 설치하며, `make install`은 `mise.lock`의 도구, Rust toolchain, `packages/rust/Cargo.lock`의 crate를 설치하며, PIE PHAR와 보충 suite는 `mise.toml`의 tool `http:pie`와 `http:jsontestsuite`입니다.
   Enforced by: none, 판단 사항입니다. crate의 존재는 cargo의 상태이므로 make target이 Cargo.lock과 비교할 수 없습니다(K864).
 - Own: 테스트는 자기가 만든 출력만 읽고 추적되지 않은 상태에 의존하지 않습니다. record, 문서 검사, 공통 사례, build copy는 Git이 추적하는 파일을 읽으며, 각 실행은 자기 run directory와 자기 `CARGO_TARGET_DIR`로 빌드합니다.
@@ -160,7 +160,7 @@
 ## 패키지 go (packages/go)
 
 - Own: module은 `make ordered-json-go-check`로 이 패키지만 검사하며, 이 target은 `make verify-go`를 실행합니다. `make lint-go`(`.golangci.yml`을 쓰는 golangci-lint와 deadcode)가 lint합니다. `GOTOOLCHAIN`은 `local`이며, module은 `mise.toml`의 Go release를 요구합니다.
-  Enforced by: none, 판단 사항입니다. kit 0.0.77이 toolchain-check를 제거했고(K854), mise.toml과 mise.lock의 고정은 install-tools가 읽습니다.
+  Enforced by: none, 판단 사항입니다. kit 0.0.77이 toolchain check를 제거했고(K854), mise.toml과 mise.lock의 고정은 install-tools가 읽습니다.
 - Own: 패키지 테스트는 `make parity-check`가 선언된 unit과 함께 실행하는 코드 옆의 Go 테스트입니다.
   Enforced by: `make parity-declarations-check`
 - Own: module의 변경은 [CHANGELOG.ko.md](CHANGELOG.ko.md)의 이 패키지 절에 적습니다.

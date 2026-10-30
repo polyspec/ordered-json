@@ -150,7 +150,7 @@ const LANGUAGE_TARGETS: Record<string, string[]> = {
 };
 function parallelViolations(parsed: Workflow): string[] {
   const found: string[] = [];
-  const expected = { parity: ['toolchain-check', 'cargo-downloads-check', 'test-markers-check', 'verify-all', 'parity-check'], ...LANGUAGE_TARGETS };
+  const expected = { parity: ['test-markers-check', 'verify-all', 'parity-check'], ...LANGUAGE_TARGETS };
   for (const [name, targets] of Object.entries(expected)) {
     const job = parsed.jobs[name];
     if (job === undefined) { found.push(`missing independent job ${name}`); continue; }
@@ -189,7 +189,7 @@ test('T2.83: serializing parity or a native job and moving shared verification a
   const parsed = workflow(read('ci.yml'));
   const parity = known(parsed.jobs.parity, 'the parity job');
   const step = known(parity.steps?.find(step => step.run?.startsWith('make ci-targets ')), 'the parity checks');
-  step.run = 'make ci-targets TARGETS="toolchain-check cargo-downloads-check parity-check"';
+  step.run = 'make ci-targets TARGETS="parity-check"';
   assert.ok(parallelViolations(parsed).includes('parity does not own its checks'));
 });
 
@@ -287,7 +287,7 @@ test('setup-node disables its cache', () => {
 
 test('a job that does not install the kit package first fails', () => {
   for (const name of CHECK_WORKFLOWS) {
-    assert.ok(anyIncludes(violations(name, changed(read(name), 'run: make install-packages\n', 'run: make toolchain-check\n')), 'the make targets of kit exist only after @polyspec/kit is installed'), name);
+    assert.ok(anyIncludes(violations(name, changed(read(name), 'run: make install-packages\n', 'run: make verify-all\n')), 'the make targets of kit exist only after @polyspec/kit is installed'), name);
   }
 });
 

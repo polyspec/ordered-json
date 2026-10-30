@@ -82,7 +82,7 @@ The PIE record `var/records/pie-verification.json` records the PIE version and P
 
 | Job | Targets |
 | --- | --- |
-| `parity` | `toolchain-check cargo-downloads-check test-markers-check verify-all parity-check` |
+| `parity` | `test-markers-check verify-all parity-check` |
 | `js` | `test-js` |
 | `rust` | `test-rust lint-rust` |
 | `go` | `test-go lint-go` |
@@ -97,7 +97,7 @@ make install-tools TOOLS="go rust php composer python uv"
 make kit-install-symbols EXTRACTORS="go php"
 make kit-install-php-arginfo
 make ordered-json-install-parity
-make ci-targets TARGETS="toolchain-check cargo-downloads-check test-markers-check verify-all parity-check"
+make ci-targets TARGETS="test-markers-check verify-all parity-check"
 ~~~
 
 After the canonical locked-package bootstrap, every job installs the pinned npm and locked packages. Each language job requests its tools through Kit `make install-tools TOOLS="..."` and reuses the product package installers for locked Rust, Composer and Python dependencies. The parity job prepares all comparison environments in its own checkout through those same package installers. Kit 0.0.61 provides selected installation. Parity explicitly installs its Go/PHP symbol extractors and PHP arginfo through Kit targets, while the extension job installs only PHP arginfo. Locked PIE and supplementary input downloads use native mise through product install targets. No custom tool installer is maintained here and no speedup is claimed before measurement. The `docs` job runs the repository checks and TypeScript lint with `make install-tools`, and prepares Git hooks. The push gate retains `push-gate-commit`, `docs-check`, `evidence-check` and `commits-check`. Release and gates workflows remain managed by kit.

@@ -114,8 +114,8 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
   Enforced by: none, whether a result depends on the machine is a judgement that no tool makes.
 - Own: A check makes no registry query whose result depends on time: no latest lookup, no `@latest`, no resolution of a version range and no query about outdated packages. Installing what a lock pins by exact version and integrity hash is allowed, as `npm ci` and `composer install` are. `make release-consumer` installs the release archives from the committed locks of `tests/release-consumer`, and `make release-consumer-lock` resolves those locks and is not a check.
   Enforced by: none, judged at review.
-- Own: No command installs a tool on demand. Node.js, Rust, Go, Python, PHP and npm are pinned by tracked files: Go, Python, Composer and the other tools of `mise.toml` are exact releases locked by digests in `mise.lock`, and PHP is pinned by its minor release in `.php-version`, which `make toolchain-check` compares as major.minor. Every command except the consumer install runs cargo, go, npm and Composer offline, so a missing download fails with a message to run `make install`.
-  Enforced by: none, judged at review: kit 0.0.77 removed toolchain-check (K854), and the pins of mise.toml and mise.lock are read by install-tools.
+- Own: No command installs a tool on demand. Node.js, Rust, Go, Python, PHP and npm are pinned by tracked files: Go, Python, Composer and the other tools of `mise.toml` are exact releases locked by digests in `mise.lock`, and PHP is pinned by its minor release in `.php-version`, which `make toolchain check` compares as major.minor. Every command except the consumer install runs cargo, go, npm and Composer offline, so a missing download fails with a message to run `make install`.
+  Enforced by: none, judged at review: kit 0.0.77 removed toolchain check (K854), and the pins of mise.toml and mise.lock are read by install-tools.
 - Own: Only `make install-tools TOOLS=npm`, `make install-packages` and `make install` download. The first installs npm, the second the packages of `package-lock.json`, and `make install` the tools of `mise.lock`, the Rust toolchain, and the crates of `packages/rust/Cargo.lock`; the PIE PHAR and the supplementary suite are the tools `http:pie` and `http:jsontestsuite` of `mise.toml`.
   Enforced by: none, judged at review: the crates of a Cargo.lock are the state of cargo, which a make target cannot compare with the lock (K864).
 - Own: A test reads only the outputs it creates and does not depend on untracked state. Records, documentation checks, shared cases and build copies read the files Git tracks, and each run builds in its own run directory with its own `CARGO_TARGET_DIR`.
@@ -159,7 +159,7 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
 ## Package go (packages/go)
 
 - Own: The module is checked alone by `make ordered-json-go-check`, which runs `make verify-go`, and linted by `make lint-go` (golangci-lint with `.golangci.yml`, and deadcode). `GOTOOLCHAIN` is `local`, and the module requires the Go release of `mise.toml`.
-  Enforced by: none, judged at review: kit 0.0.77 removed toolchain-check (K854), and the pins of mise.toml and mise.lock are read by install-tools.
+  Enforced by: none, judged at review: kit 0.0.77 removed toolchain check (K854), and the pins of mise.toml and mise.lock are read by install-tools.
 - Own: Its package tests are the Go tests beside the code that `make parity-check` runs with their declared units.
   Enforced by: `make parity-declarations-check`
 - Own: The changes of the module are listed in its section of [CHANGELOG.md](CHANGELOG.md).

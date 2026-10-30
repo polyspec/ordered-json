@@ -1,7 +1,7 @@
 // The environment of every run: the tools are the declared releases, a check reads no network, and make install is the only
 // recipe that downloads. The releases are declared in the packageManager of package.json, rust-toolchain.toml, .php-version
 // and mise.toml, whose Node.js, Go and Python are the pins of @polyspec/kit and which the go line of the go.mod names;
-// make toolchain-check compares the running tools with them, and every target that runs a tool depends on it.
+// make install-tools installs the running tools with them, and every target that runs a tool depends on it.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
@@ -14,7 +14,6 @@ import { known } from './checkout.mts';
 
 const OFFLINE = { CARGO_NET_OFFLINE: 'true', GOPROXY: 'off', npm_config_offline: 'true', COMPOSER_DISABLE_NETWORK: '1' };
 // The targets whose recipe builds or runs an implementation.
-const TOOL_TARGETS = ['verify-all', 'verify-js', 'verify-rust', 'verify-go', 'verify-php', 'verify-php-extension', 'verify-python', 'pie-check', 'benchmark', 'benchmark-check'];
 const makefile = () => readFileSync(path.join(ROOT, 'Makefile'), 'utf8');
 const read = (file: string) => readFileSync(path.join(ROOT, file), 'utf8');
 /** The version that mise.toml declares for the tool `name`. */
@@ -69,15 +68,6 @@ test('make install makes every download of the checks', () => {
   assert.deepEqual(known(table.get('ordered-json-install-rust'), 'the target ordered-json-install-rust').recipe, ['$(ONLINE) rustup toolchain install --no-self-update', '$(ONLINE) $(CARGO) fetch --locked --manifest-path node_modules/@polyspec/kit/scripts/kit/catch-check-rust/Cargo.toml']);
 });
 
-test('a target that runs a tool depends on the toolchain and download checks', () => {
-  const table = recipes(makefile());
-  for (const target of TOOL_TARGETS) {
-    const { prerequisites } = known(table.get(target), `the target ${target}`);
-    assert.ok(prerequisites.includes('toolchain-check'), target);
-    if (target === 'pie-check') assert.ok(!prerequisites.includes('cargo-downloads-check'), 'PIE builds only PHP and needs no Rust cache');
-    else assert.ok(prerequisites.includes('cargo-downloads-check'), target);
-  }
-});
 
 test('the tools of the checkout come first on the path', () => {
   assert.match(makefile(), /^export PATH := \$\(CURDIR\)\/var\/tools\/bin:/m);

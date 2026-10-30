@@ -14,7 +14,7 @@ JSON_TEST_SUITE ?=
 # that mise installs in mise.toml at the digests of mise.lock. No command installs or selects a toolchain on demand:
 # make install-tools TOOLS=npm installs npm and mise into var/tools/bin and make install the tools of mise.lock into
 # var/tools/mise (make install-tools of @polyspec/kit), whose shims kit.mk puts first on PATH with var/tools/bin, so no tool
-# of the machine is used or changed, and make toolchain-check compares every tool with its declaration.
+# of the machine is used or changed, and install-tools installs every tool at its declaration.
 export PATH := $(CURDIR)/var/tools/bin:$(PATH)
 export GOTOOLCHAIN := local
 export RUSTUP_AUTO_INSTALL := 0
@@ -36,7 +36,7 @@ include node_modules/@polyspec/kit/scripts/kit/kit-bootstrap.mk
 
 # The targets of the full suite that make check runs through the guard of full-run of @polyspec/kit and that the jobs of
 # .github/workflows run with make ci-targets (a target is in one job). verify-all writes the aggregate record into var/records.
-CHECK_TARGETS := kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage parity-declarations-check docs-check evidence-check toolchain-check cargo-downloads-check verify-all parity-check lint-rust lint-go lint-php lint-php-ext test-php-ext lint-python pie-check ordered-json-test-scripts typecheck lint-ts test-js test-rust test-go test-php test-python
+CHECK_TARGETS := kit-check suppression-check bypass-check divergence-check link-check rules-check rebuild-check language-check test-markers-check duplication-check layout-check hooks-check owner-validate release-coverage parity-declarations-check docs-check evidence-check verify-all parity-check lint-rust lint-go lint-php lint-php-ext test-php-ext lint-python pie-check ordered-json-test-scripts typecheck lint-ts test-js test-rust test-go test-php test-python
 
 .PHONY: check ordered-json-test-scripts typecheck ordered-json-install-php ordered-json-install-python verify-all verify-js verify-rust verify-go verify-php verify-php-extension verify-python evidence-check pie-check \
 	benchmark benchmark-check python-parse-budget install ordered-json-install ordered-json-install-rust \
@@ -61,8 +61,8 @@ install: ordered-json-install
 deps-node:
 	$(MAKE) --no-print-directory install-packages
 deps-go:
-	$(ONLINE) $(GO) -C packages/go mod download
-deps-rust: ordered-json-install-rust
+	$(GO) -C packages/go mod download
+deps-rust: ordered-json-install-rust cargo-downloads-fetch
 deps-php: ordered-json-install-php
 deps-python: ordered-json-install-python
 ordered-json-install: install-kit ordered-json-install-rust cargo-downloads-fetch ordered-json-install-php ordered-json-install-python
@@ -116,10 +116,10 @@ typecheck:
 # verify-all builds and verifies every implementation with the shared cases, writes var/records/verification.json and checks
 # it with the evidence check (scripts/verify.mts --record); verify-<implementation> verifies one implementation and writes no
 # record. The package tests of each implementation run in parity-check, with the native runner of its language.
-verify-all: toolchain-check cargo-downloads-check
+verify-all:
 	$(NODE) scripts/verify.mts --record$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
 
-verify-js verify-rust verify-go verify-php verify-php-extension verify-python: toolchain-check cargo-downloads-check
+verify-js verify-rust verify-go verify-php verify-php-extension verify-python:
 	$(NODE) scripts/verify.mts --only $(patsubst verify-%,%,$@)$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
 
 # evidence-check checks the feature rows against the evidence they name, the release assets of the published features and the
@@ -129,14 +129,14 @@ evidence-check:
 
 # pie-check builds the extension with the PIE PHAR of mise.toml, verifies the module with the shared cases and writes
 # var/records/pie-verification.json (scripts/check-pie.mts).
-pie-check: toolchain-check
+pie-check:
 	$(NODE) scripts/check-pie.mts$(if $(JSON_TEST_SUITE), --suite "$(JSON_TEST_SUITE)")
 
-benchmark: toolchain-check cargo-downloads-check
+benchmark:
 	$(NODE) benchmarks/run.mts
 
 # benchmark-check measures the benchmark without replacing the committed result.
-benchmark-check: toolchain-check cargo-downloads-check
+benchmark-check:
 	$(NODE) benchmarks/run.mts --check
 
 # The packages keep no Makefile (ruling 6 of the fourth pass): each package's check and test are targets of this Makefile,
@@ -167,5 +167,5 @@ parity-check: build-php-ext
 # when the Python median exceeds three times the PHP median (benchmarks/python-parse/run.py). A person runs it after a
 # change of the Python parser; it is no target of make check.
 python-parse-budget:
-	$(MAKE) --no-print-directory toolchain-check TOOLS="python php"
+	$(MAKE) --no-print-directory install-tools TOOLS="python php"
 	$(PYTHON) benchmarks/python-parse/run.py

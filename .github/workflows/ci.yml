@@ -75,7 +75,7 @@ jobs:
         run: make hooks
       - name: make ci-targets
         if: ${{ !cancelled() }}
-        run: make ci-targets TARGETS="kit-check suppression-check bypass-check divergence-check link-state-check rules-check rebuild-check language-check duplication-check layout-check hooks-check owner-validate release-coverage parity-declarations-check docs-check evidence-check ordered-json-test-scripts typecheck lint-ts"
+        run: make ci-targets TARGETS="kit-check suppression-check bypass-check divergence-check link-check rules-check rebuild-check language-check duplication-check layout-check hooks-check owner-validate release-coverage parity-declarations-check docs-check evidence-check ordered-json-test-scripts typecheck lint-ts"
       # actions/upload-artifact v7.0.1: the report of this job, var/report/ci-targets.
       - name: report
         if: ${{ !cancelled() }}
@@ -136,7 +136,7 @@ jobs:
         env:
           JSON_TEST_SUITE: var/tools/mise/installs/http-jsontestsuite/latest
           TOOLS: node npm mise go rust php composer python uv
-        run: make ci-targets TARGETS="toolchain-check cargo-downloads-check test-markers-check verify-all parity-check"
+        run: make ci-targets TARGETS="test-markers-check verify-all parity-check"
       # actions/upload-artifact v7.0.1
       - name: report
         if: ${{ !cancelled() }}
