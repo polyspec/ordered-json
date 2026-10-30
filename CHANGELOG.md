@@ -7,6 +7,7 @@
 ## Unreleased
 
 ## 0.0.13
+- T2.103: @polyspec/kit is pinned to the 0.0.75 asset and the lock is updated (kit K883 and K888 among the release) (T2.103)
 - T2.102: the python parity symbols are named by their module polyspec.ordered_json, as the python extractor reads them (T2.102)
 - T2.101: the PHP value test asserts the same thing in both runs and no longer branches on the extension (T2.101)
 - T2.100: ordered-json 0.0.13 is released: the version of every manifest and lock of config/release.json is 0.0.13, and the changelogs name it (T2.100)
