@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 7b682254f154af5357043fb044acf759606d4fd8b2d16387c65998e4cb2dad57 -->
+<!-- source-sha256: 26932f4d505079472792e9986dd397c22d021f20157d50608cd993f762363d43 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -134,3 +134,4 @@
 | T2.112 | 중복 검사(duplication-check)에서 테스트 폴더 제외를 제거한다(P34): 각 언어의 반복된 테스트 블록을 표 기반 케이스나 공용 헬퍼로 재구성하며, 모든 케이스는 그대로 남긴다 | config/duplication.json packages/python/tests/shape.py packages/python/tests/probe.py packages/python/tests/test_official.py CHANGELOG.md CHANGELOG.ko.md | `make duplication-check` | [o] |
 | T2.113 | AGENTS.md와 PRINCIPLES.md의 규칙 중 기계가 검사할 수 있는 부분마다 기존 검사를 Enforced by에 명시하고, 판단만 남는 규칙에만 none을 둔다. 새 검사 장치는 추가하지 않는다 | AGENTS.md AGENTS.ko.md CHANGELOG.md CHANGELOG.ko.md | `make rules-check` | [o] |
 | T2.114 | kit이 삭제한 dependency-review, release-consumer-lock, release-consumer, toolchain check를 이름으로 든 AGENTS 규칙을 지운다. lock은 패키지 관리자가 소유하므로 대체 검사를 추가하지 않는다 | AGENTS.md AGENTS.ko.md CHANGELOG.md CHANGELOG.ko.md | `make rules-check` `make docs-check` | [o] |
+| T2.115 | locked kit이 정의하지 않는 make release-consumer와 make release-consumer-lock을 이름으로 든 distribution과 installation의 consumer 단락을, consumer가 패키지 관리자로 release를 설치하는 내용으로 고쳐 쓴다 | docs/operations/distribution.md docs/operations/distribution.ko.md docs/operations/installation.md docs/operations/installation.ko.md CHANGELOG.md CHANGELOG.ko.md | `make docs-check` | [ ] |
