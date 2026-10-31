@@ -83,9 +83,13 @@
   Enforced by: `make release-verify`
 - Own: version-bump commit `Release X.Y.Z`는 저장소의 모든 manifest에 version을 설정하며, 또 `make dependency-review RECORD=1`로 dependency review를 다시 기록하고, `make release-consumer-lock TAG=vX.Y.Z`로 consumer lock을 쓰며, 각 changelog의 `## Unreleased`를 `## X.Y.Z`로 바꿉니다.
   Enforced by: none; 검토에서 판단합니다.
-- Own: Go tag `packages/go/vX.Y.Z`는 같은 commit에서 `vX.Y.Z`보다 먼저 push합니다. Go tag가 GitHub에 없이 `vX.Y.Z`만 push되면 release 검증이 실패합니다.
+- Own: Go tag `packages/go/vX.Y.Z`는 같은 commit에서 `vX.Y.Z`보다 먼저 push합니다.
   Enforced by: none, 검토에서 판단합니다.
-- Own: tag push는 `.github/workflows/release.yml`을 실행합니다. 이 workflow는 tag된 commit이 `ci-passed`가 통과한 `main`에 있는지, 모든 manifest에 tag의 version이 있는지, `CHANGELOG.md`에 `## X.Y.Z` 절이 있는지 확인한 뒤 archive와 Python wheel을 빌드하고 GitHub Release를 만듭니다.
+- Own: Go tag가 GitHub에 없이 `vX.Y.Z`만 push되면 release 검증이 실패합니다.
+  Enforced by: `make release-verify`
+- Own: tag push는 `.github/workflows/release.yml`을 실행하며, 이 workflow는 tag된 commit이 `ci-passed`가 통과한 `main`에 있는지 확인합니다.
+  Enforced by: `make release-verify`
+- Own: tag push 뒤 모든 manifest에 tag의 version이 있고 `CHANGELOG.md`에 `## X.Y.Z` 절이 있으며, 그다음 release.yml이 archive와 Python wheel을 빌드하고 GitHub Release를 만듭니다.
   Enforced by: none, 검토에서 판단합니다.
 - Own: 다른 저장소의 패키지를 고정하는 패키지는 GitHub에 실제로 존재하는 tag만 이름으로 적습니다. 고정은 그 tag를 push한 뒤에 씁니다.
   Enforced by: none, 검토에서 판단합니다.
@@ -149,7 +153,11 @@
 <a id="package-rust"></a>
 ## 패키지 rust (packages/rust)
 
-- Own: crate는 `make ordered-json-rust-check`로 이 패키지만 검사하며, 이 target은 `make verify-rust`를 실행합니다. `make lint-rust`(`-D warnings`를 붙인 clippy)가 lint합니다. crate는 `packages/rust/Cargo.lock`에 고정된 버전이며, `make install`이 내려받고 검사는 내려받지 않습니다.
+- Own: crate는 `make lint-rust`(`-D warnings`를 붙인 clippy)가 lint합니다.
+  Enforced by: `make lint-rust`
+- Own: crate는 `make ordered-json-rust-check`로 이 패키지만 검사하며, 이 target은 `make verify-rust`를 실행합니다.
+  Enforced by: none, 판단 사항입니다. workflow, Git hook, Claude Code hook 어디도 이 target을 실행하지 않습니다.
+- Own: crate는 `packages/rust/Cargo.lock`에 고정된 버전이며, `make install`이 내려받고 검사는 내려받지 않습니다.
   Enforced by: none, 판단 사항입니다. crate의 존재는 cargo의 상태이므로 make target이 Cargo.lock과 비교할 수 없습니다(K864).
 - Own: 패키지 테스트는 `make parity-check`가 선언된 unit과 함께 실행하는 crate의 native 테스트입니다.
   Enforced by: `make parity-declarations-check`
@@ -159,7 +167,11 @@
 <a id="package-go"></a>
 ## 패키지 go (packages/go)
 
-- Own: module은 `make ordered-json-go-check`로 이 패키지만 검사하며, 이 target은 `make verify-go`를 실행합니다. `make lint-go`(`.golangci.yml`을 쓰는 golangci-lint와 deadcode)가 lint합니다. `GOTOOLCHAIN`은 `local`이며, module은 `mise.toml`의 Go release를 요구합니다.
+- Own: module은 `make lint-go`(`.golangci.yml`을 쓰는 golangci-lint와 deadcode)가 lint합니다.
+  Enforced by: `make lint-go`
+- Own: module은 `make ordered-json-go-check`로 이 패키지만 검사하며, 이 target은 `make verify-go`를 실행합니다.
+  Enforced by: none, 판단 사항입니다. workflow, Git hook, Claude Code hook 어디도 이 target을 실행하지 않습니다.
+- Own: `GOTOOLCHAIN`은 `local`이며, module은 `mise.toml`의 Go release를 요구합니다.
   Enforced by: none, 판단 사항입니다. kit 0.0.77이 toolchain check를 제거했고(K854), mise.toml과 mise.lock의 고정은 install-tools가 읽습니다.
 - Own: 패키지 테스트는 `make parity-check`가 선언된 unit과 함께 실행하는 코드 옆의 Go 테스트입니다.
   Enforced by: `make parity-declarations-check`
@@ -169,7 +181,11 @@
 <a id="package-php"></a>
 ## 패키지 php (packages/php)
 
-- Own: Composer 패키지는 `make ordered-json-php-check`로 이 패키지만 검사하며, 이 target은 `make verify-php`를 실행합니다. `make lint-php`(phpcs와 PHPStan)가 lint합니다. `composer.lock`은 platform `8.4.1`로 잠기고 PHP `>=8.4`를 요구하며, manifest가 바뀌면 `composer update --lock`으로 다시 잠급니다.
+- Own: Composer 패키지는 `make lint-php`(phpcs와 PHPStan)가 lint합니다.
+  Enforced by: `make lint-php`
+- Own: Composer 패키지는 `make ordered-json-php-check`로 이 패키지만 검사하며, 이 target은 `make verify-php`를 실행합니다.
+  Enforced by: none, 판단 사항입니다. workflow, Git hook, Claude Code hook 어디도 이 target을 실행하지 않습니다.
+- Own: `composer.lock`은 platform `8.4.1`로 잠기고 PHP `>=8.4`를 요구하며, manifest가 바뀌면 `composer update --lock`으로 다시 잠급니다.
   Enforced by: none, 검토에서 판단합니다.
 - Own: 패키지 테스트는 `packages/php/tests`의 PHPUnit 테스트이며, `make install`이 설치하고 `make parity-check`가 선언된 unit과 함께 실행합니다.
   Enforced by: `make parity-check`

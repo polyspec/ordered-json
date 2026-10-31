@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 1996983578339118c852997767ce49a0f5f4caf60607e9fbcdcf26e8f149f8ec -->
+<!-- source-sha256: c38d169933b25fa347fe42aa4c438a33ad5544de253f931286f1a19626543c1c -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -132,4 +132,4 @@
 | T2.110 | ordered-json 0.0.14 릴리스: 버전과 changelog를 올린다 | package.json packages/js/package.json composer.json packages/php/composer.json packages/php-ext/composer.json packages/rust/Cargo.toml packages/python/pyproject.toml CHANGELOG.md CHANGELOG.ko.md | `make release-coverage` | [o] |
 | T2.111 | .links 링크 선언을 로컬 exclude만이 아니라 .gitignore에서도 무시한다 | .gitignore CHANGELOG.md CHANGELOG.ko.md | `git check-ignore -q .links && grep -qx "/.links" .gitignore` | [o] |
 | T2.112 | 중복 검사(duplication-check)에서 테스트 폴더 제외를 제거한다(P34): 각 언어의 반복된 테스트 블록을 표 기반 케이스나 공용 헬퍼로 재구성하며, 모든 케이스는 그대로 남긴다 | config/duplication.json packages/python/tests/shape.py packages/python/tests/probe.py packages/python/tests/test_official.py CHANGELOG.md CHANGELOG.ko.md | `make duplication-check` | [o] |
-| T2.113 | AGENTS.md와 PRINCIPLES.md의 규칙 중 기계가 검사할 수 있는 부분마다 기존 검사를 Enforced by에 명시하고, 판단만 남는 규칙에만 none을 둔다. 새 검사 장치는 추가하지 않는다 | AGENTS.md AGENTS.ko.md PRINCIPLES.md PRINCIPLES.ko.md | `make rules-check` | [ ] |
+| T2.113 | AGENTS.md와 PRINCIPLES.md의 규칙 중 기계가 검사할 수 있는 부분마다 기존 검사를 Enforced by에 명시하고, 판단만 남는 규칙에만 none을 둔다. 새 검사 장치는 추가하지 않는다 | AGENTS.md AGENTS.ko.md CHANGELOG.md CHANGELOG.ko.md | `make rules-check` | [o] |

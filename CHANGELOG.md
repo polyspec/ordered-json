@@ -8,6 +8,7 @@
 
 - T2.111: .links, the link declaration of kit (K869), is ignored by .gitignore, not only by the local exclude (T2.111)
 - T2.112: the tests of the Python package share one helper module for the value tree and the rebuild, so duplication-check no longer excludes the test folders (P34) (T2.112)
+- T2.113: AGENTS.md names the existing check of each rule that a machine can check (make lint-rust, make lint-go, make lint-php, make release-verify); a rule that only a judgement can state keeps Enforced by: none (T2.113)
 ## 0.0.14
 - T2.110: ordered-json 0.0.14 is released: the version of every manifest and lock of config/release.json is 0.0.14, and the changelogs name it (T2.110)
 - T2.108: the prepare-commit-msg hook file is removed, which kit 0.0.77 no longer serves (K892) (T2.108)

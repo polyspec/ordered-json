@@ -82,9 +82,13 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
   Enforced by: `make release-verify`
 - Own: The version-bump commit `Release X.Y.Z` sets the version in every manifest of the repository, records the dependency review again with `make dependency-review RECORD=1`, writes the consumer locks with `make release-consumer-lock TAG=vX.Y.Z` and renames `## Unreleased` of each changelog to `## X.Y.Z`.
   Enforced by: none; judged at review.
-- Own: The Go tag `packages/go/vX.Y.Z` is pushed before `vX.Y.Z`, on the same commit. A `vX.Y.Z` pushed without its Go tag on GitHub fails the verification of the release.
+- Own: The Go tag `packages/go/vX.Y.Z` is pushed before `vX.Y.Z`, on the same commit.
   Enforced by: none, judged at review.
-- Own: The tag push runs `.github/workflows/release.yml`, which requires the tagged commit on `main` with `ci-passed` passed, the version of the tag in every manifest and the section `## X.Y.Z` in `CHANGELOG.md`, then builds the archives and the Python wheel and creates the GitHub Release.
+- Own: A `vX.Y.Z` pushed without its Go tag on GitHub fails the verification of the release.
+  Enforced by: `make release-verify`
+- Own: The tag push runs `.github/workflows/release.yml`, which requires the tagged commit on `main` with `ci-passed` passed.
+  Enforced by: `make release-verify`
+- Own: After the tag push, the version of the tag is in every manifest and the section `## X.Y.Z` is in `CHANGELOG.md`, then release.yml builds the archives and the Python wheel and creates the GitHub Release.
   Enforced by: none, judged at review.
 - Own: A package that pins a package of another repository names only a tag that exists on GitHub. The pin is written after that tag is pushed.
   Enforced by: none, judged at review.
@@ -148,7 +152,11 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
 <a id="package-rust"></a>
 ## Package rust (packages/rust)
 
-- Own: The crate is checked alone by `make ordered-json-rust-check`, which runs `make verify-rust`, and linted by `make lint-rust` (clippy with `-D warnings`). Its crates are the locked versions of `packages/rust/Cargo.lock`, which `make install` downloads; no check downloads them.
+- Own: The crate is linted by `make lint-rust` (clippy with `-D warnings`).
+  Enforced by: `make lint-rust`
+- Own: The crate is checked alone by `make ordered-json-rust-check`, which runs `make verify-rust`.
+  Enforced by: none, judged at review: no workflow, Git hook or Claude Code hook runs this target.
+- Own: Its crates are the locked versions of `packages/rust/Cargo.lock`, which `make install` downloads; no check downloads them.
   Enforced by: none, judged at review: the crates of a Cargo.lock are the state of cargo, which a make target cannot compare with the lock (K864).
 - Own: Its package tests are the native tests of the crate that `make parity-check` runs with their declared units.
   Enforced by: `make parity-declarations-check`
@@ -158,7 +166,11 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
 <a id="package-go"></a>
 ## Package go (packages/go)
 
-- Own: The module is checked alone by `make ordered-json-go-check`, which runs `make verify-go`, and linted by `make lint-go` (golangci-lint with `.golangci.yml`, and deadcode). `GOTOOLCHAIN` is `local`, and the module requires the Go release of `mise.toml`.
+- Own: The module is linted by `make lint-go` (golangci-lint with `.golangci.yml`, and deadcode).
+  Enforced by: `make lint-go`
+- Own: The module is checked alone by `make ordered-json-go-check`, which runs `make verify-go`.
+  Enforced by: none, judged at review: no workflow, Git hook or Claude Code hook runs this target.
+- Own: `GOTOOLCHAIN` is `local`, and the module requires the Go release of `mise.toml`.
   Enforced by: none, judged at review: kit 0.0.77 removed toolchain check (K854), and the pins of mise.toml and mise.lock are read by install-tools.
 - Own: Its package tests are the Go tests beside the code that `make parity-check` runs with their declared units.
   Enforced by: `make parity-declarations-check`
@@ -168,7 +180,11 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
 <a id="package-php"></a>
 ## Package php (packages/php)
 
-- Own: The Composer package is checked alone by `make ordered-json-php-check`, which runs `make verify-php`, and linted by `make lint-php` (phpcs and PHPStan). Its `composer.lock` is locked to the platform `8.4.1` and requires PHP `>=8.4`, and is re-locked with `composer update --lock` when its manifest changes.
+- Own: The Composer package is linted by `make lint-php` (phpcs and PHPStan).
+  Enforced by: `make lint-php`
+- Own: The Composer package is checked alone by `make ordered-json-php-check`, which runs `make verify-php`.
+  Enforced by: none, judged at review: no workflow, Git hook or Claude Code hook runs this target.
+- Own: Its `composer.lock` is locked to the platform `8.4.1` and requires PHP `>=8.4`, and is re-locked with `composer update --lock` when its manifest changes.
   Enforced by: none, judged at review.
 - Own: Its package tests are the PHPUnit tests of `packages/php/tests` that `make parity-check` runs with their declared units, installed by `make install`.
   Enforced by: `make parity-check`
