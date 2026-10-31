@@ -1,5 +1,5 @@
 <!-- doc-id: checklist-kit-standard -->
-<!-- source-sha256: 1d3c168d953896f8b0bf914083dadd5b16f0ae9b560dd9b381cff32b6ba612de -->
+<!-- source-sha256: cae42463277fb66a9f17d8f14132945b40a78dfe6c35b614ce0f792b6b13ded9 -->
 # kit 표준 체크리스트
 
 | ID | Task | Deliverables | Verification | State |
@@ -135,4 +135,4 @@
 | T2.113 | AGENTS.md와 PRINCIPLES.md의 규칙 중 기계가 검사할 수 있는 부분마다 기존 검사를 Enforced by에 명시하고, 판단만 남는 규칙에만 none을 둔다. 새 검사 장치는 추가하지 않는다 | AGENTS.md AGENTS.ko.md CHANGELOG.md CHANGELOG.ko.md | `make rules-check` | [o] |
 | T2.114 | kit이 삭제한 dependency-review, release-consumer-lock, release-consumer, toolchain check를 이름으로 든 AGENTS 규칙을 지운다. lock은 패키지 관리자가 소유하므로 대체 검사를 추가하지 않는다 | AGENTS.md AGENTS.ko.md CHANGELOG.md CHANGELOG.ko.md | `make rules-check` `make docs-check` | [o] |
 | T2.115 | locked kit이 정의하지 않는 make release-consumer와 make release-consumer-lock을 이름으로 든 distribution과 installation의 consumer 단락을, consumer가 패키지 관리자로 release를 설치하는 내용으로 고쳐 쓴다 | docs/operations/distribution.md docs/operations/distribution.ko.md docs/operations/installation.md docs/operations/installation.ko.md CHANGELOG.md CHANGELOG.ko.md | `make docs-check` | [o] |
-| T2.116 | locked kit이 정의하지 않는 make release-versions와 make release-proof를 이름으로 든 distribution의 maintainer 릴리스 step을, release workflow가 실제로 실행하는 step으로 고쳐 쓴다 | docs/operations/distribution.md docs/operations/distribution.ko.md CHANGELOG.md CHANGELOG.ko.md | `make docs-check` | [ ] |
+| T2.116 | locked kit이 정의하지 않는 make release-versions와 make release-proof를 이름으로 든 distribution의 maintainer 릴리스 step을, release workflow가 실제로 실행하는 step으로 고쳐 쓴다 | docs/operations/distribution.md docs/operations/distribution.ko.md CHANGELOG.md CHANGELOG.ko.md | `make docs-check` | [o] |

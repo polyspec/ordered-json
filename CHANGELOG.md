@@ -11,6 +11,7 @@
 - T2.113: AGENTS.md names the existing check of each rule that a machine can check (make lint-rust, make lint-go, make lint-php, make release-verify); a rule that only a judgement can state keeps Enforced by: none (T2.113)
 - T2.114: AGENTS.md no longer names dependency-review, release-consumer-lock, release-consumer or config/dependency-policy.json, which kit deleted; the package managers own their locks (T2.114)
 - T2.115: distribution and installation describe a consumer installing a release with its package manager, not the make targets release-consumer and release-consumer-lock, which the locked kit does not define (T2.115)
+- T2.116: distribution describes the maintainer release steps of the locked kit: the make targets release-versions and release-proof, which it does not define, are removed (T2.116)
 ## 0.0.14
 - T2.110: ordered-json 0.0.14 is released: the version of every manifest and lock of config/release.json is 0.0.14, and the changelogs name it (T2.110)
 - T2.108: the prepare-commit-msg hook file is removed, which kit 0.0.77 no longer serves (K892) (T2.108)
