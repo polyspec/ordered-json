@@ -7,6 +7,7 @@
 ## Unreleased
 
 - T2.111: .links, the link declaration of kit (K869), is ignored by .gitignore, not only by the local exclude (T2.111)
+- T2.112: the tests of the Python package share one helper module for the value tree and the rebuild, so duplication-check no longer excludes the test folders (P34) (T2.112)
 ## 0.0.14
 - T2.110: ordered-json 0.0.14 is released: the version of every manifest and lock of config/release.json is 0.0.14, and the changelogs name it (T2.110)
 - T2.108: the prepare-commit-msg hook file is removed, which kit 0.0.77 no longer serves (K892) (T2.108)

@@ -11,34 +11,7 @@ import sys
 from pathlib import Path
 
 from polyspec.ordered_json import ParseError, Value, parse_bytes, stringify
-
-
-def tree(value):
-    if value.kind == "object":
-        return [
-            "object",
-            [[name, tree(member)] for name, member in value.members().items()],
-        ]
-    if value.kind == "array":
-        return ["array", [tree(item) for item in value.items()]]
-    if value.kind == "string":
-        return ["string", value.string_value()]
-    if value.kind == "number":
-        return ["number", value.number_literal()]
-    if value.kind == "boolean":
-        return ["boolean", value.boolean_value()]
-    return ["null"]
-
-
-def rebuild(value):
-    if value.kind == "object":
-        names = list(value.members())
-        entries = [(name, Value.null()) for name in names]
-        entries += [(name, rebuild(value.get(name))) for name in reversed(names)]
-        return Value.object(entries)
-    if value.kind == "array":
-        return Value.array([rebuild(item) for item in value.items()])
-    return value
+from shape import rebuild, tree
 
 
 for line in sys.stdin:
