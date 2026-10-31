@@ -81,7 +81,7 @@
 
 - Own: release는 `main`의 commit에 붙인 tag이며, 그 commit의 CI 실행은 `ci-passed` 성공으로 끝났어야 합니다. tag를 만들거나, 옮기거나, push하는 사람은 maintainer 한 명뿐입니다.
   Enforced by: `make release-verify`
-- Own: version-bump commit `Release X.Y.Z`는 저장소의 모든 manifest에 version을 설정하며, 또 `make dependency-review RECORD=1`로 dependency review를 다시 기록하고, `make release-consumer-lock TAG=vX.Y.Z`로 consumer lock을 쓰며, 각 changelog의 `## Unreleased`를 `## X.Y.Z`로 바꿉니다.
+- Own: version-bump commit `Release X.Y.Z`는 저장소의 모든 manifest에 version을 설정하며, 각 changelog의 `## Unreleased`를 `## X.Y.Z`로 바꿉니다.
   Enforced by: none; 검토에서 판단합니다.
 - Own: Go tag `packages/go/vX.Y.Z`는 같은 commit에서 `vX.Y.Z`보다 먼저 push합니다.
   Enforced by: none, 검토에서 판단합니다.
@@ -105,10 +105,6 @@
 <a id="dependencies"></a>
 ## Dependencies
 
-- Own: 의존성은 선언된 runtime 범위를 지원하는 최신 stable release를 사용하며, 이는 선택하거나 갱신할 때 판단합니다. 의존성은 `make dependency-review UPDATE=1`로 고르고 갱신하며, 바뀐 manifest나 lock은 `make dependency-review RECORD=1`이 쓰는 review 기록 `config/dependency-review.json`과 함께 commit합니다.
-  Enforced by: none, 검토에서 판단합니다.
-- Own: 더 오래된 release는 재현 가능한 이유, 고정을 제거할 조건, 검증 명령을 적은 `config/dependency-policy.json`의 예외로만 고정합니다. review 시점에 advisory가 있는 lock은 gate를 통과하지 못합니다.
-  Enforced by: none, 검토에서 판단합니다.
 - Own: polyspec 버전이 0.0.x인 동안 개발 checkout은 kit `docs/plans/local-links.md`가 설명하는 대로 설치된 polyspec 패키지를 원본에 link합니다. link는 commit하지 않습니다.
   Enforced by: none, 개발 link는 무시되는 `node_modules/`에 있어 Git 밖에 남고, 어떤 도구도 개발 checkout을 판단하지 않습니다.
 
@@ -117,9 +113,9 @@
 
 - Own: 같은 tree는 언제, 어느 기계에서든 같은 결과를 냅니다. 이 목록의 각 규칙은 이 저장소가 그 규칙을 어떻게 지키는지를 적습니다.
   Enforced by: none, 결과가 기계에 따라 달라지는지는 어떤 도구도 판단할 수 없는 판단 사항입니다.
-- Own: 검사는 시간에 따라 결과가 달라지는 registry 질의를 하지 않습니다. latest 조회, `@latest`, 범위 해석, 오래된 패키지 질의가 없습니다. lock이 정확한 version과 integrity hash로 고정한 것을 설치하는 것은 허용되며, `npm ci`와 `composer install`이 그렇듯 허용됩니다. `make release-consumer`는 `tests/release-consumer`의 commit된 lock으로 release archive를 설치하고, `make release-consumer-lock`은 그 lock을 해석하며 검사가 아닙니다.
+- Own: 검사는 시간에 따라 결과가 달라지는 registry 질의를 하지 않습니다. latest 조회, `@latest`, 범위 해석, 오래된 패키지 질의가 없습니다. lock이 정확한 version과 integrity hash로 고정한 것을 설치하는 것은 허용되며, `npm ci`와 `composer install`이 그렇듯 허용됩니다.
   Enforced by: none, 검토에서 판단합니다.
-- Own: 어떤 명령도 도구를 필요할 때 설치하지 않습니다. Node.js, Rust, Go, Python, PHP, npm은 추적 파일이 고정합니다. Go, Python, Composer와 mise가 설치하는 다른 도구는 `mise.toml`의 정확한 release이며 `mise.lock`의 digest로 잠깁니다. PHP는 `.php-version`의 minor release로 고정하며, `make toolchain check`가 major.minor를 비교합니다. consumer 설치를 제외한 모든 명령은 cargo, go, npm, Composer를 offline으로 실행하므로, 누락된 다운로드는 `make install`을 실행하라는 메시지와 함께 실패합니다.
+- Own: 어떤 명령도 도구를 필요할 때 설치하지 않습니다. Node.js, Rust, Go, Python, PHP, npm은 추적 파일이 고정합니다. Go, Python, Composer와 mise가 설치하는 다른 도구는 `mise.toml`의 정확한 release이며 `mise.lock`의 digest로 잠깁니다. PHP는 `.php-version`의 minor release로 고정합니다. install target을 제외한 모든 명령은 cargo, go, npm, Composer를 offline으로 실행하므로, 누락된 다운로드는 `make install`을 실행하라는 메시지와 함께 실패합니다.
   Enforced by: none, 판단 사항입니다. kit 0.0.77이 toolchain check를 제거했고(K854), mise.toml과 mise.lock의 고정은 install-tools가 읽습니다.
 - Own: 다운로드하는 것은 `make install-tools TOOLS=npm`, `make install-packages`, `make install`뿐입니다. 첫 번째는 npm을, 두 번째는 `package-lock.json`의 패키지를 설치하며, `make install`은 `mise.lock`의 도구, Rust toolchain, `packages/rust/Cargo.lock`의 crate를 설치하며, PIE PHAR와 보충 suite는 `mise.toml`의 tool `http:pie`와 `http:jsontestsuite`입니다.
   Enforced by: none, 판단 사항입니다. crate의 존재는 cargo의 상태이므로 make target이 Cargo.lock과 비교할 수 없습니다(K864).

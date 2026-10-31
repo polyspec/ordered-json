@@ -10,6 +10,7 @@
 - T2.111: kit 링크 선언 .links를 로컬 exclude만이 아니라 .gitignore가 무시한다 (K869) (T2.111)
 - T2.112: Python 패키지 테스트가 값 트리와 재구성 헬퍼를 한 모듈로 공유하며, 중복 검사가 테스트 폴더를 더 이상 제외하지 않는다 (P34) (T2.112)
 - T2.113: AGENTS.md는 기계가 검사할 수 있는 규칙마다 기존 검사를 Enforced by에 명시하고(make lint-rust, make lint-go, make lint-php, make release-verify), 판단만 남는 규칙은 none으로 둔다 (T2.113)
+- T2.114: AGENTS.md는 kit이 삭제한 dependency-review, release-consumer-lock, release-consumer와 config/dependency-policy.json을 더 이상 이름으로 들지 않으며, lock은 패키지 관리자가 소유합니다 (T2.114)
 ## 0.0.14
 - T2.110: ordered-json 0.0.14 릴리스: config/release.json의 모든 manifest와 lock의 버전이 0.0.14이며 changelog가 이를 기록한다 (T2.110)
 - T2.108: kit 0.0.77이 더 제공하지 않는 prepare-commit-msg 훅 파일을 제거한다 (K892) (T2.108)
