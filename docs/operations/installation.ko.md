@@ -72,7 +72,7 @@ composer install
 
 Composer는 두 zip을 모두 읽습니다. type이 `php-ext`인 package `polyspec/ordered-json-php-ext`은 설치하지 않으며, PIE가 빌드하고 설치합니다([네이티브 PHP](#native-php)).
 
-이 저장소의 package는 다른 package에 의존하지 않으므로 저장소에는 npm workspaces와 비공개 개발 manifest가 없습니다. 루트의 `package.json`과 `composer.json`은 checkout에서 설치하도록 `packages/js/`, `packages/php/`와 같은 package를 같은 `version`으로 선언하며 `repositories`가 없습니다. `make release-consumer TAG=<tag>`(`@polyspec/kit`의 release-consumer)는 `var/release/assets`의 archive를, 저장소 밖의 임시 디렉터리에서 `tests/release-consumer`의 커밋된 consumer project로 consumer처럼 설치합니다. consumer project는 tarball에 릴리스 이름으로 의존하는 `package.json`과 그 `package-lock.json`, zip의 artifact repository에서 library를 요구하는 `composer.json`과 그 `composer.lock`입니다. archive를 실행에서 빌드하므로 각 lock은 `integrity` 없이 빈 `shasum`으로 이름과 버전만 기록하며, 제3자 package는 버전과 hash로 기록합니다. `npm ci`는 빈 cache와 도달할 수 없는 registry를 가리키는 scope `@polyspec`로, `composer install`은 빈 `COMPOSER_HOME`과 `COMPOSER_CACHE_DIR`로 실행합니다. `make release-consumer-lock TAG=<tag>`는 archive로 manifest와 lock을 쓰며, 릴리스 버전이나 의존성이 바뀌면 실행하고 release commit이 실행합니다.
+이 저장소의 package는 다른 package에 의존하지 않으므로 저장소에는 npm workspaces와 비공개 개발 manifest가 없습니다. 루트의 `package.json`과 `composer.json`은 checkout에서 설치하도록 `packages/js/`, `packages/php/`와 같은 package를 같은 `version`으로 선언하며 `repositories`가 없습니다. consumer는 저장소 밖에서 release를 패키지 관리자로 설치합니다. npm은 release tarball `polyspec-ordered-json-npm-X.Y.Z.tgz`를 설치하고, Composer는 PHP 패키지를 release zip의 artifact repository에서 require합니다.
 
 <a id="native-php"></a>
 ## 네이티브 PHP

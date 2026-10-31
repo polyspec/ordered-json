@@ -52,7 +52,7 @@ The workflow is the copy of `workflows/release.yml` of `@polyspec/kit`. `make in
 5. `make release-proof TAG="$TAG"` proves the draft release from outside the checkout (the archives, the consumer installs, the Cargo package by git tag, the wheel and the Go module).
 6. `make release-undraft TAG="$TAG"` makes the release public, only after the proof passed; a failed step leaves the release a draft.
 
-The consumer projects `tests/release-consumer/npm` and `tests/release-consumer/composer` install the archives of a tag outside the repository (`make release-consumer TAG=<tag>`); their locks are written for the version of a tag by `make release-consumer-lock TAG=<tag>` on the release commit and name the archives of this repository by name and version only. After the release exists, `make release-proof TAG=<tag>` installs the GitHub Release, the archives, the Cargo package by git tag, the wheel, and the Go module from outside the checkout.
+A consumer installs a release outside the repository with its package manager: npm installs the release tarball `polyspec-ordered-json-npm-X.Y.Z.tgz`, and Composer requires the PHP packages from the release zips of an artifact repository. The Cargo package is installed by its git tag, the Python wheel from the release assets, and the Go module by its tag.
 
 The tag reaches the steps through the environment variable `TAG`. `tests/scripts/workflow-rules.test.mts` requires the trigger, the permission and the order of the steps.
 
