@@ -1,11 +1,13 @@
 <!-- doc-id: changelog -->
-<!-- source-sha256: 80b41ea45ce50c317aef2ec2ae1a5e8bc785750145a9321325a48ad737e4be45 -->
+<!-- source-sha256: 51fbe9cab40a293bc6f66d3b653ffbac43f61f57bbe62ea7e3e927cf5197a44c -->
 # 변경 기록
 
 [English](CHANGELOG.md)
 
 <a id="unreleased"></a>
 ## Unreleased
+
+## 0.0.26
 
 - 어떤 release도 root manifest를 통해 legacy 패키지를 게시하지 않는다(T3.21, docs/spec/json-contract.md#transition). root `package.json`과 `composer.json`은 `@polyspec/ordered-json`과 `polyspec/ordered-json`을 적고 legacy 소스를 읽으며, `config/release.json`이 둘 다 release했으므로 version bump가 legacy 패키지에 코어 release의 version을 주었을 것이다. root `package.json`은 private이고, `config/release.json`은 두 manifest를 어떤 release도 게시하지 않는 manifest로 적으며, legacy 이름은 마지막 release 0.0.25에 머문다. 0.0.26부터 release는 crate `polyspec-json`을 git tag로, 바인딩 패키지는 release된 뒤부터 게시한다. Red: `tests/scripts/registry.test.mts`가 `the root package.json is private`로 실패했다. Green: 그 시험 여덟 개가 통과하고 `make release-coverage`가 모든 package 파일을 분류한다.
 - 새 checkout은 이 Makefile의 target만으로 설치된다(T3.23). `make bootstrap`은 `devEngines.packageManager`의 npm release를 `npm exec`로 checkout 밖에서 `--prefix`와 cache `var/bootstrap/npm-cache`와 함께 실행해 `@polyspec/kit`을 포함한 `package-lock.json`을 설치하고, 그다음 `make install-tools TOOLS=npm`과 `make install-packages`가 실행된다. Makefile에는 `bootstrap`이 없었으므로 `node_modules`가 없는 checkout에서 `make install-tools TOOLS=npm`은 없는 `node_modules/@polyspec/kit/dist/bootstrap/bootstrap.mjs` 때문에 실패했고, 다른 release의 npm으로 하는 `npm ci`는 `EBADDEVENGINES`로 실패했다. Red: `tests/scripts/workflow-rules.test.mts`가 `make[1]: *** No rule to make target 'bootstrap'.  Stop.`으로 실패했다. Green: 그 시험 네 개가 통과한다.

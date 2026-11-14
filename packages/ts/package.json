@@ -1,6 +1,6 @@
 {
   "name": "@polyspec/json",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "The json library of polyspec for Node and the browser",
   "license": "MIT",
   "type": "module",
