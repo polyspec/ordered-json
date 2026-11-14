@@ -7,11 +7,11 @@
   ],
   "packages": [],
   "manifests": {
-    "package.json": "version",
-    "composer.json": "version",
     "packages/rust/Cargo.toml": "git-tag"
   },
   "notReleased": {
+    "package.json": "the private manifest of the development checkout, which names the legacy JavaScript package; the legacy packages keep their last release (docs/spec/json-contract.md#transition)",
+    "composer.json": "the manifest of the development checkout, which loads the legacy PHP package for the lints; the legacy packages keep their last release (docs/spec/json-contract.md#transition)",
     "Cargo.toml": "the root Cargo workspace; the crate is released by packages/rust/Cargo.toml",
     "legacy/packages/go/go.mod": "the legacy language package of the transition, which is no release target until it is removed (docs/spec/json-contract.md#transition)",
     "legacy/packages/js/package.json": "the legacy language package of the transition, which is no release target until it is removed (docs/spec/json-contract.md#transition)",

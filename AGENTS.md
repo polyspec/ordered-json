@@ -82,13 +82,13 @@ The working principles of every polyspec repository are in [PRINCIPLES.md](PRINC
 
 - Own: A release is a tag of a commit of `main` whose run of the `ci` workflow concluded with success, its job `kit / required` passed. The release workflow creates the tags; no tag is created, moved or pushed by hand.
   Enforced by: `make release-tag`
-- Own: The version-bump commit `Release X.Y.Z` sets the version in every manifest of the repository and renames `## Unreleased` of each changelog to `## X.Y.Z`.
+- Own: The version-bump commit `Release X.Y.Z` sets the version in every manifest that `config/release.json` releases and in the binding packages, which `binding scaffold` writes again from the version of the core, updates `Cargo.lock` with cargo, and renames `## Unreleased` of each changelog to `## X.Y.Z`.
   Enforced by: none; judged at review.
-- Own: The Go tag `legacy/packages/go/vX.Y.Z` is created with `vX.Y.Z` on the same commit.
+- Own: A Go module tag is created with `vX.Y.Z` on the same commit for each Go module of `config/release.json`; it names none while the legacy Go module keeps its last release and the Go module of the bindings is not released.
   Enforced by: `make release-tag`
 - Own: A successful run of the `ci` workflow on `main` runs `.github/workflows/release.yml`, which releases the top `## X.Y.Z` at the commit of that run when it is the version commit, or a later commit whose `## Unreleased` is empty while the version is untagged.
   Enforced by: `make release-tag`
-- Own: After the tag push, the version of the tag is in every manifest and the section `## X.Y.Z` is in `CHANGELOG.md`, then release.yml builds the archives and the Python wheel and creates the GitHub Release.
+- Own: After the tag push, the version of the tag is in every manifest that `config/release.json` releases and the section `## X.Y.Z` is in `CHANGELOG.md`, then release.yml builds the archives and the Python wheel and creates the GitHub Release.
   Enforced by: none, judged at review.
 - Own: A package that pins a package of another repository names only a tag that exists on GitHub. The pin is written after that tag is pushed.
   Enforced by: none, judged at review.

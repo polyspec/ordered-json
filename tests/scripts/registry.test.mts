@@ -106,3 +106,18 @@ test('the packages follow the polyspec naming convention and each Cargo package 
   // git grep exits with 1 when nothing matches.
   assert.deepEqual([old.status, old.stdout, old.stderr], [1, '', '']);
 });
+
+// docs/spec/json-contract.md#transition: the legacy packages keep their last release, and the root package.json and
+// composer.json, which name them, are the manifests of the development checkout. No release publishes them: the root
+// package.json is private, and config/release.json releases neither root manifest, so a version bump leaves them alone.
+test('no release publishes the legacy packages through the root manifests', () => {
+  /** The member `key` of the JSON object `value`, or undefined. */
+  const member = (value: unknown, key: string): unknown => (typeof value === 'object' && value !== null ? Object.entries(value).find(([name]) => name === key)?.[1] : undefined);
+  const manifest: unknown = JSON.parse(readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+  assert.equal(member(manifest, 'private'), true, 'the root package.json is private');
+  const release: unknown = JSON.parse(readFileSync(path.join(ROOT, 'config/release.json'), 'utf8'));
+  for (const file of ['package.json', 'composer.json']) {
+    assert.equal(member(member(release, 'manifests'), file), undefined, `config/release.json releases ${file}`);
+    assert.equal(typeof member(member(release, 'notReleased'), file), 'string', `config/release.json names ${file} among the manifests that no release publishes`);
+  }
+});

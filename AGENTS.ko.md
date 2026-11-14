@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 960e8da322b44abcbb4a8605ca1d0db695f41ef2fcde81b24ab2f525cbbab483 -->
+<!-- source-sha256: b7a63b1fbd84810fadbf2c1afd33175e60680d19c3c65d61ec1351f13993af61 -->
 # Development procedure
 
 [English](AGENTS.md)
@@ -83,13 +83,13 @@
 
 - Own: release는 `main`의 commit에 붙인 tag이며, 그 commit의 `ci` workflow 실행은 job `kit / required`가 통과한 성공으로 끝났어야 합니다. tag는 release workflow가 만들며, 손으로 tag를 만들거나 옮기거나 push하지 않습니다.
   Enforced by: `make release-tag`
-- Own: version-bump commit `Release X.Y.Z`는 저장소의 모든 manifest에 version을 설정하며, 각 changelog의 `## Unreleased`를 `## X.Y.Z`로 바꿉니다.
+- Own: version-bump commit `Release X.Y.Z`는 `config/release.json`이 release하는 모든 manifest와, `binding scaffold`가 코어의 version으로 다시 쓰는 바인딩 패키지에 version을 설정하고, `Cargo.lock`을 cargo로 갱신하며, 각 changelog의 `## Unreleased`를 `## X.Y.Z`로 바꿉니다.
   Enforced by: none; 검토에서 판단합니다.
-- Own: Go tag `legacy/packages/go/vX.Y.Z`는 같은 commit에 `vX.Y.Z`와 함께 만들어집니다.
+- Own: Go 모듈 tag는 `config/release.json`의 Go 모듈마다 같은 commit에 `vX.Y.Z`와 함께 만들어집니다. legacy Go 모듈이 마지막 release에 머물고 바인딩의 Go 모듈이 release되지 않는 동안 그 목록은 비어 있습니다.
   Enforced by: `make release-tag`
 - Own: `main`에서 `ci` workflow 실행이 성공하면 `.github/workflows/release.yml`이 실행되며, 이 workflow는 그 실행의 commit이 version commit이거나, version에 tag가 없고 `## Unreleased`가 비어 있는 그 뒤의 commit일 때 그 commit에 최상위 `## X.Y.Z`를 릴리스합니다.
   Enforced by: `make release-tag`
-- Own: tag push 뒤 모든 manifest에 tag의 version이 있고 `CHANGELOG.md`에 `## X.Y.Z` 절이 있으며, 그다음 release.yml이 archive와 Python wheel을 빌드하고 GitHub Release를 만듭니다.
+- Own: tag push 뒤 `config/release.json`이 release하는 모든 manifest에 tag의 version이 있고 `CHANGELOG.md`에 `## X.Y.Z` 절이 있으며, 그다음 release.yml이 archive와 Python wheel을 빌드하고 GitHub Release를 만듭니다.
   Enforced by: none, 검토에서 판단합니다.
 - Own: 다른 저장소의 패키지를 고정하는 패키지는 GitHub에 실제로 존재하는 tag만 이름으로 적습니다. 고정은 그 tag를 push한 뒤에 씁니다.
   Enforced by: none, 검토에서 판단합니다.
