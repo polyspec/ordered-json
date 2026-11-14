@@ -70,3 +70,20 @@ test('the full suite checks the form of every crate with cargo fmt', () => {
   assert.ok(variable(text, 'CHECK_TARGETS').includes('fmt-check'), 'CHECK_TARGETS names fmt-check');
   assert.deepEqual(recipe(text, 'fmt-check'), ['$(CARGO) fmt --all --check']);
 });
+
+/** The dry run of the make target `target` of the root Makefile: its exit status and the commands that make would run. */
+function dryRun(target: string): { status: number | null; output: string } {
+  const run = spawnSync('make', ['-n', '--no-print-directory', '-C', ROOT, target], { encoding: 'utf8', env: { ...process.env, LC_ALL: 'C' } });
+  return { status: run.status, output: `${run.stdout}${run.stderr}` };
+}
+
+// A fresh checkout has no node_modules, so the bootstrap of kit that make install-tools TOOLS=npm runs is not there, and an
+// npm of another release refuses the checkout, whose devEngines names its npm (EBADDEVENGINES). make bootstrap installs the
+// lock with the npm release of devEngines.packageManager, which npm exec runs outside the checkout with --prefix.
+test('make bootstrap installs the lock with the npm of devEngines', () => {
+  const { status, output } = dryRun('bootstrap');
+  assert.equal(status, 0, `the Makefile defines bootstrap:\n${output}`);
+  assert.match(output, /devEngines\.packageManager\.version/, 'the recipe reads the npm release of devEngines.packageManager');
+  assert.match(output, /exec --yes --package="npm@\$version" -- npm --prefix "\$root" ci --ignore-scripts/, 'the recipe runs npm ci --ignore-scripts with that release');
+  assert.match(output, /npm_config_cache="\$root\/var\/bootstrap\/npm-cache"/, 'the npm cache of the bootstrap is in var/bootstrap of the checkout');
+});

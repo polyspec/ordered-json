@@ -204,6 +204,18 @@ python-parse-budget:
 	$(PYTHON) benchmarks/python-parse/run.py
 
 # ---- The recipes of the bootstrap and the installs, which run the utilities of the installed kit --------------------------
+# The npm that devEngines of package.json names installs the lock, @polyspec/kit included, before the tools of the checkout
+# exist, since install-tools TOOLS=npm runs the bootstrap of the installed kit. It runs outside the checkout with --prefix,
+# since an npm of another release refuses a folder whose devEngines names npm 12.2.0 (EBADDEVENGINES); npm reads
+# allow-remote of the .npmrc of the checkout. It reads that release with the Node.js of the machine, BOOTSTRAP_NODE, since
+# the node of var/tools is not installed yet. A fresh checkout runs make bootstrap, make install-tools TOOLS=npm and
+# make install-packages, then make install.
+.PHONY: bootstrap
+BOOTSTRAP_NPM := $(abspath $(shell command -v npm))
+bootstrap: ## Install package-lock.json with the npm of devEngines before the tools of the checkout exist; ONLINE
+	root="$$PWD"; version="$$($(BOOTSTRAP_NODE) -p 'require("./package.json").devEngines.packageManager.version')"; \
+	cd "$${TMPDIR:-/tmp}" && $(ONLINE) npm_config_cache="$$root/var/bootstrap/npm-cache" "$(BOOTSTRAP_NPM)" exec --yes --package="npm@$$version" -- npm --prefix "$$root" ci --ignore-scripts
+
 .PHONY: install-kit install-tools install-packages install-link kit-install-declared kit-install-symbols toolchain-lock python-venv
 # install-kit installs, in order, the mise, node and npm of mise.toml, the packages of package-lock.json, the other tools of
 # mise.toml and the symbol extractors of config/toolchain.json, all into var/tools of this checkout.

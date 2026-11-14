@@ -1,5 +1,5 @@
 <!-- doc-id: development -->
-<!-- source-sha256: 8418354d9b60430f21e56df3b017c9c6d0818ab0b738569a596739d5ba0a12b7 -->
+<!-- source-sha256: 960e8da322b44abcbb4a8605ca1d0db695f41ef2fcde81b24ab2f525cbbab483 -->
 # Development procedure
 
 [English](AGENTS.md)
@@ -121,7 +121,7 @@
   Enforced by: none, 검토에서 판단합니다.
 - Own: 어떤 명령도 도구를 필요할 때 설치하지 않습니다. Node.js, Rust, Go, Python, PHP, npm은 추적 파일이 고정합니다. Go, Python, Composer와 mise가 설치하는 다른 도구는 `mise.toml`의 정확한 release이며 `mise.lock`의 digest로 잠깁니다. PHP는 `.php-version`의 minor release로 고정합니다. install target을 제외한 모든 명령은 cargo, go, npm, Composer를 offline으로 실행하므로, 누락된 다운로드는 `make install`을 실행하라는 메시지와 함께 실패합니다.
   Enforced by: none, 검토에서 판단합니다: kit 0.0.77이 toolchain check를 제거했고(K854), mise.toml과 mise.lock의 고정은 install-tools가 읽습니다.
-- Own: 다운로드하는 것은 `make install-tools TOOLS=npm`, `make install-packages`, `make install`뿐입니다. 첫 번째는 npm을, 두 번째는 `package-lock.json`의 패키지를 설치하며, `make install`은 `mise.lock`의 도구, Rust toolchain, root `Cargo.lock`의 crate를 설치하며, PIE PHAR와 보충 suite는 `mise.toml`의 tool `http:pie`와 `http:jsontestsuite`입니다.
+- Own: 다운로드하는 것은 `make bootstrap`, `make install-tools TOOLS=npm`, `make install-packages`, `make install`뿐입니다. 새 checkout은 이 순서로 실행합니다: `make install-tools TOOLS=npm`이 실행하는 bootstrap은 설치된 kit의 파일이므로, `make bootstrap`이 먼저 `devEngines.packageManager`의 npm release를 checkout 밖에서 실행해 `@polyspec/kit`을 포함한 `package-lock.json`을 설치합니다. 첫 번째는 npm을, 두 번째는 `package-lock.json`의 패키지를 설치하며, `make install`은 `mise.lock`의 도구, Rust toolchain, root `Cargo.lock`의 crate를 설치하며, PIE PHAR와 보충 suite는 `mise.toml`의 tool `http:pie`와 `http:jsontestsuite`입니다.
   Enforced by: none, 검토에서 판단합니다: Cargo.lock의 crate는 cargo의 상태이며, make target은 그것을 lock과 비교할 수 없습니다(K864).
 - Own: 테스트는 자기가 만든 출력만 읽고 추적되지 않은 상태에 의존하지 않습니다. record, 문서 검사, 공통 사례, build copy는 Git이 추적하는 파일을 읽으며, 각 실행은 자기 run directory와 자기 `CARGO_TARGET_DIR`로 빌드합니다.
   Enforced by: `make json-test-scripts`
